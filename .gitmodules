@@ -1,0 +1,3 @@
+[submodule "htmlbook"]
+	path = htmlbook
+	url = https://github.com/RussTedrake/htmlbook
