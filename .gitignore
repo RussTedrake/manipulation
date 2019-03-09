@@ -1,0 +1,14 @@
+*.aux
+*.log
+*.pyc
+.idea/
+build/
+examples/
+*/.ipynb_checkpoints
+venv
+
+cmake-build-debug/
+
+\.DS_Store
+
+src/jupyter_setup\.py
