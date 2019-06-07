@@ -39,9 +39,9 @@
 <section data-type="titlepage" class="titlepage">
   <header>
     <h1><a href="manipulation.html"
-           style="text-decoration:none;">Intelligent Robot Manipulation
+    style="text-decoration:none;">Open-World Robot Manipulation
     </a></h1>
-    <p data-type="subtitle">Algorithms for Perception, Planning, and
+    <p data-type="subtitle">A Systems Theory Perspective on Perception, Planning, and
       Control</p>
   	<p style="font-size: 18px;"><a href="http://people.csail.mit.edu/russt/">Russ Tedrake</a></p>
     <p style="font-size: 14px; text-align: right;">
@@ -106,15 +106,38 @@ MIT</a>. They will be updated throughout the Fall 2019 semester. </p>
 
 <section id="preface"><h1>Preface</h1>
 
+  <p>my path: walking, uavs, ... (l4DC almost intro?)  Grew from one ambitious about the promise and elegance of learning...  but was exposed to and grew into the more mature and rigorous thinking in controls.</p>
+
+  <p>I'm now focused on manipulation because...</p>
+
+  <p>Data clearly has an immensely important role to play... (discussion slides from L4DC).  A pure learning approach is like sending our newborns out to play with the wolves.  Models and simulation just need to provide a sufficiently rich sand-box.  And it definitely seems short-sighted to bet against simulation.</p>
 
 </section> <!-- end preface -->
 
 <section data-type="chapter" class="chapter" id="intro">
-<h1>The Anatomy of a Manipulation System</h1>
-
-  <section data-type="sect1"><h1>Simulation</h1></section>
+  <h1>The Challenges and Opportunities of "Open-World" Manipulation</h1>
 
 </section> <!-- end chapter (intro)-->
+
+<section data-type="chapter" class="chapter" id="systems">
+  <h1>A Systems Theoretic Approach</h1>
+
+  <blockquote>It's precisely <i>because</i> the problem is so complex that we take a rigorous approach.</blockquote>
+
+  <p>We could draw this sort of diagram for many modern manipulation systems — they are often composed of numerous modules that communicate with eg IPC.  But i am going to demand a bit more of our models.  Explixitly declare their state, their parameters (just the ones that we would like to tune/analyze automatically), and any randomness.  This opens the door for more mature approaches to testing and verification, and ultimately for synthesis.  But it is surprisingly rare in robotics today. </p>
+
+  <p>Probably don’t have to convince anyone about the value of the modularity.  Might have to convince about the value of declaring state, etc.  it will be a rexurring theme in this book.</p>
+  
+  <p>Using a drake system in your favorite ipc stack is easy.  We also make provisions for going the other way — taking your black-box component and using it in the systems framework.  But this limits which algorithms we can use on it.</p>
+
+  <p>Idea: perception spoof.  Same input/output, mich simpler dynamics.  Ground truth + noise + dropouts.</p>
+
+  <p>Runtime monitoring, system id, etc</p>
+
+  <p>One thing that we’ll leave out is humans.  It’s not that i don’t like humans, but we have enough to do here without trying to model them.  Let’s call it future work.  The one exception is when we talk about control of the arm — a few simple heuristics at this level can make the robots much safer if operating around humans.  The robot won’t understand them, but we want to make sure we still don’t hurt them.  Or other robots/agents in the scene.</p>
+
+</section> <!-- end chapter (systems)-->
+  
 
 <section data-type="chapter" class="chapter" id="hardware">
   <h1>Manipulation Hardware</h1>
