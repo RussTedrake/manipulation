@@ -39,7 +39,7 @@
 <section data-type="titlepage" class="titlepage">
   <header>
     <h1><a href="manipulation.html"
-    style="text-decoration:none;">Open-World Robot Manipulation
+    style="text-decoration:none;">Intelligent Robot Manipulation
     </a></h1>
     <p data-type="subtitle">A Systems Theory Perspective on Perception, Planning, and
       Control</p>
@@ -106,16 +106,44 @@ MIT</a>. They will be updated throughout the Fall 2019 semester. </p>
 
 <section id="preface"><h1>Preface</h1>
 
-  <p>my path: walking, uavs, ... (l4DC almost intro?)  Grew from one ambitious about the promise and elegance of learning...  but was exposed to and grew into the more mature and rigorous thinking in controls.</p>
+  <p>I've always loved robots, but it's only relatively recently that I've
+  turned my attention to robotic manipulation.  I love dynamics, and the idea of
+  building robots that can master the physics of their world to achieve
+  human/animal-like dexterity and agility.  It was
+  <a
+  href="http://underactuated.mit.edu/underactuated.html?chapter=intro">passive
+  dynamic walkers</a> and the <a
+  href="http://underactuated.mit.edu/underactuated.html?chapter=simple_legs">beautiful
+  analysis that accompanies them</a> that first helped cement this centrality of
+  dynamics in my view of the world and my approach to robotics.  From there I
+  became fascinated with (experimental) fluid dynamics, and the idea that birds
+  with articulated wings actually "manipulate" the air to achieve incredible
+  efficiency and agility. Humanoid robots and fast-flying aerial vehicles in
+  clutter forced me to start thinking more deeply about the role of perception
+  in dynamics and control.  Now I believe that this interplay between perception
+  and dynamics is truly fundamental, and I love the fact that relatively
+  "simple" problems in manipulation (how do I button up my dress shirt?) expose
+  it beautifully.</p>
 
-  <p>I'm now focused on manipulation because...</p>
+  <p>My approach to controlling these robots has always been very computational/algorithmic.  I started out using tools primarily from machine learning (especially reinforcement learning) to develop the control systems for simple walking machines; but as the robots and tasks got more complex I turned to more sophisticated tools from model-based and optimization-based control.  In my view, no other discipline has though so deeply about dynamics, and the algorithmic efficiency and guaranteed performance/robustness that can be obtained by the best model-based control algorithms far surpasses what we can do today with learning control.  Unfortunately, the mathematical maturity of controls-related research has also led the field to be relatively conservative in their problem formulations... and so far robotic manipulation breaks the stack.  For example, robust control typically traffics in dynamics that are smooth and uncertainty that can be represented by e.g. ellipsoidal or polytopic sets; but in robotic manipulation we must deal with the non-smooth mechanics of contact and uncertainty the comes from varied lighting conditions, and different numbers of objects with unknown geometry and dynamics.  In practice, no state-of-the-art robotic manipulation system to date uses rigorous control theory to design even the low-level feedback that determines when a robot makes and breaks contact with the objects it is manipulating.  An explicit goal of these notes is to try to change that.</p>
 
   <p>Data clearly has an immensely important role to play... (discussion slides from L4DC).  A pure learning approach is like sending our newborns out to play with the wolves.  Models and simulation just need to provide a sufficiently rich sand-box.  And it definitely seems short-sighted to bet against simulation.</p>
 
 </section> <!-- end preface -->
 
 <section data-type="chapter" class="chapter" id="intro">
-  <h1>The Challenges and Opportunities of "Open-World" Manipulation</h1>
+  <h1>Introduction</h1>
+
+  <section data-type="sect1"><h1>Manipulation is more than Pick-and-Place</h1></section>
+
+    <p>Motivating example: <a href="http://www.shap.ecs.soton.ac.uk/">South Hampton Assessment Procedure (SHAP)</a></p>
+
+  <section data-type="sect1"><h1>Open-World Manipulation</h1>
+  
+    <p>The challenge.</p>
+
+    <p>Might it actually make the problem easier?  (Diversity changes the optimization landscape).</p>
+  </section>
 
 </section> <!-- end chapter (intro)-->
 
