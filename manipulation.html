@@ -107,34 +107,115 @@ MIT</a>. They will be updated throughout the Fall 2019 semester. </p>
 <section id="preface"><h1>Preface</h1>
 
   <p>I've always loved robots, but it's only relatively recently that I've
-  turned my attention to robotic manipulation.  I love dynamics, and the idea of
-  building robots that can master the physics of their world to achieve
+  turned my attention to robotic manipulation.  I particularly like the
+  challenge of building robots that can master physics to achieve
   human/animal-like dexterity and agility.  It was
   <a
   href="http://underactuated.mit.edu/underactuated.html?chapter=intro">passive
-  dynamic walkers</a> and the <a
-  href="http://underactuated.mit.edu/underactuated.html?chapter=simple_legs">beautiful
-  analysis that accompanies them</a> that first helped cement this centrality of
-  dynamics in my view of the world and my approach to robotics.  From there I
-  became fascinated with (experimental) fluid dynamics, and the idea that birds
-  with articulated wings actually "manipulate" the air to achieve incredible
-  efficiency and agility. Humanoid robots and fast-flying aerial vehicles in
-  clutter forced me to start thinking more deeply about the role of perception
-  in dynamics and control.  Now I believe that this interplay between perception
-  and dynamics is truly fundamental, and I love the fact that relatively
+  dynamic walkers</a> and the beautiful analysis that accompanies them that
+  first helped cement this centrality of dynamics in my view of the world and my
+  approach to robotics.  From there I became fascinated with (experimental)
+  fluid dynamics, and the idea that birds with articulated wings actually
+  "manipulate" the air to achieve incredible efficiency and agility. Humanoid
+  robots and fast-flying aerial vehicles in clutter forced me to start thinking
+  more deeply about the role of perception in dynamics and control.  Now I
+  believe that this interplay between perception and dynamics is truly
+  fundamental, and I am passionate about the observation that relatively
   "simple" problems in manipulation (how do I button up my dress shirt?) expose
-  it beautifully.</p>
+  the problem beautifully.</p>
 
-  <p>My approach to controlling these robots has always been very computational/algorithmic.  I started out using tools primarily from machine learning (especially reinforcement learning) to develop the control systems for simple walking machines; but as the robots and tasks got more complex I turned to more sophisticated tools from model-based and optimization-based control.  In my view, no other discipline has though so deeply about dynamics, and the algorithmic efficiency and guaranteed performance/robustness that can be obtained by the best model-based control algorithms far surpasses what we can do today with learning control.  Unfortunately, the mathematical maturity of controls-related research has also led the field to be relatively conservative in their problem formulations... and so far robotic manipulation breaks the stack.  For example, robust control typically traffics in dynamics that are smooth and uncertainty that can be represented by e.g. ellipsoidal or polytopic sets; but in robotic manipulation we must deal with the non-smooth mechanics of contact and uncertainty the comes from varied lighting conditions, and different numbers of objects with unknown geometry and dynamics.  In practice, no state-of-the-art robotic manipulation system to date uses rigorous control theory to design even the low-level feedback that determines when a robot makes and breaks contact with the objects it is manipulating.  An explicit goal of these notes is to try to change that.</p>
+  <p>My approach to programming robots has always been very
+  computational/algorithmic.  I started out using tools primarily from machine
+  learning (especially reinforcement learning) to develop the control systems
+  for simple walking machines; but as the robots and tasks got more complex I
+  turned to more sophisticated tools from model-based planning and
+  optimization-based control.  In my view, no other discipline has thought so
+  deeply about dynamics as has control theory, and the algorithmic efficiency
+  and guaranteed performance/robustness that can be obtained by the best
+  model-based control algorithms far surpasses what we can do today with
+  learning control.  Unfortunately, the mathematical maturity of
+  controls-related research has also led the field to be relatively conservative
+  in their assumptions and problem formulations; the requirements for robotic
+  manipulation break these assumptions.  For example, robust control typically
+  assumes that dynamics that are (nearly) smooth and uncertainty that can be
+  represented by e.g. ellipsoidal or polytopic sets; but in robotic manipulation
+  we must deal with the non-smooth mechanics of contact and uncertainty the
+  comes from varied lighting conditions, and different numbers of objects with
+  unknown geometry and dynamics.  In practice, no state-of-the-art robotic
+  manipulation system to date (that I know of) uses rigorous control theory to
+  design even the low-level feedback that determines when a robot makes and
+  breaks contact with the objects it is manipulating.  An explicit goal of these
+  notes is to try to change that.</p>
 
-  <p>Data clearly has an immensely important role to play... (discussion slides from L4DC).  A pure learning approach is like sending our newborns out to play with the wolves.  Models and simulation just need to provide a sufficiently rich sand-box.  And it definitely seems short-sighted to bet against simulation.</p>
+  <p>In the past few years, deep learning has had an unquestionable impact on robotic perception, unblocking some of the most daunting challenges in performing manipulation outside of a laboratory or factory environment.  We will discuss relevant tools from deep learning for object recognition, segmentation, pose/keypoint estimation, and even shape completion.  Now relatively old approaches to learning control are also enjoying an incredible surge in popularity, fueled in part by massive computing power and increasingly available robot hardware and simulators.  Unlike learning for perception, learning control algorithms are still far from a technology, with some of the most impressive looking results still being hard to understand and to reproduce.  But the recent work in this area has unquestionably highlighted the pitfalls of the conservatism taken by the controls community. Learning researchers are boldly formulating much more aggressive and exciting problems for robotic manipulation than we have seen before -- in many cases we are realizing that some manipulation tasks are actually quite easy, but in other cases we are finding problems that are still fundamentally hard.
+  </p>
+
+  <p>Finally, it feels that the time is ripe for robotic manipulation to have a real and dramatic impact in the world, in fields from logistics to home robots.  Over the last few years, we've seen UAVs/drones transition from academic curiousities into consumer products; autonomous cars have been transitioning from academic research to industry now, at least in terms of dollars invested.  Manipulation feels like the next big thing that will transition from robotic research to practice. It's still a bit risky for a venture capitalist to invest in, but nobody doubts the size of the market once we have the technology.  How lucky are we to potentially be able to play a role in that transition?</p>
+
+  <p>So this is where the notes begin... we are at an incredible crossroads between learning and control and robotics with an opportunity to have immediate impact in industrial and consumer applications and potentially even to forge entirely new eras for systems theory and controls.  I'm just trying to hold on and to enjoy the ride.</p>
+
+<!---
+    <p>Data clearly has an immensely important role to play... (discussion slides from L4DC).  A pure learning approach is like sending our newborns out to play with the wolves.  Models and simulation just need to provide a sufficiently rich sand-box.  And it definitely seems short-sighted to bet against simulation.</p>
+-->
 
 </section> <!-- end preface -->
 
 <section data-type="chapter" class="chapter" id="intro">
   <h1>Introduction</h1>
 
+  <p>It's worth taking time to appreciate just how amazingly well humans are
+  able to perform tasks with our hands.  Tasks that often feel mundane to us --
+  loading the dishwasher, chopping vegetables, folding laundry -- remain as
+  incredibly challenging tasks for robots and are at the very forefront of
+  robotics research.</p>
+  
+  <todo>Add a diagram / photo of a the dish task here?</todo>
+
+  <p>Consider the problem of picking up a single plate from a stack of plates in
+  the sink and placing it into the dishwasher.  Clearly you first have to
+  perceive that there is a plate in the sink and that this it is accessible.
+  Getting your hand to the plate likely requires navigating your hand around the
+  geometry of the sink and other dishes, and the act of actually picking it up
+  might require a fairly subtle maneuver where you have to tip up the plate, sliding it along your fingers and along the sink/dishes in order to get a reasonable grasp on it.  Presumably as you lift it out of the sink, you'd like to mostly avoid collisions between the plate and the sink, which suggests a reasonable understanding of the size/extent of the plate (though note that robots tend to avoid collisions much more than robots do).  Even setting it down into the dishwasher is pretty subtle; you might think that you would align the plate with the slats and then slide it in, but I think humans are more clever than that.  A seemingly better strategy is to loosen your grip on the plate, come in at an angle and intentionally contact one side of the slat... letting the plate effectively rotate itself into position as you set it down.  But the justification for this strategy is subtle -- it is a way to achieve the kinematically accurate task without requiring much kinematic accuracy on the position/orientation of the plate.</p>
+
+  <todo>insert video of TRI dish pickup here</todo>
+
+  <p>Perhaps one of the reasons that these problems remain so hard is that they
+  require strong capabilities in numerous technical areas that have
+  traditionally been somewhat disparate -- it's hard to be an expert in all of
+  them.  More so than robotic mapping and navigation, or legged locomotion, or
+  other great areas in robotics, the most interesting problems in manipulation
+  require significant interactions between perception, planning, and control.
+  This includes both geometric perception to understand the local geometry of
+  the objects and environment, but also semantic perception to understand what
+  opportunities for manipulation are avaiable in the scene. Planning typically
+  includes both reasoning about the kinematic constraints of the task (how to I
+  command my rigid seven degree-of-freedom arm to reach into the drawer?) as
+  well as higher-level task planning (to get milk into my cup, I need to open
+  the fridge, then grab the bottle, then unscrew the lid, then pour.. and
+  perhaps even put it all back) that require understanding these kinematic
+  constraints as well as the higher level task semantics.  And the lowest level,
+  our hands are making and breaking contact with the world either directly or
+  through tools, exerting forces, rapidly and easily transitioning between
+  sticking and sliding frictional regimes -- these are incredible rich and
+  difficult problems from the perspective of dynamics and control.</p>
+
   <section data-type="sect1"><h1>Manipulation is more than Pick-and-Place</h1></section>
+
+    <p>There are a large number of applications for manipulation.  Picking up an
+    object from one bin and placing it into another bin -- one version of the
+    famous "pick and place" problem -- is a great application for robotic 
+    manipulation.  And it is an application for which we already have pretty
+    capable solutions, especially if the location/orientation of the placement
+    need not be very accurate.  The recent advances in computer vision for
+    object recognition make it very useful for a wide variety of industry
+    applications: a camera can look into a bin and find an object of interest,
+    then use a relatively simple strategy to do the pick.  This can be done with
+    conventional robot hands or more special-purpose hands that are equipped
+    with suction.  It can often be done without having a very accurate understanding of the shape, pose, mass, nor friction of the object(s) to be picked.</p>
+
+    <p>The goal for these notes, however, is to examine the much broader view of
+    manipulation that we is captured by the pick and place problem.  Even our thought experiment of loading the dishwasher -- arguably a more advanced type of pick and place -- requires much more from the perception, planning, and control systems.  But the diversity of tasks that humans (and hopefully soon robots) can do with their hands is truly remarkable.</p>
 
     <p>Motivating example: <a href="http://www.shap.ecs.soton.ac.uk/">South Hampton Assessment Procedure (SHAP)</a></p>
 
