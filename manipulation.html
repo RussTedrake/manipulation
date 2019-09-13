@@ -200,6 +200,8 @@ MIT</a>. They will be updated throughout the Fall 2019 semester. </p>
   sticking and sliding frictional regimes -- these are incredible rich and
   difficult problems from the perspective of dynamics and control.</p>
 
+  <todo>k-PAM?  Pete+Lucas imitation learning?</todo>
+
   <!-- two core research problems (that I like to focus on): 1) there are many tasks that we don't know how to program a robot to do robustly even in a single instance in lab (reach into your pocket and pull out the keys); 2) achieving robustness of a complete manipulation stack in the open-world. -->
 
   <section data-type="sect1"><h1>Manipulation is more than Pick-and-Place</h1></section>
@@ -291,17 +293,79 @@ MIT</a>. They will be updated throughout the Fall 2019 semester. </p>
 <section data-type="chapter" class="chapter" id="pose">
   <h1>Geometric Perception I: Pose Estimation and Tracking</h1>
 
-  <section data-type"sect1"><h1>Depth Sensors</h1>
+  <section data-type="sect1"><h1>Depth Sensors</h1>
   
     <p>Primarily RGB-D (ToF vs projected texture stereo vs ...) cameras and Lidar</p>
 
-    <p>The cameras we are using in this course are Intel RealSense D415....</p>
-  
+    <p>The cameras we are using in this course are <a href="https://software.intel.com/en-us/realsense/d400">Intel RealSense D415</a>....</p>
+
+    <section data-type="sect2"><h1>Simulation</h1>
+    
+      <p>There are a number of levels of fidelity at which one can simulate a depth camera.  We'll start our discussion here using an "ideal" depth camera simulation -- the pixels returned represent the true geometric depth in the direction of each pixel coordinate.  In <drake></drake> that is represented by the <code>RgbdSensor</code> system, which can be wired up directly to the <code>SceneGraph</code>.</p>
+
+      <table align="center" cellpadding="0" cellspacing="0">
+        <tr align="center">
+        <td><table cellspacing="0" cellpadding="0">
+        <tr>
+        <td align="right" style="padding:5px 0px 5px 0px">geometry_query &rarr;</td></tr>
+        </table>
+        </td><td align="center" style="border:solid;padding-left:20px;padding-right:20px" bgcolor="#F0F0F0"><a class="el" href="https://drake.mit.edu/doxygen_cxx/classdrake_1_1systems_1_1sensors_1_1_rgbd_sensor.html" title="A meta-sensor that houses RGB, depth, and label cameras, producing their corresponding images based o...">RgbdSensor</a></td><td><table cellspacing="0" cellpadding="0">
+        <tr>
+        <td align="left" style="padding:5px 0px 5px 0px">&rarr; color_image </td></tr>
+        <tr>
+        <td align="left" style="padding:5px 0px 5px 0px">&rarr; depth_image_32f </td></tr>
+        <tr>
+        <td align="left" style="padding:5px 0px 5px 0px">&rarr; depth_image_16u </td></tr>
+        <tr>
+        <td align="left" style="padding:5px 0px 5px 0px">&rarr; label_image </td></tr>
+        <tr>
+        <td align="left" style="padding:5px 0px 5px 0px">&rarr; X_WB </td></tr>
+        </table>
+        </td></tr>
+        </table>
+
+        <todo>Maybe simple visualization of the manipulation station with the camera using RgbdSensor's show_window = true?</todo>
+
+        <p>Real sensors, of course, are far from ideal -- and errors in depth returns are not simple Gaussian noise, but rather are dependent on the lighting conditions, the surface normals of the object, and the visual material properties of the object, among other things.  We will examine real point clouds, and higher fidelity simulation models of the depth cameras, after we start understanding some of the basic operations.</p>
+    </section>
   </section> 
 
   <section data-type="sect1"><h1>Working with Point Clouds</h1>
-  
-    <p>We'll use <a href="http://www.open3d.org/">Open3D</a> (note that many older projects used <a href="http://pointclouds.org/">PCL</a>, which is now defunct).</p>
+
+    <p>The data returned by a depth camera takes the form of an image, with the distance between the camera and the nearest object in the environment for each pixel.  If we combine this with the basic information about the intrisic (e.g. lens distortion parameters) and extrinsic (e.g. it's position and orientation in space) parameters of the camera, then we can interpret this depth image as a collection of points in three dimensions.  This is an extremely useful representation, called the <i>point cloud representation</i>, and as depth sensors have become so pervasive the field has built up libraries of tools for performing basic goemetric operations that are specialized for operating on point clouds.  In these notes, we'll use the <a href="http://www.open3d.org/">Open3D</a> library (note that many older projects used <a href="http://pointclouds.org/">PCL</a>, which is now defunct).</p>
+
+    <p>First, let us get a few simulated point clouds out of <drake></drake> to work with.  <drake></drake> has another useful system to help with the conversion:</p>
+
+    <table align="center" cellpadding="0" cellspacing="0">
+      <tr align="center">
+      <td><table cellspacing="0" cellpadding="0">
+      <tr>
+      <td align="right" style="padding:5px 0px 5px 0px">depth_image &rarr; </td></tr>
+      <tr>
+      <td align="right" style="padding:5px 0px 5px 0px">color_image (optional) &rarr; </td></tr>
+      <tr>
+      <td align="right" style="padding:5px 0px 5px 0px">camera_pose (optional) &rarr;</td></tr>
+      </table>
+      </td><td align="center" style="border:solid;padding-left:20px;padding-right:20px" bgcolor="#F0F0F0"><a class="el" href="http://drake.mit.edu/doxygen_cxx/classdrake_1_1perception_1_1_depth_image_to_point_cloud.html" title="Converts a depth image to a point cloud.">DepthImageToPointCloud</a></td><td><table cellspacing="0" cellpadding="0">
+      <tr>
+      <td align="left" style="padding:5px 0px 5px 0px">&rarr; point_cloud </td></tr>
+      </table>
+      </td></tr>
+    </table>
+
+    <p>You can infer from the optional input ports on this system that point cloud representations can potentially include color values for each of the Cartesian points.  The following example will get us a few point clouds to work with.</p>
+
+    <div data-type="example"><h1>Getting a simulated point cloud</h1>
+
+      <p>Here is a minimal example of generating a point clooud in drake and rendering it in the meshcat visualizer.</p>
+
+      <pysrc>first_point_cloud.py</pysrc>
+
+    </div>
+
+    <todo>Combine all point clouds via https://drake.mit.edu/pydrake/pydrake.systems.perception.html?highlight=pointcloud#pydrake.systems.perception.PointCloudConcatenation</todo>
+
+    <p>It's important to realize that the conversion of a depth image into a point cloud does loose some information -- specifically the information about the ray that was cast from the camera to arrive at that point.  In addition to declaring "there is geometry at this point", the depth image also implies that "there is no geometry in the straight line path between camera and this point".  We will make use of this information in some of our algorithms, so don't discard the depth images completely!</p>
 
     <section data-type="sect2"><h1>Plane Fitting and Normal
     Estimation</h1></section>
