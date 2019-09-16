@@ -35,10 +35,18 @@ def DepthCameraDemoSystem():
   properties = DepthCameraProperties(width=640, height=480, fov_y=np.pi/4.0, renderer_name=renderer, z_near=0.1, z_far=10.0)
   camera = builder.AddSystem(RgbdSensor(parent_id=scene_graph.world_frame_id(),
     X_PB=pose, properties=properties, show_window=False))
+  camera.set_name("rgbd_sensor")
   builder.Connect(scene_graph.get_query_output_port(),   
     camera.query_object_input_port())
 
+  # Export the camera outputs
   builder.ExportOutput(camera.color_image_output_port(), "color_image")
   builder.ExportOutput(camera.depth_image_32F_output_port(), "depth_image")
 
-  return builder.Build()
+  # Add a system to convert the camera output into a point cloud
+  
+  # Export the point cloud output.
+
+  diagram = builder.Build()
+  diagram.set_name("depth_camera_demo_system")
+  return diagram
