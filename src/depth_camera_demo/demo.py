@@ -7,7 +7,7 @@ from pydrake.geometry.render import (
 from pydrake.math import RigidTransform, RollPitchYaw
 from pydrake.multibody.parsing import Parser
 from pydrake.multibody.plant import AddMultibodyPlantSceneGraph
-from pydrake.perception import DepthImageToPointCloud
+from pydrake.perception import BaseField, DepthImageToPointCloud
 from pydrake.systems.framework import DiagramBuilder
 from pydrake.systems.sensors import RgbdSensor
 
@@ -46,8 +46,9 @@ def DepthCameraDemoSystem():
   builder.ExportOutput(camera.depth_image_32F_output_port(), "depth_image")
 
   # Add a system to convert the camera output into a point cloud
-  to_point_cloud = builder.AddSystem(DepthImageToPointCloud(camera.depth_camera_info()))
+  to_point_cloud = builder.AddSystem(DepthImageToPointCloud(camera_info=camera.depth_camera_info(), fields=BaseField.kXYZs |BaseField.kRGBs))
   builder.Connect(camera.depth_image_32F_output_port(), to_point_cloud.depth_image_input_port()) 
+  builder.Connect(camera.color_image_output_port(), to_point_cloud.color_image_input_port())
 
   # Export the point cloud output.
   builder.ExportOutput(to_point_cloud.point_cloud_output_port(), "point_cloud")

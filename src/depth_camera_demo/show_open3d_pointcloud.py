@@ -12,5 +12,6 @@ point_cloud = system.GetOutputPort("point_cloud").Eval(context)
 
 pcd = o3d.geometry.PointCloud()
 pcd.points = o3d.utility.Vector3dVector(point_cloud.xyzs().T)
+pcd.colors = o3d.utility.Vector3dVector(point_cloud.rgbs().T)
 
 o3d.visualization.draw_geometries([pcd])
