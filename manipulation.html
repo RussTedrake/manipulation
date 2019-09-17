@@ -301,7 +301,7 @@ MIT</a>. They will be updated throughout the Fall 2019 semester. </p>
 
     <section data-type="sect2"><h1>Simulation</h1>
     
-      <p>There are a number of levels of fidelity at which one can simulate a depth camera.  We'll start our discussion here using an "ideal" depth camera simulation -- the pixels returned represent the true geometric depth in the direction of each pixel coordinate.  In <drake></drake> that is represented by the <code>RgbdSensor</code> system, which can be wired up directly to the <code>SceneGraph</code>.</p>
+      <p>There are a number of levels of fidelity at which one can simulate a camera like the D415.  We'll start our discussion here using an "ideal" depth camera simulation -- the pixels returned represent the true geometric depth in the direction of each pixel coordinate.  In <drake></drake> that is represented by the <code>RgbdSensor</code> system, which can be wired up directly to the <code>SceneGraph</code>.</p>
 
       <table align="center" cellpadding="0" cellspacing="0">
         <tr align="center">
@@ -324,17 +324,47 @@ MIT</a>. They will be updated throughout the Fall 2019 semester. </p>
         </td></tr>
         </table>
 
-        <todo>Maybe simple visualization of the manipulation station with the camera using RgbdSensor's show_window = true?</todo>
+        <div data-type="example"><h1>Simulating an RGB-D Camera</h1>
 
-        <p>Real sensors, of course, are far from ideal -- and errors in depth returns are not simple Gaussian noise, but rather are dependent on the lighting conditions, the surface normals of the object, and the visual material properties of the object, among other things.  We will examine real point clouds, and higher fidelity simulation models of the depth cameras, after we start understanding some of the basic operations.</p>
+          <p>As a simple example of depth cameras in drake, I've constructed a scene with a single object (the mustard bottle from the <a href="https://github.com/RobotLocomotion/models/tree/master/ycb">YCB dataset</a>), and added an <code>RgbdSensor</code> to the diagram.  Once this is wired up, we can simply evaluate the output ports in order to obtain the color and depth images:</p>
+    
+          <pysrc>depth_camera_demo/show_camera.py</pysrc>
+    
+          <p>Remember that, in addition to looking at the source code if you like, you can always inspect the block diagram to understand what is happen at the "systems level":</p>
+
+          <pysrc>depth_camera_demo/show_diagram.py</pysrc>
+
+          <p>(Note that these demos need to have the <code>demo.py</code> file that lives in the same directory to run).  <todo>Fix this!</todo></p>
+        </div>
+    
+        <p>In the <code>ManipulationStation</code> simulation of the entire robot system for class, the <code>RgbdSensors</code> have already been added.  <a href="https://drake.mit.edu/doxygen_cxx/classdrake_1_1examples_1_1manipulation__station_1_1_manipulation_station.html">You can see image output ports for each of the cameras are already exported as output ports for the station.</a> </p>
+        
+        <p>Real depth sensors, of course, are far from ideal -- and errors in depth returns are not simple Gaussian noise, but rather are dependent on the lighting conditions, the surface normals of the object, and the visual material properties of the object, among other things.  We will examine real sensor data, and higher fidelity simulation models of the depth cameras, after we start understanding some of the basic operations.</p>
+
+        <p>Please also note that, although the depth output of the RgbdSensor is ideal, this sensor also outputs a color image.  It's much harder to talk about an ideal color image, as colors change with material properties and lighting conditions (including reflections and shadows).  In the example above, I've told drake to just use the simplest OpenGL-based renderer.  But <drake></drake> does support a number of more advanced rendering options that we will leverage in the chapters on "deep perception", which make significantly more use of the RGB channels.</p>
     </section>
   </section> 
 
+  <section data-type="sect1"><h1>Representations for Geometry</h1>
+    
+    <p>Depth image, point cloud, triangulated mesh, signed distance functions, (+ surfels, occupancy maps, ...)</p>
+
+    <p>The data returned by a depth camera takes the form of an image, where each pixel value is a single number that represents the distance between the camera and the nearest object in the environment along the pixel direction.  If we combine this with the basic information about the camera's intrisic (e.g. lens parameters) and extrinsic (e.g. position and orientation in space) parameters of the camera, then we can transform this <i>depth image representation</i> into a collection of points in three dimensions, called the <i>point cloud representation</i>.  As depth sensors have become so pervasive the field has built up libraries of tools for performing basic goemetric operations operate on point clouds, and that can be used to transform back and forth between representations.  In these notes, we'll use the <a href="http://www.open3d.org/">Open3D</a> library (note that many older projects used the <a href="http://pointclouds.org/">Point Cloud Library (PCL)</a>, which is now defunct but still has some very useful documentation).</p>
+
+    <div data-type="example"><h1>Getting RGB-D values into Open3D</h1>
+
+      <p>Here the the mustard bottle example again, but this time we push the images coming out of <drake></drake> into the Open3D representation:</p>
+
+      <pysrc>depth_camera_demo/show_open3d_rgbd.py</pysrc>
+    </div>
+
+    <p>It's important to realize that the conversion of a depth image into a point cloud does loose some information -- specifically the information about the ray that was cast from the camera to arrive at that point.  In addition to declaring "there is geometry at this point", the depth image also implies that "there is no geometry in the straight line path between camera and this point".  We will make use of this information in some of our algorithms, so don't discard the depth images completely!  More generally, we will find that each of the different geometry representations have strengths and weaknesses -- it is very common to keep multiple representations around and to convert back and forth between them.</p>
+
+  </section>
+
   <section data-type="sect1"><h1>Working with Point Clouds</h1>
 
-    <p>The data returned by a depth camera takes the form of an image, with the distance between the camera and the nearest object in the environment for each pixel.  If we combine this with the basic information about the intrisic (e.g. lens distortion parameters) and extrinsic (e.g. it's position and orientation in space) parameters of the camera, then we can interpret this depth image as a collection of points in three dimensions.  This is an extremely useful representation, called the <i>point cloud representation</i>, and as depth sensors have become so pervasive the field has built up libraries of tools for performing basic goemetric operations that are specialized for operating on point clouds.  In these notes, we'll use the <a href="http://www.open3d.org/">Open3D</a> library (note that many older projects used <a href="http://pointclouds.org/">PCL</a>, which is now defunct).</p>
-
-    <p>First, let us get a few simulated point clouds out of <drake></drake> to work with.  <drake></drake> has another useful system to help with the conversion:</p>
+    <p>First, let us get a few simulated point clouds to work with.  We can use either <drake></drake> or Open3d to convert the depth image into a point cloud; we'll use Drake for this step here simply because we already have the camera parameters in the Drake format.  Although we can call the conversion functions directly, we can also add a system that does the conversion for us in the systems framework:</p>
 
     <table align="center" cellpadding="0" cellspacing="0">
       <tr align="center">
@@ -357,37 +387,65 @@ MIT</a>. They will be updated throughout the Fall 2019 semester. </p>
 
     <div data-type="example"><h1>Getting a simulated point cloud</h1>
 
-      <p>Here is a minimal example of generating a point clooud in drake and rendering it in the meshcat visualizer.</p>
-
-      <pysrc>depth_camera_demo/show_camera.py</pysrc>
+      <p>TODO: render the point cloud in either meshcat or open3d</p>
 
     </div>
 
     <todo>Combine all point clouds via https://drake.mit.edu/pydrake/pydrake.systems.perception.html?highlight=pointcloud#pydrake.systems.perception.PointCloudConcatenation</todo>
 
-    <p>It's important to realize that the conversion of a depth image into a point cloud does loose some information -- specifically the information about the ray that was cast from the camera to arrive at that point.  In addition to declaring "there is geometry at this point", the depth image also implies that "there is no geometry in the straight line path between camera and this point".  We will make use of this information in some of our algorithms, so don't discard the depth images completely!</p>
-
     <todo>Show the point cloud in Open3D's visualizer</todo>
 
-    <section data-type="sect2"><h1>Plane Fitting and Normal
-    Estimation</h1></section>
+    There are a number of basic operations that one can do on point clouds.  I'll give just a few examples here.  
+
+    <section data-type="sect2"><h1>Surface Normal Estimation</h1>
+    
+      <p>The simplest and most straight-forward algorithm for estimating the normals of a point cloud surface is to find the $k$ nearest neighbors, and fit a plane through those points using least-squares.  Let's denote the nominal point (about which we are estimating the normal) $p_0$, and it's $k$ nearest neighboard $p_i, i\in[1,k].$  Let us form the $k \times 3$ data matrix: $$X = [ p_1 - p_0, p_2 - p_0, ..., p_k - p_0 ].$$  Then the principal components of this data matrix are given by the <a href="https://en.wikipedia.org/wiki/Singular_value_decomposition">singular value decomposition</a> of $X$ (or the eigenvectors of $X^T X$); if $X = U\Sigma V^T$, then the columns of $V$ are the principal directions, with the last column (associated with the smallest singular value) representing the normal direction.  The length can be normalized to one; but keep in mind that the sign of this vector is ambiguous -- the $k$ nearest points don't give any information about what direction might be into the object or out of the object.  This is a case where knowing the original camera direction can help -- for example, PCL offers a method <code>flipNormalTowardsViewpoint</code> that post-processes the normals.</p>
+
+      <figure>
+        <img src="http://www.pointclouds.org/assets/images/contents/documentation/features_normal.png" />
+
+        <figcaption>Normal estimation using $k$ nearest neighbords (image linked from the <a href="http://docs.pointclouds.org/trunk/group__features.html"></a>PCL documentation</a>)</figcaption>
+      </figure>
+
+      <todo>Add an example; or even support normals in the DepthImageToPointCloud.  Example could be as simple as grabbing one point from the mustard point cloud, and finding it's normal (with everything plotted in matplotlib).</todo>
+
+      <p>What was interesting and surprising (to me) about this is not that the least-squares solution works.  What is surprising is that this operation is considered commonplace and cheap -- for every point in the point cloud, we find $k$ nearest neighbors and do the normal estimation... even for very large point clouds.  Making this performant typically requires data structures like the <a href="https://en.wikipedia.org/wiki/K-d_tree">k-d tree</a> to make the nearest neighbor queries efficient.</p>
+
+      <p>Another standard feature that can be extracted from the $k$ nearest neighbors is the local curvature.  The math is quite similar.  <todo>add it here</todo></p>
+
+    </section>
+
+    <section data-type="sect2"><h1>Plane Fitting</h1>
+    
+    </section>
 
   </section>
 
   <section data-type="sect1"><h1>Iterative Closest Point (ICP)</h1>
   
     <todo>Add a simple example and a homework problem/exercise.</todo>
+
+    <todo>Normal ICP</todo>
+
+    <section data-type="sect2"><h1>Coherent Point Drift (CPD)</h1>
+
+    </section>
+  
+    <section data-type="sect2"><h1>FilterReg</h1>
+  
+    </section>
   
   </section>
 
-  <section data-type="sect1"><h1>Coherent Point Drift (CPD)</h1>
-
-    <section data-type="sect2"><h1>FilterReg</h1></section>
+  <section data-type="sect1"><h1>Pose estimation as Inverse Kinematics</h1>
+  
+    <p>Dense articulated real-time tracking (DART).</p>
 
   </section>
 
-  <section data-type="sect1"><h1>Dense Articulated Real-Time Tracking
-  (DART)</h1></section>
+  <section data-type="sect1"><h1>Tracking</h1>
+  
+  </section>
 
 </section>
 
