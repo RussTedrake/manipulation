@@ -431,11 +431,14 @@ MIT</a>. They will be updated throughout the Fall 2019 semester. </p>
 
     <section data-type="sect2"><h1>Iterative Closest Point (ICP)</h1>
 
-      <todo>Insert simple figure here, of model points and scene points.</todo>
-
       <p>One of the famous and often used (despite it's well-known limitations) is the interative closest point algorithm.  We'll start with the simplest version of it -- where instead of localizing a mesh model to the point cloud data, we will try localize two point clouds relative to each other. This is commonly referred to as "point-to-point ICP", "point cloud registration", or the "point correspondence problem".</p>
 
-      <p>Let us denote the points on our model as $m_i \in M$, and the points obtained from our sensor as $s_i \in S$.  Even when we are assuming our point clouds are ideal (noise free), we will have a number of challenges: there is no reason to expect every point in $M$ to appear in $S$ (e.g., because our camera is viewing just one side of the object, or may be partially occluded), and there is no reason to believe that every element in $S$ corresponds to one of the points in $M$ (there may be other objects in the scene).  So a major task in ICP is to attempt to solve this <i>correspondence</i> problem.  But before we do, let us understand the case where the correspondences are magically given -- specifically we will assume that for every point of interest in the scene, $s_i$, we have a map $C$ such that $c_i$ is the index into the list of model points -- so $s_i$ corresponds with $m_{c_i}$.  Once these are given, our task is to recover the rigid body transformation that describes the relative pose of the model in the scene: \[ \min_{R \in SO(3), t \in R^3} \sum_i^N \| Rs_i + t - m_{c_i} \|^2, \] where $R$ is 3x3 rotation matrix and $t$ is a 3x1 translation vector.  At first glance, this looks like a nice optimization problem -- the decision variables $R$ and $t$ enter linearly in the inside term, so it is almost another simple least-squares problem. The trick is the constraint that $R$ must be a rotation matrix.  Therefore, we could equivalently have written \begin{align*} \min_{R \in R^{3x3}, t \in R^3} && \sum_i^N \| Rs_i + t - m_{c_i} \|^2, \\ \subjto && R^T = R^{-1}, \det(R) = 1. \end{align*} Surprisingly, if we ignore the determinant constraint, then this seeming difficult (quadratically constrainted quadratic program) has a clean numerical solution -- once again given (once again) by SVD.  Define the mean model and scene points $$\bar{m} = \frac{1}{N} \sum_i^N m_{c_i}, \qquad \bar{s} = \frac{1}{N} \sum_i^N s_i.$$  Compose the data matrix $$W = \sum_i (m_{c_i} - \bar{m}) (s_i - \bar{s})^T, $$ and use SVD to compute $W = U \Sigma V^T$.  Magically, the optimal solution is \begin{gather*} R^* = U V^T, \\ 
+      <figure>
+        <img src="figures/ICP_cartoon.jpg" width="80%"/>
+        <figcaption>Model points and scene points.</figcaption>
+      </figure>
+
+      <p>Let us denote the points on our model as $m_i \in M$, and the points obtained from our sensor as $s_i \in S$.  Even when we are assuming our point clouds are ideal (noise free), we will have a number of challenges: there is no reason to expect every point in $M$ to appear in $S$ (e.g., because our camera is viewing just one side of the object, or may be partially occluded), and there is no reason to believe that every element in $S$ corresponds to one of the points in $M$ (there may be other objects in the scene).  So a major task in ICP is to attempt to solve this <i>correspondence</i> problem.  But before we do, let us understand the case where the correspondences are magically given -- specifically we will assume that for every point of interest in the scene, $s_i$, we have a map $C$ such that $c_i$ is the index into the list of model points -- so $s_i$ corresponds with $m_{c_i}$.  Once these are given, our task is to recover the rigid body transformation that describes the relative pose of the model in the scene: \[ \min_{R \in SO(3), t \in \mathbb{R}^3} \sum_i^N \| Rs_i + t - m_{c_i} \|^2, \] where $R$ is 3x3 rotation matrix and $t$ is a 3x1 translation vector.  At first glance, this looks like a nice optimization problem -- the decision variables $R$ and $t$ enter linearly in the inside term, so it is almost another simple least-squares problem. The trick is the constraint that $R$ must be a rotation matrix.  Therefore, we could equivalently have written \begin{align*} \min_{R \in \mathbb{R}^{3x3}, t \in \mathbb{R}^3} && \sum_i^N \| Rs_i + t - m_{c_i} \|^2, \\ \subjto && R^T = R^{-1}, \det(R) = 1. \end{align*} Surprisingly, if we ignore the determinant constraint, then this seeming difficult (quadratically constrainted quadratic program) has a clean numerical solution -- once again given (once again) by SVD.  Define the mean model and scene points $$\bar{m} = \frac{1}{N} \sum_i^N m_{c_i}, \qquad \bar{s} = \frac{1}{N} \sum_i^N s_i.$$  Compose the data matrix $$W = \sum_i (m_{c_i} - \bar{m}) (s_i - \bar{s})^T, $$ and use SVD to compute $W = U \Sigma V^T$.  Magically, the optimal solution is \begin{gather*} R^* = U V^T, \\ 
       t^* = \bar{m} - R \bar{s}.\end{gather*} There many derivations available in the literature, see <elib>Haralick89</elib> (section 3) for one of my favorites.  What is important for us to understand is that, once the correspondences are given, then we have an efficient and robust numerical solution to estimating the pose.</p>
 
       <p>Let us now consider the other half of the problem.  What if the pose, given by $R$ and $t$, was known... then can we back out the optimal correspondences?  If we aim to maximize our reconstruction objective, then the optimal correspondences are given by $$c_i = \argmin_{j \in N_m}\| R s_i + t - m_{c_j} \|^2,$$  where $N_m$ is the number of model points.  In words, we want to find the point in the model that is the closest in Euclidean distance to the transformed scene points.  This is the famous "nearest neighbor" problem, and we have good numerical solutions (often using the aforementioned special data structures) for it.</p>
@@ -444,23 +447,23 @@ MIT</a>. They will be updated throughout the Fall 2019 semester. </p>
 
       <p>It is important to understand that this is a local solution to a non-convex optimization problem.  So it is subject to getting stuck in local minima.  Thanks to the geometric nature of the problem, many of these local minima are graphical and intuitive.  (Will insert a few examples here). </p>
 
-      <p>Intuition about these local minima has motivated a number of ICP variants, include point to plane ICP, normal ICP, ICP that use color information, etc.</p>
+      <p>Intuition about these local minima has motivated a number of ICP variants, include point to plane ICP, normal ICP, ICP that use color information, feature-based ICP, etc.</p>
 
-      <p>Maybe more fundamental, though, is the fact that I don't think the ICP objective, even if we could optimize it perfectly is quite right.  (TODO: add the example of a long thin book).</p>
+      <p>Maybe more fundamental, though, is the fact that I don't think the ICP objective, even if we could optimize it perfectly is quite right.  (TODO: add the example of a long thin book).  And there is information that we have, which should aid in estimating the pose, which is not present in the point cloud (like the location of the cameras).</p>
     
     </section>
 
     <todo>Add a simple example and a homework problem/exercise.</todo>
 
 
-    <section data-type="sect2"><h1>Coherent Point Drift (CPD) and FilterReg</h1>
-
-    </section>
-  
     <section data-type="sect2"><h1>Pose estimation as Inverse Kinematics</h1>
   
       <p>Dense articulated real-time tracking (DART).</p>
   
+    </section>
+  
+    <section data-type="sect2"><h1>Coherent Point Drift (CPD) and FilterReg</h1>
+
     </section>
   
     <section data-type="sect2"><h1>Global registration</h1>
