@@ -27,8 +27,8 @@
       src="htmlbook/MathJax/MathJax.js?config=TeX-AMS_HTML">
     </script>
 
-    <link rel="stylesheet" href="highlight/styles/default.css">
-    <script src="highlight/highlight.pack.js"></script> <!-- http://highlightjs.readthedocs.io/en/latest/css-classes-reference.html#language-names-and-aliases -->
+    <link rel="stylesheet" href="htmlbook/highlight/styles/default.css">
+    <script src="htmlbook/highlight/highlight.pack.js"></script> <!-- http://highlightjs.readthedocs.io/en/latest/css-classes-reference.html#language-names-and-aliases -->
     <script>hljs.initHighlightingOnLoad();</script>
 
     <link rel="stylesheet" type="text/css" href="htmlbook/book.css">
@@ -285,11 +285,6 @@ MIT</a>. They will be updated throughout the Fall 2019 semester. </p>
 
 </section>
 
-<section data-type="chapter" class="chapter" id="kinematics">
-  <h1>Kinematics and Dynamics</h1>
-
-</section>
-
 <section data-type="chapter" class="chapter" id="pose">
   <h1>Geometric Perception I: Pose Estimation and Tracking</h1>
 
@@ -324,7 +319,7 @@ MIT</a>. They will be updated throughout the Fall 2019 semester. </p>
         </td></tr>
         </table>
 
-        <div data-type="example"><h1>Simulating an RGB-D Camera</h1>
+        <div data-type="example" class="drake"><h1>Simulating an RGB-D Camera</h1>
 
           <p>As a simple example of depth cameras in drake, I've constructed a scene with a single object (the mustard bottle from the <a href="https://github.com/RobotLocomotion/models/tree/master/ycb">YCB dataset</a>), and added an <code>RgbdSensor</code> to the diagram.  Once this is wired up, we can simply evaluate the output ports in order to obtain the color and depth images:</p>
     
@@ -351,7 +346,7 @@ MIT</a>. They will be updated throughout the Fall 2019 semester. </p>
 
     <p>The data returned by a depth camera takes the form of an image, where each pixel value is a single number that represents the distance between the camera and the nearest object in the environment along the pixel direction.  If we combine this with the basic information about the camera's intrisic (e.g. lens parameters) and extrinsic (e.g. position and orientation in space) parameters of the camera, then we can transform this <i>depth image representation</i> into a collection of points in three dimensions, called the <i>point cloud representation</i>.  As depth sensors have become so pervasive the field has built up libraries of tools for performing basic goemetric operations operate on point clouds, and that can be used to transform back and forth between representations.  In these notes, we'll use the <a href="http://www.open3d.org/">Open3D</a> library (note that many older projects used the <a href="http://pointclouds.org/">Point Cloud Library (PCL)</a>, which is now defunct but still has some very useful documentation).</p>
 
-    <div data-type="example"><h1>Getting RGB-D values into Open3D</h1>
+    <div data-type="example" class="drake"><h1>Getting RGB-D values into Open3D</h1>
 
       <p>Here the the mustard bottle example again, but this time we push the images coming out of <drake></drake> into the Open3D representation:</p>
 
@@ -385,9 +380,9 @@ MIT</a>. They will be updated throughout the Fall 2019 semester. </p>
 
     <p>You can infer from the optional input ports on this system that point cloud representations can potentially include color values for each of the Cartesian points.  The following example will get us a few point clouds to work with.</p>
 
-    <div data-type="example"><h1>Getting a simulated point cloud</h1>
+    <div data-type="example" class="drake"><h1>Getting a simulated point cloud</h1>
 
-      <p>TODO: render the point cloud in either meshcat or open3d</p>
+      <pysrc>depth_camera_demo/show_open3d_pointcloud.py</pysrc>
 
     </div>
 
@@ -602,8 +597,134 @@ MIT</a>. They will be updated throughout the Fall 2019 semester. </p>
 
 <appendix class="part" title="Appendix">
 
+  <section data-type="chapter" class="chapter" id="drake"><h1>Drake</h1>
+
+    <p>The <drake></drake> website is the main source for information and
+    documentation.  This goal of this chapter provide a few specific pointers
+    and recommended workflows to get you up and running quickly with the
+    examples provided in these notes.</p>
+  
+  
+    <p><b>NOTE: If you are taking the MIT class, we have provided a Docker
+    workflow for you to make sure you are kept up to date week by week.  Do NOT
+    use the instructions below.  <a
+    href="http://manipulation.csail.mit.edu/install_drake_docker.html">Follow
+    these instructions instead.</a></b></p>
+  
+    <div style="height:30px"></div>
+  
+    <p>First, pick your platform (click on your OS):</p>
+  
+    <p style="text-align:center">
+    <span class="bionic">
+      <b>Ubuntu Linux (Bionic)</b>  |
+      <span onclick="setPlatform('mac');" style="text-decoration:underline;cursor:pointer">Mac Homebrew</span>
+    </span>
+    <span class="mac">
+      <span onclick="setPlatform('bionic');"
+            style="text-decoration:underline;cursor:pointer">Ubuntu Linux
+        (Bionic)</span>  |
+      <b>Mac Homebrew</b> </span></p>
+  
+    <section data-type="sect1"><h1>Install Drake</h1>
+  
+      <p>Although I hope that power users will build <drake></drake> from source
+      (and contribute back), I recommend using the precompiled binaries to get
+      started.  The links below indicate the specific distributions that the
+      examples in this text have been tested against.</p>
+  
+      <section data-type="sect2"><h1>Download the binaries</h1>
+  
+        <div class="bionic"><pre class="highlight"><code>curl -o drake.tar.gz <div id="drake-bionic-binaries" style="display:inline">https://drake-packages.csail.mit.edu/drake/nightly/drake-latest-bionic.tar.gz</div></code></pre></div>
+  
+        <div class="mac"><pre class="highlight"><code>curl -o drake.tar.gz <div id="drake-mac-binaries" style="display:inline">https://drake-packages.csail.mit.edu/drake/nightly/drake-latest-mac.tar.gz</div></code></pre></div>
+  
+      </section>
+  
+      <section data-type="sect2"><h1>Unpack and set your PYTHONPATH and Test</h1>
+  
+        <div class="bionic"><pre class="highlight"><code>sudo tar -xvzf drake.tar.gz -C /opt
+sudo /opt/drake/share/drake/setup/install_prereqs
+export PYTHONPATH=/opt/drake/lib/python3.6/site-packages:${PYTHONPATH}
+  
+python3 -c 'import pydrake; print(pydrake.__file__)</code></pre></div>
+  
+        <div class="mac"><pre class="highlight"><code>sudo tar -xvzf drake.tar.gz -C /opt
+/opt/drake/share/drake/setup/install_prereqs
+export PYTHONPATH=/opt/drake/lib/python3.7/site-packages:${PYTHONPATH}
+export PATH=/usr/local/opt/python/libexec/bin:${PATH}
+  
+python3 -c 'import pydrake; print(pydrake.__file__)</code></pre></div>
+      </section>
+  
+      <section data-type="sect2"><h1>See Also</h1>
+  
+        <p>There are a number of <a href="https://nbviewer.jupyter.org/github/RobotLocomotion/drake/tree/master/tutorials/">tutorials</a> in <drake></drake> that can help you get started.</p>
+  
+      </section>
+  
+    </section>
+  
+    <section data-type="sect1"><h1>Download the textbook supplement</h1>
+  
+      <div><pre class="highlight"><code>git clone https://github.com/RussTedrake/manipulation.git</code></pre></div>
+  
+      <p>and install the prerequisites using the platform-specific installation script provided:</p>
+  
+      <div class="bionic"><pre class="highlight"><code>sudo manipulation/scripts/setup/ubuntu/18.04/install_prereqs
+export PYTHONPATH=`pwd`/manipulation/src:${PYTHONPATH}</code></pre></div>
+  
+      <div class="mac"><pre class="highlight"><code>manipulation/scripts/setup/mac/install_prereqs
+export PYTHONPATH=`pwd`/manipulation/src:${PYTHONPATH}</code></pre></div>
+  
+    </section>
+  
+    <section data-type="sect1"><h1>Run a textbook example</h1>
+  
+      <p>Note: All of the examples in the textbook supplement currently assume
+      that working directory of your python interpreter is the
+      <code>manipulation/src</code> directory.</p>
+  
+        <pysrc>depth_camera_demo/show_camera.py</pysrc>
+  
+    </section>
+  
+    <!--
+    <section data-type="sect1"><h1>Consider Jupyter Notebook</h1>
+  
+      <p>The examples you'll find throughout the text are provided so that
+      they can be run in any python interpreter.  However, many people
+      <i>love</i> the <a href="http://jupyter.org/">Jupyter Notebook</a>
+      workflow, and the code should work for you there, as well.</p>
+  
+      <p><a href="src/double_pendulum/simulate.ipynb">Here is an example</a> that
+      shows you how to tell <code>matplotlib</code> to perform well in the
+      notebook (including with animations).</p>
+  
+      <jupyter>double_pendulum/simulate.ipynb</jupyter>
+  
+    </section>
+-->  
+    <div style="height:30px"></div>
+  
+    <todo>
+      Docker?
+      
+      Troubleshooting.
+    </todo>
+  
+    <section data-type="sect1"><h1>Listing of <drake></drake> examples throughout this text</h1>
+  
+      <p>The best overview we have for the remaining capabilities in <drake></drake> are the main chapters of these notes.  For convenience, here is a list of software examples that are sprinkled throughout the text:</p>
+  
+      <div id="list_of_drake_examples"><center>Coming soon!</center></div>
+  
+    </section>
+  
+  </section> <!-- end chapter on drake -->
+
   <section data-type="chapter" class="chapter" id="v_and_v">
-    <h1>Robot Kinematics</h1>
+    <h1>Robot Kinematics and Dynamics</h1>
 
     <p>Pose / Rigid Transform.  Rotation matrices, Euler angles, quaternions. </p>
 
