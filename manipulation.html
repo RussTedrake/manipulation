@@ -644,13 +644,13 @@ MIT</a>. They will be updated throughout the Fall 2019 semester. </p>
       <section data-type="sect2"><h1>Unpack and set your PYTHONPATH and Test</h1>
   
         <div class="bionic"><pre class="highlight"><code>sudo tar -xvzf drake.tar.gz -C /opt
-sudo /opt/drake/share/drake/setup/install_prereqs
+sudo /opt/drake/share/drake/setup/install_prereqs.sh
 export PYTHONPATH=/opt/drake/lib/python3.6/site-packages:${PYTHONPATH}
   
 python3 -c 'import pydrake; print(pydrake.__file__)</code></pre></div>
   
         <div class="mac"><pre class="highlight"><code>sudo tar -xvzf drake.tar.gz -C /opt
-/opt/drake/share/drake/setup/install_prereqs
+/opt/drake/share/drake/setup/install_prereqs.sh
 export PYTHONPATH=/opt/drake/lib/python3.7/site-packages:${PYTHONPATH}
 export PATH=/usr/local/opt/python/libexec/bin:${PATH}
   
@@ -671,10 +671,10 @@ python3 -c 'import pydrake; print(pydrake.__file__)</code></pre></div>
   
       <p>and install the prerequisites using the platform-specific installation script provided:</p>
   
-      <div class="bionic"><pre class="highlight"><code>sudo manipulation/scripts/setup/ubuntu/18.04/install_prereqs
+      <div class="bionic"><pre class="highlight"><code>sudo manipulation/setup/ubuntu/install_prereqs.sh
 export PYTHONPATH=`pwd`/manipulation/src:${PYTHONPATH}</code></pre></div>
   
-      <div class="mac"><pre class="highlight"><code>manipulation/scripts/setup/mac/install_prereqs
+      <div class="mac"><pre class="highlight"><code>manipulation/setup/mac/install_prereqs.sh
 export PYTHONPATH=`pwd`/manipulation/src:${PYTHONPATH}</code></pre></div>
   
     </section>
