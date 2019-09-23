@@ -481,10 +481,33 @@ MIT</a>. They will be updated throughout the Fall 2019 semester. </p>
 <section data-type="chapter" class="chapter" id="planning">
   <h1>Basic Planning and Control</h1>
 
-  <section data-type="sect1"><h1>Task-space control</h1></section>
+  <!--
+    Control topics:
+    Tracking a joint-space trajectory
+      Robot dynamics - friction, etc.
+      UR-10 vs IIWA vs Baxter
+      Position control vs torque control (linkages, direct drive robots story)
+      challenge: Unkown mass of the object.
+      PD Control.  Inverse dynamics control.  (any material from slotine?  adaptive?  sliding mode?)  deluca "dynamic control of a single axis" http://www.diag.uniroma1.it/~deluca/rob1_en/16_DynamicControlSingleAxis.pdf
+      Spong model of elastic joints (deluca showed a video in his RSS talk)
+        exact gravity cancellation - https://www.youtube.com/watch?v=tKSCn2gN7Ks&t=9960s
+      Maybe -- planar IIWA sdf from andres? (how well does it render in matplotlib)
+    Tracking an end-effector trajectory
+      Differential IK (in drake)
+      Force control
+      Operation-space control
+      Hybrid Control
+      Impedance control
+      Remote compliance (http://manipulation.csail.mit.edu/lecture_notes/Lec7.pdf)
+      Estimating contact location -- contact particle filter, etc.
+        haddadin videos (e.g. http://www.diag.uniroma1.it/~deluca/IIT_Seminar_Jan23_2019_ADL.pdf)
+      De Luca pHRI
+        https://www.youtube.com/playlist?list=PLvAUmIzqq6oaRtwX9l9sjDhcNMXNCGSN0
+  -->
 
-  <section
-          data-type="sect1"><h1>Kinematic trajectory optimization</h1></section>
+  <section data-type="sect1"><h1>Kinematic trajectory optimization</h1></section>
+
+  <section data-type="sect1"><h1>Task-space control</h1></section>
 
   <section data-type="sect1"><h1>Key-point formulations</h1></section>
 
