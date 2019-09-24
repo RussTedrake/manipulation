@@ -479,8 +479,20 @@ MIT</a>. They will be updated throughout the Fall 2019 semester. </p>
 
 </section>
 
-<section data-type="chapter" class="chapter" id="planning">
-  <h1>Basic Planning and Control</h1>
+<section data-type="chapter" class="chapter" id="control">
+  <h1>Manipulator Control</h1>
+
+  <section data-type="sect1"><h1>Position-controlled robots</h1>
+
+    <figure>
+      <img height=200px src="https://www.robots.com/images/robots/Universal/Universal_UR10_0002.jpg" />
+      <img height=200px src="https://www07.abb.com/api/ir/getimage/36fb710b-54e0-4e53-8383-aacde553ec56/1" />
+      <figcaption>Two popular position controlled manipulators.  (Left) The UR10 from Universal Robotics.  (Right)The ABB Yumi.</figcaption>
+    </figure>
+
+    <p>Most robot arms today are "position controlled" -- given a desired joint position (or joint trajectory), the robot executes it with relatively high precision.  Let's take a moment to understand why this is such a common interface.</p>
+
+  </section>
 
   <!--
     Control topics:
@@ -490,7 +502,7 @@ MIT</a>. They will be updated throughout the Fall 2019 semester. </p>
       Position control vs torque control (linkages, direct drive robots story)
       challenge: Unkown mass of the object.
       PD Control.  Inverse dynamics control.  (any material from slotine?  adaptive?  sliding mode?)  deluca "dynamic control of a single axis" http://www.diag.uniroma1.it/~deluca/rob1_en/16_DynamicControlSingleAxis.pdf
-      Spong model of elastic joints (deluca showed a video in his RSS talk)
+      Spong model of elastic joints <elib>Spong87</elib> (deluca showed a video in his RSS talk)
         exact gravity cancellation - https://www.youtube.com/watch?v=tKSCn2gN7Ks&t=9960s
       Maybe -- planar IIWA sdf from andres? (how well does it render in matplotlib)
     Tracking an end-effector trajectory
@@ -504,13 +516,14 @@ MIT</a>. They will be updated throughout the Fall 2019 semester. </p>
         haddadin videos (e.g. http://www.diag.uniroma1.it/~deluca/IIT_Seminar_Jan23_2019_ADL.pdf)
       De Luca pHRI
         https://www.youtube.com/playlist?list=PLvAUmIzqq6oaRtwX9l9sjDhcNMXNCGSN0
-  -->
 
   <section data-type="sect1"><h1>Kinematic trajectory optimization</h1></section>
 
   <section data-type="sect1"><h1>Task-space control</h1></section>
 
   <section data-type="sect1"><h1>Key-point formulations</h1></section>
+
+  -->
 
 </section>
 
