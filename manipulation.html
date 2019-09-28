@@ -272,14 +272,56 @@ MIT</a>. They will be updated throughout the Fall 2019 semester. </p>
   <h1>Manipulation Hardware</h1>
 
   <todo>insert the manipulation station block diagram image here.</todo>
-	
-  <section data-type="sect1"><h1>Arms, Hands, Sensors, ...</h1></section>
 
-  <section data-type="sect1"><h1>Low-cost arms</h1></section>
+  <section data-type="sect1"><h1>Arms</h1>
 
-  <section data-type="sect1"><h1>Dexterous Hands</h1></section>
+    <section data-type="sect2"><h1>Position-controlled robots</h1>
 
-  <section data-type="sect1"><h1>Soft Hands/Skins</h1></section>
+      <figure>
+        <img height=200px src="https://www.robots.com/images/robots/Universal/Universal_UR10_0002.jpg" />
+        <img height=200px src="https://www07.abb.com/api/ir/getimage/36fb710b-54e0-4e53-8383-aacde553ec56/1" />
+        <figcaption>Two popular position controlled manipulators.  (Left) The UR10 from Universal Robotics.  (Right)The ABB Yumi.</figcaption>
+      </figure>
+
+      <p>Most robot arms today are "position controlled" -- given a desired joint position (or joint trajectory), the robot executes it with relatively high precision.  Do you know why (really)?  In most of our derivations, we would be happier if we could measure and control joint torque directly; if we could command torque (at sufficiently high bandwidth) then we could certainly regulate positions, too.</p>
+
+      <p>Light-weight arms like the example above are actuated with electric motors.  For a reasonably high-quality electric motor (with windings designed to minimize torque ripple, etc), we expect the torque that the motor outputs to be directly proportional to the current that we apply: $$\tau = k_{i} i,$$ where $\tau$ is the torque, $i$ is the applied current, and $k_i$ is the "motor torque constant". (Similarly, applied voltage has a simple (affine) relationship with the motor's steady-state velocity).  If we can control the current, then why can we not control the torque?
+      </p>
+
+      <p>Electric motors are most efficient at high speeds (often > 100 or 1,000 rotations per minute), but they cannot move that fast if they are loaded with the weight of an entire robot arm.  We probably don't actually want our robots to move that fast even if they could!  So nearly all electric robots have fairly substantial gear reductions, often on the order of 100:1; the transmission output turns one revolution for every 100 rotations of the motor, and the output torque is 100 times greater than the motor torque.  For a gear ratio, $n$, actuating a joint $\theta$, we have $$\theta_{motor} = n \theta,\quad \dot\theta_{motor} = n \dot\theta, \qquad \tau_{motor} = \frac{1}{n} \tau.$$  Interestingly, this has a fairly profound impact on the resulting dynamics (given by $f = ma$), even for a single joint.  Thinking only about the arm, we would write $ma = \sum f$ in the rotational coordinates as $$I \ddot\theta = \tau_{gravity} + \tau_{friction} + \tau,$$ where $I$ is the moment of inertia. For example, for a <a href="http://underactuated.mit.edu/underactuated.html?chapter=pend" target="underactuated">simple pendulum</a>, we might have have $$ml^2 \ddot\theta = \tau - mgl\sin\theta - b\dot\theta.$$</p>
+
+    </section>
+
+    <section data-type="sect2"><h1>Torque-controlled robots</h1>
+
+      <p>Direct-drive robots.  Hydraulic robots.</p>
+
+      <p>With elastic joints...</p>
+    
+
+    </section>
+
+    <section data-type="sect2"><h1>Low-cost arms</h1></section>
+
+  </section>
+
+  <section data-type="sect1"><h1>Hands</h1>
+
+    <section data-type="sect2"><h1>Simple grippers</h1></section>
+
+    <section data-type="sect2"><h1>Dexterous hands</h1></section>
+
+    <section data-type="sect2"><h1>Soft/underactuated hands</h1></section>
+
+    <section data-type="sect2"><h1>Other end-effectors</h1>
+    
+      <p>Suction, jamming grippers, tool-changers...`</p>
+
+    </section>
+
+  </section>
+
+  <section data-type="sect1"><h1>Cameras and Depth Sensors</h1></section>
 
   <section data-type="sect1"><h1>Tactile Sensors</h1></section>
 
@@ -298,7 +340,7 @@ MIT</a>. They will be updated throughout the Fall 2019 semester. </p>
 <div class="part" title="Perception">
 
 <section data-type="chapter" class="chapter" id="point_clouds">
-    <h1>Depth Cameras and Point Clouds</h1>
+    <h1>Depth Images and Point Clouds</h1>
 
 </section>
 
@@ -570,18 +612,6 @@ MIT</a>. They will be updated throughout the Fall 2019 semester. </p>
 <section data-type="chapter" class="chapter" id="manipulator">
   <h1>Manipulator Control</h1>
 
-  <section data-type="sect1"><h1>Position-controlled robots</h1>
-
-    <figure>
-      <img height=200px src="https://www.robots.com/images/robots/Universal/Universal_UR10_0002.jpg" />
-      <img height=200px src="https://www07.abb.com/api/ir/getimage/36fb710b-54e0-4e53-8383-aacde553ec56/1" />
-      <figcaption>Two popular position controlled manipulators.  (Left) The UR10 from Universal Robotics.  (Right)The ABB Yumi.</figcaption>
-    </figure>
-
-    <p>Most robot arms today are "position controlled" -- given a desired joint position (or joint trajectory), the robot executes it with relatively high precision.  Let's take a moment to understand why this is such a common interface.</p>
-
-  </section>
-
   <!--
     Control topics:
     Tracking a joint-space trajectory
@@ -627,6 +657,7 @@ MIT</a>. They will be updated throughout the Fall 2019 semester. </p>
 
   <section data-type="sect1"><h1>Planning through Contact</h1></section>
   
+  <section data-type="sect1"><h1>Visuo-Motor Policies</h1></section>
 </section>
 
 <section data-type="chapter" class="chapter" id="imitation">
