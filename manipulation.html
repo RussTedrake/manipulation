@@ -285,8 +285,25 @@ MIT</a>. They will be updated throughout the Fall 2019 semester. </p>
 
 </section>
 
+<section data-type="kinematics" class="chapter" id="kinematics"><h1>Kinematics</h1>
+
+  <p>Pose / Rigid Transform.  Rotation matrices, Euler angles, quaternions. </p>
+
+  <p>Forward kinematics, inverse kinematics, Jacobians (analytic/geometric).</p>
+
+  <!-- This is hard material to learn from text.  Have to do some simple exercises.  -->
+
+</section>
+
+<div class="part" title="Perception">
+
+<section data-type="chapter" class="chapter" id="point_clouds">
+    <h1>Depth Cameras and Point Clouds</h1>
+
+</section>
+
 <section data-type="chapter" class="chapter" id="pose">
-  <h1>Geometric Perception I: Pose Estimation and Tracking</h1>
+  <h1>Pose Estimation and Tracking</h1>
 
   <p>There is no question that deep learning has had an enormous impact in perception -- one might even say that it has enabling the current surge in manipulation advances.  And we will certainly cover it in these notes.  But when I've heard colleagues say that "all perception these days is based on deep learning", I can't help but cry foul.  There has been another surge of progress in the last few years that has been happening in parallel -- the revolution in geometric reasoning -- fueled by applications in autonomous driving and augmented reality in addition to manipulation.  Most advanced manipulation systems these days combine both "deep perception" and "geometric perception".</p>
 
@@ -479,7 +496,78 @@ MIT</a>. They will be updated throughout the Fall 2019 semester. </p>
 
 </section>
 
-<section data-type="chapter" class="chapter" id="control">
+<section data-type="chapter" class="chapter" id="fusion">
+    <h1>Dense Reconstructions</h1>
+  
+    <section data-type="sect1"><h1>Kinect Fusion</h1></section>
+  
+    <section data-type="sect1"><h1>Elastic Fusion</h1></section>
+  
+    <section data-type="sect1"><h1>SurfelWarp</h1></section>
+  
+</section>
+
+<section data-type="chapter" class="chapter" id="perception">
+    <h1>Deep Learning for Perception</h1>
+  
+    <section data-type="sect1"><h1>Getting training data</h1>
+  
+      <section data-type="sect2"><h1>LabelFusion</h1></section>
+  
+      <section data-type="sect2"><h1>Synthetic Datasets</h1></section>
+    </section>
+  
+    <section data-type="sect1"><h1>Segmentation</h1></section>
+  
+    <section data-type="sect1"><h1>Object recognition</h1></section>
+  
+    <section data-type="sect1"><h1>Pose estimation</h1></section>
+  
+    <section data-type="sect1"><h1>Keypoint Detection</h1></section>
+  
+    <section data-type="sect1"><h1>Dense Descriptors</h1></section>
+  
+  </section>
+
+</div>
+
+<div class="part" title="Planning">
+
+<section data-type="chapter" class="chapter" id="grasping">
+    <h1>Grasping</h1>
+  
+    <section data-type="sect1"><h1>Anti-podal grasps</h1></section>
+  
+    <section data-type="sect1"><h1>Grasp optimization</h1></section>
+  
+    <section data-type="sect1"><h1>Learning grasps</h1></section>
+  
+  </section>
+
+<section data-type="chapter" class="chapter" id="planning">
+    <h1>Planning in Cluttered Environments</h1>
+  
+</section>
+    
+<section data-type="chapter" class="chapter" id="belief">
+    <h1>Planning under Uncertainty</h1>
+  
+</section>
+    
+                
+<section data-type="chapter" class="chapter" id="task">
+    <h1>Programming the Task Level Execution</h1>
+
+    <section data-type="sect1"><h1>Behavior Trees</h1></section>
+
+    <section data-type="sect1"><h1>Task and Motion Planning</h1></section>
+</section>
+
+</div>
+
+<div class="part" title="Control">
+
+<section data-type="chapter" class="chapter" id="manipulator">
   <h1>Manipulator Control</h1>
 
   <section data-type="sect1"><h1>Position-controlled robots</h1>
@@ -519,12 +607,10 @@ MIT</a>. They will be updated throughout the Fall 2019 semester. </p>
 
         slotine wam ball throwing.  (have video, but here is maybe the most relevant paper? (by niemeyer) https://journals.sagepub.com/doi/pdf/10.1177/027836499101000206)
 
-        albu-schaffer impedance/admittance https://www.youtube.com/watch?time_continue=1364&v=9ZKOEw8jdxc
+        impedance control wikipedia article is great
+        https://en.wikipedia.org/wiki/Impedance_control#Joint_space
 
-        DLR arm control paper has lots of details on the hardware
-        http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.1024.5166&rep=rep1&type=pdf
-        and the control
-        https://journals-sagepub-com.libproxy.mit.edu/doi/pdf/10.1177/0278364907073776
+        
 
   <section data-type="sect1"><h1>Kinematic trajectory optimization</h1></section>
 
@@ -536,112 +622,46 @@ MIT</a>. They will be updated throughout the Fall 2019 semester. </p>
 
 </section>
 
-<section data-type="chapter" class="chapter" id="grasping">
-  <h1>Grasping</h1>
-
-  <section data-type="sect1"><h1>Anti-podal grasps</h1></section>
-
-  <section data-type="sect1"><h1>Grasp optimization</h1></section>
-
-  <section data-type="sect1"><h1>Learning grasps</h1></section>
-
-</section>
-
-<section data-type="chapter" class="chapter" id="task">
-    <h1>Programming the Task Level Execution</h1>
-
-    <section data-type="sect1"><h1>Behavior Trees</h1></section>
-
-
-</section>
-
-<section data-type="chapter" class="chapter" id="fusion">
-  <h1>Geometric Perception II: Dense Reconstructions</h1>
-
-  <section data-type="sect1"><h1>Kinect Fusion</h1></section>
-
-  <section data-type="sect1"><h1>Elastic Fusion</h1></section>
-
-  <section data-type="sect1"><h1>SurfelWarp</h1></section>
-
-</section>
-
-<section data-type="chapter" class="chapter" id="planning">
-  <h1>Planning in Cluttered Environments</h1>
-
-</section>
-
-<section data-type="chapter" class="chapter" id="perception">
-  <h1>Deep Learning for Perception</h1>
-
-  <section data-type="sect1"><h1>Getting training data</h1>
-
-    <section data-type="sect2"><h1>LabelFusion</h1></section>
-
-    <section data-type="sect2"><h1>Synthetic Datasets</h1></section>
-  </section>
-
-  <section data-type="sect1"><h1>Segmentation</h1></section>
-
-  <section data-type="sect1"><h1>Object recognition</h1></section>
-
-  <section data-type="sect1"><h1>Pose estimation</h1></section>
-
-  <section data-type="sect1"><h1>Keypoint Detection</h1></section>
-
-  <section data-type="sect1"><h1>Dense Descriptors</h1></section>
-
-</section>
-
-<section data-type="chapter" class="chapter" id="control">
-  <h1>Feedback Control</h1>
-
-</section>
-
 <section data-type="chapter" class="chapter" id="planning">
   <h1>Non-Prehensile Manipulation</h1>
 
   <section data-type="sect1"><h1>Planning through Contact</h1></section>
   
 </section>
+
+<section data-type="chapter" class="chapter" id="imitation">
+    <h1>Teleoperation and Imitation Learning</h1>
   
-<section data-type="chapter" class="chapter" id="belief">
-  <h1>Planning under Uncertainty</h1>
-
+    <!-- Not exactly sure where I want to put this, but it seems useful to have.  My current view is that this is an extremely useful set of tools for exploring the space of solutions, but probably not a final solution...  -->
+    <p>Interfaces.  Inputs (keyboard + mouse, HTC Vive, data gloves...).  Feedback (VR, haptic feedback).</p>
+  
 </section>
-
-
-<section data-type="chapter" class="chapter" id="tamp">
-  <h1>Task and Motion Planning</h1>
-
-</section>
-
+  
 <section data-type="chapter" class="chapter" id="rl">
-  <h1>Reinforcement Learning</h1>
-
+    <h1>Reinforcement Learning</h1>
+  
 </section>
+  
+  
+</div>
+
+<div class="part" title="Special Topics">
 
 <section data-type="chapter" class="chapter" id="intuitive">
     <h1>Intuitive Physics</h1>
 
 </section>
 
-<section data-type="chapter" class="chapter" id="imitation">
-  <h1>Teleoperation and Imitation Learning</h1>
-
-  <!-- Not exactly sure where I want to put this, but it seems useful to have.  My current view is that this is an extremely useful set of tools for exploring the space of solutions, but probably not a final solution...  -->
-  <p>Interfaces.  Inputs (keyboard + mouse, HTC Vive, data gloves...).  Feedback (VR, haptic feedback).</p>
-
-</section>
-
 <todo>Maybe a chapter on tactile feedback (estimation, tracking, slip detection, etc)?</todo>
 
-<section data-type="chapter" class="chapter" id="v_and_v">
+<section data-type="chapter" class="chapter" id="verification">
   <h1>Verification and Validation</h1>
 
   <p>P(world)</p>
 
 </section>
+
+</div>
 
 <appendix class="part" title="Appendix">
 
@@ -770,18 +790,6 @@ export PYTHONPATH=`pwd`/manipulation/src:${PYTHONPATH}</code></pre></div>
     </section>
   
   </section> <!-- end chapter on drake -->
-
-  <section data-type="chapter" class="chapter" id="v_and_v">
-    <h1>Robot Kinematics and Dynamics</h1>
-
-    <p>Pose / Rigid Transform.  Rotation matrices, Euler angles, quaternions. </p>
-
-    <p>Forward kinematics, inverse kinematics, Jacobians (analytic/geometric).</p>
-
-    <!-- This is hard material to learn from text.  Have to do some simple exercises.  -->
-      
-  </section>
-  
 
 </appendix>
 
