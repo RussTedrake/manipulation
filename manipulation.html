@@ -316,14 +316,15 @@ MIT</a>. They will be updated throughout the Fall 2019 semester. </p>
 
     <section data-type="sect2"><h1>Torque-controlled robots</h1>
 
-      <p>Direct-drive robots.  Hydraulic robots.</p>
+      <p>Although not as common, there are a number of robots that do support direct control of the joint torques.  There are a handful of ways that this capability can be realized.</p>  
+        
+      <p>It <i>is</i> possible to actuate a robot using electric motors that require only a small gear reduction (e.g. $\le$ 10:1) where the frictional forces are negligible.  In the past, these "direct-drive robots"<elib>Asada87</elib> had enormous motors and limited payloads.  More recently, robots like the <a href="https://robots.ieee.org/robots/wam/">Barrett WAM</a> arm used cable drives to keep the arm light keep the motors at the base.  More recently, we've seen progress in high-torque outrunner and frameless motors bringing in a new generation of low-cost, direct-drive robots: c.f. MIT Cheetah <elib>Wensing17</elib>, <a href="http://rll.berkeley.edu/blue/">Berkeley Blue</a>, and <a href="https://www.halodi.com/">Halodi Eve</a>.</p>
 
-      <p>With elastic joints...</p>
-    
+      <p>Hydraulic actuators provide another solution for generating large torques without large transmissions.  Sarcos had a series of <a href="https://www.youtube.com/watch?v=VDxWHNtZvyI">torque-controlled arms</a> (and humanoids); and many of the most famous robots from <a href="https://www.bostondynamics.com/robots">Boston Dynamics</a> are based on hydraulics (though there is an increasing trend towards electric motors).  These robots typically have a single central pump and each actuator has a (light weight) valve that can shunt fluid through the actuator or through a bypass; the differential pressure across the actuator is closely related to the resulting force/torque.</p>
+
+      <p>Another approach to torque control is to add sensors to directly measure the torque at the joint side of the actuator.  This is the approach used by the Kuka IIWA robot that we use in the example throughout this text; the IIWA actuators have <a href="https://en.wikipedia.org/wiki/Strain_gauge">strain gauges</a> integrated into the transmission.  However there is a trade-off between the stiffness of the transmission and that accuracy of the force/torque measurement -- the IIWA transmission includes an explicit "Flex Spline" with a stiffness around 5000 Nm/rad <elib>Wedler12</elib>.  Taking this idea to an extreme,Gill Pratt proposed "series-elastic actuators" that have even lower stiffness springs in the transmission, and proposed measuring joint position on the motor <i>and</i> joint sides to estimate the applied torques <elib>Pratt95b</elib>.  For example, the <a href="https://en.wikipedia.org/wiki/Baxter_(robot)">Baxter</a> robot from Rethink use series elastic actuators with a stiffness around ???<todo>Find this number</todo>.  Even for the IIWA actuators, the joint elasticity is significant enough that the low level controllers go to great length to take it into account explicitly it in order to achieve high performance control of the joints.</p>
 
     </section>
-
-    <section data-type="sect2"><h1>Low-cost arms</h1></section>
 
   </section>
 
