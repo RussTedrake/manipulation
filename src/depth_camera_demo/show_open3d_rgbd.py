@@ -20,4 +20,4 @@ plt.imshow(rgbd_image.depth)
 plt.title('Depth image')
 plt.show()
 
-#point_cloud = o3d.geometry.PointCloud.create_from_rgbd_image(rgbd_image, )
+# point_cloud = o3d.geometry.PointCloud.create_from_rgbd_image(rgbd_image, )

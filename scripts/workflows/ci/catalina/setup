@@ -31,32 +31,15 @@
 
 set -euxo pipefail
 
-if [[ "${EUID}" -eq 0 ]]; then
-  echo 'This script must NOT be run as root' >&2
-  exit 1
-fi
+curl -LsSO https://drake-packages.csail.mit.edu/drake/continuous/drake-latest-mac.tar.gz
+tar -xf drake-latest-mac.tar.gz
+sudo mv drake /opt
 
-if [[ "$(uname -s)" != 'Darwin' || "$(uname -r)" < 17 ]]; then
-  echo 'ERROR: This script requires macOS Mojave (10.14) or Catalina (10.15)' >&2
-  exit 2
-fi
+export HOMEBREW_CURL_RETRIES=4
+export HOMEBREW_NO_ANALYTICS=1
+export HOMEBREW_NO_AUTO_UPDATE=1
+export HOMEBREW_NO_BOTTLE_SOURCE_FALLBACK=1
+export HOMEBREW_NO_INSTALL_CLEANUP=1
 
-if ! command -v brew &>/dev/null; then
-  ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-fi
-
-# NOTE: Assumes that the drake (binary) install_prereqs script will also be
-# run. Only install what we need to download drake and any additional
-# requirements for this project.
-
-brew install $(tr '\n' ' ' <<EOF
-numpy
-python
-EOF
-)
-
-pip3 install --disable-pip-version-check --upgrade $(tr '\n' ' ' <<EOF
-open3d
-pycodestyle
-EOF
-)
+/opt/drake/share/drake/setup/install_prereqs
+./setup/mac/install_prereqs.sh

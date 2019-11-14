@@ -1,4 +1,4 @@
-#!/bin/zsh
+#!/bin/bash
 
 # Copyright (c) 2019, Massachusetts Institute of Technology.
 # All rights reserved.
@@ -31,32 +31,10 @@
 
 set -euxo pipefail
 
-if [[ "${EUID}" -eq 0 ]]; then
-  echo 'This script must NOT be run as root' >&2
-  exit 1
-fi
+mkdir -p build
+pushd build
 
-if [[ "$(uname -s)" != 'Darwin' || "$(uname -r)" < 17 ]]; then
-  echo 'ERROR: This script requires macOS Mojave (10.14) or Catalina (10.15)' >&2
-  exit 2
-fi
+/usr/bin/cmake -DCMAKE_SYSTEM_PREFIX_PATH=/opt/drake ..
+xvfb-run -a /usr/bin/ctest --output-on-failure
 
-if ! command -v brew &>/dev/null; then
-  ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-fi
-
-# NOTE: Assumes that the drake (binary) install_prereqs script will also be
-# run. Only install what we need to download drake and any additional
-# requirements for this project.
-
-brew install $(tr '\n' ' ' <<EOF
-numpy
-python
-EOF
-)
-
-pip3 install --disable-pip-version-check --upgrade $(tr '\n' ' ' <<EOF
-open3d
-pycodestyle
-EOF
-)
+popd

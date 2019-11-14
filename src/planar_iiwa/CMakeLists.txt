@@ -1,4 +1,5 @@
-#!/bin/zsh
+# -*- mode: cmake -*-
+# vi: set ft=cmake :
 
 # Copyright (c) 2019, Massachusetts Institute of Technology.
 # All rights reserved.
@@ -29,34 +30,9 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-set -euxo pipefail
-
-if [[ "${EUID}" -eq 0 ]]; then
-  echo 'This script must NOT be run as root' >&2
-  exit 1
-fi
-
-if [[ "$(uname -s)" != 'Darwin' || "$(uname -r)" < 17 ]]; then
-  echo 'ERROR: This script requires macOS Mojave (10.14) or Catalina (10.15)' >&2
-  exit 2
-fi
-
-if ! command -v brew &>/dev/null; then
-  ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-fi
-
-# NOTE: Assumes that the drake (binary) install_prereqs script will also be
-# run. Only install what we need to download drake and any additional
-# requirements for this project.
-
-brew install $(tr '\n' ' ' <<EOF
-numpy
-python
-EOF
+add_python_test(viz_test.py)
+set_tests_properties(planar_iiwa_viz_test.py PROPERTIES
+  DISABLED ON  # Could not find planar_iiwa14_spheres_dense_elbow_collision.urdf
 )
 
-pip3 install --disable-pip-version-check --upgrade $(tr '\n' ' ' <<EOF
-open3d
-pycodestyle
-EOF
-)
+add_python_style_test()
