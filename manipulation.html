@@ -635,14 +635,23 @@ MIT</a>. They will be updated throughout the Fall 2019 semester. </p>
 <section data-type="chapter" class="chapter" id="manipulator">
   <h1>Manipulator Control</h1>
 
+  <p>In this chapter we will give a brief introduction to methods for controlling the motion of the arm -- this is a relatively mature and well-understood topic.  This is in contrast with the state of algorithms for controlling the motion of the objects in the world, which in its full generality is still a relatively immature and poorly-understood topic (and the subject of the next few chapters).  But even though our goal is controlling the motion of objects in the world, the first step is to move the robot!</p> 
+    
+  <p>As we discussed in the <a href="manipulation.html?chapter=hardware">hardware chapter</a>, depending on the type of robot you have, your options for controlling its motion may be quite limited (e.g. position control via joint PD gains/setpoints only).  Even robots that accept torque commands from the user often implement the control algorithms that we'll discuss here in their low level robot firmware; and it might be hard/unnecessary to disable and replace with your own low-level controller.  From this perspective, these notes will (I hope) help you understand what is happening in the low-level control routines, and improve your ability to use them as an expert.</p>
+
+  <p>Our treatment will make use of the standard form of the robot <a href="http://underactuated.mit.edu/underactuated.html?chapter=multibody">manipulator equations</a>: \begin{equation}{\bf M}(\bq)\ddot{\bq} + \bC(\bq,\dot{\bq})\dot{\bq} =
+      \btau_g(\bq) + \btau, \label{eq:manip} \end{equation}
+  where $\bq$ is the joint position vector, $\bM$ is the inertia matrix, $\bC$ captures Coriolis forces, and $\btau_g$ is the gravity vector and $\btau$ is the torque command.  We will begin by assuming that all of the parameters in these equations are known -- we've taken the time to model/estimate the masses and inertias, link lengths, etc; there are also many powerful results from system identification and adaptive control to help us relax that assumption later.</p>
+
+  <section data-type="sect1">PID Control</section>
+
+  <section data-type="sect1">Inverse Dynamics Control</section>
+
+  <section data-type="sect1">Joint Impedance Control</section>
+
+
   <!--
-    Control topics:
-    Tracking a joint-space trajectory
-      Robot dynamics - friction, etc.
-      UR-10 vs IIWA vs Baxter
-      Position control vs torque control (linkages, direct drive robots story)
-      challenge: Unkown mass of the object.
-      PD Control.  Inverse dynamics control.  (any material from slotine?  adaptive?  sliding mode?)  deluca "dynamic control of a single axis" http://www.diag.uniroma1.it/~deluca/rob1_en/16_DynamicControlSingleAxis.pdf
+  PD Control.  Inverse dynamics control.  (any material from slotine?  adaptive?  sliding mode?)  deluca "dynamic control of a single axis" http://www.diag.uniroma1.it/~deluca/rob1_en/16_DynamicControlSingleAxis.pdf
       Spong model of elastic joints <elib>Spong87</elib> (deluca showed a video in his RSS talk)
         exact gravity cancellation - https://www.youtube.com/watch?v=tKSCn2gN7Ks&t=9960s
       Maybe -- planar IIWA sdf from andres? (how well does it render in matplotlib)
@@ -675,7 +684,7 @@ MIT</a>. They will be updated throughout the Fall 2019 semester. </p>
 
 </section>
 
-<section data-type="chapter" class="chapter" id="planning">
+<section data-type="chapter" class="chapter" id="contact">
   <h1>Non-Prehensile Manipulation</h1>
 
   <section data-type="sect1"><h1>Planning through Contact</h1></section>
