@@ -875,14 +875,43 @@ export PYTHONPATH=`pwd`/manipulation/src:${PYTHONPATH}</code></pre></div>
 
     <section data-type="sect1"><h1>Kuka LBR iiwa</h1>
 
-      <p>We have made extensive use of both the iiwa 7 R800 and thte iiwa 14 R820; <drake></drake> provides URDFs for both models and the drivers should work for either.  We use the iiwa7 for the course because it is slightly smaller and we do not need the end-effector payload.</p>
+      <p>We have made extensive use of both the iiwa7 R800 and the iiwa14 R820; <drake></drake> provides URDFs for both models and the drivers should work for either.  We use the iiwa7 for the labs in this course because it is slightly smaller and we do not need the end-effector payload.</p>
 
-      <p>
-        <ul><li><a href="https://github.com/RobotLocomotion/drake-iiwa-driver">LCM Driver</a></li>
-        </ul>
-        </p>
+      <ul>
+        <li><a href="https://github.com/RobotLocomotion/drake-iiwa-driver">LCM Driver</a></li>
+      </ul>
 
     </section>
+
+    <section data-type="sect1"><h1>Schunk WSG Gripper</h1>
+
+      <p>We've been quite happy with the Schunk WSG 50 gripper as a reliable and accurate two-fingered gripper solution.</p>
+
+      <ul>
+        <li><a href="https://github.com/RobotLocomotion/drake-schunk-driver">LCM Driver</a></li>
+      </ul>
+
+    </section>
+
+    <section data-type="sect1"><h1>Intel Realsense D415 Depth Cameras</h1>
+
+      <p>The D415 has been the camera of choice because of it's relatively good minimum range and due to the fact that multiple cameras do not interfere with each other when viewing the same scene.</p>
+
+      <ul>
+        <li>Coming soon: <a href="https://github.com/RobotLocomotion/realsense2-lcm-driver">LCM Driver</a></li>
+        <li>Coming soon: <a href="https://github.com/ToyotaResearchInstitute/handical">Camera calibration toolbox</a>.</li>
+      </ul>
+
+
+    </section>
+
+    <section data-type="sect1"><h1>Miscellaneous hardware.</h1>
+
+      <p>For the purposes of having a common workstation that we can use in the labs, we have included here the simple environment in which we mount the robot.  The robot just barely fits in the arena -- it was designed with the dimensions limited so that it can be moved (via a manual pallet jack) through standard office doors. </p>
+
+      <p>CAD and bill of materials coming soon.</p>
+
+    </section>    
 
   </section>
 
