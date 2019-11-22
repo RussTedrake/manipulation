@@ -1,0 +1,32 @@
+# -*- python -*-
+
+py_library(
+  name = "demo",
+  imports = ["/Users/russt/drake-install/lib/python3.7/site-packages"],
+  srcs = ["demo.py"],
+  deps = ["@drake//bindings/pydrake"],
+)
+
+py_test(
+  name = "show_camera",
+  srcs = ["show_camera.py"],
+  deps = ["demo"],
+)
+
+py_test(
+  name = "show_diagram",
+  srcs = ["show_diagram.py"],
+  deps = ["demo"],
+)
+
+py_test(
+  name = "show_open3d_rgbd",
+  srcs = ["show_open3d_rgbd.py"],
+  deps = ["demo"],
+)
+
+py_test(
+  name = "station_cameras",
+  srcs = ["station_cameras.py"],
+  deps = ["demo"],
+)
