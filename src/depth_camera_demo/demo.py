@@ -1,7 +1,7 @@
 import numpy as np
 import open3d as o3d
 
-from pydrake.common import FindResourceOrThrow
+from pydrake.common import FindResourceOrThrow, set_log_level
 from pydrake.geometry.render import (
     DepthCameraProperties, MakeRenderEngineVtk, RenderEngineVtkParams)
 from pydrake.math import RigidTransform, RollPitchYaw
@@ -14,6 +14,10 @@ from pydrake.systems.sensors import RgbdSensor
 
 def DepthCameraDemoSystem():
     builder = DiagramBuilder()
+
+    # If you have trouble finding resources, you can enable trace logging
+    # to see how `FindResource*` is searching.
+    set_log_level("trace")
 
     # Create the physics engine + scene graph.
     plant, scene_graph = AddMultibodyPlantSceneGraph(builder)
