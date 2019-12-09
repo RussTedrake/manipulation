@@ -138,16 +138,16 @@ MIT</a>. They will be updated throughout the Fall 2019 semester. </p>
   in their assumptions and problem formulations; the requirements for robotic
   manipulation break these assumptions.  For example, robust control typically
   assumes that dynamics that are (nearly) smooth and uncertainty that can be
-  represented by e.g. ellipsoidal or polytopic sets; but in robotic manipulation
-  we must deal with the non-smooth mechanics of contact and uncertainty the
-  comes from varied lighting conditions, and different numbers of objects with
-  unknown geometry and dynamics.  In practice, no state-of-the-art robotic
-  manipulation system to date (that I know of) uses rigorous control theory to
-  design even the low-level feedback that determines when a robot makes and
-  breaks contact with the objects it is manipulating.  An explicit goal of these
-  notes is to try to change that.</p>
+  represented by simple distributions or simple sets; but in robotic
+  manipulation we must deal with the non-smooth mechanics of contact and
+  uncertainty the comes from varied lighting conditions, and different numbers
+  of objects with unknown geometry and dynamics.  In practice, no
+  state-of-the-art robotic manipulation system to date (that I know of) uses
+  rigorous control theory to design even the low-level feedback that determines
+  when a robot makes and breaks contact with the objects it is manipulating.  An
+  explicit goal of these notes is to try to change that.</p>
 
-  <p>In the past few years, deep learning has had an unquestionable impact on robotic perception, unblocking some of the most daunting challenges in performing manipulation outside of a laboratory or factory environment.  We will discuss relevant tools from deep learning for object recognition, segmentation, pose/keypoint estimation, and even shape completion.  Now relatively old approaches to learning control are also enjoying an incredible surge in popularity, fueled in part by massive computing power and increasingly available robot hardware and simulators.  Unlike learning for perception, learning control algorithms are still far from a technology, with some of the most impressive looking results still being hard to understand and to reproduce.  But the recent work in this area has unquestionably highlighted the pitfalls of the conservatism taken by the controls community. Learning researchers are boldly formulating much more aggressive and exciting problems for robotic manipulation than we have seen before -- in many cases we are realizing that some manipulation tasks are actually quite easy, but in other cases we are finding problems that are still fundamentally hard.
+  <p>In the past few years, deep learning has had an unquestionable impact on robotic perception, unblocking some of the most daunting challenges in performing manipulation outside of a laboratory or factory environment.  We will discuss relevant tools from deep learning for object recognition, segmentation, pose/keypoint estimation, shape completion, etc.  Now relatively old approaches to learning control are also enjoying an incredible surge in popularity, fueled in part by massive computing power and increasingly available robot hardware and simulators.  Unlike learning for perception, learning control algorithms are still far from a technology, with some of the most impressive looking results still being hard to understand and to reproduce.  But the recent work in this area has unquestionably highlighted the pitfalls of the conservatism taken by the controls community. Learning researchers are boldly formulating much more aggressive and exciting problems for robotic manipulation than we have seen before -- in many cases we are realizing that some manipulation tasks are actually quite easy, but in other cases we are finding problems that are still fundamentally hard.
   </p>
 
   <p>Finally, it feels that the time is ripe for robotic manipulation to have a real and dramatic impact in the world, in fields from logistics to home robots.  Over the last few years, we've seen UAVs/drones transition from academic curiosities into consumer products; autonomous cars have been transitioning from academic research to industry now, at least in terms of dollars invested.  Manipulation feels like the next big thing that will transition from robotic research to practice. It's still a bit risky for a venture capitalist to invest in, but nobody doubts the size of the market once we have the technology.  How lucky are we to potentially be able to play a role in that transition?</p>
@@ -156,7 +156,7 @@ MIT</a>. They will be updated throughout the Fall 2019 semester. </p>
 
   <section><h1>A manipulation toolbox</h1></section>
 
-    <p>Another explicit goal of these lecture notes is to provide high-quality implementations of the most useful tools in a manipulation scientists' toolbox.  Although I admit a bias for pedadogy (each component should have a clear mathematical formulation), I believe that clarity can often be achieved without sacrificing significant performance.  Manipulation research is moving quickly, and I aim to evolve these notes to keep pace.  I hope that the software components provided in <drake></drake> and in these notes can be directly useful to you in your own work.</p>
+    <p>Another explicit goal of these lecture notes is to provide high-quality implementations of the most useful tools in a manipulation scientists' toolbox.  When I am forced to choose between mathematical clarity and runtime performance, the clear formulation is always my first priority; I will include a performant formulation, too, or try to give pointers to alternatives.  Manipulation research is moving quickly, and I aim to evolve these notes to keep pace.  I hope that the software components provided in <drake></drake> and in these notes can be directly useful to you in your own work.</p>
 
     <p>If you would like to replicate any or all of the hardware that we use for these notes, you can find information and instructions in the <a href="manipulation.html?chapter=station">appendix</a>.</p>
 
@@ -294,11 +294,24 @@ MIT</a>. They will be updated throughout the Fall 2019 semester. </p>
       <p>Light-weight arms like the example above are actuated with electric motors.  For a reasonably high-quality electric motor (with windings designed to minimize torque ripple, etc), we expect the torque that the motor outputs to be directly proportional to the current that we apply: $$\tau = k_{i} i,$$ where $\tau$ is the torque, $i$ is the applied current, and $k_m$ is the "motor torque constant". (Similarly, applied voltage has a simple (affine) relationship with the motor's steady-state velocity).  If we can control the current, then why can we not control the torque?  
       </p>
 
-      <p>The short answer is that our electric motors often require large gear reductions, and gear reductions come with a number of dynamic effects that are very difficult to model -- including backlash, vibration, and friction. So perhaps a more accurate description of a motor + transmission is $$\tau = k_m i + \tau_{transmission},$$ where the last term is considered difficult to model.  Conventional wisdom is that for large gear-ratios (say $\gg 10$), this term is significant enough that it cannot be ignored, and torque is no longer simply related to current.</p>
+      <p>The short answer is that our electric motors often require large gear reductions, and gear reductions come with a number of dynamic effects that are very difficult to model -- including backlash, vibration, and friction. So perhaps a more accurate description of a motor + transmission is $$\tau = k_m i + \tau_{transmission},$$ where the last term is considered difficult to model, and may even have internal dynamics (like for the backlash).  Conventional wisdom is that for large gear-ratios (say $\gg 10$), this term is significant enough that it cannot be ignored, and torque is no longer simply related to current.</p>
 
       <section data-type="sect3"><h1>Position Control.</h1>
 
-        <p>How can we overcome this challenge of not having a good model of the transmission dynamics?  Regulating the current or speed of the motor only requires sensors on the motor; if we add more sensors on the output side of the transmission, then we can use high-gain feedback to try to directly regulate the joint, instead of the motor.  Importantly, although the torques due to the transmission are not known precisely, they are also not arbitrary -- for instance they will never add energy into the system.  Most importantly, we can be confident that there is a <i>monotonically increasing</i> relationship between the current that we put into the motor and the torque at the joint, and ultimately the acceleration of the joint.  Note though that monotonic here means "non-decreasing" but <i>not</i> "strictly increasing", because, for instance, when a joint is starting from rest, static friction will resist small torques without having any acceleration at the output.</p>
+        <p>How can we overcome this challenge of not having a good model of the
+        transmission dynamics?  Regulating the current or speed of the motor
+        only requires sensors on the motor; if we add more sensors on the output
+        side of the transmission, then we can use high-gain feedback to try to
+        directly regulate the joint, instead of the motor.  Importantly,
+        although the torques due to the transmission are not known precisely,
+        they are also not arbitrary -- for instance they will never add energy
+        into the system.  Most importantly, we can be confident that there is a
+        <i>monotonically increasing</i> relationship between the current that we
+        put into the motor and the torque at the joint, and ultimately the
+        acceleration of the joint.  Note though that I mean monotonic precisely,
+        "non-decreasing" but <i>not</i> "strictly increasing", because, for
+        instance, when a joint is starting from rest, static friction will
+        resist small torques without having any acceleration at the output.</p>
 
         <p>The most common sensor to add to the joint is a position sensor -- typically an encoder or potentiometer -- these are inexpensive, accurate, and robust.  In practice, we think of these as providing (after some signal filtering/conditioning) accurate measurements of the joint position and joint velocity -- joint accelerations can also be obtained via differentiation but are generally considered more noisy and less suitable for use in tight feedback loops.  This is sufficient for accurately tracking desired position trajectories of the arm... for each joint, if we are given a desired trajectory $q^d(t)$, then I can track this using <a href="https://en.wikipedia.org/wiki/PID_controller">proportional-integral-derivative (PID) control</a>: 
         $$\tau = k_p (q^d - q) + k_d (\dot{q}^d - \dot{q}) + k_i \int (q^d - q) dt,$$ with $k_p$, $k_d$, and $k_i$ being the position, velocity, and integral gains.  PID control has a rich theory, and a trove of knowledge about how to choose the gains, which I will not reproduce here.  I will note, however, that when we simulate position-controlled robots we use the equation above, commanding a torque directly, but on hardware our PID controller can output desired motor currents directly, since we cannot command torques.  This is generally considered sufficiently accurate for simulation, but does mean that we often have a separate list of gains for the physical robot than for the simulation, differing by at least the motor torque constant.</p>
@@ -309,7 +322,16 @@ MIT</a>. They will be updated throughout the Fall 2019 semester. </p>
 
       <section data-type="sect3"><h1>An aside: link dynamics with a transmission.</h1>
 
-        <p>One thing that might be surprising is that, despite the fact that the joint dynamics of a manipulator are highly coupled and state dependent, the PID gains for each joint are often chosen independently for each joint, and are constant (not <a href="https://en.wikipedia.org/wiki/Gain_scheduling">gain-scheduled</a>).  Wouldn't you expect that e.g. a robot arm at full extention holding a milk jug should be applying very different than the torques required when it is unloaded in a vertical hanging position?  Surprisingly, the required torques might not be as different as one would think.</p>
+        <p>One thing that might be surprising is that, despite the fact that the
+        joint dynamics of a manipulator are highly coupled and state dependent,
+        the PID gains for each joint are often chosen independently for each
+        joint, and are constant (not <a
+        href="https://en.wikipedia.org/wiki/Gain_scheduling">gain-scheduled</a>).
+        Wouldn't you expect for the torques required for e.g. a robot arm at
+        full extention holding a milk jug might be very different than the
+        torques required when it is unloaded in a vertical hanging position?
+        Surprisingly, the required gains/torques might not be as different as
+        one would think.</p>
           
         <p>Electric motors are most efficient at high speeds (often > 100 or 1,000 rotations per minute).  We probably don't actually want our robots to move that fast even if they could!  So nearly all electric robots have fairly substantial gear reductions, often on the order of 100:1; the transmission output turns one revolution for every 100 rotations of the motor, and the output torque is 100 times greater than the motor torque.  For a gear ratio, $n$, actuating a joint $q$, we have $$q_{motor} = n q,\quad \dot{q}_{motor} = n \dot{q}, \quad \ddot{q}_{motor} = n \ddot{q}, \qquad \tau_{motor} = \frac{1}{n} \tau.$$  Interestingly, this has a fairly profound impact on the resulting dynamics (given by $f = ma$), even for a single joint.  Thinking only about the arm, we would write $ma = \sum f$ in the rotational coordinates as $$I_{arm} \ddot{q} = \tau_{gravity} + \tau,$$ where $I_{arm}$ is the moment of inertia. For example, for a <a href="http://underactuated.mit.edu/underactuated.html?chapter=pend" target="underactuated">simple pendulum</a>, we might have have $$ml^2 \ddot{q} = - mgl\sin{q} + \tau.$$  But the applied joint torque $\tau$ actually comes from the motor -- if we write this equation in terms of motor coordinates we get: $$\frac{I_{arm}}{n} \ddot{q}_{motor} = \tau_{gravity} + n\tau_{motor}.$$  If we divide through by $n$, and take into account the fact that the motor itself has inertia (e.g. from the large spinning magnets) that is not effected by the gear ratio, then we obtain:
         $$\left(I_{motor} + \frac{I_{arm}}{n^2}\right) \ddot{q}_{motor} = \frac{\tau_{gravity}}{n} + \tau_{motor}.$$</p>
@@ -649,7 +671,14 @@ MIT</a>. They will be updated throughout the Fall 2019 semester. </p>
       \btau_g(\bq) + \btau, \label{eq:manip} \end{equation}
   where $\bq$ is the joint position vector, $\bM$ is the inertia matrix, $\bC$ captures Coriolis forces, and $\btau_g$ is the gravity vector and $\btau$ is the torque command.  We will begin by assuming that all of the parameters in these equations are known -- we've taken the time to model/estimate the masses and inertias, link lengths, etc; there are also many powerful results from system identification and adaptive control to help us relax that assumption later.</p>
 
-  <section data-type="sect1"><h1>PID Control</h1></section>
+  <section data-type="sect1"><h1>PID Control</h1>
+  
+    <p>Recall the standard form for a <a href="https://en.wikipedia.org/wiki/PID_controller">proportional-integral-derivative (PID) control</a> of joint $j$: 
+      $$\tau_j = k_{pj} (q^d_j - q_j) + k_{dj} (\dot{q}^d_j - \dot{q}_j) + k_j \int (q^d_j - q_j) dt,$$ with $k_p$, $k_d$, and $k_i$ being the position, velocity, and integral gains.</p>
+
+      <todo>Numerical examples on the planar iiwa?</todo>
+  
+  </section>
 
   <section data-type="sect1"><h1>Inverse Dynamics Control</h1></section>
 
