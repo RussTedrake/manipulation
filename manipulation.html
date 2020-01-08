@@ -147,20 +147,63 @@ MIT</a>. They will be updated throughout the Fall 2019 semester. </p>
   when a robot makes and breaks contact with the objects it is manipulating.  An
   explicit goal of these notes is to try to change that.</p>
 
-  <p>In the past few years, deep learning has had an unquestionable impact on robotic perception, unblocking some of the most daunting challenges in performing manipulation outside of a laboratory or factory environment.  We will discuss relevant tools from deep learning for object recognition, segmentation, pose/keypoint estimation, shape completion, etc.  Now relatively old approaches to learning control are also enjoying an incredible surge in popularity, fueled in part by massive computing power and increasingly available robot hardware and simulators.  Unlike learning for perception, learning control algorithms are still far from a technology, with some of the most impressive looking results still being hard to understand and to reproduce.  But the recent work in this area has unquestionably highlighted the pitfalls of the conservatism taken by the controls community. Learning researchers are boldly formulating much more aggressive and exciting problems for robotic manipulation than we have seen before -- in many cases we are realizing that some manipulation tasks are actually quite easy, but in other cases we are finding problems that are still fundamentally hard.
+  <p>In the past few years, deep learning has had an unquestionable impact on
+  robotic perception, unblocking some of the most daunting challenges in
+  performing manipulation outside of a laboratory or factory environment.  We
+  will discuss relevant tools from deep learning for object recognition,
+  segmentation, pose/keypoint estimation, shape completion, etc.  Now relatively
+  old approaches to learning control are also enjoying an incredible surge in
+  popularity, fueled in part by massive computing power and increasingly
+  available robot hardware and simulators.  Unlike learning for perception,
+  learning control algorithms are still far from a technology, with some of the
+  most impressive looking results still being hard to understand and to
+  reproduce.  But the recent work in this area has unquestionably highlighted
+  the pitfalls of the conservatism taken by the controls community. Learning
+  researchers are boldly formulating much more aggressive and exciting problems
+  for robotic manipulation than we have seen before -- in many cases we are
+  realizing that some manipulation tasks are actually quite easy, but in other
+  cases we are finding problems that are still fundamentally hard.
   </p>
 
-  <p>Finally, it feels that the time is ripe for robotic manipulation to have a real and dramatic impact in the world, in fields from logistics to home robots.  Over the last few years, we've seen UAVs/drones transition from academic curiosities into consumer products; autonomous cars have been transitioning from academic research to industry now, at least in terms of dollars invested.  Manipulation feels like the next big thing that will transition from robotic research to practice. It's still a bit risky for a venture capitalist to invest in, but nobody doubts the size of the market once we have the technology.  How lucky are we to potentially be able to play a role in that transition?</p>
+  <p>Finally, it feels that the time is ripe for robotic manipulation to have a
+  real and dramatic impact in the world, in fields from logistics to home
+  robots.  Over the last few years, we've seen UAVs/drones transition from
+  academic curiosities into consumer products; autonomous cars have been
+  transitioning from academic research to industry now, at least in terms of
+  dollars invested.  Manipulation feels like the next big thing that will
+  transition from robotic research to practice. It's still a bit risky for a
+  venture capitalist to invest in, but nobody doubts the size of the market once
+  we have the technology.  How lucky are we to potentially be able to play a
+  role in that transition?</p>
 
-  <p>So this is where the notes begin... we are at an incredible crossroads between learning and control and robotics with an opportunity to have immediate impact in industrial and consumer applications and potentially even to forge entirely new eras for systems theory and controls.  I'm just trying to hold on and to enjoy the ride.</p>
+  <p>So this is where the notes begin... we are at an incredible crossroads
+  between learning and control and robotics with an opportunity to have
+  immediate impact in industrial and consumer applications and potentially even
+  to forge entirely new eras for systems theory and controls.  I'm just trying
+  to hold on and to enjoy the ride.</p>
 
   <section><h1>A manipulation toolbox</h1></section>
 
-    <p>Another explicit goal of these lecture notes is to provide high-quality implementations of the most useful tools in a manipulation scientists' toolbox.  When I am forced to choose between mathematical clarity and runtime performance, the clear formulation is always my first priority; I will include a performant formulation, too, or try to give pointers to alternatives.  Manipulation research is moving quickly, and I aim to evolve these notes to keep pace.  I hope that the software components provided in <drake></drake> and in these notes can be directly useful to you in your own work.</p>
+    <p>Another explicit goal of these lecture notes is to provide high-quality
+    implementations of the most useful tools in a manipulation scientists'
+    toolbox.  When I am forced to choose between mathematical clarity and
+    runtime performance, the clear formulation is always my first priority; I
+    will include a performant formulation, too, or try to give pointers to
+    alternatives.  Manipulation research is moving quickly, and I aim to evolve
+    these notes to keep pace.  I hope that the software components provided in
+    <drake></drake> and in these notes can be directly useful to you in your own
+    work.</p>
 
-    <p>If you would like to replicate any or all of the hardware that we use for these notes, you can find information and instructions in the <a href="manipulation.html?chapter=station">appendix</a>.</p>
+    <p>If you would like to replicate any or all of the hardware that we use for
+    these notes, you can find information and instructions in the <a
+    href="manipulation.html?chapter=station">appendix</a>.</p>
 
-    <p>As you use the code, please consider <a href="https://drake.mit.edu/getting_help.html">contributing back</a> (especially to the mature code in <drake></drake>).  Even questions/bug reports can be important contributions.  If you have questions/find issues with these notes, please submit them <a href=https://github.com/RussTedrake/manipulation/issues">here</a>.</p>
+    <p>As you use the code, please consider <a
+    href="https://drake.mit.edu/getting_help.html">contributing back</a>
+    (especially to the mature code in <drake></drake>).  Even questions/bug
+    reports can be important contributions.  If you have questions/find issues
+    with these notes, please submit them <a
+    href=https://github.com/RussTedrake/manipulation/issues">here</a>.</p>
 
   </section>
 
