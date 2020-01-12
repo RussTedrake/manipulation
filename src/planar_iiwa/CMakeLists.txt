@@ -31,8 +31,5 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 add_python_test(viz_test.py)
-set_tests_properties(planar_iiwa_viz_test.py PROPERTIES
-  DISABLED ON  # Could not find planar_iiwa14_spheres_dense_elbow_collision.urdf
-)
 
 add_python_style_test()
