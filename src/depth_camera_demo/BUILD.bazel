@@ -7,26 +7,30 @@ py_library(
   deps = ["@drake//bindings/pydrake"],
 )
 
-py_test(
-  name = "show_camera",
-  srcs = ["show_camera.py"],
-  deps = ["demo"],
-)
+# Disabled pending resolution of #8.
+#py_test(
+#  name = "show_camera",
+#  srcs = ["show_camera.py"],
+#  deps = ["demo"],
+#)
 
-py_test(
-  name = "show_diagram",
-  srcs = ["show_diagram.py"],
-  deps = ["demo"],
-)
+# Disabled pending resolution of #8.
+#py_test(
+#  name = "show_diagram",
+#  srcs = ["show_diagram.py"],
+#  deps = ["demo"],
+#)
 
-py_test(
-  name = "show_open3d_rgbd",
-  srcs = ["show_open3d_rgbd.py"],
-  deps = ["demo"],
-)
+# Disabled pending resolution of #8.
+#py_test(
+#  name = "show_open3d_rgbd",
+#  srcs = ["show_open3d_rgbd.py"],
+#  deps = ["demo"],
+#)
 
-py_test(
-  name = "station_cameras",
-  srcs = ["station_cameras.py"],
-  deps = ["demo"],
-)
+# Disabled pending resolution of #8.
+#py_test(
+#  name = "station_cameras",
+#  srcs = ["station_cameras.py"],
+#  deps = ["demo"],
+#)
