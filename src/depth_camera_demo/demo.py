@@ -20,7 +20,7 @@ def DepthCameraDemoSystem():
     set_log_level("trace")
 
     # Create the physics engine + scene graph.
-    plant, scene_graph = AddMultibodyPlantSceneGraph(builder)
+    plant, scene_graph = AddMultibodyPlantSceneGraph(builder, time_step=0.0)
     # Add a single object into it.
     Parser(plant, scene_graph).AddModelFromFile(FindResourceOrThrow(
         "drake/manipulation/models/ycb/sdf/006_mustard_bottle.sdf"))

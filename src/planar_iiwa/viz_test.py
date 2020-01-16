@@ -12,7 +12,7 @@ from pydrake.systems.planar_scenegraph_visualizer import (
 )
 
 builder = DiagramBuilder()
-plant, scene_graph = AddMultibodyPlantSceneGraph(builder)
+plant, scene_graph = AddMultibodyPlantSceneGraph(builder, time_step=0.0)
 
 Parser(plant, scene_graph).AddModelFromFile(FindResourceOrThrow(
     "drake/manipulation/models/iiwa_description/urdf/planar_iiwa14_spheres_dense_elbow_collision.urdf"))  # noqa
