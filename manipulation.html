@@ -209,7 +209,7 @@ MIT</a>. They will be updated throughout the Fall 2019 semester. </p>
 
 </section> <!-- end preface -->
 
-<section data-type="chapter" class="chapter" id="intro">
+<chapter class="chapter" id="intro">
   <h1>Introduction</h1>
 
   <p>It's worth taking time to appreciate just how amazingly well humans are
@@ -253,7 +253,7 @@ MIT</a>. They will be updated throughout the Fall 2019 semester. </p>
 
   <!-- two core research problems (that I like to focus on): 1) there are many tasks that we don't know how to program a robot to do robustly even in a single instance in lab (reach into your pocket and pull out the keys); 2) achieving robustness of a complete manipulation stack in the open-world. -->
 
-  <section data-type="sect1"><h1>Manipulation is more than Pick-and-Place</h1></section>
+  <section><h1>Manipulation is more than Pick-and-Place</h1>
 
     <p>There are a large number of applications for manipulation.  Picking up an
     object from one bin and placing it into another bin -- one version of the
@@ -272,7 +272,9 @@ MIT</a>. They will be updated throughout the Fall 2019 semester. </p>
 
     <p>One field that has thought about the Motivating example: <a href="http://www.shap.ecs.soton.ac.uk/">South Hampton Assessment Procedure (SHAP)</a></p>
 
-  <section data-type="sect1"><h1>Open-World Manipulation</h1>
+  </section>  
+
+  <section><h1>Open-World Manipulation</h1>
   
     <p>Perhaps because humans are so good at manipulation, our expectations in terms of performance and robustness for these tasks is extremely high.  It's not enough to be able to load one set of place in a laboratory environment into a dishwasher reliably.  We'd like to be able to manipulate basically any plate that someone might put into the sink.  And we'd like the system to be able to work in any kitchen, despite various geometric configurations, lighting conditions, etc.  The challenge of achieving and verifying robustness of a complex manipulation stack with physics, perception, planning, and control in the loop is already daunting.  But how do we provide test coverage for every kitchen in the world?</p>
 
@@ -281,11 +283,11 @@ MIT</a>. They will be updated throughout the Fall 2019 semester. </p>
     <p>Might it actually make the problem easier?  (Diversity changes the optimization landscape).</p>
   </section>
 
-  <section data-type="sect1"><h1>Simulation</h1>
+  <section><h1>Simulation</h1>
   
   </section>
 
-  <section data-type="sect1">
+  <section>
     <h1>A Systems Theoretic Approach</h1>
   
     <blockquote>It's precisely <i>because</i> the problem is so complex that we take a rigorous approach.</blockquote>
@@ -302,9 +304,9 @@ MIT</a>. They will be updated throughout the Fall 2019 semester. </p>
   
     <p>One thing that we’ll leave out is humans.  It’s not that i don’t like humans, but we have enough to do here without trying to model them.  Let’s call it future work.  The one exception is when we talk about control of the arm — a few simple heuristics at this level can make the robots much safer if operating around humans.  The robot won’t understand them, but we want to make sure we still don’t hurt them.  Or other robots/agents in the scene.</p>
   
-  </section> <!-- end chapter (systems)-->
+  </section> 
 
-  <section data-type="sect1"><h1>Components of a Modern Manipulation System</h1>
+  <section><h1>Components of a Modern Manipulation System</h1>
 
     <p>The remaining chapters of these notes are organized...</p>
     <p>The central role of modeling and simulation.</p>
@@ -312,19 +314,19 @@ MIT</a>. They will be updated throughout the Fall 2019 semester. </p>
 
   </section>
 
-</section> <!-- end chapter (intro)-->
+</chapter> <!-- end chapter (intro)-->
 
 
   
 
-<section data-type="chapter" class="chapter" id="hardware">
+<chapter class="chapter" id="hardware">
   <h1>Manipulation Hardware</h1>
 
   <todo>insert the manipulation station block diagram image here.</todo>
 
   <section data-type="sect1"><h1>Arms</h1>
 
-    <section data-type="sect2"><h1>Position-controlled robots</h1>
+    <subsection data-type="sect2"><h1>Position-controlled robots</h1>
 
       <figure>
         <img height=200px src="https://www.robots.com/images/robots/Universal/Universal_UR10_0002.jpg" />
@@ -339,7 +341,7 @@ MIT</a>. They will be updated throughout the Fall 2019 semester. </p>
 
       <p>The short answer is that our electric motors often require large gear reductions, and gear reductions come with a number of dynamic effects that are very difficult to model -- including backlash, vibration, and friction. So perhaps a more accurate description of a motor + transmission is $$\tau = k_m i + \tau_{transmission},$$ where the last term is considered difficult to model, and may even have internal dynamics (like for the backlash).  Conventional wisdom is that for large gear-ratios (say $\gg 10$), this term is significant enough that it cannot be ignored, and torque is no longer simply related to current.</p>
 
-      <section data-type="sect3"><h1>Position Control.</h1>
+      <subsubsection data-type="sect3"><h1>Position Control.</h1>
 
         <p>How can we overcome this challenge of not having a good model of the
         transmission dynamics?  Regulating the current or speed of the motor
@@ -361,9 +363,9 @@ MIT</a>. They will be updated throughout the Fall 2019 semester. </p>
 
         <todo>Add a simulation of a single joint against gravity with PID control gains on sliders, following a sinusoidal trajectory.</todo>
 
-      </section>
+      </subsubsection>
 
-      <section data-type="sect3"><h1>An aside: link dynamics with a transmission.</h1>
+      <subsubsection data-type="sect3"><h1>An aside: link dynamics with a transmission.</h1>
 
         <p>One thing that might be surprising is that, despite the fact that the
         joint dynamics of a manipulator are highly coupled and state dependent,
@@ -381,11 +383,11 @@ MIT</a>. They will be updated throughout the Fall 2019 semester. </p>
           
         <p>It's interesting to note that, even though the mass of the motors might make up only a small fraction of the total mass of the robot, for highly geared robots they can play a significant role in the dynamics of the joints.  The "reflected inertia" of the arm at the motor is cut by the square of the gear ratio; or the "reflected inertia" of the motor at the arm is multiplied by the square of the gear ratio.  This has interesting consequences -- as we move to the multi-link case, we will see that the inertia of the arm is a <a href="http://underactuated.mit.edu/underactuated.html?chapter=multibody" target="underactuated">state-dependent function that captures the inertial coupling of the other joints in the manipulator</a>.  The motor inertia, on the other hand, is constant.  For large gear ratios, this means the dynamics of the joint are less dependent on the nonlinear effects of joint position and velocity, making it relatively easier to tune constant feedback gains that perform well in all configurations.</p>
         
-      </section>
+      </subsubsection>
 
-    </section>
+    </subsection>
 
-    <section data-type="sect2"><h1>Torque-controlled robots</h1>
+    <subsection data-type="sect2"><h1>Torque-controlled robots</h1>
 
       <p>Although not as common, there are a number of robots that do support direct control of the joint torques.  There are a handful of ways that this capability can be realized.</p>  
         
@@ -395,23 +397,23 @@ MIT</a>. They will be updated throughout the Fall 2019 semester. </p>
 
       <p>Another approach to torque control is to add sensors to directly measure the torque at the joint side of the actuator.  This is the approach used by the Kuka IIWA robot that we use in the example throughout this text; the IIWA actuators have <a href="https://en.wikipedia.org/wiki/Strain_gauge">strain gauges</a> integrated into the transmission.  However there is a trade-off between the stiffness of the transmission and that accuracy of the force/torque measurement -- the IIWA transmission includes an explicit "Flex Spline" with a stiffness around 5000 Nm/rad <elib>Wedler12</elib>.  Taking this idea to an extreme, Gill Pratt proposed "series-elastic actuators" that have even lower stiffness springs in the transmission, and proposed measuring joint position on the motor <i>and</i> joint sides to estimate the applied torques <elib>Pratt95b</elib>.  For example, the <a href="https://en.wikipedia.org/wiki/Baxter_(robot)">Baxter</a> and Sawyer robots from Rethink use series elastic actuators; I don't think they've published the spring stiffness values but similarly-motivated series-elastic actuators from <a href=http://docs.hebi.us/hardware.html>HEBI robotics are closer to 100 Nm/rad</a>.  Even for the IIWA actuators, the joint elasticity is significant enough that the low level controllers go to great length to take it into account explicitly it in order to achieve high performance control of the joints.</p>
 
-    </section>
+    </subsection>
 
-    </section>
+  </section>
 
   <section data-type="sect1"><h1>Hands</h1>
 
-    <section data-type="sect2"><h1>Simple grippers</h1></section>
+    <subsection data-type="sect2"><h1>Simple grippers</h1></subsection>
 
-    <section data-type="sect2"><h1>Dexterous hands</h1></section>
+    <subsection data-type="sect2"><h1>Dexterous hands</h1></subsection>
 
-    <section data-type="sect2"><h1>Soft/underactuated hands</h1></section>
+    <subsection data-type="sect2"><h1>Soft/underactuated hands</h1></subsection>
 
-    <section data-type="sect2"><h1>Other end-effectors</h1>
+    <subsection data-type="sect2"><h1>Other end-effectors</h1>
     
       <p>Suction, jamming grippers, tool-changers...`</p>
 
-    </section>
+    </subsection>
 
   </section>
 
@@ -419,9 +421,9 @@ MIT</a>. They will be updated throughout the Fall 2019 semester. </p>
 
   <section data-type="sect1"><h1>Tactile Sensors</h1></section>
 
-</section>
+</chapter>
 
-<section data-type="chapter" class="chapter" id="kinematics"><h1>Geometry, Coordinates Systems, and Kinematics</h1>
+<chapter class="chapter" id="kinematics"><h1>Geometry, Coordinates Systems, and Kinematics</h1>
 
   <p>Pose / Rigid Transform.  Rotation matrices, Euler angles, quaternions. </p>
 
@@ -429,16 +431,16 @@ MIT</a>. They will be updated throughout the Fall 2019 semester. </p>
 
   <!-- This is hard material to learn from text.  Have to do some simple exercises.  -->
 
-</section>
+</chapter>
 
 <div class="part" title="Perception">
 
-<section data-type="chapter" class="chapter" id="point_clouds">
+<chapter class="chapter" id="point_clouds">
     <h1>Color Images, Depth Images, and Point Clouds</h1>
 
-</section>
+</chapter>
 
-<section data-type="chapter" class="chapter" id="pose">
+<chapter class="chapter" id="pose">
   <h1>Pose Estimation and Tracking</h1>
 
   <p>There is no question that deep learning has had an enormous impact in perception -- one might even say that it has enabling the current surge in manipulation advances.  And we will certainly cover it in these notes.  But when I've heard colleagues say that "all perception these days is based on deep learning", I can't help but cry foul.  There has been another surge of progress in the last few years that has been happening in parallel -- the revolution in geometric reasoning -- fueled by applications in autonomous driving and augmented reality in addition to manipulation.  Most advanced manipulation systems these days combine both "deep perception" and "geometric perception".</p>
@@ -449,7 +451,7 @@ MIT</a>. They will be updated throughout the Fall 2019 semester. </p>
 
     <p>The cameras we are using in this course are <a href="https://software.intel.com/en-us/realsense/d400">Intel RealSense D415</a>....</p>
 
-    <section data-type="sect2"><h1>Simulation</h1>
+    <subsection data-type="sect2"><h1>Simulation</h1>
     
       <p>There are a number of levels of fidelity at which one can simulate a camera like the D415.  We'll start our discussion here using an "ideal" depth camera simulation -- the pixels returned represent the true geometric depth in the direction of each pixel coordinate.  In <drake></drake> that is represented by the <code>RgbdSensor</code> system, which can be wired up directly to the <code>SceneGraph</code>.</p>
 
@@ -474,7 +476,7 @@ MIT</a>. They will be updated throughout the Fall 2019 semester. </p>
         </td></tr>
         </table>
 
-        <div data-type="example" class="drake"><h1>Simulating an RGB-D Camera</h1>
+        <example class="drake"><h1>Simulating an RGB-D Camera</h1>
 
           <p>As a simple example of depth cameras in drake, I've constructed a scene with a single object (the mustard bottle from the <a href="https://github.com/RobotLocomotion/models/tree/master/ycb">YCB dataset</a>), and added an <code>RgbdSensor</code> to the diagram.  Once this is wired up, we can simply evaluate the output ports in order to obtain the color and depth images:</p>
     
@@ -485,15 +487,15 @@ MIT</a>. They will be updated throughout the Fall 2019 semester. </p>
           <pysrc>depth_camera_demo/show_diagram.py</pysrc>
 
           <p>(Note that these demos need to have the <code>demo.py</code> file that lives in the same directory to run).  <todo>Fix this!</todo></p>
-        </div>
+        </example>
     
         <p>In the <code>ManipulationStation</code> simulation of the entire robot system for class, the <code>RgbdSensors</code> have already been added.  <a href="https://drake.mit.edu/doxygen_cxx/classdrake_1_1examples_1_1manipulation__station_1_1_manipulation_station.html">You can see image output ports for each of the cameras are already exported as output ports for the station.</a> </p>
         
         <p>Real depth sensors, of course, are far from ideal -- and errors in depth returns are not simple Gaussian noise, but rather are dependent on the lighting conditions, the surface normals of the object, and the visual material properties of the object, among other things.  We will examine real sensor data, and higher fidelity simulation models of the depth cameras, after we start understanding some of the basic operations.</p>
 
         <p>Please also note that, although the depth output of the RgbdSensor is ideal, this sensor also outputs a color image.  It's much harder to talk about an ideal color image, as colors change with material properties and lighting conditions (including reflections and shadows).  In the example above, I've told drake to just use the simplest OpenGL-based renderer.  But <drake></drake> does support a number of more advanced rendering options that we will leverage in the chapters on "deep perception", which make significantly more use of the RGB channels.</p>
-    </section>
-  </section> 
+    </subsection>
+  </section>
 
   <section data-type="sect1"><h1>Representations for Geometry</h1>
     
@@ -501,12 +503,12 @@ MIT</a>. They will be updated throughout the Fall 2019 semester. </p>
 
     <p>The data returned by a depth camera takes the form of an image, where each pixel value is a single number that represents the distance between the camera and the nearest object in the environment along the pixel direction.  If we combine this with the basic information about the camera's intrisic (e.g. lens parameters) and extrinsic (e.g. position and orientation in space) parameters of the camera, then we can transform this <i>depth image representation</i> into a collection of points in three dimensions, called the <i>point cloud representation</i>.  As depth sensors have become so pervasive the field has built up libraries of tools for performing basic goemetric operations operate on point clouds, and that can be used to transform back and forth between representations.  In these notes, we'll use the <a href="http://www.open3d.org/">Open3D</a> library (note that many older projects used the <a href="http://pointclouds.org/">Point Cloud Library (PCL)</a>, which is now defunct but still has some very useful documentation).</p>
 
-    <div data-type="example" class="drake"><h1>Getting RGB-D values into Open3D</h1>
+    <example class="drake"><h1>Getting RGB-D values into Open3D</h1>
 
       <p>Here the the mustard bottle example again, but this time we push the images coming out of <drake></drake> into the Open3D representation:</p>
 
       <pysrc>depth_camera_demo/show_open3d_rgbd.py</pysrc>
-    </div>
+    </example>
 
     <p>It's important to realize that the conversion of a depth image into a point cloud does loose some information -- specifically the information about the ray that was cast from the camera to arrive at that point.  In addition to declaring "there is geometry at this point", the depth image also implies that "there is no geometry in the straight line path between camera and this point".  We will make use of this information in some of our algorithms, so don't discard the depth images completely!  More generally, we will find that each of the different geometry representations have strengths and weaknesses -- it is very common to keep multiple representations around and to convert back and forth between them.</p>
 
@@ -535,11 +537,11 @@ MIT</a>. They will be updated throughout the Fall 2019 semester. </p>
 
     <p>You can infer from the optional input ports on this system that point cloud representations can potentially include color values for each of the Cartesian points.  The following example will get us a few point clouds to work with.</p>
 
-    <div data-type="example" class="drake"><h1>Getting a simulated point cloud</h1>
+    <example class="drake"><h1>Getting a simulated point cloud</h1>
 
       <pysrc>depth_camera_demo/show_open3d_pointcloud.py</pysrc>
 
-    </div>
+    </example>
 
     <todo>Combine all point clouds via https://drake.mit.edu/pydrake/pydrake.systems.perception.html?highlight=pointcloud#pydrake.systems.perception.PointCloudConcatenation</todo>
 
@@ -547,7 +549,7 @@ MIT</a>. They will be updated throughout the Fall 2019 semester. </p>
 
     There are a number of basic operations that one can do on point clouds.  I'll give just a few examples here.  
 
-    <section data-type="sect2"><h1>Surface Normal Estimation</h1>
+    <subsection data-type="sect2"><h1>Surface Normal Estimation</h1>
     
       <p>The simplest and most straight-forward algorithm for estimating the normals of a point cloud surface is to find the $k$ nearest neighbors, and fit a plane through those points using least-squares.  Let's denote the nominal point (about which we are estimating the normal) $p_0$, and it's $k$ nearest neighboard $p_i, i\in[1,k].$  Let us form the $k \times 3$ data matrix: $$X = [ p_1 - p_0, p_2 - p_0, ..., p_k - p_0 ].$$  Then the principal components of this data matrix are given by the <a href="https://en.wikipedia.org/wiki/Singular_value_decomposition">singular value decomposition</a> of $X$ (or the eigenvectors of $X^T X$); if $X = U\Sigma V^T$, then the columns of $V$ are the principal directions, with the last column (associated with the smallest singular value) representing the normal direction.  The length can be normalized to one; but keep in mind that the sign of this vector is ambiguous -- the $k$ nearest points don't give any information about what direction might be into the object or out of the object.  This is a case where knowing the original camera direction can help -- for example, PCL offers a method <code>flipNormalTowardsViewpoint</code> that post-processes the normals.</p>
 
@@ -563,15 +565,15 @@ MIT</a>. They will be updated throughout the Fall 2019 semester. </p>
 
       <p>Another standard feature that can be extracted from the $k$ nearest neighbors is the local curvature.  The math is quite similar.  <todo>add it here</todo></p>
 
-    </section>
+    </subsection>
 
-    <section data-type="sect2"><h1>Plane Segmentation</h1>
+    <subsection data-type="sect2"><h1>Plane Segmentation</h1>
     
       <p>Moving beyond local properties like surface normals and local curvature, we might choose to process a point cloud into primitive shapes -- like boxes or spheres.  Another practical and natural segmentation is segmenting surfaces into planes... which we can accomplish with heuristic algorithms which group neighboring points with similar surface normals.  We used this effectively in the DARPA Robotics Challenge.</p>
 
       <todo>Insert DRC plane segmentation videos here, from https://drive.google.com/drive/folders/1gYMJ0djBXbevWDBpekkK58pcbtZFr0A0 </todo>
 
-    </section>
+    </subsection>
 
   </section>
 
@@ -579,7 +581,7 @@ MIT</a>. They will be updated throughout the Fall 2019 semester. </p>
 
     <p>For many manipulation tasks, our goal is to estimate the pose of a particular known object in the scene.  In the extreme case, we might have a perfect mesh model of the object that we want to manipulation, and our task is to find the subset of the point cloud that can "fit" best to the known model.</p>
 
-    <section data-type="sect2"><h1>Iterative Closest Point (ICP)</h1>
+    <subsection data-type="sect2"><h1>Iterative Closest Point (ICP)</h1>
 
       <p>One of the famous and often used (despite it's well-known limitations) is the interative closest point algorithm.  We'll start with the simplest version of it -- where instead of localizing a mesh model to the point cloud data, we will try localize two point clouds relative to each other. This is commonly referred to as "point-to-point ICP", "point cloud registration", or the "point correspondence problem".</p>
 
@@ -602,26 +604,26 @@ MIT</a>. They will be updated throughout the Fall 2019 semester. </p>
 
       <p>Maybe more fundamental, though, is the fact that I don't think the ICP objective, even if we could optimize it perfectly is quite right.  (TODO: add the example of a long thin book).  And there is information that we have, which should aid in estimating the pose, which is not present in the point cloud (like the location of the cameras).</p>
     
-    </section>
+    </subsection>
 
     <todo>Add a simple example and a homework problem/exercise.</todo>
 
 
-    <section data-type="sect2"><h1>Pose estimation as Inverse Kinematics</h1>
+    <subsection data-type="sect2"><h1>Pose estimation as Inverse Kinematics</h1>
   
       <p>Dense articulated real-time tracking (DART).</p>
   
-    </section>
+    </subsection>
   
-    <section data-type="sect2"><h1>Coherent Point Drift (CPD) and FilterReg</h1>
+    <subsection data-type="sect2"><h1>Coherent Point Drift (CPD) and FilterReg</h1>
 
-    </section>
+    </subsection>
   
-    <section data-type="sect2"><h1>Global registration</h1>
+    <subsection data-type="sect2"><h1>Global registration</h1>
   
       <todo>Greg's work.  Luca Carlone's work.  etc.</todo>
 
-    </section>
+    </subsection>
   
   </section>
 
@@ -630,9 +632,9 @@ MIT</a>. They will be updated throughout the Fall 2019 semester. </p>
   
   </section>
 
-</section>
+</chapter>
 
-<section data-type="chapter" class="chapter" id="fusion">
+<chapter class="chapter" id="fusion">
     <h1>Dense Reconstructions</h1>
   
     <section data-type="sect1"><h1>Kinect Fusion</h1></section>
@@ -641,35 +643,35 @@ MIT</a>. They will be updated throughout the Fall 2019 semester. </p>
   
     <section data-type="sect1"><h1>SurfelWarp</h1></section>
   
-</section>
+</chapter>
 
-<section data-type="chapter" class="chapter" id="perception">
-    <h1>Deep Learning for Perception</h1>
-  
-    <section data-type="sect1"><h1>Getting training data</h1>
-  
-      <section data-type="sect2"><h1>LabelFusion</h1></section>
-  
-      <section data-type="sect2"><h1>Synthetic Datasets</h1></section>
-    </section>
-  
-    <section data-type="sect1"><h1>Segmentation</h1></section>
-  
-    <section data-type="sect1"><h1>Object recognition</h1></section>
-  
-    <section data-type="sect1"><h1>Pose estimation</h1></section>
-  
-    <section data-type="sect1"><h1>Keypoint Detection</h1></section>
-  
-    <section data-type="sect1"><h1>Dense Descriptors</h1></section>
-  
+<chapter class="chapter" id="perception">
+  <h1>Deep Learning for Perception</h1>
+
+  <section data-type="sect1"><h1>Getting training data</h1>
+
+    <subsection data-type="sect2"><h1>LabelFusion</h1></subsection>
+
+    <subsection data-type="sect2"><h1>Synthetic Datasets</h1></subsection>
   </section>
+
+  <section data-type="sect1"><h1>Segmentation</h1></section>
+
+  <section data-type="sect1"><h1>Object recognition</h1></section>
+
+  <section data-type="sect1"><h1>Pose estimation</h1></section>
+
+  <section data-type="sect1"><h1>Keypoint Detection</h1></section>
+
+  <section data-type="sect1"><h1>Dense Descriptors</h1></section>
+  
+</chapter>
 
 </div>
 
 <div class="part" title="Planning">
 
-<section data-type="chapter" class="chapter" id="grasping">
+<chapter class="chapter" id="grasping">
     <h1>Grasping</h1>
   
     <section data-type="sect1"><h1>Anti-podal grasps</h1></section>
@@ -678,32 +680,32 @@ MIT</a>. They will be updated throughout the Fall 2019 semester. </p>
   
     <section data-type="sect1"><h1>Learning grasps</h1></section>
   
-  </section>
+</chapter>
 
-<section data-type="chapter" class="chapter" id="planning">
+<chapter class="chapter" id="planning">
     <h1>Planning in Cluttered Environments</h1>
   
-</section>
+</chapter>
     
-<section data-type="chapter" class="chapter" id="belief">
+<chapter class="chapter" id="belief">
     <h1>Planning under Uncertainty</h1>
   
-</section>
+</chapter>
     
                 
-<section data-type="chapter" class="chapter" id="task">
+<chapter class="chapter" id="task">
     <h1>Programming the Task Level Execution</h1>
 
     <section data-type="sect1"><h1>Behavior Trees</h1></section>
 
     <section data-type="sect1"><h1>Task and Motion Planning</h1></section>
-</section>
+</chapter>
 
 </div>
 
 <div class="part" title="Control">
 
-<section data-type="chapter" class="chapter" id="manipulator">
+<chapter class="chapter" id="manipulator">
   <h1>Manipulator Control</h1>
 
   <p>In this chapter we will give a brief introduction to methods for controlling the motion of the arm -- this is a relatively mature and well-understood topic.  This is in contrast with the state of algorithms for controlling the motion of the objects in the world, which in its full generality is still a relatively immature and poorly-understood topic (and the subject of the next few chapters).  But even though our goal is controlling the motion of objects in the world, the first step is to move the robot!</p> 
@@ -760,53 +762,53 @@ MIT</a>. They will be updated throughout the Fall 2019 semester. </p>
 
   -->
 
-</section>
+</chapter>
 
-<section data-type="chapter" class="chapter" id="contact">
+<chapter class="chapter" id="contact">
   <h1>Non-Prehensile Manipulation</h1>
 
   <section data-type="sect1"><h1>Planning through Contact</h1></section>
   
   <section data-type="sect1"><h1>Visuo-Motor Policies</h1></section>
-</section>
+</chapter>
 
-<section data-type="chapter" class="chapter" id="imitation">
+<chapter class="chapter" id="imitation">
     <h1>Teleoperation and Imitation Learning</h1>
   
     <!-- Not exactly sure where I want to put this, but it seems useful to have.  My current view is that this is an extremely useful set of tools for exploring the space of solutions, but probably not a final solution...  -->
     <p>Interfaces.  Inputs (keyboard + mouse, HTC Vive, data gloves...).  Feedback (VR, haptic feedback).</p>
   
-</section>
+</chapter>
   
-<section data-type="chapter" class="chapter" id="rl">
+<chapter class="chapter" id="rl">
     <h1>Reinforcement Learning</h1>
   
-</section>
+</chapter>
   
   
 </div>
 
 <div class="part" title="Special Topics">
 
-<section data-type="chapter" class="chapter" id="intuitive">
+<chapter class="chapter" id="intuitive">
     <h1>Intuitive Physics</h1>
 
-</section>
+</chapter>
 
 <todo>Maybe a chapter on tactile feedback (estimation, tracking, slip detection, etc)?</todo>
 
-<section data-type="chapter" class="chapter" id="verification">
+<chapter class="chapter" id="verification">
   <h1>Verification and Validation</h1>
 
   <p>P(world)</p>
 
-</section>
+</chapter>
 
 </div>
 
 <appendix class="part" title="Appendix">
 
-  <section data-type="chapter" class="chapter" id="drake"><h1>Drake</h1>
+  <chapter class="chapter" id="drake"><h1>Drake</h1>
 
     <p>The <drake></drake> website is the main source for information and
     documentation.  This goal of this chapter provide a few specific pointers
@@ -842,15 +844,15 @@ MIT</a>. They will be updated throughout the Fall 2019 semester. </p>
       started.  The links below indicate the specific distributions that the
       examples in this text have been tested against.</p>
   
-      <section data-type="sect2"><h1>Download the binaries</h1>
+      <subsection data-type="sect2"><h1>Download the binaries</h1>
   
         <div class="bionic"><pre class="highlight"><code>curl -o drake.tar.gz <div id="drake-bionic-binaries" style="display:inline">https://drake-packages.csail.mit.edu/drake/nightly/drake-latest-bionic.tar.gz</div></code></pre></div>
   
         <div class="mac"><pre class="highlight"><code>curl -o drake.tar.gz <div id="drake-mac-binaries" style="display:inline">https://drake-packages.csail.mit.edu/drake/nightly/drake-latest-mac.tar.gz</div></code></pre></div>
   
-      </section>
+      </subsection>
   
-      <section data-type="sect2"><h1>Unpack and set your PYTHONPATH and Test</h1>
+      <subsection data-type="sect2"><h1>Unpack and set your PYTHONPATH and Test</h1>
   
         <div class="bionic"><pre class="highlight"><code>sudo tar -xvzf drake.tar.gz -C /opt
 sudo /opt/drake/share/drake/setup/install_prereqs.sh
@@ -863,13 +865,13 @@ python3 -c 'import pydrake; print(pydrake.__file__)</code></pre></div>
 export PYTHONPATH=/opt/drake/lib/python3.7/site-packages:${PYTHONPATH}
   
 python3 -c 'import pydrake; print(pydrake.__file__)</code></pre></div>
-      </section>
+      </subsection>
   
-      <section data-type="sect2"><h1>See Also</h1>
+      <subsection data-type="sect2"><h1>See Also</h1>
   
         <p>There are a number of <a href="https://nbviewer.jupyter.org/github/RobotLocomotion/drake/tree/master/tutorials/">tutorials</a> in <drake></drake> that can help you get started.</p>
   
-      </section>
+      </subsection>
   
     </section>
   
@@ -929,9 +931,9 @@ export PYTHONPATH=`pwd`/manipulation/src:${PYTHONPATH}</code></pre></div>
   
     </section>
   
-  </section> <!-- end chapter on drake -->
+  </chapter> <!-- end chapter on drake -->
 
-  <section data-type="chapter" class="chapter" id="station"><h1>Setting up your own "Manipulation Station"</h1>
+  <chapter class="chapter" id="station"><h1>Setting up your own "Manipulation Station"</h1>
 
     <p>Simulation is an extremely powerful tool, and the fact that we can give it away freely makes it a powerful equalizer.  Just a few years ago, nobody believed that you could develop a manipulation system in simulation and expect it to work in reality.  Nowadays, though, we are seeing consistent evidence that our simulation fidelity is high enough that if can achieve <i>robust</i> performance in simulation, then we are optimistic that it can transfer to reality.</p>
 
@@ -989,7 +991,7 @@ export PYTHONPATH=`pwd`/manipulation/src:${PYTHONPATH}</code></pre></div>
 
     </section>    
 
-  </section>
+  </chapter>
 
 
 </appendix>
