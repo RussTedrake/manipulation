@@ -324,9 +324,9 @@ MIT</a>. They will be updated throughout the Fall 2019 semester. </p>
 
   <todo>insert the manipulation station block diagram image here.</todo>
 
-  <section data-type="sect1"><h1>Arms</h1>
+  <section><h1>Arms</h1>
 
-    <subsection data-type="sect2"><h1>Position-controlled robots</h1>
+    <subsection><h1>Position-controlled robots</h1>
 
       <figure>
         <img height=200px src="https://www.robots.com/images/robots/Universal/Universal_UR10_0002.jpg" />
@@ -341,7 +341,7 @@ MIT</a>. They will be updated throughout the Fall 2019 semester. </p>
 
       <p>The short answer is that our electric motors often require large gear reductions, and gear reductions come with a number of dynamic effects that are very difficult to model -- including backlash, vibration, and friction. So perhaps a more accurate description of a motor + transmission is $$\tau = k_m i + \tau_{transmission},$$ where the last term is considered difficult to model, and may even have internal dynamics (like for the backlash).  Conventional wisdom is that for large gear-ratios (say $\gg 10$), this term is significant enough that it cannot be ignored, and torque is no longer simply related to current.</p>
 
-      <subsubsection data-type="sect3"><h1>Position Control.</h1>
+      <subsubsection><h1>Position Control.</h1>
 
         <p>How can we overcome this challenge of not having a good model of the
         transmission dynamics?  Regulating the current or speed of the motor
@@ -365,7 +365,7 @@ MIT</a>. They will be updated throughout the Fall 2019 semester. </p>
 
       </subsubsection>
 
-      <subsubsection data-type="sect3"><h1>An aside: link dynamics with a transmission.</h1>
+      <subsubsection><h1>An aside: link dynamics with a transmission.</h1>
 
         <p>One thing that might be surprising is that, despite the fact that the
         joint dynamics of a manipulator are highly coupled and state dependent,
@@ -387,7 +387,7 @@ MIT</a>. They will be updated throughout the Fall 2019 semester. </p>
 
     </subsection>
 
-    <subsection data-type="sect2"><h1>Torque-controlled robots</h1>
+    <subsection><h1>Torque-controlled robots</h1>
 
       <p>Although not as common, there are a number of robots that do support direct control of the joint torques.  There are a handful of ways that this capability can be realized.</p>  
         
@@ -401,15 +401,15 @@ MIT</a>. They will be updated throughout the Fall 2019 semester. </p>
 
   </section>
 
-  <section data-type="sect1"><h1>Hands</h1>
+  <section><h1>Hands</h1>
 
-    <subsection data-type="sect2"><h1>Simple grippers</h1></subsection>
+    <subsection><h1>Simple grippers</h1></subsection>
 
-    <subsection data-type="sect2"><h1>Dexterous hands</h1></subsection>
+    <subsection><h1>Dexterous hands</h1></subsection>
 
-    <subsection data-type="sect2"><h1>Soft/underactuated hands</h1></subsection>
+    <subsection><h1>Soft/underactuated hands</h1></subsection>
 
-    <subsection data-type="sect2"><h1>Other end-effectors</h1>
+    <subsection><h1>Other end-effectors</h1>
     
       <p>Suction, jamming grippers, tool-changers...`</p>
 
@@ -417,9 +417,9 @@ MIT</a>. They will be updated throughout the Fall 2019 semester. </p>
 
   </section>
 
-  <section data-type="sect1"><h1>Cameras and Depth Sensors</h1></section>
+  <section><h1>Cameras and Depth Sensors</h1></section>
 
-  <section data-type="sect1"><h1>Tactile Sensors</h1></section>
+  <section><h1>Tactile Sensors</h1></section>
 
 </chapter>
 
@@ -445,13 +445,13 @@ MIT</a>. They will be updated throughout the Fall 2019 semester. </p>
 
   <p>There is no question that deep learning has had an enormous impact in perception -- one might even say that it has enabling the current surge in manipulation advances.  And we will certainly cover it in these notes.  But when I've heard colleagues say that "all perception these days is based on deep learning", I can't help but cry foul.  There has been another surge of progress in the last few years that has been happening in parallel -- the revolution in geometric reasoning -- fueled by applications in autonomous driving and augmented reality in addition to manipulation.  Most advanced manipulation systems these days combine both "deep perception" and "geometric perception".</p>
 
-  <section data-type="sect1"><h1>Depth Sensors</h1>
+  <section><h1>Depth Sensors</h1>
   
     <p>Primarily RGB-D (ToF vs projected texture stereo vs ...) cameras and Lidar</p>
 
     <p>The cameras we are using in this course are <a href="https://software.intel.com/en-us/realsense/d400">Intel RealSense D415</a>....</p>
 
-    <subsection data-type="sect2"><h1>Simulation</h1>
+    <subsection><h1>Simulation</h1>
     
       <p>There are a number of levels of fidelity at which one can simulate a camera like the D415.  We'll start our discussion here using an "ideal" depth camera simulation -- the pixels returned represent the true geometric depth in the direction of each pixel coordinate.  In <drake></drake> that is represented by the <code>RgbdSensor</code> system, which can be wired up directly to the <code>SceneGraph</code>.</p>
 
@@ -497,7 +497,7 @@ MIT</a>. They will be updated throughout the Fall 2019 semester. </p>
     </subsection>
   </section>
 
-  <section data-type="sect1"><h1>Representations for Geometry</h1>
+  <section><h1>Representations for Geometry</h1>
     
     <p>Depth image, point cloud, triangulated mesh, signed distance functions, (+ surfels, occupancy maps, ...)</p>
 
@@ -514,7 +514,7 @@ MIT</a>. They will be updated throughout the Fall 2019 semester. </p>
 
   </section>
 
-  <section data-type="sect1"><h1>Working with Point Clouds</h1>
+  <section><h1>Working with Point Clouds</h1>
 
     <p>First, let us get a few simulated point clouds to work with.  We can use either <drake></drake> or Open3d to convert the depth image into a point cloud; we'll use Drake for this step here simply because we already have the camera parameters in the Drake format.  Although we can call the conversion functions directly, we can also add a system that does the conversion for us in the systems framework:</p>
 
@@ -549,7 +549,7 @@ MIT</a>. They will be updated throughout the Fall 2019 semester. </p>
 
     There are a number of basic operations that one can do on point clouds.  I'll give just a few examples here.  
 
-    <subsection data-type="sect2"><h1>Surface Normal Estimation</h1>
+    <subsection><h1>Surface Normal Estimation</h1>
     
       <p>The simplest and most straight-forward algorithm for estimating the normals of a point cloud surface is to find the $k$ nearest neighbors, and fit a plane through those points using least-squares.  Let's denote the nominal point (about which we are estimating the normal) $p_0$, and it's $k$ nearest neighboard $p_i, i\in[1,k].$  Let us form the $k \times 3$ data matrix: $$X = [ p_1 - p_0, p_2 - p_0, ..., p_k - p_0 ].$$  Then the principal components of this data matrix are given by the <a href="https://en.wikipedia.org/wiki/Singular_value_decomposition">singular value decomposition</a> of $X$ (or the eigenvectors of $X^T X$); if $X = U\Sigma V^T$, then the columns of $V$ are the principal directions, with the last column (associated with the smallest singular value) representing the normal direction.  The length can be normalized to one; but keep in mind that the sign of this vector is ambiguous -- the $k$ nearest points don't give any information about what direction might be into the object or out of the object.  This is a case where knowing the original camera direction can help -- for example, PCL offers a method <code>flipNormalTowardsViewpoint</code> that post-processes the normals.</p>
 
@@ -567,7 +567,7 @@ MIT</a>. They will be updated throughout the Fall 2019 semester. </p>
 
     </subsection>
 
-    <subsection data-type="sect2"><h1>Plane Segmentation</h1>
+    <subsection><h1>Plane Segmentation</h1>
     
       <p>Moving beyond local properties like surface normals and local curvature, we might choose to process a point cloud into primitive shapes -- like boxes or spheres.  Another practical and natural segmentation is segmenting surfaces into planes... which we can accomplish with heuristic algorithms which group neighboring points with similar surface normals.  We used this effectively in the DARPA Robotics Challenge.</p>
 
@@ -577,11 +577,11 @@ MIT</a>. They will be updated throughout the Fall 2019 semester. </p>
 
   </section>
 
-  <section data-type="sect1"><h1>Geometric Pose Estimation</h1>
+  <section><h1>Geometric Pose Estimation</h1>
 
     <p>For many manipulation tasks, our goal is to estimate the pose of a particular known object in the scene.  In the extreme case, we might have a perfect mesh model of the object that we want to manipulation, and our task is to find the subset of the point cloud that can "fit" best to the known model.</p>
 
-    <subsection data-type="sect2"><h1>Iterative Closest Point (ICP)</h1>
+    <subsection><h1>Iterative Closest Point (ICP)</h1>
 
       <p>One of the famous and often used (despite it's well-known limitations) is the interative closest point algorithm.  We'll start with the simplest version of it -- where instead of localizing a mesh model to the point cloud data, we will try localize two point clouds relative to each other. This is commonly referred to as "point-to-point ICP", "point cloud registration", or the "point correspondence problem".</p>
 
@@ -609,17 +609,17 @@ MIT</a>. They will be updated throughout the Fall 2019 semester. </p>
     <todo>Add a simple example and a homework problem/exercise.</todo>
 
 
-    <subsection data-type="sect2"><h1>Pose estimation as Inverse Kinematics</h1>
+    <subsection><h1>Pose estimation as Inverse Kinematics</h1>
   
       <p>Dense articulated real-time tracking (DART).</p>
   
     </subsection>
   
-    <subsection data-type="sect2"><h1>Coherent Point Drift (CPD) and FilterReg</h1>
+    <subsection><h1>Coherent Point Drift (CPD) and FilterReg</h1>
 
     </subsection>
   
-    <subsection data-type="sect2"><h1>Global registration</h1>
+    <subsection><h1>Global registration</h1>
   
       <todo>Greg's work.  Luca Carlone's work.  etc.</todo>
 
@@ -628,7 +628,7 @@ MIT</a>. They will be updated throughout the Fall 2019 semester. </p>
   </section>
 
 
-  <section data-type="sect1"><h1>Tracking</h1>
+  <section><h1>Tracking</h1>
   
   </section>
 
@@ -637,33 +637,33 @@ MIT</a>. They will be updated throughout the Fall 2019 semester. </p>
 <chapter class="chapter" id="fusion">
     <h1>Dense Reconstructions</h1>
   
-    <section data-type="sect1"><h1>Kinect Fusion</h1></section>
+    <section><h1>Kinect Fusion</h1></section>
   
-    <section data-type="sect1"><h1>Elastic Fusion</h1></section>
+    <section><h1>Elastic Fusion</h1></section>
   
-    <section data-type="sect1"><h1>SurfelWarp</h1></section>
+    <section><h1>SurfelWarp</h1></section>
   
 </chapter>
 
 <chapter class="chapter" id="perception">
   <h1>Deep Learning for Perception</h1>
 
-  <section data-type="sect1"><h1>Getting training data</h1>
+  <section><h1>Getting training data</h1>
 
-    <subsection data-type="sect2"><h1>LabelFusion</h1></subsection>
+    <subsection><h1>LabelFusion</h1></subsection>
 
-    <subsection data-type="sect2"><h1>Synthetic Datasets</h1></subsection>
+    <subsection><h1>Synthetic Datasets</h1></subsection>
   </section>
 
-  <section data-type="sect1"><h1>Segmentation</h1></section>
+  <section><h1>Segmentation</h1></section>
 
-  <section data-type="sect1"><h1>Object recognition</h1></section>
+  <section><h1>Object recognition</h1></section>
 
-  <section data-type="sect1"><h1>Pose estimation</h1></section>
+  <section><h1>Pose estimation</h1></section>
 
-  <section data-type="sect1"><h1>Keypoint Detection</h1></section>
+  <section><h1>Keypoint Detection</h1></section>
 
-  <section data-type="sect1"><h1>Dense Descriptors</h1></section>
+  <section><h1>Dense Descriptors</h1></section>
   
 </chapter>
 
@@ -674,11 +674,11 @@ MIT</a>. They will be updated throughout the Fall 2019 semester. </p>
 <chapter class="chapter" id="grasping">
     <h1>Grasping</h1>
   
-    <section data-type="sect1"><h1>Anti-podal grasps</h1></section>
+    <section><h1>Anti-podal grasps</h1></section>
   
-    <section data-type="sect1"><h1>Grasp optimization</h1></section>
+    <section><h1>Grasp optimization</h1></section>
   
-    <section data-type="sect1"><h1>Learning grasps</h1></section>
+    <section><h1>Learning grasps</h1></section>
   
 </chapter>
 
@@ -696,9 +696,9 @@ MIT</a>. They will be updated throughout the Fall 2019 semester. </p>
 <chapter class="chapter" id="task">
     <h1>Programming the Task Level Execution</h1>
 
-    <section data-type="sect1"><h1>Behavior Trees</h1></section>
+    <section><h1>Behavior Trees</h1></section>
 
-    <section data-type="sect1"><h1>Task and Motion Planning</h1></section>
+    <section><h1>Task and Motion Planning</h1></section>
 </chapter>
 
 </div>
@@ -716,7 +716,7 @@ MIT</a>. They will be updated throughout the Fall 2019 semester. </p>
       \btau_g(\bq) + \btau, \label{eq:manip} \end{equation}
   where $\bq$ is the joint position vector, $\bM$ is the inertia matrix, $\bC$ captures Coriolis forces, and $\btau_g$ is the gravity vector and $\btau$ is the torque command.  We will begin by assuming that all of the parameters in these equations are known -- we've taken the time to model/estimate the masses and inertias, link lengths, etc; there are also many powerful results from system identification and adaptive control to help us relax that assumption later.</p>
 
-  <section data-type="sect1"><h1>PID Control</h1>
+  <section><h1>PID Control</h1>
   
     <p>Recall the standard form for a <a href="https://en.wikipedia.org/wiki/PID_controller">proportional-integral-derivative (PID) control</a> of joint $j$: 
       $$\tau_j = k_{pj} (q^d_j - q_j) + k_{dj} (\dot{q}^d_j - \dot{q}_j) + k_j \int (q^d_j - q_j) dt,$$ with $k_p$, $k_d$, and $k_i$ being the position, velocity, and integral gains.</p>
@@ -725,9 +725,9 @@ MIT</a>. They will be updated throughout the Fall 2019 semester. </p>
   
   </section>
 
-  <section data-type="sect1"><h1>Inverse Dynamics Control</h1></section>
+  <section><h1>Inverse Dynamics Control</h1></section>
 
-  <section data-type="sect1"><h1>Joint Impedance Control</h1></section>
+  <section><h1>Joint Impedance Control</h1></section>
 
 
   <!--
@@ -754,11 +754,11 @@ MIT</a>. They will be updated throughout the Fall 2019 semester. </p>
 
         
 
-  <section data-type="sect1"><h1>Kinematic trajectory optimization</h1></section>
+  <section><h1>Kinematic trajectory optimization</h1></section>
 
-  <section data-type="sect1"><h1>Task-space control</h1></section>
+  <section><h1>Task-space control</h1></section>
 
-  <section data-type="sect1"><h1>Key-point formulations</h1></section>
+  <section><h1>Key-point formulations</h1></section>
 
   -->
 
@@ -767,9 +767,9 @@ MIT</a>. They will be updated throughout the Fall 2019 semester. </p>
 <chapter class="chapter" id="contact">
   <h1>Non-Prehensile Manipulation</h1>
 
-  <section data-type="sect1"><h1>Planning through Contact</h1></section>
+  <section><h1>Planning through Contact</h1></section>
   
-  <section data-type="sect1"><h1>Visuo-Motor Policies</h1></section>
+  <section><h1>Visuo-Motor Policies</h1></section>
 </chapter>
 
 <chapter class="chapter" id="imitation">
@@ -837,14 +837,14 @@ MIT</a>. They will be updated throughout the Fall 2019 semester. </p>
         (Bionic)</span>  |
       <b>Mac Homebrew</b> </span></p>
   
-    <section data-type="sect1"><h1>Install Drake</h1>
+    <section><h1>Install Drake</h1>
   
       <p>Although I hope that power users will build <drake></drake> from source
       (and contribute back), I recommend using the precompiled binaries to get
       started.  The links below indicate the specific distributions that the
       examples in this text have been tested against.</p>
   
-      <subsection data-type="sect2"><h1>Download the binaries</h1>
+      <subsection><h1>Download the binaries</h1>
   
         <div class="bionic"><pre class="highlight"><code>curl -o drake.tar.gz <div id="drake-bionic-binaries" style="display:inline">https://drake-packages.csail.mit.edu/drake/nightly/drake-latest-bionic.tar.gz</div></code></pre></div>
   
@@ -852,7 +852,7 @@ MIT</a>. They will be updated throughout the Fall 2019 semester. </p>
   
       </subsection>
   
-      <subsection data-type="sect2"><h1>Unpack and set your PYTHONPATH and Test</h1>
+      <subsection><h1>Unpack and set your PYTHONPATH and Test</h1>
   
         <div class="bionic"><pre class="highlight"><code>sudo tar -xvzf drake.tar.gz -C /opt
 sudo /opt/drake/share/drake/setup/install_prereqs.sh
@@ -867,7 +867,7 @@ export PYTHONPATH=/opt/drake/lib/python3.7/site-packages:${PYTHONPATH}
 python3 -c 'import pydrake; print(pydrake.__file__)</code></pre></div>
       </subsection>
   
-      <subsection data-type="sect2"><h1>See Also</h1>
+      <subsection><h1>See Also</h1>
   
         <p>There are a number of <a href="https://nbviewer.jupyter.org/github/RobotLocomotion/drake/tree/master/tutorials/">tutorials</a> in <drake></drake> that can help you get started.</p>
   
@@ -875,7 +875,7 @@ python3 -c 'import pydrake; print(pydrake.__file__)</code></pre></div>
   
     </section>
   
-    <section data-type="sect1"><h1>Download the textbook supplement</h1>
+    <section><h1>Download the textbook supplement</h1>
   
       <div><pre class="highlight"><code>git clone https://github.com/RussTedrake/manipulation.git</code></pre></div>
   
@@ -889,7 +889,7 @@ export PYTHONPATH=`pwd`/manipulation/src:${PYTHONPATH}</code></pre></div>
   
     </section>
   
-    <section data-type="sect1"><h1>Run a textbook example</h1>
+    <section><h1>Run a textbook example</h1>
   
       <p>Note: All of the examples in the textbook supplement currently assume
       that working directory of your python interpreter is the
@@ -900,7 +900,7 @@ export PYTHONPATH=`pwd`/manipulation/src:${PYTHONPATH}</code></pre></div>
     </section>
   
     <!--
-    <section data-type="sect1"><h1>Consider Jupyter Notebook</h1>
+    <section><h1>Consider Jupyter Notebook</h1>
   
       <p>The examples you'll find throughout the text are provided so that
       they can be run in any python interpreter.  However, many people
@@ -923,7 +923,7 @@ export PYTHONPATH=`pwd`/manipulation/src:${PYTHONPATH}</code></pre></div>
       Troubleshooting.
     </todo>
   
-    <section data-type="sect1"><h1>Listing of <drake></drake> examples throughout this text</h1>
+    <section><h1>Listing of <drake></drake> examples throughout this text</h1>
   
       <p>The best overview we have for the remaining capabilities in <drake></drake> are the main chapters of these notes.  For convenience, here is a list of software examples that are sprinkled throughout the text:</p>
   
@@ -939,7 +939,7 @@ export PYTHONPATH=`pwd`/manipulation/src:${PYTHONPATH}</code></pre></div>
 
     <p>Of course, there is no substitute to watching your ideas/code bring life to a real physical robot.  The goal of this chapter is to help commoditize the robot hardware infrastructure, to the extent possible, by proving the bill of materials, the low-level drivers, and basic setup instructions to get you up and running with your very own manipulation station.</p>
 
-    <section data-type="sect1"><h1>Message Passing</h1>
+    <section><h1>Message Passing</h1>
     
       <p><drake></drake> supports multiple message passing subsystems (including ROS1), and for the most part I have no strong opinions about what you should use.  We use <a href="https://lcm-proj.github.io/">LCM</a> for this class because (1) it is lightweight as a dependency (it would be very painful/restrictive to have ROS as a mandatory dependency for <drake></drake>) and (2) we prefer multicast UDP to tcp/ip for the lowest level communications to/from the robot.</p>
 
@@ -947,7 +947,7 @@ export PYTHONPATH=`pwd`/manipulation/src:${PYTHONPATH}</code></pre></div>
 
     </section>
 
-    <section data-type="sect1"><h1>Kuka LBR iiwa + Schunk WSG Gripper</h1>
+    <section><h1>Kuka LBR iiwa + Schunk WSG Gripper</h1>
 
       <p>We have made extensive use of both the iiwa7 R800 and the iiwa14 R820; <drake></drake> provides URDFs for both models and the drivers should work for either.  We use the iiwa7 for the labs in this course because it is slightly smaller and we do not need the end-effector payload.</p>
 
@@ -965,7 +965,7 @@ export PYTHONPATH=`pwd`/manipulation/src:${PYTHONPATH}</code></pre></div>
 
     </section>
 
-    <section data-type="sect1"><h1>Intel Realsense D415 Depth Cameras</h1>
+    <section><h1>Intel Realsense D415 Depth Cameras</h1>
 
       <p>The D415 has been the camera of choice because of it's relatively good
       minimum range and due to the fact that multiple cameras do not interfere
@@ -983,7 +983,7 @@ export PYTHONPATH=`pwd`/manipulation/src:${PYTHONPATH}</code></pre></div>
 
     </section>
 
-    <section data-type="sect1"><h1>Miscellaneous hardware.</h1>
+    <section><h1>Miscellaneous hardware.</h1>
 
       <p>For the purposes of having a common workstation that we can use in the labs, we have included here the simple environment in which we mount the robot.  The robot just barely fits in the arena -- it was designed with the dimensions limited so that it can be moved (via a manual pallet jack) through standard office doors. </p>
 
