@@ -35,7 +35,7 @@
   </head>
 
 
-<body data-type="book" class="book" id="htmlbook" onload="revealChapters();">
+<body data-type="book" class="book" id="htmlbook" onload="revealChapters('manipulation');">
 <section data-type="titlepage" class="titlepage">
   <header>
     <h1><a href="manipulation.html"
@@ -882,18 +882,17 @@ python3 -c 'import pydrake; print(pydrake.__file__)</code></pre></div>
       <p>and install the prerequisites using the platform-specific installation script provided:</p>
   
       <div class="bionic"><pre class="highlight"><code>sudo manipulation/setup/ubuntu/install_prereqs.sh
-export PYTHONPATH=`pwd`/manipulation/src:${PYTHONPATH}</code></pre></div>
+export PYTHONPATH=`pwd`/manipulation:${PYTHONPATH}</code></pre></div>
   
       <div class="mac"><pre class="highlight"><code>manipulation/setup/mac/install_prereqs.sh
-export PYTHONPATH=`pwd`/manipulation/src:${PYTHONPATH}</code></pre></div>
+export PYTHONPATH=`pwd`/manipulation:${PYTHONPATH}</code></pre></div>
   
     </section>
   
     <section><h1>Run a textbook example</h1>
   
-      <p>Note: All of the examples in the textbook supplement currently assume
-      that working directory of your python interpreter is the
-      <code>manipulation/src</code> directory.</p>
+      <p>Note: All of the examples in the textbook supplement can be found in
+      the <code>manipulation</code> subdirectory.</p>
   
         <pysrc>depth_camera_demo/show_camera.py</pysrc>
   
@@ -907,7 +906,7 @@ export PYTHONPATH=`pwd`/manipulation/src:${PYTHONPATH}</code></pre></div>
       <i>love</i> the <a href="http://jupyter.org/">Jupyter Notebook</a>
       workflow, and the code should work for you there, as well.</p>
   
-      <p><a href="src/double_pendulum/simulate.ipynb">Here is an example</a> that
+      <p><a href="double_pendulum/simulate.ipynb">Here is an example</a> that
       shows you how to tell <code>matplotlib</code> to perform well in the
       notebook (including with animations).</p>
   

@@ -35,4 +35,4 @@ project(manipulation DESCRIPTION "Intelligent Robot Manipulation")
 
 include(CTest)
 
-add_subdirectory(src)
+add_subdirectory(manipulation)

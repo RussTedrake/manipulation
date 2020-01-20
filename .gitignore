@@ -11,8 +11,6 @@ cmake-build-debug/
 
 \.DS_Store
 
-src/jupyter_setup\.py
-
 .vscode/
 
 bazel-*
