@@ -8,14 +8,15 @@ from pydrake.systems.analysis import Simulator
 from pydrake.systems.framework import DiagramBuilder
 from pydrake.systems.primitives import ConstantVectorSource
 from pydrake.systems.planar_scenegraph_visualizer import (
-    PlanarSceneGraphVisualizer
-)
+    PlanarSceneGraphVisualizer)
 
 builder = DiagramBuilder()
 plant, scene_graph = AddMultibodyPlantSceneGraph(builder, time_step=0.0)
 
-Parser(plant, scene_graph).AddModelFromFile(FindResourceOrThrow(
-    "drake/manipulation/models/iiwa_description/urdf/planar_iiwa14_spheres_dense_elbow_collision.urdf"))  # noqa
+Parser(plant, scene_graph).AddModelFromFile(
+    FindResourceOrThrow(
+        "drake/manipulation/models/iiwa_description/urdf/planar_iiwa14_spheres_dense_elbow_collision.urdf"  # noqa
+    ))  # noqa
 plant.Finalize()
 
 visualizer = builder.AddSystem(PlanarSceneGraphVisualizer(scene_graph))

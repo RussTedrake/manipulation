@@ -1,10 +1,15 @@
-# -*- python -*-
+# -*- mode: python -*-
+# vi: set ft=python :
 
-py_library(
+# Copyright 2020 Massachusetts Institute of Technology.
+# Licensed under the BSD 3-Clause License. See LICENSE.TXT for details.
+
+load("//htmlbook/tools/python:defs.bzl", "rt_py_library")
+
+rt_py_library(
   name = "demo",
-  imports = ["/Users/russt/drake-install/lib/python3.7/site-packages"],
+  imports = [".."],
   srcs = ["demo.py"],
-  deps = ["@drake//bindings/pydrake"],
 )
 
 # Disabled pending resolution of #8.

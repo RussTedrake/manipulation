@@ -11,6 +11,11 @@ exports_files(
     visibility = ["//visibility:public"],
 )
 
+exports_files(
+    ["setup.cfg"],
+    visibility = ["//:__subpackages__"],
+)
+
 filegroup(
     name = "html",
     srcs = glob(["*.html", "*.html.in"]),

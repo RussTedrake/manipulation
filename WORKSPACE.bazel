@@ -1,48 +1,73 @@
-# -*- python -*-
+# -*- mode: python -*-
+# vi: set ft=python :
 
-# This file marks a workspace root for the Bazel build system. see
-# https://bazel.build/ .
+# Copyright 2020 Massachusetts Institute of Technology.
+# Licensed under the BSD 3-Clause License. See LICENSE.TXT for details.
 
 workspace(name = "manipulation")
 
-# Load drake (recipe is from https://github.com/RobotLocomotion/drake-external-examples/blob/master/drake_bazel_installed/WORKSPACE)
+load(
+    "//htmlbook/tools:repositories.bzl",
+    "rt_dependencies",
+    "rt_toolchains",
+)
 
-# Choose which nightly build of Drake to use.
-DRAKE_RELEASE = "latest"  # Can also use YYYYMMDD here, e.g., "20191026".
-DRAKE_CHECKSUM = ""       # When using YYYYMMDD, best to add a checksum here.
+rt_dependencies()
 
-# To use a local unpacked Drake binary release instead of an http download, set
-# the INSTALLED_DRAKE_DIR environment variable to the correct path, e.g., 
-# "/opt/drake".
-load("//:environ.bzl", "environ_repository")
-environ_repository(name = "environ", vars = ["INSTALLED_DRAKE_DIR"])
-load("@environ//:environ.bzl", INSTALLED_DRAKE_DIR = "INSTALLED_DRAKE_DIR")
+rt_toolchains()
 
-# This is only relevant when INSTALLED_DRAKE_DIR is set.
+load("@bazel_skylib//lib:versions.bzl", "versions")
+
+versions.check("2.0.0")
+
+load(
+    "//htmlbook/tools/python:repositories.bzl",
+    "rt_pip3_import",
+    "rt_python_repositories",
+)
+
+rt_python_repositories()
+
+rt_pip3_import(name = "pip")
+
+load("@pip//:requirements.bzl", "pip_install")
+
+pip_install()
+
+load("//htmlbook/tools/buildifier:repositories.bzl", "buildifier_dependencies")
+
+buildifier_dependencies()
+
+load("//htmlbook/tools/tidy:repositories.bzl", "tidy_dependencies")
+
+tidy_dependencies()
+
+# Set the DRAKE_INSTALL_DIR environment variable to the correct path; if
+# DRAKE_INSTALL_DIR is not set it will look in "/opt/drake".
+load("//htmlbook/tools:environ.bzl", "environ_repository")
+
+# Allowing PWD to be loaded here is a terrible work-around that allows me to
+# pass the equivalent of BUILD_WORKSPACE_DIRECTORY as a command line argument
+# (since it's not available to tests).  This enables *non-hermetic* tests...
+# which I introduced because it is hard to list all .py and .ipynb  files as
+# dependencies via bazel's glob since "labels are not allowed to cross the
+# package boundary and glob does not match files in subpackages."
+environ_repository(
+    name = "environ",
+    vars = [
+        "DRAKE_INSTALL_DIR",
+        "PWD",
+    ],
+)
+
+load("@environ//:environ.bzl", "DRAKE_INSTALL_DIR")
+
 new_local_repository(
-    name = "drake_artifacts",
-    path = INSTALLED_DRAKE_DIR,
-    build_file_content = "#",
-) if INSTALLED_DRAKE_DIR else None
+    name = "rules_drake",
+    build_file_content = "",
+    path = DRAKE_INSTALL_DIR if DRAKE_INSTALL_DIR else "/opt/drake",
+)
 
-# This is only relevant when INSTALLED_DRAKE_DIR is unset.
-load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
-http_archive(
-    name = "drake_artifacts",
-    url = "https://drake-packages.csail.mit.edu/drake/nightly/drake-{}-bionic.tar.gz".format(DRAKE_RELEASE),
-    sha256 = DRAKE_CHECKSUM,
-    strip_prefix = "drake/",
-    build_file_content = "#",
-) if not INSTALLED_DRAKE_DIR else None
-
-# Load and run the repository rule that knows how to provide the @drake
-# repository based on a Drake binary release.
-load("@drake_artifacts//:share/drake/repo.bzl", "drake_repository")
+load("@rules_drake//:share/drake/repo.bzl", "drake_repository")
 
 drake_repository(name = "drake")
-
-
-
-# TODO(russt): set MPLBACKEND=Template environment variable for tests"
-# TODO(russt): add python lint tests
-# TODO(russt): tests fail on drake deprecated warning
