@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+
+<html>
+
+  <head>
+    <title>Intelligent Robotic Manipulation: Manipulation Hardware</title>
+    <meta name="Intelligent Robotic Manipulation: Manipulation Hardware" content="text/html; charset=utf-8;" />
+    <link rel="canonical" href="http://underactuated.mit.edu/hardware.html" />
+
+    <script src="https://hypothes.is/embed.js" async></script>
+    <script type="text/javascript" src="htmlbook/book.js"></script>
+
+    <script src="htmlbook/mathjax-config.js" defer></script> 
+    <script type="text/javascript" id="MathJax-script" defer
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js">
+    </script>
+    <script>window.MathJax || document.write('<script type="text/javascript" src="htmlbook/MathJax/es5/tex-chtml.js" defer><\/script>')</script>
+
+    <link rel="stylesheet" href="htmlbook/highlight/styles/default.css">
+    <script src="htmlbook/highlight/highlight.pack.js"></script> <!-- http://highlightjs.readthedocs.io/en/latest/css-classes-reference.html#language-names-and-aliases -->
+    <script>hljs.initHighlightingOnLoad();</script>
+
+    <link rel="stylesheet" type="text/css" href="htmlbook/book.css" />
+  </head>
+
+<body onload="loadChapter('underactuated');">
+
+<div data-type="titlepage">
+  <header>
+    <h1><a href="index.html" style="text-decoration:none;">Intelligent Robotic Manipulation</a></h1>
+    <p data-type="subtitle">Algorithms for Walking, Running, Swimming, Flying, and Manipulation</p> 
+    <p style="font-size: 18px;"><a href="http://people.csail.mit.edu/russt/">Russ Tedrake</a></p>
+    <p style="font-size: 14px; text-align: right;"> 
+      &copy; Russ Tedrake, 2020<br/>
+      <a href="tocite.html">How to cite these notes</a> &nbsp; | &nbsp;
+      <a target="_blank" href="https://docs.google.com/forms/d/e/1FAIpQLSesAhROfLRfexrRFebHWLtRpjhqtb8k_iEagWMkvc7xau08iQ/viewform?usp=sf_link">Send me your feedback</a><br/>
+    </p>
+  </header>
+</div>
+
+<p><b>Note:</b> These are working notes used for <a
+href="http://underactuated.csail.mit.edu/Spring2020/">a course being taught
+at MIT</a>. They will be updated throughout the Spring 2020 semester.  <a 
+href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos are available on YouTube</a>.</p> 
+
+<table style="width:100%;"><tr style="width:100%">
+  <td style="width:33%;text-align:left;"><a class="previous_chapter" href=intro.html>Previous Chapter</a></td>
+  <td style="width:33%;text-align:center;"><a href=index.html>Table of contents</a></td>
+  <td style="width:33%;text-align:right;"><a class="next_chapter" href=kinematics.html>Next Chapter</a></td>
+</tr></table>
+
+
+<!-- EVERYTHING ABOVE THIS LINE IS OVERWRITTEN BY THE INSTALL SCRIPT -->
+<chapter style="counter-reset: chapter 1"><h1>Manipulation Hardware</h1>
+
+  <todo>insert the manipulation station block diagram image here.</todo>
+
+  <section><h1>Arms</h1>
+
+    <subsection><h1>Position-controlled robots</h1>
+
+      <figure>
+        <img height=200px src="https://www.robots.com/images/robots/Universal/Universal_UR10_0002.jpg" />
+        <img height=200px src="https://www07.abb.com/api/ir/getimage/36fb710b-54e0-4e53-8383-aacde553ec56/1" />
+        <figcaption>Two popular position controlled manipulators.  (Left) The UR10 from Universal Robotics.  (Right)The ABB Yumi.</figcaption>
+      </figure>
+
+      <p>Most robot arms today are "position controlled" -- given a desired joint position (or joint trajectory), the robot executes it with relatively high precision.  Do you know why (really)?  In most cases, especially when we are coming into contact with other surfaces/objects that we do not have good models for, we would be happier if we could measure and control joint torque directly; if we could command torque (at sufficiently high bandwidth) then we could certainly regulate positions, too.</p>
+
+      <p>Light-weight arms like the example above are actuated with electric motors.  For a reasonably high-quality electric motor (with windings designed to minimize torque ripple, etc), we expect the torque that the motor outputs to be directly proportional to the current that we apply: $$\tau = k_{i} i,$$ where $\tau$ is the torque, $i$ is the applied current, and $k_m$ is the "motor torque constant". (Similarly, applied voltage has a simple (affine) relationship with the motor's steady-state velocity).  If we can control the current, then why can we not control the torque?  
+      </p>
+
+      <p>The short answer is that our electric motors often require large gear reductions, and gear reductions come with a number of dynamic effects that are very difficult to model -- including backlash, vibration, and friction. So perhaps a more accurate description of a motor + transmission is $$\tau = k_m i + \tau_{transmission},$$ where the last term is considered difficult to model, and may even have internal dynamics (like for the backlash).  Conventional wisdom is that for large gear-ratios (say $\gg 10$), this term is significant enough that it cannot be ignored, and torque is no longer simply related to current.</p>
+
+      <subsubsection><h1>Position Control.</h1>
+
+        <p>How can we overcome this challenge of not having a good model of the
+        transmission dynamics?  Regulating the current or speed of the motor
+        only requires sensors on the motor; if we add more sensors on the output
+        side of the transmission, then we can use high-gain feedback to try to
+        directly regulate the joint, instead of the motor.  Importantly,
+        although the torques due to the transmission are not known precisely,
+        they are also not arbitrary -- for instance they will never add energy
+        into the system.  Most importantly, we can be confident that there is a
+        <i>monotonically increasing</i> relationship between the current that we
+        put into the motor and the torque at the joint, and ultimately the
+        acceleration of the joint.  Note though that I mean monotonic precisely,
+        "non-decreasing" but <i>not</i> "strictly increasing", because, for
+        instance, when a joint is starting from rest, static friction will
+        resist small torques without having any acceleration at the output.</p>
+
+        <p>The most common sensor to add to the joint is a position sensor -- typically an encoder or potentiometer -- these are inexpensive, accurate, and robust.  In practice, we think of these as providing (after some signal filtering/conditioning) accurate measurements of the joint position and joint velocity -- joint accelerations can also be obtained via differentiation but are generally considered more noisy and less suitable for use in tight feedback loops.  This is sufficient for accurately tracking desired position trajectories of the arm... for each joint, if we are given a desired trajectory $q^d(t)$, then I can track this using <a href="https://en.wikipedia.org/wiki/PID_controller">proportional-integral-derivative (PID) control</a>: 
+        $$\tau = k_p (q^d - q) + k_d (\dot{q}^d - \dot{q}) + k_i \int (q^d - q) dt,$$ with $k_p$, $k_d$, and $k_i$ being the position, velocity, and integral gains.  PID control has a rich theory, and a trove of knowledge about how to choose the gains, which I will not reproduce here.  I will note, however, that when we simulate position-controlled robots we use the equation above, commanding a torque directly, but on hardware our PID controller can output desired motor currents directly, since we cannot command torques.  This is generally considered sufficiently accurate for simulation, but does mean that we often have a separate list of gains for the physical robot than for the simulation, differing by at least the motor torque constant.</p>
+
+        <todo>Add a simulation of a single joint against gravity with PID control gains on sliders, following a sinusoidal trajectory.</todo>
+
+      </subsubsection>
+
+      <subsubsection><h1>An aside: link dynamics with a transmission.</h1>
+
+        <p>One thing that might be surprising is that, despite the fact that the
+        joint dynamics of a manipulator are highly coupled and state dependent,
+        the PID gains for each joint are often chosen independently for each
+        joint, and are constant (not <a
+        href="https://en.wikipedia.org/wiki/Gain_scheduling">gain-scheduled</a>).
+        Wouldn't you expect for the torques required for e.g. a robot arm at
+        full extention holding a milk jug might be very different than the
+        torques required when it is unloaded in a vertical hanging position?
+        Surprisingly, the required gains/torques might not be as different as
+        one would think.</p>
+          
+        <p>Electric motors are most efficient at high speeds (often > 100 or 1,000 rotations per minute).  We probably don't actually want our robots to move that fast even if they could!  So nearly all electric robots have fairly substantial gear reductions, often on the order of 100:1; the transmission output turns one revolution for every 100 rotations of the motor, and the output torque is 100 times greater than the motor torque.  For a gear ratio, $n$, actuating a joint $q$, we have $$q_{motor} = n q,\quad \dot{q}_{motor} = n \dot{q}, \quad \ddot{q}_{motor} = n \ddot{q}, \qquad \tau_{motor} = \frac{1}{n} \tau.$$  Interestingly, this has a fairly profound impact on the resulting dynamics (given by $f = ma$), even for a single joint.  Thinking only about the arm, we would write $ma = \sum f$ in the rotational coordinates as $$I_{arm} \ddot{q} = \tau_{gravity} + \tau,$$ where $I_{arm}$ is the moment of inertia. For example, for a <a href="http://underactuated.mit.edu/underactuated.html?chapter=pend" target="underactuated">simple pendulum</a>, we might have have $$ml^2 \ddot{q} = - mgl\sin{q} + \tau.$$  But the applied joint torque $\tau$ actually comes from the motor -- if we write this equation in terms of motor coordinates we get: $$\frac{I_{arm}}{n} \ddot{q}_{motor} = \tau_{gravity} + n\tau_{motor}.$$  If we divide through by $n$, and take into account the fact that the motor itself has inertia (e.g. from the large spinning magnets) that is not effected by the gear ratio, then we obtain:
+        $$\left(I_{motor} + \frac{I_{arm}}{n^2}\right) \ddot{q}_{motor} = \frac{\tau_{gravity}}{n} + \tau_{motor}.$$</p>
+          
+        <p>It's interesting to note that, even though the mass of the motors might make up only a small fraction of the total mass of the robot, for highly geared robots they can play a significant role in the dynamics of the joints.  The "reflected inertia" of the arm at the motor is cut by the square of the gear ratio; or the "reflected inertia" of the motor at the arm is multiplied by the square of the gear ratio.  This has interesting consequences -- as we move to the multi-link case, we will see that the inertia of the arm is a <a href="http://underactuated.mit.edu/underactuated.html?chapter=multibody" target="underactuated">state-dependent function that captures the inertial coupling of the other joints in the manipulator</a>.  The motor inertia, on the other hand, is constant.  For large gear ratios, this means the dynamics of the joint are less dependent on the nonlinear effects of joint position and velocity, making it relatively easier to tune constant feedback gains that perform well in all configurations.</p>
+        
+      </subsubsection>
+
+    </subsection>
+
+    <subsection><h1>Torque-controlled robots</h1>
+
+      <p>Although not as common, there are a number of robots that do support direct control of the joint torques.  There are a handful of ways that this capability can be realized.</p>  
+        
+      <p>It <i>is</i> possible to actuate a robot using electric motors that require only a small gear reduction (e.g. $\le$ 10:1) where the frictional forces are negligible.  In the past, these "direct-drive robots"<elib>Asada87</elib> had enormous motors and limited payloads.  More recently, robots like the <a href="https://robots.ieee.org/robots/wam/">Barrett WAM</a> arm used cable drives to keep the arm light keep the motors at the base.  And just in the last few years, we've seen progress in high-torque outrunner and frameless motors bringing in a new generation of low-cost, direct-drive robots: c.f. MIT Cheetah <elib>Wensing17</elib>, <a href="http://rll.berkeley.edu/blue/">Berkeley Blue</a>, and <a href="https://www.halodi.com/">Halodi Eve</a>.</p>
+
+      <p>Hydraulic actuators provide another solution for generating large torques without large transmissions.  Sarcos had a series of <a href="https://www.youtube.com/watch?v=VDxWHNtZvyI">torque-controlled arms</a> (and humanoids), and many of the most famous robots from <a href="https://www.bostondynamics.com/robots">Boston Dynamics</a> are based on hydraulics (though there is an increasing trend towards electric motors).  These robots typically have a single central pump and each actuator has a (light weight) valve that can shunt fluid through the actuator or through a bypass; the differential pressure across the actuator is closely related to the resulting force/torque.</p>
+
+      <p>Another approach to torque control is to add sensors to directly measure the torque at the joint side of the actuator.  This is the approach used by the Kuka IIWA robot that we use in the example throughout this text; the IIWA actuators have <a href="https://en.wikipedia.org/wiki/Strain_gauge">strain gauges</a> integrated into the transmission.  However there is a trade-off between the stiffness of the transmission and that accuracy of the force/torque measurement -- the IIWA transmission includes an explicit "Flex Spline" with a stiffness around 5000 Nm/rad <elib>Wedler12</elib>.  Taking this idea to an extreme, Gill Pratt proposed "series-elastic actuators" that have even lower stiffness springs in the transmission, and proposed measuring joint position on the motor <i>and</i> joint sides to estimate the applied torques <elib>Pratt95b</elib>.  For example, the <a href="https://en.wikipedia.org/wiki/Baxter_(robot)">Baxter</a> and Sawyer robots from Rethink use series elastic actuators; I don't think they've published the spring stiffness values but similarly-motivated series-elastic actuators from <a href=http://docs.hebi.us/hardware.html>HEBI robotics are closer to 100 Nm/rad</a>.  Even for the IIWA actuators, the joint elasticity is significant enough that the low level controllers go to great length to take it into account explicitly it in order to achieve high performance control of the joints.</p>
+
+    </subsection>
+
+  </section>
+
+  <section><h1>Hands</h1>
+
+    <subsection><h1>Simple grippers</h1></subsection>
+
+    <subsection><h1>Dexterous hands</h1></subsection>
+
+    <subsection><h1>Soft/underactuated hands</h1></subsection>
+
+    <subsection><h1>Other end-effectors</h1>
+    
+      <p>Suction, jamming grippers, tool-changers...`</p>
+
+    </subsection>
+
+  </section>
+
+  <section><h1>Cameras and Depth Sensors</h1></section>
+
+  <section><h1>Tactile Sensors</h1></section>
+  
+</chapter>
+<!-- EVERYTHING BELOW THIS LINE IS OVERWRITTEN BY THE INSTALL SCRIPT -->
+
+<table style="width:100%;"><tr style="width:100%">
+  <td style="width:33%;text-align:left;"><a class="previous_chapter" href=intro.html>Previous Chapter</a></td>
+  <td style="width:33%;text-align:center;"><a href=index.html>Table of contents</a></td>
+  <td style="width:33%;text-align:right;"><a class="next_chapter" href=kinematics.html>Next Chapter</a></td>
+</tr></table>
+
+<div id="footer">
+  <hr>
+  <table style="width:100%;">
+    <tr><td><em>Intelligent Robotic Manipulation</em></td><td align="right">&copy; Russ
+      Tedrake, 2020</td></tr>
+  </table>
+</div>
+
+
+</body>
+</html>

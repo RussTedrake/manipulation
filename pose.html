@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+
+<html>
+
+  <head>
+    <title>Intelligent Robotic Manipulation: Pose Estimation and Tracking</title>
+    <meta name="Intelligent Robotic Manipulation: Pose Estimation and Tracking" content="text/html; charset=utf-8;" />
+    <link rel="canonical" href="http://underactuated.mit.edu/pose.html" />
+
+    <script src="https://hypothes.is/embed.js" async></script>
+    <script type="text/javascript" src="htmlbook/book.js"></script>
+
+    <script src="htmlbook/mathjax-config.js" defer></script> 
+    <script type="text/javascript" id="MathJax-script" defer
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js">
+    </script>
+    <script>window.MathJax || document.write('<script type="text/javascript" src="htmlbook/MathJax/es5/tex-chtml.js" defer><\/script>')</script>
+
+    <link rel="stylesheet" href="htmlbook/highlight/styles/default.css">
+    <script src="htmlbook/highlight/highlight.pack.js"></script> <!-- http://highlightjs.readthedocs.io/en/latest/css-classes-reference.html#language-names-and-aliases -->
+    <script>hljs.initHighlightingOnLoad();</script>
+
+    <link rel="stylesheet" type="text/css" href="htmlbook/book.css" />
+  </head>
+
+<body onload="loadChapter('underactuated');">
+
+<div data-type="titlepage">
+  <header>
+    <h1><a href="index.html" style="text-decoration:none;">Intelligent Robotic Manipulation</a></h1>
+    <p data-type="subtitle">Algorithms for Walking, Running, Swimming, Flying, and Manipulation</p> 
+    <p style="font-size: 18px;"><a href="http://people.csail.mit.edu/russt/">Russ Tedrake</a></p>
+    <p style="font-size: 14px; text-align: right;"> 
+      &copy; Russ Tedrake, 2020<br/>
+      <a href="tocite.html">How to cite these notes</a> &nbsp; | &nbsp;
+      <a target="_blank" href="https://docs.google.com/forms/d/e/1FAIpQLSesAhROfLRfexrRFebHWLtRpjhqtb8k_iEagWMkvc7xau08iQ/viewform?usp=sf_link">Send me your feedback</a><br/>
+    </p>
+  </header>
+</div>
+
+<p><b>Note:</b> These are working notes used for <a
+href="http://underactuated.csail.mit.edu/Spring2020/">a course being taught
+at MIT</a>. They will be updated throughout the Spring 2020 semester.  <a 
+href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos are available on YouTube</a>.</p> 
+
+<table style="width:100%;"><tr style="width:100%">
+  <td style="width:33%;text-align:left;"><a class="previous_chapter" href=pixels.html>Previous Chapter</a></td>
+  <td style="width:33%;text-align:center;"><a href=index.html>Table of contents</a></td>
+  <td style="width:33%;text-align:right;"><a class="next_chapter" href=deep_perception.html>Next Chapter</a></td>
+</tr></table>
+
+
+<!-- EVERYTHING ABOVE THIS LINE IS OVERWRITTEN BY THE INSTALL SCRIPT -->
+<chapter style="counter-reset: chapter 4"><h1>Pose Estimation and Tracking</h1>
+
+  <p>There is no question that deep learning has had an enormous impact in perception -- one might even say that it has enabling the current surge in manipulation advances.  And we will certainly cover it in these notes.  But when I've heard colleagues say that "all perception these days is based on deep learning", I can't help but cry foul.  There has been another surge of progress in the last few years that has been happening in parallel -- the revolution in geometric reasoning -- fueled by applications in autonomous driving and augmented reality in addition to manipulation.  Most advanced manipulation systems these days combine both "deep perception" and "geometric perception".</p>
+
+  <section><h1>Depth Sensors</h1>
+  
+    <p>Primarily RGB-D (ToF vs projected texture stereo vs ...) cameras and Lidar</p>
+
+    <p>The cameras we are using in this course are <a href="https://software.intel.com/en-us/realsense/d400">Intel RealSense D415</a>....</p>
+
+    <subsection><h1>Simulation</h1>
+    
+      <p>There are a number of levels of fidelity at which one can simulate a camera like the D415.  We'll start our discussion here using an "ideal" depth camera simulation -- the pixels returned represent the true geometric depth in the direction of each pixel coordinate.  In <drake></drake> that is represented by the <code>RgbdSensor</code> system, which can be wired up directly to the <code>SceneGraph</code>.</p>
+
+      <table align="center" cellpadding="0" cellspacing="0">
+        <tr align="center">
+        <td><table cellspacing="0" cellpadding="0">
+        <tr>
+        <td align="right" style="padding:5px 0px 5px 0px">geometry_query &rarr;</td></tr>
+        </table>
+        </td><td align="center" style="border:solid;padding-left:20px;padding-right:20px" bgcolor="#F0F0F0"><a class="el" href="https://drake.mit.edu/doxygen_cxx/classdrake_1_1systems_1_1sensors_1_1_rgbd_sensor.html" title="A meta-sensor that houses RGB, depth, and label cameras, producing their corresponding images based o...">RgbdSensor</a></td><td><table cellspacing="0" cellpadding="0">
+        <tr>
+        <td align="left" style="padding:5px 0px 5px 0px">&rarr; color_image </td></tr>
+        <tr>
+        <td align="left" style="padding:5px 0px 5px 0px">&rarr; depth_image_32f </td></tr>
+        <tr>
+        <td align="left" style="padding:5px 0px 5px 0px">&rarr; depth_image_16u </td></tr>
+        <tr>
+        <td align="left" style="padding:5px 0px 5px 0px">&rarr; label_image </td></tr>
+        <tr>
+        <td align="left" style="padding:5px 0px 5px 0px">&rarr; X_WB </td></tr>
+        </table>
+        </td></tr>
+        </table>
+
+        <example class="drake"><h1>Simulating an RGB-D Camera</h1>
+
+          <p>As a simple example of depth cameras in drake, I've constructed a scene with a single object (the mustard bottle from the <a href="https://github.com/RobotLocomotion/models/tree/master/ycb">YCB dataset</a>), and added an <code>RgbdSensor</code> to the diagram.  Once this is wired up, we can simply evaluate the output ports in order to obtain the color and depth images:</p>
+    
+          <pysrc>manipulation/depth_camera_demo/show_camera.py</pysrc>
+    
+          <p>Remember that, in addition to looking at the source code if you like, you can always inspect the block diagram to understand what is happen at the "systems level":</p>
+
+          <pysrc>manipulation/depth_camera_demo/show_diagram.py</pysrc>
+
+          <p>(Note that these demos need to have the <code>demo.py</code> file that lives in the same directory to run).  <todo>Fix this!</todo></p>
+        </example>
+    
+        <p>In the <code>ManipulationStation</code> simulation of the entire robot system for class, the <code>RgbdSensors</code> have already been added.  <a href="https://drake.mit.edu/doxygen_cxx/classdrake_1_1examples_1_1manipulation__station_1_1_manipulation_station.html">You can see image output ports for each of the cameras are already exported as output ports for the station.</a> </p>
+        
+        <p>Real depth sensors, of course, are far from ideal -- and errors in depth returns are not simple Gaussian noise, but rather are dependent on the lighting conditions, the surface normals of the object, and the visual material properties of the object, among other things.  We will examine real sensor data, and higher fidelity simulation models of the depth cameras, after we start understanding some of the basic operations.</p>
+
+        <p>Please also note that, although the depth output of the RgbdSensor is ideal, this sensor also outputs a color image.  It's much harder to talk about an ideal color image, as colors change with material properties and lighting conditions (including reflections and shadows).  In the example above, I've told drake to just use the simplest OpenGL-based renderer.  But <drake></drake> does support a number of more advanced rendering options that we will leverage in the chapters on "deep perception", which make significantly more use of the RGB channels.</p>
+    </subsection>
+  </section>
+
+  <section><h1>Representations for Geometry</h1>
+    
+    <p>Depth image, point cloud, triangulated mesh, signed distance functions, (+ surfels, occupancy maps, ...)</p>
+
+    <p>The data returned by a depth camera takes the form of an image, where each pixel value is a single number that represents the distance between the camera and the nearest object in the environment along the pixel direction.  If we combine this with the basic information about the camera's intrisic (e.g. lens parameters) and extrinsic (e.g. position and orientation in space) parameters of the camera, then we can transform this <i>depth image representation</i> into a collection of points in three dimensions, called the <i>point cloud representation</i>.  As depth sensors have become so pervasive the field has built up libraries of tools for performing basic goemetric operations operate on point clouds, and that can be used to transform back and forth between representations.  In these notes, we'll use the <a href="http://www.open3d.org/">Open3D</a> library (note that many older projects used the <a href="http://pointclouds.org/">Point Cloud Library (PCL)</a>, which is now defunct but still has some very useful documentation).</p>
+
+    <example class="drake"><h1>Getting RGB-D values into Open3D</h1>
+
+      <p>Here the the mustard bottle example again, but this time we push the images coming out of <drake></drake> into the Open3D representation:</p>
+
+      <pysrc>manipulation/depth_camera_demo/show_open3d_rgbd.py</pysrc>
+    </example>
+
+    <p>It's important to realize that the conversion of a depth image into a point cloud does loose some information -- specifically the information about the ray that was cast from the camera to arrive at that point.  In addition to declaring "there is geometry at this point", the depth image also implies that "there is no geometry in the straight line path between camera and this point".  We will make use of this information in some of our algorithms, so don't discard the depth images completely!  More generally, we will find that each of the different geometry representations have strengths and weaknesses -- it is very common to keep multiple representations around and to convert back and forth between them.</p>
+
+  </section>
+
+  <section><h1>Working with Point Clouds</h1>
+
+    <p>First, let us get a few simulated point clouds to work with.  We can use either <drake></drake> or Open3d to convert the depth image into a point cloud; we'll use Drake for this step here simply because we already have the camera parameters in the Drake format.  Although we can call the conversion functions directly, we can also add a system that does the conversion for us in the systems framework:</p>
+
+    <table align="center" cellpadding="0" cellspacing="0">
+      <tr align="center">
+      <td><table cellspacing="0" cellpadding="0">
+      <tr>
+      <td align="right" style="padding:5px 0px 5px 0px">depth_image &rarr; </td></tr>
+      <tr>
+      <td align="right" style="padding:5px 0px 5px 0px">color_image (optional) &rarr; </td></tr>
+      <tr>
+      <td align="right" style="padding:5px 0px 5px 0px">camera_pose (optional) &rarr;</td></tr>
+      </table>
+      </td><td align="center" style="border:solid;padding-left:20px;padding-right:20px" bgcolor="#F0F0F0"><a class="el" href="http://drake.mit.edu/doxygen_cxx/classdrake_1_1perception_1_1_depth_image_to_point_cloud.html" title="Converts a depth image to a point cloud.">DepthImageToPointCloud</a></td><td><table cellspacing="0" cellpadding="0">
+      <tr>
+      <td align="left" style="padding:5px 0px 5px 0px">&rarr; point_cloud </td></tr>
+      </table>
+      </td></tr>
+    </table>
+
+    <p>You can infer from the optional input ports on this system that point cloud representations can potentially include color values for each of the Cartesian points.  The following example will get us a few point clouds to work with.</p>
+
+    <example class="drake"><h1>Getting a simulated point cloud</h1>
+
+      <pysrc>manipulation/depth_camera_demo/show_open3d_pointcloud.py</pysrc>
+
+    </example>
+
+    <todo>Combine all point clouds via https://drake.mit.edu/pydrake/pydrake.systems.perception.html?highlight=pointcloud#pydrake.systems.perception.PointCloudConcatenation</todo>
+
+    <todo>Show the point cloud in Open3D's visualizer</todo>
+
+    There are a number of basic operations that one can do on point clouds.  I'll give just a few examples here.  
+
+    <subsection><h1>Surface Normal Estimation</h1>
+    
+      <p>The simplest and most straight-forward algorithm for estimating the normals of a point cloud surface is to find the $k$ nearest neighbors, and fit a plane through those points using least-squares.  Let's denote the nominal point (about which we are estimating the normal) $p_0$, and it's $k$ nearest neighboard $p_i, i\in[1,k].$  Let us form the $k \times 3$ data matrix: $$X = [ p_1 - p_0, p_2 - p_0, ..., p_k - p_0 ].$$  Then the principal components of this data matrix are given by the <a href="https://en.wikipedia.org/wiki/Singular_value_decomposition">singular value decomposition</a> of $X$ (or the eigenvectors of $X^T X$); if $X = U\Sigma V^T$, then the columns of $V$ are the principal directions, with the last column (associated with the smallest singular value) representing the normal direction.  The length can be normalized to one; but keep in mind that the sign of this vector is ambiguous -- the $k$ nearest points don't give any information about what direction might be into the object or out of the object.  This is a case where knowing the original camera direction can help -- for example, PCL offers a method <code>flipNormalTowardsViewpoint</code> that post-processes the normals.</p>
+
+      <figure>
+        <img src="http://www.pointclouds.org/assets/images/contents/documentation/features_normal.png" />
+
+        <figcaption>Normal estimation using $k$ nearest neighbords (image linked from the <a href="http://docs.pointclouds.org/trunk/group__features.html"></a>PCL documentation</a>)</figcaption>
+      </figure>
+
+      <todo>Add an example; or even support normals in the DepthImageToPointCloud.  Example could be as simple as grabbing one point from the mustard point cloud, and finding it's normal (with everything plotted in matplotlib).</todo>
+
+      <p>What was interesting and surprising (to me) about this is not that the least-squares solution works.  What is surprising is that this operation is considered commonplace and cheap -- for every point in the point cloud, we find $k$ nearest neighbors and do the normal estimation... even for very large point clouds.  Making this performant typically requires data structures like the <a href="https://en.wikipedia.org/wiki/K-d_tree">k-d tree</a> to make the nearest neighbor queries efficient.</p>
+
+      <p>Another standard feature that can be extracted from the $k$ nearest neighbors is the local curvature.  The math is quite similar.  <todo>add it here</todo></p>
+
+    </subsection>
+
+    <subsection><h1>Plane Segmentation</h1>
+    
+      <p>Moving beyond local properties like surface normals and local curvature, we might choose to process a point cloud into primitive shapes -- like boxes or spheres.  Another practical and natural segmentation is segmenting surfaces into planes... which we can accomplish with heuristic algorithms which group neighboring points with similar surface normals.  We used this effectively in the DARPA Robotics Challenge.</p>
+
+      <todo>Insert DRC plane segmentation videos here, from https://drive.google.com/drive/folders/1gYMJ0djBXbevWDBpekkK58pcbtZFr0A0 </todo>
+
+    </subsection>
+
+  </section>
+
+  <section><h1>Geometric Pose Estimation</h1>
+
+    <p>For many manipulation tasks, our goal is to estimate the pose of a particular known object in the scene.  In the extreme case, we might have a perfect mesh model of the object that we want to manipulation, and our task is to find the subset of the point cloud that can "fit" best to the known model.</p>
+
+    <subsection><h1>Iterative Closest Point (ICP)</h1>
+
+      <p>One of the famous and often used (despite it's well-known limitations) is the interative closest point algorithm.  We'll start with the simplest version of it -- where instead of localizing a mesh model to the point cloud data, we will try localize two point clouds relative to each other. This is commonly referred to as "point-to-point ICP", "point cloud registration", or the "point correspondence problem".</p>
+
+      <figure>
+        <img src="figures/ICP_cartoon.jpg" width="80%"/>
+        <figcaption>Model points and scene points.</figcaption>
+      </figure>
+
+      <p>Let us denote the points on our model as $m_i \in M$, and the points obtained from our sensor as $s_i \in S$.  Even when we are assuming our point clouds are ideal (noise free), we will have a number of challenges: there is no reason to expect every point in $M$ to appear in $S$ (e.g., because our camera is viewing just one side of the object, or may be partially occluded), and there is no reason to believe that every element in $S$ corresponds to one of the points in $M$ (there may be other objects in the scene).  So a major task in ICP is to attempt to solve this <i>correspondence</i> problem.  But before we do, let us understand the case where the correspondences are magically given -- specifically we will assume that for every point of interest in the scene, $s_i$, we have a map $C$ such that $c_i$ is the index into the list of model points -- so $s_i$ corresponds with $m_{c_i}$.  Once these are given, our task is to recover the rigid body transformation that describes the relative pose of the model in the scene: \[ \min_{R \in SO(3), t \in \mathbb{R}^3} \sum_i^N \| Rs_i + t - m_{c_i} \|^2, \] where $R$ is 3x3 rotation matrix and $t$ is a 3x1 translation vector.  At first glance, this looks like a nice optimization problem -- the decision variables $R$ and $t$ enter linearly in the inside term, so it is almost another simple least-squares problem. The trick is the constraint that $R$ must be a rotation matrix.  Therefore, we could equivalently have written \begin{align*} \min_{R \in \mathbb{R}^{3x3}, t \in \mathbb{R}^3} && \sum_i^N \| Rs_i + t - m_{c_i} \|^2, \\ \subjto && R^T = R^{-1}, \det(R) = 1. \end{align*} Surprisingly, if we ignore the determinant constraint, then this seeming difficult (quadratically constrainted quadratic program) has a clean numerical solution -- once again given (once again) by SVD.  Define the mean model and scene points $$\bar{m} = \frac{1}{N} \sum_i^N m_{c_i}, \qquad \bar{s} = \frac{1}{N} \sum_i^N s_i.$$  Compose the data matrix $$W = \sum_i (m_{c_i} - \bar{m}) (s_i - \bar{s})^T, $$ and use SVD to compute $W = U \Sigma V^T$.  Magically, the optimal solution is \begin{gather*} R^* = U V^T, \\ 
+      t^* = \bar{m} - R \bar{s}.\end{gather*} Sometimes this formulation of gives a Householder reflection matrix instead of a rotation matrix.  If this is the case, which can be checked if the determinant of $R^*$ is -1, you must negate the third column of $V$, then recompute $R^*$.
+      There many derivations available in the literature, see <elib>Haralick89</elib> (section 3) for one of my favorites.  What is important for us to understand is that, once the correspondences are given, then we have an efficient and robust numerical solution to estimating the pose.</p>
+
+      <p>Let us now consider the other half of the problem.  What if the pose, given by $R$ and $t$, was known... then can we back out the optimal correspondences?  If we aim to maximize our reconstruction objective, then the optimal correspondences are given by $$c_i = \argmin_{j \in N_m}\| R s_i + t - m_{c_j} \|^2,$$  where $N_m$ is the number of model points.  In words, we want to find the point in the model that is the closest in Euclidean distance to the transformed scene points.  This is the famous "nearest neighbor" problem, and we have good numerical solutions (often using the aforementioned special data structures) for it.</p>
+
+      <p>Although solving for the pose and the correspondences jointly is very difficult, ICP leverages the idea if we solve for them independently, then both parts have good solutions.  So the iterative algorithm simply starts with an initial guess of $R$ and $t$, estimates the correspondences by finding the nearest neighbords, then computes a new $R$ and $t$, and so on until this iteration converges.  I like to think of this as a specific instance of the general solution approaches taken in optimization for e.g. bilinear optimization or expectation maximization.</p>
+
+      <p>It is important to understand that this is a local solution to a non-convex optimization problem.  So it is subject to getting stuck in local minima.  Thanks to the geometric nature of the problem, many of these local minima are graphical and intuitive.  (Will insert a few examples here). </p>
+
+      <p>Intuition about these local minima has motivated a number of ICP variants, include point to plane ICP, normal ICP, ICP that use color information, feature-based ICP, etc.</p>
+
+      <p>Maybe more fundamental, though, is the fact that I don't think the ICP objective, even if we could optimize it perfectly is quite right.  (TODO: add the example of a long thin book).  And there is information that we have, which should aid in estimating the pose, which is not present in the point cloud (like the location of the cameras).</p>
+    
+    </subsection>
+
+    <todo>Add a simple example and a homework problem/exercise.</todo>
+
+
+    <subsection><h1>Pose estimation as Inverse Kinematics</h1>
+  
+      <p>Dense articulated real-time tracking (DART).</p>
+  
+    </subsection>
+  
+    <subsection><h1>Coherent Point Drift (CPD) and FilterReg</h1>
+
+    </subsection>
+  
+    <subsection><h1>Global registration</h1>
+  
+      <todo>Greg's work.  Luca Carlone's work.  etc.</todo>
+
+    </subsection>
+  
+  </section>
+
+
+  <section><h1>Tracking</h1>
+  
+  </section>
+
+</chapter>
+<!-- EVERYTHING BELOW THIS LINE IS OVERWRITTEN BY THE INSTALL SCRIPT -->
+
+<table style="width:100%;"><tr style="width:100%">
+  <td style="width:33%;text-align:left;"><a class="previous_chapter" href=pixels.html>Previous Chapter</a></td>
+  <td style="width:33%;text-align:center;"><a href=index.html>Table of contents</a></td>
+  <td style="width:33%;text-align:right;"><a class="next_chapter" href=deep_perception.html>Next Chapter</a></td>
+</tr></table>
+
+<div id="footer">
+  <hr>
+  <table style="width:100%;">
+    <tr><td><em>Intelligent Robotic Manipulation</em></td><td align="right">&copy; Russ
+      Tedrake, 2020</td></tr>
+  </table>
+</div>
+
+
+</body>
+</html>

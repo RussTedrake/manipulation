@@ -1,0 +1,35 @@
+{
+  "chapter_ids" : [
+    "intro",
+    "hardware",
+    "kinematics",
+    "pixels",
+    "pose",
+    "deep_perception",
+    "grasping",
+    "trajectories",
+    "task",
+    "manipulator",
+    "rl",
+    "underactuated",
+    "drake",
+    "station"
+  ],
+  "other_potential_chapters": [ 
+    "belief-space planning",
+    "Teleoperation and Imitation Learning; Interfaces.  Inputs (keyboard + mouse, HTC Vive, data gloves...).  Feedback (VR, haptic feedback).",
+    "system id / intuitive physics",
+    "verification and/or distributions over the world",
+    "tactile feedback (estimation, tracking, slip detection, etc)?"
+  ],
+  "parts_format": "dict(first chapter id, name of the part)",
+  "parts" : {
+    "point_clouds": "Perception",
+    "grasping": "Planning",
+    "manipulator": "Control",
+    "drake": "Appendix"
+  },
+  "other_potential_parts" : [
+    "Special topics"
+  ]
+}

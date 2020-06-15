@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+
+<html>
+
+  <head>
+    <title>Intelligent Robotic Manipulation: Introduction</title>
+    <meta name="Intelligent Robotic Manipulation: Introduction" content="text/html; charset=utf-8;" />
+    <link rel="canonical" href="http://underactuated.mit.edu/intro.html" />
+
+    <script src="https://hypothes.is/embed.js" async></script>
+    <script type="text/javascript" src="htmlbook/book.js"></script>
+
+    <script src="htmlbook/mathjax-config.js" defer></script> 
+    <script type="text/javascript" id="MathJax-script" defer
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js">
+    </script>
+    <script>window.MathJax || document.write('<script type="text/javascript" src="htmlbook/MathJax/es5/tex-chtml.js" defer><\/script>')</script>
+
+    <link rel="stylesheet" href="htmlbook/highlight/styles/default.css">
+    <script src="htmlbook/highlight/highlight.pack.js"></script> <!-- http://highlightjs.readthedocs.io/en/latest/css-classes-reference.html#language-names-and-aliases -->
+    <script>hljs.initHighlightingOnLoad();</script>
+
+    <link rel="stylesheet" type="text/css" href="htmlbook/book.css" />
+  </head>
+
+<body onload="loadChapter('underactuated');">
+
+<div data-type="titlepage">
+  <header>
+    <h1><a href="index.html" style="text-decoration:none;">Intelligent Robotic Manipulation</a></h1>
+    <p data-type="subtitle">Algorithms for Walking, Running, Swimming, Flying, and Manipulation</p> 
+    <p style="font-size: 18px;"><a href="http://people.csail.mit.edu/russt/">Russ Tedrake</a></p>
+    <p style="font-size: 14px; text-align: right;"> 
+      &copy; Russ Tedrake, 2020<br/>
+      <a href="tocite.html">How to cite these notes</a> &nbsp; | &nbsp;
+      <a target="_blank" href="https://docs.google.com/forms/d/e/1FAIpQLSesAhROfLRfexrRFebHWLtRpjhqtb8k_iEagWMkvc7xau08iQ/viewform?usp=sf_link">Send me your feedback</a><br/>
+    </p>
+  </header>
+</div>
+
+<p><b>Note:</b> These are working notes used for <a
+href="http://underactuated.csail.mit.edu/Spring2020/">a course being taught
+at MIT</a>. They will be updated throughout the Spring 2020 semester.  <a 
+href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos are available on YouTube</a>.</p> 
+
+<table style="width:100%;"><tr style="width:100%">
+  <td style="width:33%;text-align:left;"><a class="previous_chapter"></a></td>
+  <td style="width:33%;text-align:center;"><a href=index.html>Table of contents</a></td>
+  <td style="width:33%;text-align:right;"><a class="next_chapter" href=hardware.html>Next Chapter</a></td>
+</tr></table>
+
+
+<!-- EVERYTHING ABOVE THIS LINE IS OVERWRITTEN BY THE INSTALL SCRIPT -->
+<chapter style="counter-reset: chapter 0"><h1>Introduction</h1>
+
+  <p>It's worth taking time to appreciate just how amazingly well humans are
+  able to perform tasks with our hands.  Tasks that often feel mundane to us --
+  loading the dishwasher, chopping vegetables, folding laundry -- remain as
+  incredibly challenging tasks for robots and are at the very forefront of
+  robotics research.</p>
+    
+  <todo>Add a diagram / photo of a the dish task here?</todo>
+  
+  <p>Consider the problem of picking up a single plate from a stack of plates in
+  the sink and placing it into the dishwasher.  Clearly you first have to
+  perceive that there is a plate in the sink and that this it is accessible.
+  Getting your hand to the plate likely requires navigating your hand around the
+  geometry of the sink and other dishes, and the act of actually picking it up
+  might require a fairly subtle maneuver where you have to tip up the plate,
+  sliding it along your fingers and along the sink/dishes in order to get a
+  reasonable grasp on it.  Presumably as you lift it out of the sink, you'd like
+  to mostly avoid collisions between the plate and the sink, which suggests a
+  reasonable understanding of the size/extent of the plate (though note that
+  robots tend to avoid collisions much more than humans do).  Even placing the
+  plate into the dishwasher is pretty subtle; you might think that you would
+  align the plate with the slats and then slide it in, but I think humans are
+  more clever than that.  A seemingly better strategy is to loosen your grip on
+  the plate, come in at an angle and intentionally contact one side of the
+  slat... letting the plate effectively rotate itself into position as you set
+  it down.  But the justification for this strategy is subtle -- it is a way to
+  achieve the kinematically accurate task without requiring much kinematic
+  accuracy on the position/orientation of the plate.</p>
+  
+  <todo>insert video of TRI dish pickup here</todo>
+  
+  <p>Perhaps one of the reasons that these problems remain so hard is that they
+  require strong capabilities in numerous technical areas that have
+  traditionally been somewhat disparate -- it's hard to be an expert in all of
+  them.  More so than robotic mapping and navigation, or legged locomotion, or
+  other great areas in robotics, the most interesting problems in manipulation
+  require significant interactions between perception, planning, and control.
+  This includes both geometric perception to understand the local geometry of
+  the objects and environment, but also semantic perception to understand what
+  opportunities for manipulation are avaiable in the scene. Planning typically
+  includes both reasoning about the kinematic constraints of the task (how to I
+  command my rigid seven degree-of-freedom arm to reach into the drawer?) as
+  well as higher-level task planning (to get milk into my cup, I need to open
+  the fridge, then grab the bottle, then unscrew the lid, then pour.. and
+  perhaps even put it all back) that require understanding these kinematic
+  constraints as well as the higher level task semantics.  And the lowest level,
+  our hands are making and breaking contact with the world either directly or
+  through tools, exerting forces, rapidly and easily transitioning between
+  sticking and sliding frictional regimes -- these are incredible rich and
+  difficult problems from the perspective of dynamics and control.</p>
+  
+  <todo>k-PAM?  Pete+Lucas imitation learning?</todo>
+  
+  <!-- two core research problems (that I like to focus on): 1) there are many tasks that we don't know how to program a robot to do robustly even in a single instance in lab (reach into your pocket and pull out the keys); 2) achieving robustness of a complete manipulation stack in the open-world. -->
+  
+  <section><h1>Manipulation is more than Pick-and-Place</h1>
+  
+    <p>There are a large number of applications for manipulation.  Picking up an
+    object from one bin and placing it into another bin -- one version of the
+    famous "pick and place" problem -- is a great application for robotic
+    manipulation.  And it is an application for which we already have pretty
+    capable solutions, especially if the location/orientation of the placement
+    need not be very accurate.  The recent advances in computer vision for
+    object recognition make it very useful for a wide variety of industry
+    applications: a camera can look into a bin and find an object of interest,
+    then use a relatively simple strategy to do the pick.  This can be done with
+    conventional robot hands or more special-purpose hands that are equipped
+    with suction.  It can often be done without having a very accurate
+    understanding of the shape, pose, mass, nor friction of the object(s) to be
+    picked.</p>
+  
+    <p>The goal for these notes, however, is to examine the much broader view of
+    manipulation that we is captured by the pick and place problem.  Even our
+    thought experiment of loading the dishwasher -- arguably a more advanced
+    type of pick and place -- requires much more from the perception, planning,
+    and control systems.  But the diversity of tasks that humans (and hopefully
+    soon robots) can do with their hands is truly remarkable.</p>
+  
+    <p>One field that has thought about the Motivating example: <a href="http://www.shap.ecs.soton.ac.uk/">South Hampton Assessment Procedure (SHAP)</a></p>
+  
+  </section>  
+  
+  <section><h1>Open-World Manipulation</h1>
+    
+    <p>Perhaps because humans are so good at manipulation, our expectations in
+    terms of performance and robustness for these tasks is extremely high.  It's
+    not enough to be able to load one set of place in a laboratory environment
+    into a dishwasher reliably.  We'd like to be able to manipulate basically
+    any plate that someone might put into the sink.  And we'd like the system to
+    be able to work in any kitchen, despite various geometric configurations,
+    lighting conditions, etc.  The challenge of achieving and verifying
+    robustness of a complex manipulation stack with physics, perception,
+    planning, and control in the loop is already daunting.  But how do we
+    provide test coverage for every kitchen in the world?</p>
+  
+    <p>The idea that the world has infinite variability (there will never be a
+    point at which you have seen every possible kitchen) is often referred to as
+    the "open-world" or "open-domain" problem -- a term popularized first in the
+    context of <a href="https://en.wikipedia.org/wiki/Open_world">video
+    games</a>.</p>
+  
+    <p>Might it actually make the problem easier?  (Diversity changes the
+    optimization landscape).</p>
+  </section>
+  
+  <section><h1>Simulation</h1>
+    
+  </section>
+  
+  <section><h1>A Systems Theoretic Approach</h1>
+    
+    <blockquote>It's precisely <i>because</i> the problem is so complex that we
+    take a rigorous approach.</blockquote>
+  
+    <p>We could draw this sort of diagram for many modern manipulation systems —
+    they are often composed of numerous modules that communicate with eg IPC.
+    But i am going to demand a bit more of our models.  Explicitly declare their
+    state, their parameters (just the ones that we would like to tune/analyze
+    automatically), and any randomness.  This opens the door for more mature
+    approaches to testing and verification, and ultimately for synthesis.  But
+    it is surprisingly rare in robotics today. </p>
+  
+    <p>Probably don’t have to convince anyone about the value of the modularity.
+    Might have to convince about the value of declaring state, etc.  it will be
+    a recurring theme in this book.</p>
+    
+    <p>Using a drake system in your favorite ipc stack is easy.  We also make
+    provisions for going the other way — taking your black-box component and
+    using it in the systems framework.  But this limits which algorithms we can
+    use on it.</p>
+  
+    <p>Idea: perception spoof.  Same input/output, mich simpler dynamics.
+    Ground truth + noise + dropouts.</p>
+  
+    <p>Runtime monitoring, system id, etc</p>
+    
+    <p>One thing that we’ll leave out is humans.  It’s not that i don’t like humans, but we have enough to do here without trying to model them.  Let’s call it future work.  The one exception is when we talk about control of the arm — a few simple heuristics at this level can make the robots much safer if operating around humans.  The robot won’t understand them, but we want to make sure we still don’t hurt them.  Or other robots/agents in the scene.</p>
+    
+  </section> 
+  
+  <section><h1>Components of a Modern Manipulation System</h1>
+  
+    <p>The remaining chapters of these notes are organized...</p>
+    <p>The central role of modeling and simulation.</p>
+    <p>Robot Hardware.  Mathematical models.</p>
+
+  </section>
+  
+</chapter>
+<!-- EVERYTHING BELOW THIS LINE IS OVERWRITTEN BY THE INSTALL SCRIPT -->
+
+<table style="width:100%;"><tr style="width:100%">
+  <td style="width:33%;text-align:left;"><a class="previous_chapter"></a></td>
+  <td style="width:33%;text-align:center;"><a href=index.html>Table of contents</a></td>
+  <td style="width:33%;text-align:right;"><a class="next_chapter" href=hardware.html>Next Chapter</a></td>
+</tr></table>
+
+<div id="footer">
+  <hr>
+  <table style="width:100%;">
+    <tr><td><em>Intelligent Robotic Manipulation</em></td><td align="right">&copy; Russ
+      Tedrake, 2020</td></tr>
+  </table>
+</div>
+
+
+</body>
+</html>
