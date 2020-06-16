@@ -88,6 +88,7 @@ LC_CTYPE=en_US.UTF-8 LANG=en_US.UTF-8 pip3 install --disable-pip-version-check $
 gradescope-utils
 open3d
 timeout-decorator
+torch
 EOF
 )
 
