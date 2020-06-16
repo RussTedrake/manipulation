@@ -4,7 +4,7 @@ _A Systems Theory Perspective on Perception, Planning, and Control_
 
 <http://manipulation.csail.mit.edu/>
 
-![](https://github.com/RussTedrake/manipulation/workflows/ci/badge.svg)
+![](https://github.com/RussTedrake/manipulation/workflows/CI/badge.svg)
 
 ## To Download and Install Drake
 
