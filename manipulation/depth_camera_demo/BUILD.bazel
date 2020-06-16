@@ -7,9 +7,9 @@
 load("//htmlbook/tools/python:defs.bzl", "rt_py_library")
 
 rt_py_library(
-  name = "demo",
-  imports = [".."],
-  srcs = ["demo.py"],
+    name = "demo",
+    srcs = ["demo.py"],
+    imports = [".."],
 )
 
 # Disabled pending resolution of #8.
