@@ -69,6 +69,7 @@ jupyter-nbconvert
 jupyter-notebook
 locales
 python3
+python3-future
 python3-ipywidgets
 python3-matplotlib
 python3-numpy
@@ -84,7 +85,9 @@ EOF
 locale-gen en_US.UTF-8
 
 LC_CTYPE=en_US.UTF-8 LANG=en_US.UTF-8 pip3 install --disable-pip-version-check $(cat <<EOF
+gradescope-utils
 open3d
+timeout-decorator
 EOF
 )
 
