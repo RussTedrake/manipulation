@@ -13,8 +13,8 @@ _macOS Mojave (10.14) and macOS Catalina (10.15)_
 ```zsh
 curl -O https://drake-packages.csail.mit.edu/drake/nightly/drake-latest-mac.tar.gz
 tar -xf drake-latest-mac.tar.gz
-mv drake /path/to/drake
-/path/to/drake/share/drake/setup/install_prereqs
+mv drake /opt/drake
+/opt/drake/share/drake/setup/install_prereqs
 ```
 
 _Ubuntu 18.04 (Bionic)_
@@ -22,8 +22,8 @@ _Ubuntu 18.04 (Bionic)_
 ```bash
 wget https://drake-packages.csail.mit.edu/drake/nightly/drake-latest-bionic.tar.gz
 tar -xf drake-latest-bionic.tar.gz
-mv drake /path/to/drake
-sudo /path/to/drake/share/drake/setup/install_prereqs
+mv drake /opt/drake
+sudo /opt/drake/share/drake/setup/install_prereqs
 ```
 
 ## To Run the Unit Tests
@@ -31,21 +31,15 @@ sudo /path/to/drake/share/drake/setup/install_prereqs
 _macOS Mojave (10.14) and macOS Catalina (10.15)_
 
 ```zsh
-./setup/mac/install_prereqs.sh
-mkdir build
-cd build
-cmake -DCMAKE_SYSTEM_PREFIX_PATH=/path/to/drake ..
-ctest
+./scripts/setup/mac/install_prereqs.sh
+bazel test //...
 ```
 
 _Ubuntu 18.04 (Bionic)_
 
 ```bash
-sudo ./setup/ubuntu/install_prereqs.sh
-mkdir build
-cd build
-cmake -DCMAKE_SYSTEM_PREFIX_PATH=/path/to/drake ..
-ctest
+sudo ./scripts/setup/ubuntu/18.04/install_prereqs.sh
+bazel test //...
 ```
 
 ## To Cite
