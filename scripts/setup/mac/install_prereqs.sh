@@ -32,31 +32,19 @@
 set -euxo pipefail
 
 if [[ "${EUID}" -eq 0 ]]; then
-  echo 'This script must NOT be run as root' >&2
+  echo 'ERROR: This script must NOT be run as root' >&2
   exit 1
 fi
 
-if [[ "$(uname -s)" != 'Darwin' || "$(uname -r)" < 17 ]]; then
-  echo 'ERROR: This script requires macOS Mojave (10.14) or Catalina (10.15)' >&2
-  exit 2
+if command -v conda &>/dev/null; then
+  echo 'WARNING: Anaconda is NOT supported. Please remove the Anaconda bin directory from the PATH.' >&2
 fi
 
 if ! command -v brew &>/dev/null; then
-  ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+  bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
 fi
 
-# NOTE: Assumes that the drake (binary) install_prereqs script will also be
-# run. Only install what we need to download drake and any additional
-# requirements for this project.
+export HOMEBREW_CURL_RETRIES=4
 
-brew install $(tr '\n' ' ' <<EOF
-numpy
-python
-EOF
-)
-
-pip3 install --disable-pip-version-check --upgrade $(tr '\n' ' ' <<EOF
-open3d
-pycodestyle
-EOF
-)
+brew update
+brew bundle --file="$(dirname ${(%):-%x})/Brewfile" --no-lock

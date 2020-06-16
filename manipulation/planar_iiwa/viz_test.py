@@ -16,7 +16,7 @@ plant, scene_graph = AddMultibodyPlantSceneGraph(builder, time_step=0.0)
 Parser(plant, scene_graph).AddModelFromFile(
     FindResourceOrThrow(
         "drake/manipulation/models/iiwa_description/urdf/planar_iiwa14_spheres_dense_elbow_collision.urdf"  # noqa
-    ))  # noqa
+    ))
 plant.Finalize()
 
 visualizer = builder.AddSystem(PlanarSceneGraphVisualizer(scene_graph))

@@ -151,7 +151,7 @@ export PYTHONPATH=/opt/drake/lib/python3.6/site-packages:${PYTHONPATH}
 python3 -c 'import pydrake; print(pydrake.__file__)</code></pre></div>
 
       <div class="mac"><pre class="highlight"><code>sudo tar -xvzf drake.tar.gz -C /opt
-/opt/drake/share/drake/setup/install_prereqs
+/opt/drake/share/drake/setup/install_prereqs.sh
 export PYTHONPATH=/opt/drake/lib/python3.8/site-packages:${PYTHONPATH}
 export PATH=/usr/local/opt/python@3.8/bin:${PATH}
 
@@ -165,10 +165,10 @@ python3 -c 'import pydrake; print(pydrake.__file__)</code></pre></div>
 
       <p>and install the prerequisites using the platform-specific installation script provided:</p>
 
-      <div class="bionic"><pre class="highlight"><code>sudo manipulation/scripts/setup/ubuntu/18.04/install_prereqs
+      <div class="bionic"><pre class="highlight"><code>sudo manipulation/scripts/setup/ubuntu/18.04/install_prereqs.sh
 export PYTHONPATH=`pwd`/manipulation:${PYTHONPATH}</code></pre></div>
 
-      <div class="mac"><pre class="highlight"><code>manipulation/scripts/setup/mac/install_prereqs
+      <div class="mac"><pre class="highlight"><code>manipulation/scripts/setup/mac/install_prereqs.sh
 export PYTHONPATH=`pwd`/manipulation:${PYTHONPATH}</code></pre></div>
 
     </subsection>
