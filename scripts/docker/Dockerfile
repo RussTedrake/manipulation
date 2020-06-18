@@ -23,7 +23,7 @@ LABEL org.opencontainers.image.authors="Russ Tedrake"
 LABEL org.opencontainers.image.description="A systems theory perspective on perception, planning, and control"
 LABEL org.opencontainers.image.licenses="BSD-3-Clause"
 LABEL org.opencontainers.image.source="https://github.com/RussTedrake/manipulation.git"
-LABEL org.opencontainers.image.title="Intelligent Robot Manipulation"
+LABEL org.opencontainers.image.title="Robot Manipulation"
 LABEL org.opencontainers.image.url="http://manipulation.csail.mit.edu/"
 LABEL org.opencontainers.image.vendor="Massachusetts Institute of Technology"
 COPY scripts/docker/pip.conf /root/.config/pip/pip.conf

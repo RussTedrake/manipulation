@@ -1,6 +1,6 @@
-# Intelligent Robot Manipulation
+# Robot Manipulation
 
-_A Systems Theory Perspective on Perception, Planning, and Control_
+_Perception, Planning, and Control_
 
 <http://manipulation.csail.mit.edu/>
 
@@ -44,6 +44,5 @@ bazel test //...
 
 ## To Cite
 
-Russ Tedrake. _Intelligent Robot Manipulation: A Systems Theory Perspective on
-Perception, Planning, and Control (Course Notes for MIT 6.881)._ Downloaded on
-[date] from <http://manipulation.mit.edu/>.
+Russ Tedrake. _Robot Manipulation: Perception, Planning, and Control (Course
+Notes for MIT 6.881)._ Downloaded on [date] from <http://manipulation.mit.edu/>.
