@@ -11,7 +11,7 @@
     "task",
     "manipulator",
     "rl",
-    "underactuated",
+    "contact",
     "drake",
     "station"
   ],
