@@ -2,6 +2,7 @@
   "chapter_ids" : [
     "intro",
     "hardware",
+    "simulation",
     "kinematics",
     "pixels",
     "pose",
