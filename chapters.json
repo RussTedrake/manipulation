@@ -11,8 +11,8 @@
     "trajectories",
     "task",
     "manipulator",
+    "underactuated",
     "rl",
-    "contact",
     "drake",
     "station"
   ],
