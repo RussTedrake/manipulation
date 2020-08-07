@@ -25,7 +25,7 @@
   ],
   "parts_format": "dict(first chapter id, name of the part)",
   "parts" : {
-    "point_clouds": "Perception",
+    "pixels": "Perception",
     "grasping": "Planning",
     "manipulator": "Control",
     "drake": "Appendix"

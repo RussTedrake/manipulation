@@ -59,7 +59,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
   incredibly challenging tasks for robots and are at the very forefront of
   robotics research.</p>
     
-  <todo>Add a diagram / photo of a the dish task here?</todo>
+  <todo>Add a diagram / photo of the dish task here?</todo>
   
   <p>Consider the problem of picking up a single plate from a stack of plates in
   the sink and placing it into the dishwasher.  Clearly you first have to
@@ -70,13 +70,12 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
   sliding it along your fingers and along the sink/dishes in order to get a
   reasonable grasp on it.  Presumably as you lift it out of the sink, you'd like
   to mostly avoid collisions between the plate and the sink, which suggests a
-  reasonable understanding of the size/extent of the plate (though note that
-  robots tend to avoid collisions much more than humans do).  Even placing the
+  reasonable understanding of the size/extent of the plate (though I actually think robots today are too afraid of collisions).  Even placing the
   plate into the dishwasher is pretty subtle; you might think that you would
   align the plate with the slats and then slide it in, but I think humans are
   more clever than that.  A seemingly better strategy is to loosen your grip on
   the plate, come in at an angle and intentionally contact one side of the
-  slat... letting the plate effectively rotate itself into position as you set
+  slat, letting the plate effectively rotate itself into position as you set
   it down.  But the justification for this strategy is subtle -- it is a way to
   achieve the kinematically accurate task without requiring much kinematic
   accuracy on the position/orientation of the plate.</p>
@@ -85,29 +84,30 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
   
   <p>Perhaps one of the reasons that these problems remain so hard is that they
   require strong capabilities in numerous technical areas that have
-  traditionally been somewhat disparate -- it's hard to be an expert in all of
+  traditionally been somewhat disparate; it's challenging to be an expert in all of
   them.  More so than robotic mapping and navigation, or legged locomotion, or
   other great areas in robotics, the most interesting problems in manipulation
   require significant interactions between perception, planning, and control.
   This includes both geometric perception to understand the local geometry of
   the objects and environment, but also semantic perception to understand what
   opportunities for manipulation are available in the scene. Planning typically
-  includes both reasoning about the kinematic constraints of the task (how to I
+  includes both reasoning about the kinematic and dynamic constraints of the task (how to I
   command my rigid seven degree-of-freedom arm to reach into the drawer?) as
   well as higher-level task planning (to get milk into my cup, I need to open
-  the fridge, then grab the bottle, then unscrew the lid, then pour.. and
-  perhaps even put it all back) that require understanding these kinematic
-  constraints as well as the higher level task semantics.  And the lowest level,
+  the fridge, then grab the bottle, then unscrew the lid, then pour... and
+  perhaps even put it all back when I'm done); the low-level begs for representations using real numbers, but the higher levels feel more logical and discrete.  At perhaps the lowest level,
   our hands are making and breaking contact with the world either directly or
   through tools, exerting forces, rapidly and easily transitioning between
-  sticking and sliding frictional regimes -- these are incredible rich and
+  sticking and sliding frictional regimes -- these alone are incredible rich and
   difficult problems from the perspective of dynamics and control.</p>
   
   <todo>k-PAM?  Pete+Lucas imitation learning?</todo>
+    
+  <p>There is a lot for us to discuss!</p>
   
   <!-- two core research problems (that I like to focus on): 1) there are many tasks that we don't know how to program a robot to do robustly even in a single instance in lab (reach into your pocket and pull out the keys); 2) achieving robustness of a complete manipulation stack in the open-world. -->
   
-  <section><h1>Manipulation is more than Pick-and-Place</h1>
+  <section><h1>Manipulation is more than pick-and-place</h1>
   
     <p>There are a large number of applications for manipulation.  Picking up an
     object from one bin and placing it into another bin -- one version of the
@@ -118,8 +118,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
     object recognition make it very useful for a wide variety of industry
     applications: a camera can look into a bin and find an object of interest,
     then use a relatively simple strategy to do the pick.  This can be done with
-    conventional robot hands or more special-purpose hands that are equipped
-    with suction.  It can often be done without having a very accurate
+    conventional robot hands or more special-purpose end-effectors that, for instance, use suction.  It can often be done without having a very accurate
     understanding of the shape, pose, mass, nor friction of the object(s) to be
     picked.</p>
   
@@ -131,18 +130,18 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
     soon robots) can do with their hands is truly remarkable.</p>
   
     <p>One field that has thought about the Motivating example: <a href="http://www.shap.ecs.soton.ac.uk/">South Hampton Assessment Procedure (SHAP)</a></p>
+      
+    <p>It's also important to recognize that manipulation research today looks very different than manipulation research looked like in the 1980's and 1990's.  During that time there was a strong and beautiful focus on "manipulation as grasping" -- with seminal work on, for instance, the kinematics/dynamics of multifingered hands assuming a stable grasp on an object.  Sometimes still, I hear people use the term "grasping" as almost synonymous with manipulation.  But the goals of manipulation research today, and of these notes, are much broader than that.  Is grasping a sufficient description of what your hand is doing when you are buttoning your shirt?  Making a salad?  Spreading peanut butter on toast?</p>
   
   </section>  
   
   <section><h1>Open-World Manipulation</h1>
     
-    <p>$$\dot{x} = f(x_2,u)$$</p>
-    
     <p>Perhaps because humans are so good at manipulation, our expectations in
     terms of performance and robustness for these tasks is extremely high.  It's
-    not enough to be able to load one set of place in a laboratory environment
+    not enough to be able to load one set of plates in a laboratory environment
     into a dishwasher reliably.  We'd like to be able to manipulate basically
-    any plate that someone might put into the sink.  And we'd like the system to
+    any plate that someone might put in the sink.  And we'd like the system to
     be able to work in any kitchen, despite various geometric configurations,
     lighting conditions, etc.  The challenge of achieving and verifying
     robustness of a complex manipulation stack with physics, perception,
@@ -153,14 +152,31 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
     point at which you have seen every possible kitchen) is often referred to as
     the "open-world" or "open-domain" problem -- a term popularized first in the
     context of <a href="https://en.wikipedia.org/wiki/Open_world">video
-    games</a>.</p>
+    games</a>.  It can be tough to strike a balance between rigorous thinking about aspects of the manipulation problem, and trying to embrace the diversity and complexity of the entire world.  But it's important to walk that line.</p>
   
-    <p>Might it actually make the problem easier?  (Diversity changes the
-    optimization landscape).</p>
+    <p>There is chance that diversity of manipulation in the open world might actually make the problem easier.  We are just at the dawn of the era of big data in robotics; the impact this will have cannot be overstated.  But I think it is deeper than that.  As an example, some of our optimization formulations for planning and control might get stuck in local minima now because narrow problem formulations can have many quirky solutions; but once we ask a controller to work in a huge diversity of scenarios then the quirky solutions can be discarded and the optimization landscape may become much simpler.  But to the extent that is true, then we should aim to understand it rigorously!</p>
   </section>
   
   <section><h1>Simulation</h1>
+      
+    <p>There is yet another reason why this feels like a good time to write a text on manipulation.  Our software tools have (very recently) gotten much better!  And the new availability of free online interactive compute makes it possible to share those tools broadly.</p>
+      
+    <p>It was only about three years ago that I remember talking to my students, who were all quite comfortable with using simulation for developing control systems for walking robots, about using simulation for manipulation.  "You can't work on manipulation in simulation" was their refrain, and for good reason.  The complexity of the contact mechanics in manipulation has traditionally been much harder to simulate than a walking robot that only interacts with the ground and through a minimal set of contact points.  Looming even larger, though, was the centrality of perception for manipulation; it was generally accepted that one could not simulate a camera well enough to be meaningful.</p>
+      
+    <p>How quickly things can change!  The last few years has seen a rapid adoption of video-game quality rendering by the robotics and computer vision communities.  The growing consensus now is that game-engine renderers <i>can</i> model cameras well enough not only to <i>test</i> a perception system in simulation, but even to <i>train</i> perception systems in simulation and expect them to work in the real world!  This is fairly amazing, as we were all very concerned before that deep learning perception systems would learn to exploit any quirks of the simulated images that could make the problem easier.</p>
+      
+    <p>We have also seen dramatic improvements in the quality and performance of contact simulation.  Making robust and performant simulations of the multi-body contact involves dealing with complex geometry queries and stiff differential / difference equations.  There is still room for fundamental improvements in the mathematical formulations of the governing equations, but today's solvers are good enough to be extremely useful.</p>
     
+    <p>As a result, this book is not something to read passively.  Each chapter will have working code examples, which you can run immediately (no installation required) on <a href="https://colab.research.google.com/">Google's Colaboratory</a>, or download/install and run on your local machine (see the <a href="drake.html">appendix</a> for more details).  I hope you consume these notes as if it's a full-contact sport!</p>
+      
+    <p>I have organized those examples by chapter.  There is an "Open in Colab" button at the top of each chapter; I'd encourage you to open it immediately when you are reading the chapter and running the first cell, which takes up to two minutes to provision the cloud machine.  Then as you read the text, I will have examples that will have corresponding sections in the notebook.  Here is a warm-up.</p>
+      
+    <example><h1>Teleoperate a (simulated) robot.</h1>
+      
+        <p></p>
+      
+    </example>
+            
   </section>
   
   <section><h1>A Systems Theoretic Approach</h1>
