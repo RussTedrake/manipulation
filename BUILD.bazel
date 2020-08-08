@@ -32,7 +32,7 @@ html_tidy_test(
     config = ".tidy.config",
 )
 
-# TODO(russt): Enable this!
+# TODO(russt): Make this pass and enable the test!
 #rt_ipynb_test(
 #    name = "intro",
 #    srcs = ["intro.ipynb"],
