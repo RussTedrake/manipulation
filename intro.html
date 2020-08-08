@@ -49,9 +49,11 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
   <td style="width:33%;text-align:right;"><a class="next_chapter" href=hardware.html>Next Chapter</a></td>
 </tr></table>
 
-
 <!-- EVERYTHING ABOVE THIS LINE IS OVERWRITTEN BY THE INSTALL SCRIPT -->
 <chapter style="counter-reset: chapter 0"><h1>Introduction</h1>
+  <todo>Integrate this into the header better.</todo>
+  <a target="intro" href="https://colab.research.google.com/github/RussTedrake/manipulation/blob/master/intro.ipynb">
+    <img style="vertical-align:bottom" src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
 
   <p>It's worth taking time to appreciate just how amazingly well humans are
   able to perform tasks with our hands.  Tasks that often feel mundane to us --
@@ -59,26 +61,29 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
   incredibly challenging tasks for robots and are at the very forefront of
   robotics research.</p>
     
-  <todo>Can I do an illustration of the dish task with a human, ala alberto/francois artwork?  https://fhogan.github.io/img/hybrid_behavior.png </todo>
+  <todo>Can I do an illustration of the dish task with a human, ala
+  alberto/francois artwork?  https://fhogan.github.io/img/hybrid_behavior.png
+  </todo>
   
   <p>Consider the problem of picking up a single plate from a stack of plates in
   the sink and placing it into the dishwasher.  Clearly you first have to
-  perceive that there is a plate in the sink and that it is accessible.
-  Getting your hand to the plate likely requires navigating your hand around the
+  perceive that there is a plate in the sink and that it is accessible. Getting
+  your hand to the plate likely requires navigating your hand around the
   geometry of the sink and other dishes, and the act of actually picking it up
   might require a fairly subtle maneuver where you have to tip up the plate,
   sliding it along your fingers and along the sink/dishes in order to get a
   reasonable grasp on it.  Presumably as you lift it out of the sink, you'd like
   to mostly avoid collisions between the plate and the sink, which suggests a
-  reasonable understanding of the size/extent of the plate (though I actually think robots today are too afraid of collisions).  Even placing the
-  plate into the dishwasher is pretty subtle; you might think that you would
-  align the plate with the slats and then slide it in, but I think humans are
-  more clever than that.  A seemingly better strategy is to loosen your grip on
-  the plate, come in at an angle and intentionally contact one side of the
-  slat, letting the plate effectively rotate itself into position as you set
-  it down.  But the justification for this strategy is subtle -- it is a way to
-  achieve the kinematically accurate task without requiring much kinematic
-  accuracy on the position/orientation of the plate.</p>
+  reasonable understanding of the size/extent of the plate (though I actually
+  think robots today are too afraid of collisions).  Even placing the plate into
+  the dishwasher is pretty subtle; you might think that you would align the
+  plate with the slats and then slide it in, but I think humans are more clever
+  than that.  A seemingly better strategy is to loosen your grip on the plate,
+  come in at an angle and intentionally contact one side of the slat, letting
+  the plate effectively rotate itself into position as you set it down.  But the
+  justification for this strategy is subtle -- it is a way to achieve the
+  kinematically accurate task without requiring much kinematic accuracy on the
+  position/orientation of the plate.</p>
   
   <figure>
     <todo>Move this to the manip repo (or not?) and definitely implement the deferred loading.</todo>
@@ -86,52 +91,79 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
         <source src="https://s3.amazonaws.com/media-p.slid.es/videos/1350152/TpzT02Cy/plate_pickup.mp4"/>
     </video>
     <figcaption>
-    A robot picking up a plate from a potentially cluttered sink (left: in simulation, right: in reality).  This examples is from the <a href="https://www.tri.global/news/tri-taking-on-the-hard-problems-in-manipulation-re-2019-6-27">manipulation team at the Toyota Research Institute</a>.
+    A robot picking up a plate from a potentially cluttered sink (left: in
+    simulation, right: in reality).  This examples is from the <a
+    href="https://www.tri.global/news/tri-taking-on-the-hard-problems-in-manipulation-re-2019-6-27">manipulation
+    team at the Toyota Research Institute</a>.
     </figcaption>
   </figure>
     
   <p>Perhaps one of the reasons that these problems remain so hard is that they
   require strong capabilities in numerous technical areas that have
-  traditionally been somewhat disparate; it's challenging to be an expert in all of
-  them.  More so than robotic mapping and navigation, or legged locomotion, or
-  other great areas in robotics, the most interesting problems in manipulation
-  require significant interactions between perception, planning, and control.
-  This includes both geometric perception to understand the local geometry of
-  the objects and environment, but also semantic perception to understand what
-  opportunities for manipulation are available in the scene. Planning typically
-  includes both reasoning about the kinematic and dynamic constraints of the task (how to I
-  command my rigid seven degree-of-freedom arm to reach into the drawer?) as
-  well as higher-level task planning (to get milk into my cup, I need to open
-  the fridge, then grab the bottle, then unscrew the lid, then pour... and
-  perhaps even put it all back when I'm done); the low-level begs for representations using real numbers, but the higher levels feel more logical and discrete.  At perhaps the lowest level,
-  our hands are making and breaking contact with the world either directly or
-  through tools, exerting forces, rapidly and easily transitioning between
-  sticking and sliding frictional regimes -- these alone are incredible rich and
-  difficult problems from the perspective of dynamics and control.</p>
+  traditionally been somewhat disparate; it's challenging to be an expert in all
+  of them.  More so than robotic mapping and navigation, or legged locomotion,
+  or other great areas in robotics, the most interesting problems in
+  manipulation require significant interactions between perception, planning,
+  and control. This includes both geometric perception to understand the local
+  geometry of the objects and environment, but also semantic perception to
+  understand what opportunities for manipulation are available in the scene.
+  Planning typically includes both reasoning about the kinematic and dynamic
+  constraints of the task (how to I command my rigid seven degree-of-freedom arm
+  to reach into the drawer?) as well as higher-level task planning (to get milk
+  into my cup, I need to open the fridge, then grab the bottle, then unscrew the
+  lid, then pour... and perhaps even put it all back when I'm done); the
+  low-level begs for representations using real numbers, but the higher levels
+  feel more logical and discrete.  At perhaps the lowest level, our hands are
+  making and breaking contact with the world either directly or through tools,
+  exerting forces, rapidly and easily transitioning between sticking and sliding
+  frictional regimes -- these alone are incredible rich and difficult problems
+  from the perspective of dynamics and control.</p>
   
     
   <p>There is a lot for us to discuss!</p>
   
-  <!-- two core research problems (that I like to focus on): 1) there are many tasks that we don't know how to program a robot to do robustly even in a single instance in lab (reach into your pocket and pull out the keys); 2) achieving robustness of a complete manipulation stack in the open-world. -->
+  <!-- two core research problems (that I like to focus on): 1) there are many
+  tasks that we don't know how to program a robot to do robustly even in a
+  single instance in lab (reach into your pocket and pull out the keys); 2)
+  achieving robustness of a complete manipulation stack in the open-world. -->
   
   <section><h1>Manipulation is more than pick-and-place</h1>
   
     <p>There are a large number of applications for manipulation.  Picking up an
     object from one bin and placing it into another bin -- one version of the
     famous "pick and place" problem -- is a great application for robotic
-    manipulation.  Robots have done this for decades in factories with carefully curated parts.  In just the last few years, we've seen a new generation of pick-and-place systems that use deep learning for perception, and can work well with much more diverse sets of objects, especially if the location/orientation of the placement need not be very accurate.  This can be done with
-    conventional robot hands or more special-purpose end-effectors that, for instance, use suction.  It can often be done without having a very accurate
-    understanding of the shape, pose, mass, nor friction of the object(s) to be
-    picked.</p>
+    manipulation.  Robots have done this for decades in factories with carefully
+    curated parts.  In just the last few years, we've seen a new generation of
+    pick-and-place systems that use deep learning for perception, and can work
+    well with much more diverse sets of objects, especially if the
+    location/orientation of the placement need not be very accurate.  This can
+    be done with conventional robot hands or more special-purpose end-effectors
+    that, for instance, use suction.  It can often be done without having a very
+    accurate understanding of the shape, pose, mass, nor friction of the
+    object(s) to be picked.</p>
   
     <p>The goal for these notes, however, is to examine the much broader view of
     manipulation that what is captured by the pick and place problem.  Even our
     thought experiment of loading the dishwasher -- arguably a more advanced
     type of pick and place -- requires much more from the perception, planning,
     and control systems.  But the diversity of tasks that humans (and hopefully
-    soon robots) can do with their hands is truly remarkable.  To see one small catalog of examples that I like, take a look at the <a href="http://www.shap.ecs.soton.ac.uk/about-usage.php?task=buttons/">South Hampton Assessment Procedure (SHAP)</a>, which was designed as a way to empirically evaluate prosthetic hands.</p>
+    soon robots) can do with their hands is truly remarkable.  To see one small
+    catalog of examples that I like, take a look at the <a
+    href="http://www.shap.ecs.soton.ac.uk/about-usage.php?task=buttons/">South
+    Hampton Assessment Procedure (SHAP)</a>, which was designed as a way to
+    empirically evaluate prosthetic hands.</p>
       
-    <p>It's also important to recognize that manipulation research today looks very different than manipulation research looked like in the 1980's and 1990's.  During that time there was a strong and beautiful focus on "manipulation as grasping", with seminal work on, for instance, the kinematics/dynamics of multi-fingered hands assuming a stable grasp on an object.  Sometimes still, I hear people use the term "grasping" as almost synonymous with manipulation.  But please realize that the goals of manipulation research today, and of these notes, are much broader than that.  Is grasping a sufficient description of what your hand is doing when you are buttoning your shirt?  Making a salad?  Spreading peanut butter on toast?</p>
+    <p>It's also important to recognize that manipulation research today looks
+    very different than manipulation research looked like in the 1980's and
+    1990's.  During that time there was a strong and beautiful focus on
+    "manipulation as grasping", with seminal work on, for instance, the
+    kinematics/dynamics of multi-fingered hands assuming a stable grasp on an
+    object.  Sometimes still, I hear people use the term "grasping" as almost
+    synonymous with manipulation.  But please realize that the goals of
+    manipulation research today, and of these notes, are much broader than that.
+    Is grasping a sufficient description of what your hand is doing when you are
+    buttoning your shirt?  Making a salad?  Spreading peanut butter on
+    toast?</p>
   
   </section>  
   
@@ -152,30 +184,87 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
     point at which you have seen every possible kitchen) is often referred to as
     the "open-world" or "open-domain" problem -- a term popularized first in the
     context of <a href="https://en.wikipedia.org/wiki/Open_world">video
-    games</a>.  It can be tough to strike a balance between rigorous thinking about aspects of the manipulation problem, and trying to embrace the diversity and complexity of the entire world.  But it's important to walk that line.</p>
+    games</a>.  It can be tough to strike a balance between rigorous thinking
+    about aspects of the manipulation problem, and trying to embrace the
+    diversity and complexity of the entire world.  But it's important to walk
+    that line.</p>
   
-    <p>There is chance that diversity of manipulation in the open world might actually make the problem easier.  We are just at the dawn of the era of big data in robotics; the impact this will have cannot be overstated.  But I think it is deeper than that.  As an example, some of our optimization formulations for planning and control might get stuck in local minima now because narrow problem formulations can have many quirky solutions; but once we ask a controller to work in a huge diversity of scenarios then the quirky solutions can be discarded and the optimization landscape may become much simpler.  But to the extent that is true, then we should aim to understand it rigorously!</p>
+    <p>There is chance that diversity of manipulation in the open world might
+    actually make the problem easier.  We are just at the dawn of the era of big
+    data in robotics; the impact this will have cannot be overstated.  But I
+    think it is deeper than that.  As an example, some of our optimization
+    formulations for planning and control might get stuck in local minima now
+    because narrow problem formulations can have many quirky solutions; but once
+    we ask a controller to work in a huge diversity of scenarios then the quirky
+    solutions can be discarded and the optimization landscape may become much
+    simpler.  But to the extent that is true, then we should aim to understand
+    it rigorously!</p>
   </section>
   
   <section><h1>Simulation</h1>
       
-    <p>There is another reason that we are now entering a golden age for manipulation research.  Our software tools have (very recently) gotten much better!</p>
+    <p>There is another reason that we are now entering a golden age for
+    manipulation research.  Our software tools have (very recently) gotten much
+    better!</p>
       
-    <p>It was only about three years ago that I remember talking to my students, who were all quite adept at using simulation for developing control systems for walking robots, about using simulation for manipulation.  "You can't work on manipulation in simulation" was their refrain, and for good reason.  The complexity of the contact mechanics in manipulation has traditionally been much harder to simulate than a walking robot that only interacts with the ground and through a minimal set of contact points.  Looming even larger, though, was the centrality of perception for manipulation; it was generally accepted that one could not simulate a camera well enough to be meaningful.</p>
+    <p>It was only about three years ago that I remember talking to my students,
+    who were all quite adept at using simulation for developing control systems
+    for walking robots, about using simulation for manipulation.  "You can't
+    work on manipulation in simulation" was their refrain, and for good reason.
+    The complexity of the contact mechanics in manipulation has traditionally
+    been much harder to simulate than a walking robot that only interacts with
+    the ground and through a minimal set of contact points.  Looming even
+    larger, though, was the centrality of perception for manipulation; it was
+    generally accepted that one could not simulate a camera well enough to be
+    meaningful.</p>
       
-    <p>How quickly things can change!  The last few years has seen a rapid adoption of video-game quality rendering by the robotics and computer vision communities.  The growing consensus now is that game-engine renderers <i>can</i> model cameras well enough not only to <i>test</i> a perception system in simulation, but even to <i>train</i> perception systems in simulation and expect them to work in the real world!  This is fairly amazing, as we were all very concerned before that training a deep learning perception system in simulation would allow it to exploit any quirks of the simulated images that could make the problem easier.</p>
+    <p>How quickly things can change!  The last few years has seen a rapid
+    adoption of video-game quality rendering by the robotics and computer vision
+    communities.  The growing consensus now is that game-engine renderers
+    <i>can</i> model cameras well enough not only to <i>test</i> a perception
+    system in simulation, but even to <i>train</i> perception systems in
+    simulation and expect them to work in the real world!  This is fairly
+    amazing, as we were all very concerned before that training a deep learning
+    perception system in simulation would allow it to exploit any quirks of the
+    simulated images that could make the problem easier.</p>
       
-    <p>We have also seen dramatic improvements in the quality and performance of contact simulation.  Making robust and performant simulations of multi-body contact involves dealing with complex geometry queries and stiff (measure-) differential equations.  There is still room for fundamental improvements in the mathematical formulations of the governing equations, but today's solvers are good enough to be extremely useful.</p>
+    <p>We have also seen dramatic improvements in the quality and performance of
+    contact simulation.  Making robust and performant simulations of multi-body
+    contact involves dealing with complex geometry queries and stiff (measure-)
+    differential equations.  There is still room for fundamental improvements in
+    the mathematical formulations of the governing equations, but today's
+    solvers are good enough to be extremely useful.</p>
       
 </section>
     
 <section><h1>These notes are interactive</h1>
     
-    <p>By leveraging the power of simulation, and the new availability of free online interactive compute makes, I having been working to make these notes more than a bunch of static text.  Each chapter will have working code examples, which you can run immediately (no installation required) on <a href="https://colab.research.google.com/">Google's Colaboratory</a>, or download/install and run on your local machine (see the <a href="drake.html">appendix</a> for more details).  It uses an open-source library called <drake></drake> which has been a labor of love for me over the last 7 years or so.  Because all of the code is open source, it is entirely up to you how deep into the rabbit hole you choose to go.</p>
+    <p>By leveraging the power of simulation, and the new availability of free
+    online interactive compute makes, I having been working to make these notes
+    more than a bunch of static text.  Each chapter will have working code
+    examples, which you can run immediately (no installation required) on <a
+    href="https://colab.research.google.com/">Google's Colaboratory</a>, or
+    download/install and run on your local machine (see the <a
+    href="drake.html">appendix</a> for more details).  It uses an open-source
+    library called <drake></drake> which has been a labor of love for me over
+    the last 7 years or so.  Because all of the code is open source, it is
+    entirely up to you how deep into the rabbit hole you choose to go.</p>
     
-    <p>Mortimer Adler famously said "Reading a [great] book should be a conversation between you and the author." In addition to the interactive graphics/code, I've added the ability to highlight/comment/ask questions directly on these notes (go ahead and try it).  Adler's suggestion was that <i>great</i> writing can turn static text into a dialogue, transcending distance and time; perhaps I'm cheating, but technology can help me communicate with you even if my writing isn't as strong as Adler would have liked!</p>
+    <p>Mortimer Adler famously said "Reading a [great] book should be a
+    conversation between you and the author." In addition to the interactive
+    graphics/code, I've added the ability to highlight/comment/ask questions
+    directly on these notes (go ahead and try it).  Adler's suggestion was that
+    <i>great</i> writing can turn static text into a dialogue, transcending
+    distance and time; perhaps I'm cheating, but technology can help me
+    communicate with you even if my writing isn't as strong as Adler would have
+    liked!</p>
       
-    <p>I have organized the software examples into notebooks by chapter.  There is an "Open in Colab" button at the top of each chapter; I'd encourage you to open it immediately when you are reading the chapter and running the first cell, which takes up to two minutes to provision the cloud machine.  Then as you read the text, I will have examples that will have corresponding sections in the notebook.  Here is a warm-up.</p>
+    <p>I have organized the software examples into notebooks by chapter.  There
+    is an "Open in Colab" button at the top of each chapter; I'd encourage you
+    to open it immediately when you are reading the chapter and running the
+    first cell, which takes up to two minutes to provision the cloud machine.
+    Then as you read the text, I will have examples that will have corresponding
+    sections in the notebook.  Here is a warm-up.</p>
       
     <example><h1>Teleoperation in 3D.</h1>
       
@@ -193,40 +282,104 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
   
   <section><h1>Model-based design and analysis</h1>
     
-    <p>Thanks to progress in simulation, it is now possible to pursue a meaningful study of manipulation without needing a physical robot.  But simulation (of our robot dynamics, sensors, actuators and its environment) is not enough.  Another major challenge in manipulation is the potential number and complexity of autonomy components (perception, planning, and control) that we need to assemble in order to do the tasks.  A major goals of these notes is to attempt to bridle this complexity, to the extent possible.</p>
+    <p>Thanks to progress in simulation, it is now possible to pursue a
+    meaningful study of manipulation without needing a physical robot.  But
+    simulation (of our robot dynamics, sensors, actuators and its environment)
+    is not enough.  Another major challenge in manipulation is the potential
+    number and complexity of autonomy components (perception, planning, and
+    control) that we need to assemble in order to do the tasks.  A major goals
+    of these notes is to attempt to bridle this complexity, to the extent
+    possible.</p>
       
-    <p>Many of you will be familiar with <a href="http://ros.org">ROS (the Robot Operating System)</a>.  I believe that ROS was one of the best things to happen to robotics in the last decade.  It meant that experts from different subdisciplines could easily share their expertise in the form of modular components.  Components (as ROS packages) simply agree on the messages that they will send and receive on the network; packages can inter-operate even if they are written in different programming languages or even on different operating systems.</p>
+    <p>Many of you will be familiar with <a href="http://ros.org">ROS (the Robot
+    Operating System)</a>.  I believe that ROS was one of the best things to
+    happen to robotics in the last decade.  It meant that experts from different
+    subdisciplines could easily share their expertise in the form of modular
+    components.  Components (as ROS packages) simply agree on the messages that
+    they will send and receive on the network; packages can inter-operate even
+    if they are written in different programming languages or even on different
+    operating systems.</p>
 
-    <p>Although ROS makes it relatively easy to get started with manipulation, it doesn't serve my pedagogical goals of thinking clearly about manipulation.  The modular approach to authoring the components is extremely good, and we will adopt it here.  But in <drake></drake> we ask for a little bit more from each of the components -- essentially that they declare their states, parameters, and timing semantics in a consistent way -- so that we have a much better chance of understanding the complex relationships between systems.  This has great practical value as well; the ability to debug a full manipulation stack with repeatable deterministic simulations (even if they include randomness) is surprisingly rare in the field but hugely valuable.</p>
+    <p>Although ROS makes it relatively easy to get started with manipulation,
+    it doesn't serve my pedagogical goals of thinking clearly about
+    manipulation.  The modular approach to authoring the components is extremely
+    good, and we will adopt it here.  But in <drake></drake> we ask for a little
+    bit more from each of the components -- essentially that they declare their
+    states, parameters, and timing semantics in a consistent way -- so that we
+    have a much better chance of understanding the complex relationships between
+    systems.  This has great practical value as well; the ability to debug a
+    full manipulation stack with repeatable deterministic simulations (even if
+    they include randomness) is surprisingly rare in the field but hugely
+    valuable.</p>
       
-    <p>The key building block in our work will be <drake></drake> <b>Systems</b>, and systems can be combined in complex combinations into <b>Diagrams</b>.  System diagrams have long been the modeling paradigm used in controls, and the software aspect of it will be very familiar to you if you've used tools like Simulink, LabView, or Modelica.  These software tools refer to the block-diagram design paradigm as "model-based design".</p>
+    <p>The key building block in our work will be <drake></drake>
+    <b>Systems</b>, and systems can be combined in complex combinations into
+    <b>Diagrams</b>.  System diagrams have long been the modeling paradigm used
+    in controls, and the software aspect of it will be very familiar to you if
+    you've used tools like Simulink, LabView, or Modelica.  These software tools
+    refer to the block-diagram design paradigm as "model-based design".</p>
     
     <example><h1>System Diagrams</h1>
         
-        <p>Even the examples above, which relied on you to perform teleoperation instead of having an autonomy stack, were still the result of combining numerous parts.  For any system (a system diagram is still a system) that you have in <drake></drake>, you can visualize that diagram directly in the notebook.</p>
+        <p>Even the examples above, which relied on you to perform teleoperation
+        instead of having an autonomy stack, were still the result of combining
+        numerous parts.  For any system (a system diagram is still a system)
+        that you have in <drake></drake>, you can visualize that diagram
+        directly in the notebook.</p>
         
         <iframe width="100%" height="300px" src="https://people.csail.mit.edu/russt/uploads/manip_station.html"></iframe>
-        <todo>Update this to the newer rendering, and host the file in manipulation/data.</todo>
+        <todo>Update this to the newer rendering, and host the file in
+        manipulation/data.</todo>
         
-        <p>This graphic is interactive.  Make sure you zoom in and click around to get a sense for the amount of complexity that we can abstract away in this framework.  For instance, try expanding the <code>iiwa_controller</code> block.</p>
+        <p>This graphic is interactive.  Make sure you zoom in and click around
+        to get a sense for the amount of complexity that we can abstract away in
+        this framework.  For instance, try expanding the
+        <code>iiwa_controller</code> block.</p>
         
-        <p>Whenever you are ready to learn more about the Systems Framework in <drake></drake>, I recommend starting with the "Modeling Dynamical Systems" tutorial linked from the <a href="http://drake.mit.edu">main drake website</a>.</p>
+        <p>Whenever you are ready to learn more about the Systems Framework in
+        <drake></drake>, I recommend starting with the "Modeling Dynamical
+        Systems" tutorial linked from the <a href="http://drake.mit.edu">main
+        drake website</a>.</p>
         
-        <todo>Make the tutorial link more specific once they land in their colab workspace.</todo>
+        <todo>Make the tutorial link more specific once they land in their colab
+        workspace.</todo>
       
     </example>
 
-    <p>Let me be transparent: not everybody likes this systems framework.  Some people are just trying to move fast, and don't see the benefits of slowing down to declare their state variables, etc.  It will likely feel like a burden to you the first time you go to write a new system.  But it's precisely <i>because</i> we're trying to build complex systems quickly that I advocate this more rigorous approach.  I believe that getting to the next level of maturity in our open-world manipulation system requires more maturity from our building blocks.</p>
+    <p>Let me be transparent: not everybody likes this systems framework.  Some
+    people are just trying to move fast, and don't see the benefits of slowing
+    down to declare their state variables, etc.  It will likely feel like a
+    burden to you the first time you go to write a new system.  But it's
+    precisely <i>because</i> we're trying to build complex systems quickly that
+    I advocate this more rigorous approach.  I believe that getting to the next
+    level of maturity in our open-world manipulation system requires more
+    maturity from our building blocks.</p>
         
   </section> 
   
   <section><h1>Organization of these notes</h1>
   
-    <p>The remaining chapters of these notes are organized around the component-level building blocks of manipulation.  Many of these components each individually build on a wealth of literature (e.g. from computer vision, or dynamics and control).  Rather than be overwhelmed, I've chosen to focus on delivering a consistent coherent presentation of the most relevant ideas from each field <i>as they relate to manipulation</i>, and pointers to more literature.  Even finding a single notation across all of the fields can be a challenge!</p>
+    <p>The remaining chapters of these notes are organized around the
+    component-level building blocks of manipulation.  Many of these components
+    each individually build on a wealth of literature (e.g. from computer
+    vision, or dynamics and control).  Rather than be overwhelmed, I've chosen
+    to focus on delivering a consistent coherent presentation of the most
+    relevant ideas from each field <i>as they relate to manipulation</i>, and
+    pointers to more literature.  Even finding a single notation across all of
+    the fields can be a challenge!</p>
         
-    <p>The next few chapters will give you a minimal background on the relevant robot hardware that we are simulating, on (some of) the details about simulating them, and on the geometry and kinematics basics that we will use heavily through the notes.</p>
+    <p>The next few chapters will give you a minimal background on the relevant
+    robot hardware that we are simulating, on (some of) the details about
+    simulating them, and on the geometry and kinematics basics that we will use
+    heavily through the notes.</p>
         
-    <p>For the remainder of the notes, rather than organize the chapters into "Perception", "Planning", and "Control", I've decided to spiral through these topics.  In the first part, we'll do just enough perception, planning, and control to build up a basic manipulation system that can perform pick-and-place manipulation of known singulated objects.  Then I'll try to motivate each new chapter by describing what our previous system cannot do, and what we hope it will do by the end of the chapter.</p>
+    <p>For the remainder of the notes, rather than organize the chapters into
+    "Perception", "Planning", and "Control", I've decided to spiral through
+    these topics.  In the first part, we'll do just enough perception, planning,
+    and control to build up a basic manipulation system that can perform
+    pick-and-place manipulation of known singulated objects.  Then I'll try to
+    motivate each new chapter by describing what our previous system cannot do,
+    and what we hope it will do by the end of the chapter.</p>
       
     <p>I welcome any feedback.  And don't forget to interact!</p>
       
