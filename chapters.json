@@ -2,8 +2,7 @@
   "chapter_ids" : [
     "intro",
     "hardware",
-    "simulation",
-    "kinematics",
+    "pick",
     "pixels",
     "pose",
     "deep_perception",
@@ -25,7 +24,7 @@
   ],
   "parts_format": "dict(first chapter id, name of the part)",
   "parts" : {
-    "pixels": "Perception",
+    "pixels": "Perception (Note: I'm going to refactor the remaining chapters)",
     "grasping": "Planning",
     "manipulator": "Control",
     "drake": "Appendix"

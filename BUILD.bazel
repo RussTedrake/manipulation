@@ -38,6 +38,12 @@ html_tidy_test(
 #    srcs = ["intro.ipynb"],
 #)
 
+# TODO(russt): Make this pass and enable the test!
+#rt_ipynb_test(
+#    name = "hardware",
+#    srcs = ["hardware.ipynb"],
+#)
+
 filegroup(
     name = "chapters",
     srcs = ["chapters.json"],
