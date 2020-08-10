@@ -171,10 +171,109 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       <p>It's a good time to be working on manipulation!</p>
       
     </subsection>
+    
+    <subsection><h1>Simulating the Kuka iiwa</h1>
+    
+      <p>It's time to simulate our chosen robotic arm.  The first step is to obtain a robot description file (URDF or SDF).  For convenience, we <a href="https://github.com/RobotLocomotion/drake/tree/e3beced2025277411b456e11450316d07a146f5a/manipulation/models">ship</a> the iiwa models with drake.  If you're interested in simulating a different robot, you can find either a URDF or SDF describing most commercial robots somewhere online.  But a word of warning: the quality of these models can vary wildly.  We've seen surprising errors in even the kinematics (link lengths, geometries, etc), but the dynamics properties (inertia, friction, etc) in particular are often not accurate at all.  Sometimes they are not even mathematically consistent (e.g. it is possible to specify an inertial matrix which is not physically realizable by any rigid body).  Drake will complain if you ask it to load one of these; we would rather alert you early than start generating bogus simulations.  There is also increasingly good support in CAD software for exporting to a robot format.</p>
+      
+      <p>Now we have to import this robot description file in our physics engine.  In Drake, the physics engine is called <code>MultibodyPlant</code>.  The term "plant" may seem odd -- it is the word used in the controls literature to represent the physical system, with origins in the control of chemical plants -- but it is pervasive.  You can access the methods of <code>MultibodyPlant</code> through its class methods, e.g. for use in designing a model-based controller.  But in order to work with our model-based design philosophy, <code>MultibodyPlant</code> also provides an interface as a <code>System</code>, with input and output ports.</p>
+      
+      <table align="center" cellpadding="0" cellspacing="0">
+<tr align="center">
+<td style="vertical-align:middle"><table cellspacing="0" cellpadding="0">
+<tr>
+<td align="right" style="padding:5px 0px 5px 0px">applied_generalized_force&rarr;</td></tr>
+<tr>
+<td align="right" style="padding:5px 0px 5px 0px">applied_spatial_force&rarr;</td></tr>
+<tr>
+<td align="right" style="padding:5px 0px 5px 0px"><em style="color:gray">model_instance_name[i]</em>_actuation&rarr;</td></tr>
+<tr>
+<td align="right" style="padding:5px 0px 5px 0px"><span style="color:green">geometry_query</span>&rarr;</td></tr>
+</table>
+</td><td align="center" style="border:solid;padding-left:20px;padding-right:20px;vertical-align:middle" bgcolor="#F0F0F0"><a class="el" href="https://drake.mit.edu/doxygen_cxx/classdrake_1_1multibody_1_1_multibody_plant.html" title="MultibodyPlant is a Drake system framework representation (see systems::System) for the model of a ph...">MultibodyPlant</a></td><td style="vertical-align:middle"><table cellspacing="0" cellpadding="0">
+<tr>
+<td align="left" style="padding:5px 0px 5px 0px">&rarr; continuous_state</td></tr>
+<tr>
+<td align="left" style="padding:5px 0px 5px 0px">&rarr; body_poses</td></tr>
+<tr>
+<td align="left" style="padding:5px 0px 5px 0px">&rarr; body_spatial_velocities</td></tr>
+<tr>
+<td align="left" style="padding:5px 0px 5px 0px">&rarr; body_spatial_accelerations</td></tr>
+<tr>
+<td align="left" style="padding:5px 0px 5px 0px">&rarr; generalized_acceleration</td></tr>
+<tr>
+<td align="left" style="padding:5px 0px 5px 0px">&rarr; reaction_forces</td></tr>
+<tr>
+<td align="left" style="padding:5px 0px 5px 0px">&rarr; contact_results</td></tr>
+<tr>
+<td align="left" style="padding:5px 0px 5px 0px">&rarr; <em style="color:gray">model_instance_name[i]</em>_continuous_state</td></tr>
+<tr>
+<td align="left" style="padding:5px 0px 5px 0px">&rarr; <em style="color:gray"> model_instance_name[i]</em>_generalized_acceleration</td></tr>
+<tr>
+<td align="left" style="padding:5px 0px 5px 0px">&rarr; <em style="color:gray"> model_instance_name[i]</em>_generalized_contact_forces</td></tr>
+<tr>
+<td align="left" style="padding:5px 0px 5px 0px">&rarr; <span style="color:green">geometry_pose</span></td></tr>
+</table>
+</td></tr>
+</table>
+      
+      <p>As you might expect for something as complex and general as a physics engine, it has many input and output ports; most of them are optional.  I'll illustrate the mechanics of using these in the following example.</p>
+      
+      <example><h1>Simulating the passive iiwa</h1>
+      
+      
+      </example>
+      
+      <p>The computation behind that example is substantial, but so far the output was not.  The best way to visualize the results of a physics engine is with a 2D or 3D visualizer.  For that, we need one more system.  In Drake with call it the <code>SceneGraph</code>.</p>
+      
+<table align="center" cellpadding="0" cellspacing="0">
+<tr align="center">
+<td style="vertical-align:middle"><table cellspacing="0" cellpadding="0">
+<tr>
+<td align="right" style="padding:5px 0px 5px 0px">source_pose{0}&rarr;</td></tr>
+<tr>
+<td align="right" style="padding:5px 0px 5px 0px">...&rarr;</td></tr>
+<tr>
+<td align="right" style="padding:5px 0px 5px 0px">source_pose{N-1}&rarr;</td></tr>
+</table>      
+</td><td align="center" style="border:solid;padding-left:20px;padding-right:20px;vertical-align:middle" bgcolor="#F0F0F0"><a class="el" href="https://drake.mit.edu/doxygen_cxx/classdrake_1_1geometry_1_1_scene_graph.html" title="SceneGraph serves as the nexus for all geometry (and geometry-based operations) in a Diagram.">SceneGraph</a></td><td style="vertical-align:middle"><table cellspacing="0" cellpadding="0">
+<tr>
+<td align="left" style="padding:5px 0px 5px 0px">&rarr; lcm_visualization</td></tr>
+<tr>
+<td align="left" style="padding:5px 0px 5px 0px">&rarr; query</td></tr>
+</table>
+</td></tr>
+</table>
+      
+      <example><h1>Visualizing the scene</h1>
+      
+      </example>
+      
+      <p>You might wonder why <code>MultibodyPlant</code> doesn't handle the geometry of the scene as well.  Well there are many application where we'd like to render complex scenes, and use complex sensors, but supply custom dynamics.  Autonomous driving is a great example; in that case we want to populate a <code>SceneGraph</code> with all of the geometry of the vehicles and environment, but we often want to simulate the vehicles with very simple vehicle models that stop well short of adding tire mechanics into our physics engine.</p>
+      
+      <p>We have a basic simulation of the iiwa, but already some subtleties emerge.  The physics engine needs to be told what torques to apply at the joints.  In our example, we apply zero torque, and the robot falls down.  In reality, that never happens; in fact there is essentially never a situation where the physical iiwa robot experiences zero torque at the joints, even when the controller is turned off.  Like many mature industrial robot arms, iiwa has mechanical brakes at each joint that are engaged whenever the controller is turned off.  To simulate the robot with the controller turned off, we would need to tell our physics engine about the torques produced by these brakes.</p>
+      
+      <p>In fact, even when the controller is turned on, and despite the fact that it is a torque-controlled robot, we can never actually send zero torques to the motors.  The iiwa software interface accepts "feed-forward torque" commands, but it will always add these as additional torques to its low-level controller which is compensating for gravity and the motor/transmission mechanics.  This often feels frustrating, but probably we don't actually want to get into the details of simulating the drive mechanics.</p>
+      
+      <p>As a result, the simplest reasonable simulation we can provide of the iiwa must include a simulation of their low-level controller.  We will use the iiwa's "joint impedance control" mode, and will describe the details of that once they become important for getting the robot to perform better.  For now, we can treat it as given, and produce our simplest reasonable iiwa simulation.</p>
+      
+      <example><h1>Adding the iiwa low-level controller</h1>
+      
+      </example>
+      
+      <p>As a final note, you might think that simulating the <i>dynamics</i> of the robot is overkill, if my only goal is to simulate manipulation tasks where the robot is moving only relatively slowly, and effects of mass, inertia and forces might be less important than just the positions that the robot (and the objects) occupy in space.  I would actually agree with you.  But it's surprisingly tricky to get a <i>kinematic</i> simulation to respect the basic rules of interaction; e.g. to know when the object gets picked up or when it does not (see, for instance <elib>Pang18</elib>). Currently, in drake, we end up simulating the full dynamics, but using simpler models for planning and control.</p>
+      
+    </subsection>
 
   </section>
 
   <section><h1>Hands</h1>
+    
+    <p>You might have noticed that the iiwa does not actually ship with a hand attached; rather it has a mounting plate so that you can attach the end-effector of your choice (and some options on access ports so you can connect your end-effector to the computer without wires running down the outside of the robot).  So now we have another decision to make: what hand should we use?</p>
+    
+    <p>It is interesting that the researchers in manipulation tend to fall into a few camps on this point.  Of course, our fascination with the human hand is well placed, and we dream of building robotic hands that are as dexterous and sensor-rich.  But the reality is that we aren't there yet.  Some people choose to pursue this dream and work with the best dexterous hands on the market, and struggle with the complexity and lack of robustness that ensues.  Another camp points out that dexterous hands are not necessary -- I can give you a simple gripper from the toy store and you can still accomplish amazingly useful tasks around the home.  Indeed there is an elegance in the clarity and simplicity of the simple grippers.  And the newest camp is promoting clever mechanical designs for hands, which we'll call "underactuated hands", that can achieve some of the advantages of a human hand based on clever mechanics alone.  But often these hands are exceedingly good at the task they are designed for (mostly "enveloping grasps"), but it would be very hard to use one of these to, for instance, button my shirt.</p>
+    
+    <p>Let's dig in a little more.</p>
 
     <subsection><h1>Simple grippers</h1></subsection>
 
