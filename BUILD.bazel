@@ -40,8 +40,8 @@ html_tidy_test(
 
 # TODO(russt): Make this pass and enable the test!
 #rt_ipynb_test(
-#    name = "hardware",
-#    srcs = ["hardware.ipynb"],
+#    name = "robot",
+#    srcs = ["robot.ipynb"],
 #)
 
 filegroup(
