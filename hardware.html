@@ -3,8 +3,8 @@
 <html>
 
   <head>
-    <title>Robotic Manipulation: Your Manipulation Hardware</title>
-    <meta name="Robotic Manipulation: Your Manipulation Hardware" content="text/html; charset=utf-8;" />
+    <title>Robotic Manipulation: Let's get you a robot</title>
+    <meta name="Robotic Manipulation: Let's get you a robot" content="text/html; charset=utf-8;" />
     <link rel="canonical" href="http://manipulation.csail.mit.edu/hardware.html" />
 
     <script src="https://hypothes.is/embed.js" async></script>
@@ -51,16 +51,16 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
 
 
 <!-- EVERYTHING ABOVE THIS LINE IS OVERWRITTEN BY THE INSTALL SCRIPT -->
-<chapter style="counter-reset: chapter 1"><h1>Your Manipulation Hardware</h1>
+<chapter style="counter-reset: chapter 1"><h1>Let's get you a robot</h1>
   <a style="float:right; margin-top:-80px;" target="hardware" href="https://colab.research.google.com/github/RussTedrake/manipulation/blob/master/hardware.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open Corresponding Notebook In Colab"/></a>
   <div style="clear:right;"></div>
     
   <p>In this chapter we're going to outfit your <a
   href="https://en.wikipedia.org/wiki/Mecha">mech</a>.  I want to make sure you
-  understand the hardware that we've selected for these notes, and how it
-  compares to the other hardware available today.  You should come away with a
-  clear understanding of the sensor signals that are available to you and the
-  commands that you can send to the robot.</p>
+  understand the robot hardware that we've selected for these notes, and how it
+  compares to the other hardware available today.  You should also come away
+  with an understanding of how we simulate the robot and what commands that you
+  can send to the robot interface.</p>
     
   <p>Although we are going to focus on one particular set of hardware for these
   notes, one of the great things about modern robotics is that many of the tools
@@ -595,13 +595,39 @@ alt="Open In Colab"/></a></p>
     
       <p>Suction, jamming grippers, tool-changers...`</p>
 
+      <p>I particularly liked the response that Matt Mason, one of the main
+      advocates for simple grippers throughout the years, gave to <a
+      href="https://youtu.be/LfWiBdOc2FI?t=4025">a question at the end of one of
+      our robotics seminars</a>: he argued that useful robots in e.g. the
+      kitchen will probably have special purpose tools that can be changed
+      quickly.</p>
+
+    </subsection>
+
+    <subsection><h1>And our choice is...</h1>
+    
+      <p>For most of these notes, the simple two-fingered grippers serve our
+      pedagogical goals the best.  In particular, I've selected the <a
+      href="https://schunk.com/us_en/gripping-systems/series/wsg/">Schunk WSG
+      050</a>, which we have used extensively in our research over the last few
+      years.  We'll also explore a few different end-effectors in later
+      chapters, when they help to explain the concepts.</p>
+
     </subsection>
 
   </section>
 
-  <section><h1>Cameras and depth sensors</h1></section>
+  <section><h1>Sensors</h1>
+  
+    <p>I haven't said much yet about sensors.  In fact, sensors are going to be
+    a major topic for us when we get to perception with (depth) cameras, and
+    when we think about <a
+    href="https://en.wikipedia.org/wiki/Tactile_sensor">tactile sensing</a>. But
+    I will defer those topics until we need them.</p>
 
-  <section><h1>Tactile sensors</h1></section>
+    <p>For now, let us focus on the joint sensors on the robot.  Both the iiwa and the Schunk WSG provide joint feedback -- the iiwa driver gives "measured position", "estimated velocity", and "measured torque" at each of its seven joints; remember that joint accelerations are typically considered too noisy to rely on.  Similarly the Schunk WSG outputs "measured state" (position + velocity) and "measured force".  We can make all of these available as ports in a block diagram.</p>
+  
+  </section>
   
   <section><h1>Putting it all together</h1>
   
@@ -755,7 +781,7 @@ alt="Open In Colab"/></a></p>
 <div id="footer">
   <hr>
   <table style="width:100%;">
-    <tr><td><em>Robotic Manipulation</em></td><td align="right">&copy; Russ
+    <tr><td><em>Robotic Manipulation</em></td><td style="text-align:right">&copy; Russ
       Tedrake, 2020</td></tr>
   </table>
 </div>
