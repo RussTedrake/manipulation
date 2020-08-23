@@ -540,29 +540,13 @@ alt="Open In Colab"/></a></p>
 
   <section><h1>Hands</h1>
     
-    <p>You might have noticed that the iiwa does not actually ship with a hand
-    attached; rather it has a mounting plate so that you can attach the
-    end-effector of your choice (and some options on access ports so you can
+    <p>You might have noticed that the iiwa model does not actually have a hand
+    attached; the robot ships with a mounting plate so that you can attach the
+    "end-effector" of your choice (and some options on access ports so you can
     connect your end-effector to the computer without wires running down the
     outside of the robot).  So now we have another decision to make: what hand
     should we use?</p>
     
-    <p>It is interesting that the researchers in manipulation tend to fall into
-    a few camps on this point.  Of course, our fascination with the human hand
-    is well placed, and we dream of building robotic hands that are as dexterous
-    and sensor-rich.  But the reality is that we aren't there yet.  Some people
-    choose to pursue this dream and work with the best dexterous hands on the
-    market, and struggle with the complexity and lack of robustness that ensues.
-    Another camp points out that dexterous hands are not necessary -- I can give
-    you a simple gripper from the toy store and you can still accomplish
-    amazingly useful tasks around the home.  Indeed there is an elegance in the
-    clarity and simplicity of the simple grippers.  Finally, the third and
-    newest camp is promoting clever mechanical designs for hands, which we'll
-    call "underactuated hands", that can achieve some of the advantages of a
-    human hand based on mechanics alone.  But often these hands are amazingly
-    good at some range of tasks (most often "enveloping grasps"), but not as
-    general purpose.</p>
-
     <example><h1>Robot hands</h1>
     
       <p>We can explore different hand models in drake using the same sort of
@@ -575,19 +559,78 @@ alt="Open In Colab"/></a></p>
       </p>
 
     </example>    
-    
-    <subsection><h1>Simple grippers</h1></subsection>
 
-    <subsection><h1>Dexterous hands</h1></subsection>
+    <p>It is interesting that, when it comes to robot end effectors, researchers
+    in manipulation tend to partition themselves into a few distinct camps.</p>
+    
+    <subsection><h1>Dexterous hands</h1>
+    
+      <figure>
+        <table><tr><td>
+        <img style="height:250px" src="figures/shadow_dexterous_hand.jpg"/>
+        </td><td style="width:50px"></td><td>
+        <img style="height:250px" src="figures/allegro_hand.png"/>
+        </td></tr>
+        </table>
+        <figcaption>Dexterous hands.  Left: the <a href="https://www.shadowrobot.com/products/dexterous-hand/">Shadow Dexterous Hand</a>.  Right: the <a href="http://www.wonikrobotics.com/Allegro-Hand.htm">Allegro Hand</a>.</figcaption>
+      </figure>
+
+      <p>Of course, our fascination with the human hand is well placed, and we
+      dream of building robotic hands that are as dexterous and sensor-rich.
+      But the reality is that we aren't there yet.  Some people choose to pursue
+      this dream and work with the best dexterous hands on the market, and
+      struggle with the complexity and lack of robustness that ensues.  The famous <a href="https://openai.com/blog/learning-dexterity/">"learning dexterity"</a> project from OpenAI used the Shadow hand for playing with a Rubik's cube, and the work that had to go into the hand in order to support the endurance learning experiments was definitely a part of the story.</p>
+      
+    </subsection>
+
+    <subsection><h1>Simple grippers</h1>
+    
+      <figure>
+        <iframe width="420" height="330" src="https://www.youtube.com/embed/oyHWkQcin7I" frameborder="0" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        <figcaption>This video of tele-operation with the PR1 from Ken
+        Salisbury's group is now a classic example of doing amazingly useful
+        things with a very simple hand.  Check out their <a
+        href="http://personalrobotics.stanford.edu/">website</a> for more
+        videos, including sweeping, fetching a beer, and unloading a
+        dishwasher.</figcaption>
+      </figure>
+
+      <p><img style="width:150px;float:right;margin-left:10px"
+      src="figures/toy_robot_hand.jpg"/>Another camp points out that dexterous
+      hands are not necessary -- I can give you a simple gripper from the toy
+      store and you can still accomplish amazingly useful tasks around the home.
+      The PR1 videos above are a great demonstration of this.</p>
+
+      <p>Another important argument in favor of simple hands is the elegance and
+      clarity that comes from reducing the complexity.  If thinking clearly
+      about simple grippers helps us understand more deeply <i>why</i> we need
+      more dexterous hands (I think it will), then great.  For most of these
+      notes, a simple two-fingered gripper will serve our pedagogical goals the
+      best.  In particular, I've selected the <a
+      href="https://schunk.com/us_en/gripping-systems/series/wsg/">Schunk WSG
+      050</a>, which we have used extensively in our research over the last few
+      years.  We'll also explore a few different end-effectors in later
+      chapters, when they help to explain the concepts.</p>
+  
+      <p>To be clear: just because a hand is simple (few degrees of freedom)
+      does not mean that it is low quality.  On the contrary, the Schunk WSG is
+      a very high-quality gripper with force control and force measurement at
+      its single degree of freedom that surpasses the fidelity of the Kuka.  It
+      would be hard to achieve the same in a dexterous hand with many
+      joints.</p>
+
+    </subsection>
 
     <subsection><h1>Soft/underactuated hands</h1></subsection>
 
-    <!-- hard to use for other tasks.it
-    would be very hard to use one of these to, for instance, button my
-    shirt.
-    -->
+      <p>Finally, the third and newest camp is promoting clever mechanical
+      designs for hands, which we'll call "underactuated hands", that can
+      achieve some of the advantages of a human hand based on mechanics alone.
+      But often these hands are amazingly good at some range of tasks (most
+      often "enveloping grasps"), but not as general purpose.  It would be very
+      hard to use one of these to, for instance, button my shirt.</p>
 
-    <subsection><h1>Other end-effectors</h1>
+    <subsection><h1>Other end effectors</h1>
     
       <p>Suction, jamming grippers, tool-changers...`</p>
 
@@ -597,17 +640,6 @@ alt="Open In Colab"/></a></p>
       our robotics seminars</a>: he argued that useful robots in e.g. the
       kitchen will probably have special purpose tools that can be changed
       quickly.</p>
-
-    </subsection>
-
-    <subsection><h1>And our choice is...</h1>
-    
-      <p>For most of these notes, the simple two-fingered grippers serve our
-      pedagogical goals the best.  In particular, I've selected the <a
-      href="https://schunk.com/us_en/gripping-systems/series/wsg/">Schunk WSG
-      050</a>, which we have used extensively in our research over the last few
-      years.  We'll also explore a few different end-effectors in later
-      chapters, when they help to explain the concepts.</p>
 
     </subsection>
 
@@ -627,6 +659,12 @@ alt="Open In Colab"/></a></p>
   
   <section><h1>Putting it all together</h1>
   
+    <p>If you've worked through the examples, you've seen that a proper
+    simulation of our robot is more than just a physics engine -- it requires
+    assembling physics, actuator and sensor models, and low-level robot
+    controllers into a common framework.  In practice, in Drake, that means that
+    we are assembling increasingly sophisticated block diagrams.</p>
+
     <p>One of the best things about the block-diagram modeling paradigm is the
     power of abstraction and encapsulation.  We can assemble a
     <code>Diagram</code> that contains all of the components necessary to
