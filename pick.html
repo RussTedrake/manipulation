@@ -66,17 +66,17 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
   <i>perception</i> problem for one chapter, and will let you assume that you
   have access to a perfect measurement of the current position/orientation of
   the brick.  Even without perception, completing this task this requires us to
-  build up a basic toolkit for geometry and kinematics; it's natural place to
+  build up a basic toolkit for geometry and kinematics; it's a natural place to
   start.</p>
 
-  <p>Let me start by establishing some terminology and notation for 
-  kinematics.  This is one area where careful notation can yield dividends, and
-  sloppy notation will inevitably lead to confusion and bugs.  The Drake
-  developers have gone to great length to establish and document a consistent <a
+  <p>First, we will establish some terminology and notation for kinematics. This
+  is one area where careful notation can yield dividends, and sloppy notation
+  will inevitably lead to confusion and bugs.  The Drake developers have gone to
+  great length to establish and document a consistent <a
   href="https://drake.mit.edu/doxygen_cxx/group__multibody__notation.html">
-  multibody notation</a>, and even have documentation describing the philosophy
-  behind it. I'll adhere to that notation here.</p>
-
+  multibody notation</a>, and have even included some of their
+  motivation/philosophy. I'll adhere to that notation here.</p>
+  
   <p>For a nice recent and much more thorough treatment of robot kinematics, I'd
   recommend the first seven chapters of <a
   href="http://hades.mech.northwestern.edu/index.php/Modern_Robotics">Modern
@@ -84,23 +84,65 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
   text, which is freely available online, they have excellent accompanying
   videos.  The chapters 2 and 3 of the 1994 book by Murray et al. are also still
   excellent (and now free online)<elib>Murray94</elib>.</p>
-  
+    
   <p>Please don't get overwhelmed by how much background material there is to
   know!  I am personally of the opinion that a clear understanding of just a few
   basic ideas should make you very effective here.  The details will come
-  later.</p>
+  later.</p>    
 
-  <section><h1>Coordinate Frames</h1>
+  <section><h1>Coordinate frames and transforms</h1>
 
-    <p></p>
+    <p><img style="height:80px;float:left;margin-right:10px"
+    src="figures/coordinate_frames.png"/> frames (or just "frames") have names;
+    in math we typically give them a capital letter.  $W$ for world.  $B$ for a
+    body.  Frame is origin + three vectors.  Right-hand rule.  World frame uses
+    vehicle coordinates (z is up).</p>
+
+    <p>Positions $^Pp^Q$, Rotations $R$, $^BR^C$, Transforms $X$, $^BX^C$.  Use
+    brackets if it gets confusing.  Expressed-in.</p>
+
+    <subsection><h1>Rotation representations</h1>
+    
+      <p>Quaternions, Euler angles, Axis angles, Rotation matrices.</p>
+      <p>We'll get into them if/when we need to, but for now it's sufficient to
+      understand that `RigidTransform`...</p>
+
+    </subsection>
+  </section>
+
+  <section><h1>Forward kinematics</h1>
+  
+    <p>Each body has a frame.  (We can have additional frames).  So the probelm
+    for forward kinematics is simply to compute $^W</p>
+  
+  
+  </section>
+
+  <section><h1>Differential kinematics (Jacobians)</h1>
+
+    <p>Analytic/Geometric</p>
 
   </section>
 
-  <p>Pose / Rigid Transform.  Rotation matrices, Euler angles, quaternions. </p>
+  <section><h1>Inverse kinematics</h1>
 
-  <p>Forward kinematics, inverse kinematics, Jacobians (analytic/geometric).</p>
+    <subsection><h1>As an optimization</h1>
+    
+    </subsection>
 
-  <!-- This is hard material to learn from text.  Have to do some simple exercises.  -->
+    <subsection><h1>Differential inverse kinematics</h1>
+    
+    </subsection>
+
+    <subsection><h1>Closed-form solutions</h1>
+
+        <!-- IK Fast.  Wampler.  -->
+
+    </subsection>
+
+  </section>
+
+  <section><h1>Grasp selection</h1></section>
 
 </chapter>
 <!-- EVERYTHING BELOW THIS LINE IS OVERWRITTEN BY THE INSTALL SCRIPT -->
