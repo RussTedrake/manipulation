@@ -93,82 +93,188 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
   basic ideas should make you very effective here.  The details will come
   later, if you need them.</p>    
 
-  <section><h1>Notation</h1>
+  <section><h1>Kinematics Notation</h1>
 
     <p><i>The following concepts are disarmingly subtle. I've seen incredibly
-    smart people assume they knew them and then stumble over notation
-    forevermore.  I did it for years myself.  Take a minute to read this
+    smart people assume they knew them and then perpetually stumble over
+    notation.  I did it for years myself.  Take a minute to read this
     carefully!</i></p>
 
     <p>Perhaps the most fundamental concept in geometry is the concept of a
     point.  Points occupy a position in space, and they can have names, e.g.
-    point $A$, $C$, or perhaps $B_{com}$ for the center of mass of body $B$.
-    We'll denote the position of the point as $p^A$; that's $p$ for position,
-    and not for point, because other geometric quantities can also have a
-    position.</p>
+    point $A$, $C$, or more descriptive names like $B_{com}$ for the center of
+    mass of body $B$. We'll denote the position of the point as $p^A$; that's
+    $p$ for position, and not for point, because other geometric quantities can
+    also have a position.</p>
 
     <p>But let's be more careful.  Position is actually a relative quantity.
     Really, we should only ever write the position of two points relative to
     each other. We'll use e.g. $^Ap^C$ to denote the position of $C$ relative to
-    $A$.  The left superscript looks mighty strange, but we'll see that it pays off once we start tranforming points.</p>
+    $A$.  The left superscript looks mighty strange, but we'll see that it pays
+    off once we start transforming points.</p>
     
-    <p><img style="height:90px;float:left;margin-right:10px"
-    src="figures/coordinate_frames.png"/> Every time we describe the (relative)
-    position as a vector of numbers, we need to be explicit about the coordinate
-    system.  All of our coordinate systems here will follow the "right-hand rule".
-    We'll give a coordinate system, coordinate frame, or just <i>frame</i>, a
-    name, too, like $F$.  If I want to write the position of point $C$ relative
-    to point $A$, expressed in frame $F$, I will write $[^Ap^C]_F$.  The
-    brackets come in because we'll sometimes what to refer to the elements of
-    the position, e.g. $[^Ap_i^C]_F$ is the $i$th element.</p>
+    <p>Every time we describe the (relative) position as a vector of numbers, we
+    need to be explicit about the coordinate system.  All of our coordinate
+    systems here will follow the "right-hand rule". We'll give a coordinate
+    system, coordinate frame, or just <i>frame</i>, a name, too, like $F$.  If I
+    want to write the position of point $C$ relative to point $A$, expressed in
+    frame $F$, I will write $[^Ap^C]_F$.  The brackets come in because we'll
+    sometimes what to refer to the elements of the position, e.g. $[^Ap_i^C]_F$
+    is the $i$th element.</p>
     
     <p>That is seriously heavy notation.  I don't love it myself, but it's
     the most durable I've got, and we'll have shorthand for when the context is
     clear.</p>
 
-    <p>There are a few very special frames.  We use $W$ to denote the <i>world
-    frame</i>.  We think about the world frame in Drake using vehicle
-    coordinates (positive $x$ to the front, positive $y$ to the <i>left</i>, and
-    positive $z$ is up).  The other particularly special frames are the <i>body
-    frames</i>: every body in the multibody system has a unique frame attached
-    to it.  We'll typically use $B_i$ to denote the frame for body $i$.</p>
+    <p><img style="height:90px;float:left;margin-right:10px"
+    src="figures/coordinate_frames.png"/> There are a few very special frames.
+    We use $W$ to denote the <i>world frame</i>.  We think about the world frame
+    in Drake using vehicle coordinates (positive $x$ to the front, positive $y$
+    to the <i>left</i>, and positive $z$ is up).  The other particularly special
+    frames are the <i>body frames</i>: every body in the multibody system has a
+    unique frame attached to it.  We'll typically use $B_i$ to denote the frame
+    for body $i$.</p>
 
-    <p>Frames have a position, too -- it coincides with the origin.  So it is
-    perfectly valid to write $[^Wp^A]_W$ to denote the position of point $A$
+    <p>Frames have a position, too -- it coincides with the frame origin.  So it
+    is perfectly valid to write $[^Wp^A]_W$ to denote the position of point $A$
     relative to the origin of the world frame, expressed in the world frame.
     Here is where the shorthand comes in.  If the position of a quantity is
     relative to a frame, and expressed in the same frame, then we can safely
-    omit the brackets and the subscript.  $^Fp^A \equiv [^Fp^A]_F$.
-    Furthermore, if the "relative to" field is omitted, then we assume that the
-    point is relative to $W$, so $p^A \equiv [^Wp^A]_W$.</p>
+    omit the brackets and the subscript.  $^Fp^A \equiv [^Fp^A]_F$. Furthermore,
+    if the "relative to" field is omitted, then we assume that the point is
+    relative to $W$, so $p^A \equiv [^Wp^A]_W$.</p>
 
-    <p>Frames also have an orientation.  We'll use $R$ to denote a <i>rotation
-    matrix</i>, and follow the same notation, writing $[^BR^A]_C$ to denote the
-    rotation of frame $A$ relative to frame $B$, expressed in frame $C$.</p>
+    <figure>
+      <img style="width:60%" src="figures/notation.svg"></img>
+      <!-- Note: I made this in slides.com, exported to pdf, cropped in acrobat,
+      then converted with pdf2svg. -->
+    </figure>
+
+    <p>Frames also have an orientation.  We'll use $R$ to denote a
+    <i>rotation</i>, and follow the same notation, writing $^BR^A$ to denote the
+    rotation of frame $A$ relative to frame $B$.  Unlike vectors, pure rotations
+    do not have an additional "expressed in" frame.</p>
 
     <p>A frame $F$ can be specified completely by a position and rotation
     relative to another frame.  Taken together, we call the position and
     rotation a <a
-    href="https://drake.mit.edu/doxygen_cxx/classdrake_1_1math_1_1_rigid_transform.html"><code>RigidTransform</code></a>,
-    and denote it with the letter $X$. When we talk about the <i>pose</i> of an
-    object or frame, we mean the
-    <code>RigidTransform</code> (relative to the world, if we are not more
-    explicit). $[^BX^A]_C$ is the pose of $A$ relative to frame $B$, expressed
-    in frame $C$.</p>
+    href="https://drake.mit.edu/doxygen_cxx/group__multibody__spatial__pose.html">
+    <i>spatial pose</i></a>, or just <i>pose</i>.  A <i>spatial transform</i>,
+    or just <i>transform</i>, is the "verb form" of pose.  In Drake we use <a
+    href="https://drake.mit.edu/doxygen_cxx/classdrake_1_1math_1_1_rigid_transform.html"><code>RigidTransform</code></a>
+    to represent a pose/transform, and denote it with the letter $X$. $^BX^A$ is
+    the pose of frame $A$ relative to frame $B$.  When we talk about the pose of
+    an object $O$, without mentioning a reference frame explicitly, we mean
+    $^WX^O$ where $O$ is the body frame of the object.</p>
+    
+    <p>The Drake <a
+    href="https://drake.mit.edu/doxygen_cxx/group__multibody__notation.html">
+    documentation</a> also discusses how to use this notation in code. In short,
+    $[^Bp_i^A]_C$ is written <code>pi_BA_C</code>. It works, I promise.</p>
 
+    <!--
     <subsection><h1>Rotation representations</h1>
     
+      <p>There is some subtly on how we choose to represent a relative pose /
+      rigid transform, due the various ways that we can represent a rotation.</p>
+
       <p>Quaternions, Euler angles, Axis angles, Rotation matrices.</p>
       <p>We'll get into them if/when we need to, but for now it's sufficient to
       understand that `RigidTransform`...</p>
 
+      <p>Everything is better in 2D.  We can use a scalar rotation angle to
+      completely specify a rotation represented in a frame, and we can convert
+      seamlessly between this scalar and the 2D rotation matrices.  I'll try to
+      use 2D examples to demonstrate core concepts whenever possible.</p>
+
     </subsection>
+    <example><h1>Pose in 2D</h1>
+      <todo>Colab example with sliders for x,z,theta.  Mustard bottle?</todo>
+    
+    </example>
+
+    <example><h1>Pose in 3D</h1>
+      <todo>Colab example with pose sliders.  Mustard bottle?  But also output, at least in text, the other representations.</todo>
+    </example>
+-->
+
+  </section>
+
+  <section><h1>Pick and place via spatial transforms</h1>
+  
+    <p>Now that we have the notation, we can formulate our approach to the basic
+    pick and place problem.  Let us call our object, $O$, and our gripper, $G$.
+    Our idealized perception sensor tells us $^WX^O$.  Let's create a frame
+    $O_d$ to denote the describe the "desired" pose of the object, $^WX^{O_d}$.
+    So pick and place manipulation is simply trying to make $X^O = X^{O_d}$.</p>
+    
+    <todo>Add a figure here (after Terry's PR lands).</todo>
+
+    <div>To accomplish this, we will assume that the object doesn't move
+    relative to the world ($^WX^O$ is constant) when the gripper is open, and
+    the object doesn't move relative to the gripper ($^GX^O$ is constant) when
+    the gripper is closed.  Then we can:
+      <ul style="margin:0"><li>move the gripper in the world, $X^G$, to an
+      appropriate pose relative to the object: $^OX^G$.</li>
+      <li>close the gripper.</li>
+      <li>move the gripper+object to the desired pose, $X^O = X^{O_d}$.</li>
+      <li>open the gripper, and retract the hand.</li>
+      </ul>
+    To simplify the problem of approaching the object (without colliding with
+    it) and retracting from the object, we will insert a "pregrasp pose",
+    $X^{G_{pre}}$, above the object as an intermediate step.
+    </div>
+
+    <p>Clearly, programming this strategy requires good tools for working with
+    these transforms, and for relating the pose of the gripper to the joint
+    angles of the robot.</p>
+  </section>
+
+  <section><h1>Spatial Algebra</h1>
+  
+    <p>Here is where we start to see the pay-off from our heavy notation, as we
+    define the rules of converting positions, rotations, poses, etc. between
+    different coordinate frames.  Without the notation, this invariably involves
+    me with my right hand in the air making the "right-hand rule", and my head
+    twisting around in space.  With the notation, it's a simple matter of lining
+    up the symbols properly, and we're more likely to get the right answer!</p>
+  
+    <div>
+    Here are the basic rules of algebra for our spatial quantities:  
+    <ul>
+      <li>Positions expressed in the same frame can be added when their
+      reference and target symbols match: $$[^Ap^B]_F + [^Bp^C]_F = [^Ap^C]_F.$$
+      The inverse operation is simple negation: $$[^Ap^B]_F = - [^Bp^A]_F.$$
+      Those should be pretty intuitive; make sure you confirm them for
+      yourself.</li>
+      <li>Multiplication by a rotation can be used to change the "expressed in"
+      frame: $$[^Ap^B]_G = {^GR^F} [^Ap^B]_F.$$  Note that the location of the
+      origin of the expressed-in frame does <i>not</i> effect the relative
+      position between two points; the rotation alone is all that is
+      required.</li>
+      <li>Rotations can be multiplied when their reference and target symbols
+      match: $${^AR^B} {^BR^C} = {^AR^C}.$$  The inverse operation is also
+      simply defined: $$[^AR^B]^{-1} = {^BR^A}.$$  When the rotation is
+      represented as a rotation matrix, this is literally the matrix inverse,
+      and since rotation matrices are orthonormal, we also have
+      $R^{-1}=R^T.$</li>
+      <li>Transforms bundle this up into a single, convenient notation when
+      positions are relative to a frame (and the same frame they are expressed
+      in): $${^Gp^A} = {^GX^F} {^Fp^A}.$$</li>
+      <li>Transforms compose: $${^AX^B} {^BX^C} = {^AX^C},$$  and have an inverse $$[^AX^B]^{-1} = {^BX^A}.$$</li>
+    </ul></div>
+
+    <p>In practice, transforms are implemented using <a
+    href="https://drake.mit.edu/doxygen_cxx/group__multibody__spatial__pose.html">homogenous
+    coordinates</a>, but for now I'm happy to leave that as an implementation
+    detail.</p>
+
   </section>
 
   <section><h1>Forward kinematics</h1>
   
     <p>Each body has a frame.  (We can have additional frames).  So the probelm
-    for forward kinematics is simply to compute $^W</p>
+    for forward kinematics is simply to compute $^WX^G$ as a function of the joint angles.</p>
   
   
   </section>
