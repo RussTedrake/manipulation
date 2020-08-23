@@ -77,29 +77,84 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
   multibody notation</a>, and have even included some of their
   motivation/philosophy. I'll adhere to that notation here.</p>
   
-  <p>For a nice recent and much more thorough treatment of robot kinematics, I'd
-  recommend the first seven chapters of <a
+  <p>If you'd like a more extensive background on kinematics than what I provide
+  here, my favorite reference is still <elib>Craig05</elib>.  For free online
+  resources, Chapters 2 and 3 of the 1994 book by Murray et al. (now free
+  online)<elib>Murray94</elib> are also excellent, as are the first seven
+  chapters of <a
   href="http://hades.mech.northwestern.edu/index.php/Modern_Robotics">Modern
-  Robotics by Lynch and Park</a><elib>Lynch17</elib>.  In addition to a great
-  text, which is freely available online, they have excellent accompanying
-  videos.  The chapters 2 and 3 of the 1994 book by Murray et al. are also still
-  excellent (and now free online)<elib>Murray94</elib>.</p>
+  Robotics</a> by Lynch and Park<elib>Lynch17</elib> (they also have excellent
+  accompanying videos).  Unfortunately, with three different references you'll
+  get three (slightly) different notations; mine is most similar to
+  <elib>Craig05</elib>.</p>
     
   <p>Please don't get overwhelmed by how much background material there is to
   know!  I am personally of the opinion that a clear understanding of just a few
   basic ideas should make you very effective here.  The details will come
-  later.</p>    
+  later, if you need them.</p>    
 
-  <section><h1>Coordinate frames and transforms</h1>
+  <section><h1>Notation</h1>
 
-    <p><img style="height:80px;float:left;margin-right:10px"
-    src="figures/coordinate_frames.png"/> frames (or just "frames") have names;
-    in math we typically give them a capital letter.  $W$ for world.  $B$ for a
-    body.  Frame is origin + three vectors.  Right-hand rule.  World frame uses
-    vehicle coordinates (z is up).</p>
+    <p><i>The following concepts are disarmingly subtle. I've seen incredibly
+    smart people assume they knew them and then stumble over notation
+    forevermore.  I did it for years myself.  Take a minute to read this
+    carefully!</i></p>
 
-    <p>Positions $^Pp^Q$, Rotations $R$, $^BR^C$, Transforms $X$, $^BX^C$.  Use
-    brackets if it gets confusing.  Expressed-in.</p>
+    <p>Perhaps the most fundamental concept in geometry is the concept of a
+    point.  Points occupy a position in space, and they can have names, e.g.
+    point $A$, $C$, or perhaps $B_{com}$ for the center of mass of body $B$.
+    We'll denote the position of the point as $p^A$; that's $p$ for position,
+    and not for point, because other geometric quantities can also have a
+    position.</p>
+
+    <p>But let's be more careful.  Position is actually a relative quantity.
+    Really, we should only ever write the position of two points relative to
+    each other. We'll use e.g. $^Ap^C$ to denote the position of $C$ relative to
+    $A$.  The left superscript looks mighty strange, but we'll see that it pays off once we start tranforming points.</p>
+    
+    <p><img style="height:90px;float:left;margin-right:10px"
+    src="figures/coordinate_frames.png"/> Every time we describe the (relative)
+    position as a vector of numbers, we need to be explicit about the coordinate
+    system.  All of our coordinate systems here will follow the "right-hand rule".
+    We'll give a coordinate system, coordinate frame, or just <i>frame</i>, a
+    name, too, like $F$.  If I want to write the position of point $C$ relative
+    to point $A$, expressed in frame $F$, I will write $[^Ap^C]_F$.  The
+    brackets come in because we'll sometimes what to refer to the elements of
+    the position, e.g. $[^Ap_i^C]_F$ is the $i$th element.</p>
+    
+    <p>That is seriously heavy notation.  I don't love it myself, but it's
+    the most durable I've got, and we'll have shorthand for when the context is
+    clear.</p>
+
+    <p>There are a few very special frames.  We use $W$ to denote the <i>world
+    frame</i>.  We think about the world frame in Drake using vehicle
+    coordinates (positive $x$ to the front, positive $y$ to the <i>left</i>, and
+    positive $z$ is up).  The other particularly special frames are the <i>body
+    frames</i>: every body in the multibody system has a unique frame attached
+    to it.  We'll typically use $B_i$ to denote the frame for body $i$.</p>
+
+    <p>Frames have a position, too -- it coincides with the origin.  So it is
+    perfectly valid to write $[^Wp^A]_W$ to denote the position of point $A$
+    relative to the origin of the world frame, expressed in the world frame.
+    Here is where the shorthand comes in.  If the position of a quantity is
+    relative to a frame, and expressed in the same frame, then we can safely
+    omit the brackets and the subscript.  $^Fp^A \equiv [^Fp^A]_F$.
+    Furthermore, if the "relative to" field is omitted, then we assume that the
+    point is relative to $W$, so $p^A \equiv [^Wp^A]_W$.</p>
+
+    <p>Frames also have an orientation.  We'll use $R$ to denote a <i>rotation
+    matrix</i>, and follow the same notation, writing $[^BR^A]_C$ to denote the
+    rotation of frame $A$ relative to frame $B$, expressed in frame $C$.</p>
+
+    <p>A frame $F$ can be specified completely by a position and rotation
+    relative to another frame.  Taken together, we call the position and
+    rotation a <a
+    href="https://drake.mit.edu/doxygen_cxx/classdrake_1_1math_1_1_rigid_transform.html"><code>RigidTransform</code></a>,
+    and denote it with the letter $X$. When we talk about the <i>pose</i> of an
+    object or frame, we mean the
+    <code>RigidTransform</code> (relative to the world, if we are not more
+    explicit). $[^BX^A]_C$ is the pose of $A$ relative to frame $B$, expressed
+    in frame $C$.</p>
 
     <subsection><h1>Rotation representations</h1>
     
