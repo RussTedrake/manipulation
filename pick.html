@@ -3,8 +3,8 @@
 <html>
 
   <head>
-    <title>Robotic Manipulation: Geometry, Coordinates Systems, and Kinematics</title>
-    <meta name="Robotic Manipulation: Geometry, Coordinates Systems, and Kinematics" content="text/html; charset=utf-8;" />
+    <title>Robotic Manipulation: Basic Pick and Place</title>
+    <meta name="Robotic Manipulation: Basic Pick and Place" content="text/html; charset=utf-8;" />
     <link rel="canonical" href="http://manipulation.csail.mit.edu/pick.html" />
 
     <script src="https://hypothes.is/embed.js" async></script>
@@ -51,9 +51,23 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
 
 
 <!-- EVERYTHING ABOVE THIS LINE IS OVERWRITTEN BY THE INSTALL SCRIPT -->
-<chapter style="counter-reset: chapter 2"><h1>Geometry, Coordinates Systems, and Kinematics</h1>
+<chapter style="counter-reset: chapter 2"><h1>Basic Pick and Place</h1>
 
-  
+  <figure>
+    <img src="figures/pick.png" style="width:70%"/>
+    <figcaption>Your challenge: command the robot to pick up the brick and place it in a desired position/orientation.</figcaption>
+    <todo>Update this image once we get a better schunk model.</todo>
+  </figure>
+
+  <p>The stage is set.  You have your robot.  I have a little red brick.  I'm
+  going to put it on the table in front of your robot, and your goal is to move
+  it to a desired position/orientation on the table.  I want to defer the
+  <i>perception</i> problem for one chapter, and will let you assume that you
+  have access to a perfect measurement of the current position/orientation of
+  the brick.  Even without perception, completing this task this requires us to
+  build up a basic toolkit for geometry and kinematics; it's natural place to
+  start.</p>
+
   <p>Pose / Rigid Transform.  Rotation matrices, Euler angles, quaternions. </p>
 
   <p>Forward kinematics, inverse kinematics, Jacobians (analytic/geometric).</p>
