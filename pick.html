@@ -244,9 +244,8 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
     <ul>
       <li>Positions expressed in the same frame can be added when their
       reference and target symbols match: $$[^Ap^B]_F + [^Bp^C]_F = [^Ap^C]_F.$$
-      The inverse operation is simple negation: $$[^Ap^B]_F = - [^Bp^A]_F.$$
-      Those should be pretty intuitive; make sure you confirm them for
-      yourself.</li>
+      The additive inverse is well defined: $$[^Ap^B]_F = - [^Bp^A]_F.$$ Those
+      should be pretty intuitive; make sure you confirm them for yourself.</li>
       <li>Multiplication by a rotation can be used to change the "expressed in"
       frame: $$[^Ap^B]_G = {^GR^F} [^Ap^B]_F.$$  Note that the location of the
       origin of the expressed-in frame does <i>not</i> effect the relative
@@ -260,7 +259,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       $R^{-1}=R^T.$</li>
       <li>Transforms bundle this up into a single, convenient notation when
       positions are relative to a frame (and the same frame they are expressed
-      in): $${^Gp^A} = {^GX^F} {^Fp^A}.$$</li>
+      in): $${^Gp^A} = {^GX^F} {^Fp^A} = {^Gp^F} + {^GR^F}{^Fp^A}.$$</li>
       <li>Transforms compose: $${^AX^B} {^BX^C} = {^AX^C},$$  and have an inverse $$[^AX^B]^{-1} = {^BX^A}.$$</li>
     </ul></div>
 
@@ -269,14 +268,95 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
     coordinates</a>, but for now I'm happy to leave that as an implementation
     detail.</p>
 
+    <example><h1>From camera coordinates to world coordinates</h1>
+      
+      <todo>Add a figure here.</todo>
+
+      <p>Imagine that I have a depth camera mounted in a fixed pose in my
+      workspace.  Let's call the camera frame $C$ and denote its pose in the
+      world with $^WX^C$.  This pose is often called the camera
+      "extrinsics".</p>
+
+      <p>A depth camera returns points in the camera coordinates.  Therefore,
+      we'll write this position of point $P_i$ with $^Cp^{P_i}$.  If we want to
+      convert the point into the world coordinates, we simply have $$p^{P_i} =
+      X^C {^Cp^{P_i}}.$$</p>
+
+      <p>This is a work-horse operation for us.  We often aim to merge points
+      from multiple cameras (typically in the world frame), and always need to
+      somehow relate the frames of the camera with the frames of the robot.</p>
+    
+    </example>
+
   </section>
 
   <section><h1>Forward kinematics</h1>
   
-    <p>Each body has a frame.  (We can have additional frames).  So the probelm
-    for forward kinematics is simply to compute $^WX^G$ as a function of the joint angles.</p>
-  
-  
+    <p>The spatial algebra gets us pretty close to what we need for our pick and
+    place algorithm.  But remember that the interface we have to the robot
+    reports measured joint positions, and expects commands in the form of joint
+    positions.  So our remaining task is to convert between joint angles and
+    cartesian frames.  We'll do this in steps, the first step is to go from
+    joint positions to cartesian frames: this is known as <i>forward
+    kinematics</i>.
+
+    <p>Throughout this text, we will refer to the joint positions of the robot
+    (also known as "configuration" of the robot) using a vector $q$.  If the
+    configuration of the scene includes objects as well as the robot, we would
+    use $q$ for the entire configuration vector, and use e.g. $q_{robot}$ for
+    the subset of the vector corresponding to the robot's joint positions.
+    Therefore, the goal of forward kinematics is to produce a map: $$X^B =
+    f_{kin}^B(q),$$ for any body $B$ (or any other frame we have attached to the
+    robot).  Our spatial notation and spatial algebra makes this computation
+    relatively straight-forward.</p>
+
+    <subsection><h1>The kinematic tree</h1>
+
+      <p>In order to facilitate kinematics and related multibody computations,
+      the <code>MultibodyPlant</code> organizes all of the bodies in the world
+      into a tree topology.  Every body (except the world body) has a parent,
+      which it is connected to via either a <code>Joint</code> or a "floating
+      base".</p>
+
+      <example><h1>Plotting the kinematic tree</h1>
+
+        <p><i>TODO: Example that loads a robot and an object thens call <a
+        href="https://drake.mit.edu/doxygen_cxx/classdrake_1_1multibody_1_1_multibody_plant.html#a113f30d2b1b3a8151b638300231975fa"><code>GetTopologyGraphvizString</code></a></i>.</p>
+
+      </example>
+
+      <p>Every <code>Joint</code> and "floating base" has some number of
+      position variables associated with it -- a subset of the configuration
+      vector $q$ -- and knows how to compute the configuration dependent
+      transform across the joint from the outboard frame $M$ to the inboard
+      frame $M$: $^{M}X^{F}(q)$.  Additionally, the kinematic tree defines the
+      (fixed) transforms from the child body frame to the joint frame,
+      $^{F}X^C$, and from the joint frame to the parent frame, $^PX^{M}$.
+      Altogether, we can compute the configuration transform between any one
+      body and its parent, $$^PX^C(q) = \left[^PX^M\right] \left[^MX^F(q)\right]
+      \left[^FX^C\right].$$</p>
+
+      <example><h1>Specifying the kinematic tree in URDF</h1></example>
+
+      <example><h1>Specifying the kinematic tree in SDF</h1></example>
+
+      <p>Interestingly, <code>SceneGraph</code> (the geometry engine) does not
+      maintain any tree structure.  All that <code>SceneGraph</code> knows about
+      is a list of frames specified relative to the world frame, $W$, and a list
+      of geometries attached to each frame.</p> 
+    
+    </subsection>
+
+    <subsection><h1>Forward kinematics for pick and place</h1>
+    
+      <p>In order to compute the pose of the gripper in the world, $X^G$, we
+      simply query the parent of the gripper frame in the kinematic tree, and
+      recursively compose the transforms until we get to the world frame.</p>
+
+      <example><h1>Kinematic frames of the iiwa + WSG</h1></example>
+
+    </subsection>
+
   </section>
 
   <section><h1>Differential kinematics (Jacobians)</h1>
