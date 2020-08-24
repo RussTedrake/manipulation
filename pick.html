@@ -52,6 +52,8 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
 
 <!-- EVERYTHING ABOVE THIS LINE IS OVERWRITTEN BY THE INSTALL SCRIPT -->
 <chapter style="counter-reset: chapter 2"><h1>Basic Pick and Place</h1>
+  <a style="float:right; margin-top:-80px;" target="pick" href="https://colab.research.google.com/github/RussTedrake/manipulation/blob/master/pick.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open Corresponding Notebook In Colab"/></a>
+  <div style="clear:right;"></div>
 
   <figure>
     <img src="figures/pick.png" style="width:70%"/>
@@ -74,8 +76,9 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
   will inevitably lead to confusion and bugs.  The Drake developers have gone to
   great length to establish and document a consistent <a
   href="https://drake.mit.edu/doxygen_cxx/group__multibody__notation.html">
-  multibody notation</a>, and have even included some of their
-  motivation/philosophy. I'll adhere to that notation here.</p>
+  multibody notation</a>, which they call "Monogram Notation".  The
+  documentation even includes some of the motivation/philosophy behind that
+  notation. I'll use the monogram notation throughout this text.</p>
   
   <p>If you'd like a more extensive background on kinematics than what I provide
   here, my favorite reference is still <elib>Craig05</elib>.  For free online
@@ -93,7 +96,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
   basic ideas should make you very effective here.  The details will come
   later, if you need them.</p>    
 
-  <section><h1>Kinematics Notation</h1>
+  <section><h1>Monogram Notation</h1>
 
     <p><i>The following concepts are disarmingly subtle. I've seen incredibly
     smart people assume they knew them and then perpetually stumble over
@@ -318,11 +321,21 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       which it is connected to via either a <code>Joint</code> or a "floating
       base".</p>
 
-      <example><h1>Plotting the kinematic tree</h1>
+      <example><h1>Inspecting the kinematic tree</h1>
 
-        <p><i>TODO: Example that loads a robot and an object thens call <a
-        href="https://drake.mit.edu/doxygen_cxx/classdrake_1_1multibody_1_1_multibody_plant.html#a113f30d2b1b3a8151b638300231975fa"><code>GetTopologyGraphvizString</code></a></i>.</p>
+        <p>Drake provides some visualization support for inspecting the
+        kinematic tree data structure.  The kinematic tree for an iiwa is more
+        of a vine than a tree (it's a serial manipulator), but the tree for the
+        dexterous hands are more interesting.  I've added our brick to the
+        example, too, so that you can see that a "free" body is just another
+        branch off the world root node.</p>
 
+        <p><a target="pick"
+          href="https://colab.research.google.com/github/RussTedrake/manipulation/blob/master/pick.ipynb#scrollTo=ILYLouFTjv6e"><img
+          src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
+          </p>
+    
+        <todo>Insert topology visualization here (once it is better)</todo>
       </example>
 
       <p>Every <code>Joint</code> and "floating base" has some number of
@@ -383,7 +396,11 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
 
   </section>
 
-  <section><h1>Grasp selection</h1></section>
+  <section><h1>Defining the grasp and pre-grasp poses</h1></section>
+
+  <section><h1>A pick and place trajectory</h1></section>
+
+  <section><h1>Putting it all together</h1></section>
 
 </chapter>
 <!-- EVERYTHING BELOW THIS LINE IS OVERWRITTEN BY THE INSTALL SCRIPT -->
