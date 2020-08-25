@@ -96,7 +96,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
   basic ideas should make you very effective here.  The details will come
   later, if you need them.</p>    
 
-  <section><h1>Monogram Notation</h1>
+  <section><h1>Kinematics Notation</h1>
 
     <p><i>The following concepts are disarmingly subtle. I've seen incredibly
     smart people assume they knew them and then perpetually stumble over
@@ -250,10 +250,10 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       The additive inverse is well defined: $$[^Ap^B]_F = - [^Bp^A]_F.$$ Those
       should be pretty intuitive; make sure you confirm them for yourself.</li>
       <li>Multiplication by a rotation can be used to change the "expressed in"
-      frame: $$[^Ap^B]_G = {^GR^F} [^Ap^B]_F.$$  Note that the location of the
-      origin of the expressed-in frame does <i>not</i> effect the relative
-      position between two points; the rotation alone is all that is
-      required.</li>
+      frame: $$[^Ap^B]_G = {^GR^F} [^Ap^B]_F.$$  You might be surprised that a
+      rotation alone is enough to change the expressed-in frame, but it's true.
+      The position of the expressed-in frame does <i>not</i>
+      effect the relative position between two points.</li>
       <li>Rotations can be multiplied when their reference and target symbols
       match: $${^AR^B} {^BR^C} = {^AR^C}.$$  The inverse operation is also
       simply defined: $$[^AR^B]^{-1} = {^BR^A}.$$  When the rotation is
@@ -305,13 +305,13 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
 
     <p>Throughout this text, we will refer to the joint positions of the robot
     (also known as "configuration" of the robot) using a vector $q$.  If the
-    configuration of the scene includes objects as well as the robot, we would
-    use $q$ for the entire configuration vector, and use e.g. $q_{robot}$ for
-    the subset of the vector corresponding to the robot's joint positions.
-    Therefore, the goal of forward kinematics is to produce a map: $$X^B =
-    f_{kin}^B(q),$$ for any body $B$ (or any other frame we have attached to the
-    robot).  Our spatial notation and spatial algebra makes this computation
-    relatively straight-forward.</p>
+    configuration of the scene includes objects in the environment as well as
+    the robot, we would use $q$ for the entire configuration vector, and use
+    e.g. $q_{robot}$ for the subset of the vector corresponding to the robot's
+    joint positions. Therefore, the goal of forward kinematics is to produce a
+    map: $$X^B = f_{kin}^B(q),$$ for any body $B$ (or any other frame we have
+    attached to the scene).  Our spatial notation and spatial algebra makes this
+    computation relatively straight-forward.</p>
 
     <subsection><h1>The kinematic tree</h1>
 
@@ -353,6 +353,16 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
 
       <example><h1>Specifying the kinematic tree in SDF</h1></example>
 
+      <p>You might be tempted to think that every time you add a joint to the
+      <code>MultibodyPlant</code>, you are adding a degree of freedom.  But it
+      actually works the other way around.  Every time you add a <i>body</i>
+      to the plant, you are adding many degrees of freedom.  But you can then
+      add joints to <i>remove</i> those degrees of freedom; joints are
+      constraints.  "Welding" the robot's base to the world frame removes all of
+      the floating degrees of freedom of the base.  Adding a rotational joint
+      between a child body and a parent body removes all but one degree of
+      freedom, etc.</p>
+
       <p>Interestingly, <code>SceneGraph</code> (the geometry engine) does not
       maintain any tree structure.  All that <code>SceneGraph</code> knows about
       is a list of frames specified relative to the world frame, $W$, and a list
@@ -366,7 +376,41 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       simply query the parent of the gripper frame in the kinematic tree, and
       recursively compose the transforms until we get to the world frame.</p>
 
-      <example><h1>Kinematic frames of the iiwa + WSG</h1></example>
+      <example><h1>Forward kinematics of the iiwa + WSG</h1>
+      
+        <todo>Make sure we show how to call the kinematics methods in
+        drake.</todo>
+      
+      </example>
+
+      <example><h1>Forward kinematics of "floating-base" objects</h1>
+      
+        <p>Consider the special case of having a <code>MultibodyPlant</code>
+        with exactly one body added, and no joints.  The kinematic tree is
+        simply the world frame, the body frame, and they are connected by the
+        "floating base".  What does the forward kinematics function: $$X^B =
+        f_{kin}^B(q),$$ look like in that case?  If $q$ is already representing
+        the floating-base configuration, is $f^B_{kin}$ just the identity
+        function?</p>
+
+        <p>This gets into the subtle points of how we represent transforms, and
+        how we represent rotations in particular.  There are many possible
+        representations of 3D rotations, they are good for different things, and
+        unfortunately, there is no one representation to rule them all. (This is
+        one of the many reasons why everything is better in 2D!)  Common
+        representations include 3x3 rotation matrices, Euler angles (e.g.
+        Roll-Pitch-Yaw), axis angle, and unit quaternions. In Drake, we provide
+        all of these representations, and make it easy to convert back and forth
+        between them.  In order to make the spatial algebra efficient, we use
+        rotation matrices in our <code>RigidTransform</code>, but in order to
+        have a more compact representation of configuration we use unit
+        quaternions in our configuration vector, $q$.</p>
+
+        <p>As a result, for this example, the software implementation of the
+        function $f_{kin}^B$ is precisely the function that converts the
+        position $\times$ unit quaternion representation into the position
+        $\times$ rotation matrix representation.</p>
+      </example>
 
     </subsection>
 
@@ -374,7 +418,63 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
 
   <section><h1>Differential kinematics (Jacobians)</h1>
 
-    <p>Analytic/Geometric</p>
+    <p>The forward kinematics machinery gives us the ability to compute the pose
+    of the gripper and the pose of the object, both in world coordinates.  But
+    if our goal is to <i>move</i> the gripper to the object, then we should
+    understand how changes in the joint angles relate to changes in the gripper
+    pose.  This is traditionally referred to as "differential kinematics".</p>
+
+    <p>At first blush, this is straightforward.  The change in pose is related
+    to a change in joint positions by the (partial) derivative of the forward
+    kinematics:  \begin{equation}dX^B = \pd{f_{kin}^B(q)}{q} dq = J^B(q)dq.
+    \label{eq:jacobian}\end{equation} Partial derivatives of a function are
+    referred to as "Jacobians" in many fields; in robotics it's rare to refer to
+    derivatives of the kinematics as anything else.</p>
+
+    <p>All of the subtlety, again, comes in because of the multiple
+    representations that we have for 3D rotations (rotation matrix, unit
+    quaternions, ...).  While there is no one best representation for 3D
+    rotations, it <i>is</i> possible to have one canonical representation for
+    differential rotations.  Without any loss of generality, we can represent
+    the rate of change in rotation using a six-element vector for <a
+    href="https://drake.mit.edu/doxygen_cxx/group__multibody__spatial__vectors.html"><i>spatial
+    velocity</i></a>: $$^BV^C = \begin{bmatrix} ^B\omega^C \\ ^B\text{v}^C
+    \end{bmatrix}.$$ $^BV^C$ is the spatial velocity of frame $C$ in frame $B$,
+    $^B\omega^C \in \Re^3$ is the <i>angular velocity</i> (of frame $C$ in frame
+    $B$), and $^B\text{v}^C \in R^3$ is the <i>translational velocity</i>.  So
+    there are actually <b>many</b> different kinematic Jacobians, depending on
+    which representation of 3D orientation you are using on the right-hand side
+    and on the left-hand side of equation \eqref{eq:jacobian}.</p>
+
+    <p>There is one more velocity to be aware of: I'll use $v$ to denote the
+    generalized velocity vector of the plant.  While a spatial velocity $^BV^C$
+    is six elements, a translational velocity $^B\text{v}^C$ is three elements,
+    the generalized velocity vector is whatever size it needs to be to encode
+    the time derivatives of the configuration variables, $q$.  For the iiwa
+    welded to the world frame, that means it has seven elements.  I've tried to
+    be careful to typeset each of these v's differently throughout the notes.
+    Often the distinction is also clear from the context.</p>
+
+    <example><h1>Don't assume $\dot{q} \equiv v$</h1>
+    
+      <todo>One free body.  Show the state vector is 13 elements.  Huh?  And
+      show how to make sense of it.</todo>
+    
+    </example>
+
+    <p>You may hear the terms "analytic Jacobian", which refers to the explicit
+    partial derivative of the forward kinematics, and "geometric Jacobian" which
+    replaces 3D rotations on the left-hand side with spatial velocities.  In
+    Drake's <code>MultibodyPlant</code>, we have decided to err on the side of
+    clarity, and offer 
+    <ul>
+      <li> <code>CalcJacobianAngularVelocity</code>,</li>
+      <li><code>CalcJacobianTranslationalVelocity</code>, and</li>
+      <li><code>CalcJacobianSpatialVelocity</code>,</li>
+    </ul> each taking a parameter to specify whether you'd like the Jacobian
+    with respect to $\dot{q}$ or $v$.</p>
+
+    <example><h1>Kinematic Jacobians for pick and place</h1></example>
 
   </section>
 
