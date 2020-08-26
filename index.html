@@ -27,14 +27,12 @@
 
 <div data-type="titlepage">
   <header>
-    <h1><a href="index.html" style="text-decoration:none;">Robotic
-    Manipulation</a></h1>
+    <h1><a href="index.html" style="text-decoration:none;">Robotic Manipulation</a></h1>
     <p data-type="subtitle">Perception, Planning, and Control</p> 
     <p style="font-size: 18px;"><a href="http://people.csail.mit.edu/russt/">Russ Tedrake</a></p>
     <p style="font-size: 14px; text-align: right;"> 
       &copy; Russ Tedrake, 2020<br/>
-      <a href="tocite.html">How to cite these notes</a> &nbsp; | &nbsp;
-      <a target="_blank" href="https://docs.google.com/forms/d/e/1FAIpQLSesAhROfLRfexrRFebHWLtRpjhqtb8k_iEagWMkvc7xau08iQ/viewform?usp=sf_link">Send me your feedback</a><br/>
+      <a href="misc.html">How to cite these notes, use annotations, and give feedback.</a><br/>
     </p>
   </header>
 </div>
@@ -87,16 +85,21 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       <li>Forward kinematics for pick and place</li>
     </ul>
     <li><a href=pick.html#section5>Differential kinematics (Jacobians)</a></li>
-    <li><a href=pick.html#section6>Differential Inverse Kinematics</a></li>
-    <li><a href=pick.html#section7>Inverse kinematics</a></li>
+    <li><a href=pick.html#section6>Differential inverse kinematics</a></li>
     <ul>
-      <li>As an optimization</li>
-      <li>Differential inverse kinematics</li>
-      <li>Closed-form solutions</li>
+      <li>The Jacobian pseudo-inverse</li>
+      <li>Kinematic singularities</li>
+      <li>The nullspace of the Jacobian</li>
+      <li>Let's get moving</li>
     </ul>
-    <li><a href=pick.html#section8>Defining the grasp and pre-grasp poses</a></li>
-    <li><a href=pick.html#section9>A pick and place trajectory</a></li>
-    <li><a href=pick.html#section10>Putting it all together</a></li>
+    <li><a href=pick.html#section7>Defining the grasp and pre-grasp poses</a></li>
+    <li><a href=pick.html#section8>A pick and place trajectory</a></li>
+    <li><a href=pick.html#section9>Differential inverse kinematics with constraints</a></li>
+    <ul>
+      <li>Pseudo-inverse as an optimization</li>
+    </ul>
+    <li><a href=pick.html#section10>A simpler pick and place trajectory</a></li>
+    <li><a href=pick.html#section11>Putting it all together</a></li>
   </ul>
 <p style="margin-bottom: 0; text-decoration: underline;font-variant: small-caps;"><b>Perception (Note: I'm going to refactor the remaining chapters)</b></p>
   <li><a href="pixels.html">Chapter 4: Color Images, Depth Images, and
@@ -179,6 +182,12 @@ Point Clouds</a></li>
     <li><a href=station.html#section2>Kuka LBR iiwa + Schunk WSG Gripper</a></li>
     <li><a href=station.html#section3>Intel Realsense D415 Depth Cameras</a></li>
     <li><a href=station.html#section4>Miscellaneous hardware.</a></li>
+  </ul>
+  <li><a href="misc.html">Appendix C: Miscellaneous</a></li>
+  <ul>
+    <li><a href=misc.html#cite>How to cite these notes</a></li>
+    <li><a href=misc.html#annotation>Annotation tool etiquette</a></li>
+    <li><a href=misc.html#feedback>Please give me feedback!</a></li>
   </ul>
 </ul>
 </section>

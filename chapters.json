@@ -13,7 +13,8 @@
     "underactuated",
     "rl",
     "drake",
-    "station"
+    "station",
+    "misc"
   ],
   "other_potential_chapters": [ 
     "belief-space planning",
