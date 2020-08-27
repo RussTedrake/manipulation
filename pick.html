@@ -388,22 +388,24 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
 
       <example><h1>Forward kinematics for the gripper frame</h1>
       
-        <p>We now have everything we need to evaluate the pose of the gripper in
-        the world frame: $X^G$.  We know that it will be a function of
-        configuration of the robot, which is just a part of the total state of
-        the <code>MultibodyPlant</code>.  The following example shows you how
-        that might look.</p>
+        <p>Let's evaluate the pose of the gripper in the world frame: $X^G$.  We
+        know that it will be a function of configuration of the robot, which is
+        just a part of the total state of the <code>MultibodyPlant</code>.  The
+        following example shows you how it works.</p>
 
         <p><a target="pick"
-          href="https://colab.research.google.com/github/RussTedrake/manipulation/blob/master/pick.ipynb#scrollTo=wSa5QcU0Piak"><img
+          href="https://colab.research.google.com/github/RussTedrake/manipulation/blob/master/pick.ipynb#scrollTo=5SjOClhTltPk"><img
           src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
           </p>
 
         <p>The key lines are 
           <code class="language-python"><pre>
 gripper = plant.GetBodyByName("body")
-pose = plant.EvalBodyPoseInWorld(context, gripper)
-          </pre></code>
+pose = plant.EvalBodyPoseInWorld(context, gripper)</pre></code>
+        Behind the scenes, the <code>MultibodyPlant</code> is doing all of the
+        spatial algebra we described above to return the pose (and also some
+        clever caching because you can reuse much of the computation when if you
+        want to evaluate the pose of another frame on the same robot).  
         </p>
 
       </example>
@@ -478,7 +480,7 @@ pose = plant.EvalBodyPoseInWorld(context, gripper)
     the time derivatives of the configuration variables, $q$.  For the iiwa
     welded to the world frame, that means it has seven elements.  I've tried to
     be careful to typeset each of these v's differently throughout the notes.
-    Often the distinction is also clear from the context.</p>
+    Almost always the distinction is also clear from the context.</p>
 
     <example><h1>Don't assume $\dot{q} \equiv v$</h1>
     
@@ -499,7 +501,16 @@ pose = plant.EvalBodyPoseInWorld(context, gripper)
     </ul> each taking an argument to specify whether you'd like the Jacobian
     with respect to $\dot{q}$ or $v$.</p>
 
-    <example><h1>Kinematic Jacobians for pick and place</h1></example>
+    <example><h1>Kinematic Jacobians for pick and place</h1>
+    
+      <p>Let's repeat the setup from above, but we'll print out the Jacobian of the gripper frame, relative to the world frame, expressed in the world frame.</p>
+
+      <p><a target="pick"
+        href="https://colab.research.google.com/github/RussTedrake/manipulation/blob/master/pick.ipynb#scrollTo=hSeD3PBotJUU"><img
+        src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
+        </p>
+
+    </example>
 
   </section>
 
