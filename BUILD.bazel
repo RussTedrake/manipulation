@@ -37,11 +37,15 @@ rt_ipynb_test(
     srcs = ["intro.ipynb"],
 )
 
-# TODO(russt): Make this pass and enable the test!
-#rt_ipynb_test(
-#    name = "robot",
-#    srcs = ["robot.ipynb"],
-#)
+rt_ipynb_test(
+    name = "robot",
+    srcs = ["robot.ipynb"],
+)
+
+rt_ipynb_test(
+    name = "pick",
+    srcs = ["pick.ipynb"],
+)
 
 filegroup(
     name = "chapters",
