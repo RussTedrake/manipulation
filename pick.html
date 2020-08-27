@@ -376,16 +376,36 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       recursively compose the transforms until we get to the world frame.</p>
 
       <figure>
-        <img style="width:40%" src="figures/kinematic_frames_iiwa.png"/><spacer style="width:10px"></spacer><img style="width:40%" src="figures/kinematic_frames_gripper.png"/>
-        <figcaption>Kinematic frames on the iiwa (left) and the WSG
-        (right).  For each frame, the <span style="color:red">positive $x$ axis is in red</span>, the <span style="color:green">positive $y$ axis is in green</span>, and the <span style="color:blue">positive $z$ axis is in blue</span>.</figcaption>
+        <img style="width:40%;margin-right:40px"
+        src="figures/kinematic_frames_iiwa.png"/><img style="width:40%"
+        src="figures/kinematic_frames_gripper.png"/>
+        <figcaption>Kinematic frames on the iiwa (left) and the WSG (right).
+        For each frame, the <span style="color:red">positive $x$ axis is in
+        red</span>, the <span style="color:green">positive $y$ axis is in
+        green</span>, and the <span style="color:blue">positive $z$ axis is in
+        blue</span>.</figcaption>
       </figure>
 
-      <example><h1>Forward kinematics of the iiwa + WSG</h1>
+      <example><h1>Forward kinematics for the gripper frame</h1>
       
-        <todo>Make sure we show how to call the kinematics methods in
-        drake.</todo>
-      
+        <p>We now have everything we need to evaluate the pose of the gripper in
+        the world frame: $X^G$.  We know that it will be a function of
+        configuration of the robot, which is just a part of the total state of
+        the <code>MultibodyPlant</code>.  The following example shows you how
+        that might look.</p>
+
+        <p><a target="pick"
+          href="https://colab.research.google.com/github/RussTedrake/manipulation/blob/master/pick.ipynb#scrollTo=wSa5QcU0Piak"><img
+          src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
+          </p>
+
+        <p>The key lines are 
+          <code class="language-python"><pre>
+gripper = plant.GetBodyByName("body")
+pose = plant.EvalBodyPoseInWorld(context, gripper)
+          </pre></code>
+        </p>
+
       </example>
 
       <example><h1>Forward kinematics of "floating-base" objects</h1>
