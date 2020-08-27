@@ -375,6 +375,12 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       simply query the parent of the gripper frame in the kinematic tree, and
       recursively compose the transforms until we get to the world frame.</p>
 
+      <figure>
+        <img style="width:40%" src="figures/kinematic_frames_iiwa.png"/><spacer style="width:10px"></spacer><img style="width:40%" src="figures/kinematic_frames_gripper.png"/>
+        <figcaption>Kinematic frames on the iiwa (left) and the WSG
+        (right).  For each frame, the <span style="color:red">positive $x$ axis is in red</span>, the <span style="color:green">positive $y$ axis is in green</span>, and the <span style="color:blue">positive $z$ axis is in blue</span>.</figcaption>
+      </figure>
+
       <example><h1>Forward kinematics of the iiwa + WSG</h1>
       
         <todo>Make sure we show how to call the kinematics methods in
