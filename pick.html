@@ -516,12 +516,12 @@ pose = plant.EvalBodyPoseInWorld(context, gripper)</pre></code>
 
   <section><h1>Differential inverse kinematics</h1>
     
-    <p>Something important just happened.  Make sure you didn't miss it.  The
-    relationship between joint velocities and end-effector velocities is
-    (configuration-dependent) linear: $$V^G = J^G(q)v.$$  Does this give us what
-    we need to produce changes in gripper frame $G$?  If I have a desired
-    gripper frame velocity $V^{G_d}$, then how about commanding a joint velocity
-    $v = [J^G(q)]^{-1} V^{G_d}$?</p>
+    <p>There is important structure in Eq \eqref{eq:jacobian}.  Make sure you
+    didn't miss it.  The relationship between joint velocities and end-effector
+    velocities is (configuration-dependent) linear: $$V^G = J^G(q)v.$$  Maybe
+    this gives us what we need to produce changes in gripper frame $G$?  If I
+    have a desired gripper frame velocity $V^{G_d}$, then how about commanding a
+    joint velocity $v = [J^G(q)]^{-1} V^{G_d}$?</p>
 
     <subsection><h1>The Jacobian pseudo-inverse</h1>
 
@@ -537,45 +537,66 @@ pose = plant.EvalBodyPoseInWorld(context, gripper)</pre></code>
       To choose one of them (the minimum-norm solution), we can consider using
       the <a
       href="https://en.wikipedia.org/wiki/Moore%E2%80%93Penrose_inverse">Moore-Penrose
-      pseudo-inverse</a>, $J^+$ instead: $$v = [J^G(q)]^+V^{G_d}.$$</p>
+      pseudo-inverse</a>, $J^+$, instead: $$v = [J^G(q)]^+V^{G_d}.$$</p>
 
-      <p>The pseudo-inverse, $J^+$ is a beautiful mathematical object.  When the
-      $J$ is square and full-rank, it returns the true inverse of the system.
-      When there are many solutions (here many joint velocities that accomplish
-      the same end effector spatial velocity), then it returns the minimum-norm
-      solution (the joint velocities that produce the desired spatial velocity
-      which are closest to zero in the least-squares sense).  When there is no
-      exact solution, it will return the joint velocities that produce an
-      spatial velocity which is as close to the desired velocity as possible,
-      again in the least-squares sense.  So good!</p>
+      <p>The pseudo-inverse is a beautiful mathematical concept.  When the $J$
+      is square and full-rank, the pseudo-inverse returns the true inverse of
+      the system. When there are many solutions (here many joint velocities that
+      accomplish the same end-effector spatial velocity), then it returns the
+      minimum-norm solution (the joint velocities that produce the desired
+      spatial velocity which are closest to zero in the least-squares sense).
+      When there is no exact solution, it returns the joint velocities that
+      produce an spatial velocity which is as close to the desired end-effector
+      velocity as possible, again in the least-squares sense.  So good!</p>
+
+      <example><h1>Our first end-effector "controller"</h1>
+      
+        <p><i>TODO: Use the pseudo-inverse Jacobian controller + an integrator
+        to drive the robot around.</i></p>
+
+        <p>Congratulations!</p>
+
+        <todo>Tease apart feed-forward vs feedback.</todo>
+      </example>
 
     </subsection>
 
-    <subsection><h1>Kinematic singularities</h1>
+    <subsection><h1>Invertibility of the Jacobian</h1>
 
       <p>There is a simple check to understand when the pseudo-inverse can give
-      an exactly solution (achieving exactly the desired spatial velocity): it's
-      when the Jacobian is full <i>row</i>-rank.  In this case, we need
-      $\rank(J) = 6$. Let's compute the gripper Jacobian for a few
-      configurations of the iiwa.</p>
+      an exact solution (achieving exactly the desired spatial velocity): the
+      Jacobian must be full <i>row</i>-rank.  In this case, we need $\rank(J) =
+      6$. But assigning an integer rank to a matrix doesn't tell the entire
+      story; for a real robot with (noisy) floating-point joint positions, as
+      the matrix gets <i>close</i> to losing rank, (pseudo-)inverse starts to
+      "blow-up".  A better metric, then, is to watch the smallest singular
+      value; as this approaches zero, the norm of the pseudo-inverse will
+      approach infinity.</p>
 
-      <example><h1>Rank of the gripper Jacobian</h1>
+      <example><h1>Invertibility of the gripper Jacobian</h1>
       
-        <p><i>TODO: Show a few key configurations here, and add some code to
-        plot the rank of the jacobian while the user is moving sliders
-        around.</i></p>
+        <p>You might have noticed that I printed out the smallest singular value
+        of $J^G$ in the last example.  Take it for another spin.  See if you can
+        find configurations where the smallest singular value gets close to
+        zero.</p>
+
+        <p><a target="pick"
+          href="https://colab.research.google.com/github/RussTedrake/manipulation/blob/master/pick.ipynb#scrollTo=hSeD3PBotJUU"><img
+          src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
+          </p>
+
+        <p>Here's a hint: try some configurations where the arm is very
+        straight, (e.g. driving joint 2 and 4 close to zero).</p>
 
       </example>
 
       <p>Configurations $q$ for which $\rank(J(q_{iiwa})) < 6$ for a frame of
       interest (like our gripper frame $G$) are called <i>kinematic
-      singularities</i>.  We try to avoid them when we can!  If there is one
-      thing that will make me wince when I'm watching our iiwa's in lab, it's
-      when the approach a singularity.  The iiwa has many virtues, but
-      admittedly it's kinematic workspace is not one of them.  Trust me, if you
-      try to get a big kuka to reach into a little kitchen sink all day, every
-      day, then it's only a matter of time til you hear someone shout
-      "singularity!".</p>
+      singularities</i>.  Try to avoid them if you can!  The iiwa has many
+      virtues, but admittedly its kinematic workspace is not one of them. Trust
+      me, if you try to get a big Kuka to reach into a little kitchen sink all
+      day, every day, then you will spend a non-trivial amount of time thinking
+      about avoiding singularities.</p>
 
       <p>In practice, things can get a lot better if we stop bolting our robot
       base to a fixed location in the world.  Mobile bases add complexity, but
@@ -583,7 +604,7 @@ pose = plant.EvalBodyPoseInWorld(context, gripper)</pre></code>
 
     </subsection>
 
-    <subsection><h1>The nullspace of the Jacobian</h1>
+    <subsection><h1>Nullspace of the Jacobian</h1>
     
       <p>I've already mentioned a very nice and important property of the
       pseudo-inverse: in the case where there are multiple solutions, it will
@@ -601,28 +622,15 @@ pose = plant.EvalBodyPoseInWorld(context, gripper)</pre></code>
 
       <p>Nullspace</p>
 
-      <example><h1>Nullspace centering</h1></example>
+      <example><h1>Nullspace centering</h1>
+
+        <todo>Add centering to the jacobian controller.</todo>
+      </example>
 
       <p>This is just one example of how we can use the nullspace to produce a
       sort of hierarchy of controllers.  The payoff is modest on our seven DOF
       robot, but it can become substantial when you are commanding an entire
       humanoid, or perhaps even a dexterous hand.</p>
-    
-    </subsection>
-  
-    <subsection><h1>Let's get moving</h1>
-
-      <p>We have a lot of good tools now, enough to start moving the robot.</p>
-
-      <example><h1>Our first end-effector "controller"</h1>
-      
-        <p><i>TODO: Use the pseudo-inverse Jacobian controller + an integrator
-        to drive the robot around.</i></p>
-
-        <p>Congratulations!</p>
-
-        <todo>Tease apart feed-forward vs feedback.</todo>
-      </example>
 
     </subsection>
   </section>
