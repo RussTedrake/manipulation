@@ -341,12 +341,12 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       position variables associated with it -- a subset of the configuration
       vector $q$ -- and knows how to compute the configuration dependent
       transform across the joint from the outboard frame $M$ to the inboard
-      frame $M$: $^{M}X^{F}(q)$.  Additionally, the kinematic tree defines the
+      frame $F$: $^{F}X^{M}(q)$.  Additionally, the kinematic tree defines the
       (fixed) transforms from the child body frame to the joint frame,
-      $^{F}X^C$, and from the joint frame to the parent frame, $^PX^{M}$.
+      $^{M}X^C$, and from the joint frame to the parent frame, $^PX^{F}$.
       Altogether, we can compute the configuration transform between any one
-      body and its parent, $$^PX^C(q) = \left[^PX^M\right] \left[^MX^F(q)\right]
-      \left[^FX^C\right].$$</p>
+      body and its parent, $$^PX^C(q) = \left[^PX^F\right] \left[^FX^M(q)\right]
+      \left[^MX^C\right].$$</p>
 
       <example><h1>Specifying the kinematic tree in URDF</h1></example>
 
@@ -484,8 +484,7 @@ pose = plant.EvalBodyPoseInWorld(context, gripper)</pre></code>
 
     <example><h1>Don't assume $\dot{q} \equiv v$</h1>
     
-      <todo>One free body.  Show the state vector is 13 elements.  Huh?  And
-      show how to make sense of it.</todo>
+      <p><i>TODO: One free body.  The state vector is 13 elements.  Huh?</i></p>
     
     </example>
 
@@ -551,12 +550,33 @@ pose = plant.EvalBodyPoseInWorld(context, gripper)</pre></code>
 
       <example><h1>Our first end-effector "controller"</h1>
       
-        <p><i>TODO: Use the pseudo-inverse Jacobian controller + an integrator
-        to drive the robot around.</i></p>
+        <p>Let's write a a simple controller using the pseudo-inverse of the
+        Jacobian.  First, we'll write a new <code>LeafSystem</code> that defines
+        one input port (for the iiwa measured position), and one output port
+        (for the iiwa joint velocity command).  Inside that system, we'll ask
+        MultibodyPlant for the gripper Jacobian, and compute the joint
+        velocities that will implement a desired gripper spatial velocity.</p>
 
-        <p>Congratulations!</p>
+        <p>To keep things simple for this first example, we'll just command a
+        constant gripper spatial velocity, and only run the simulation for a few
+        seconds.</p>
 
-        <todo>Tease apart feed-forward vs feedback.</todo>
+        <p>Note that we do have to add one additional system into the diagram.
+        The output of our controller is a desired joint velocity, but the input
+        that the iiwa controller is expecting is a desired joint position.  So
+        we will insert an integrator inbetween.</p>
+
+        <p>I don't expect you to understand every line in this example, but it's
+        worth finding the important lines and making sure you can change them
+        and see what happens!</p>
+
+        <p><a target="pick"
+          href="https://colab.research.google.com/github/RussTedrake/manipulation/blob/master/pick.ipynb#scrollTo=6v-EGfoI3y6V"><img
+          src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
+          </p>
+  
+        <p>Congratulations!  Things are really moving now.</p>
+
       </example>
 
     </subsection>
@@ -576,9 +596,9 @@ pose = plant.EvalBodyPoseInWorld(context, gripper)</pre></code>
       <example><h1>Invertibility of the gripper Jacobian</h1>
       
         <p>You might have noticed that I printed out the smallest singular value
-        of $J^G$ in the last example.  Take it for another spin.  See if you can
-        find configurations where the smallest singular value gets close to
-        zero.</p>
+        of $J^G$ in one of the previous examples.  Take it for another spin.
+        See if you can find configurations where the smallest singular value
+        gets close to zero.</p>
 
         <p><a target="pick"
           href="https://colab.research.google.com/github/RussTedrake/manipulation/blob/master/pick.ipynb#scrollTo=hSeD3PBotJUU"><img
@@ -587,6 +607,12 @@ pose = plant.EvalBodyPoseInWorld(context, gripper)</pre></code>
 
         <p>Here's a hint: try some configurations where the arm is very
         straight, (e.g. driving joint 2 and 4 close to zero).</p>
+
+        <p>Another good way to find the singularities are to use your
+        pseudo-inverse controller to send gripper spatial velocity commands that
+        drive the gripper to the limits of the robot's workspace.  Try it and
+        see!  In fact, this is the common case, and one that we want to work
+        hard to avoid.</p>
 
       </example>
 
