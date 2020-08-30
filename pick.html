@@ -75,9 +75,9 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
   will inevitably lead to confusion and bugs.  The Drake developers have gone to
   great length to establish and document a consistent <a
   href="https://drake.mit.edu/doxygen_cxx/group__multibody__notation.html">
-  multibody notation</a>, which they call "Monogram Notation".  The
-  documentation even includes some of the motivation/philosophy behind that
-  notation. I'll use the monogram notation throughout this text.</p>
+  multibody notation</a>, which we call "Monogram Notation".  The documentation
+  even includes some of the motivation/philosophy behind that notation. I'll use
+  the monogram notation throughout this text.</p>
   
   <p>If you'd like a more extensive background on kinematics than what I provide
   here, my favorite reference is still <elib>Craig05</elib>.  For free online
@@ -87,7 +87,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
   href="http://hades.mech.northwestern.edu/index.php/Modern_Robotics">Modern
   Robotics</a> by Lynch and Park<elib>Lynch17</elib> (they also have excellent
   accompanying videos).  Unfortunately, with three different references you'll
-  get three (slightly) different notations; mine is most similar to
+  get three (slightly) different notations; ours is most similar to
   <elib>Craig05</elib>.</p>
     
   <p>Please don't get overwhelmed by how much background material there is to
@@ -95,7 +95,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
   basic ideas should make you very effective here.  The details will come
   later, if you need them.</p>    
 
-  <section><h1>Kinematics Notation</h1>
+  <section><h1>Monogram Notation</h1>
 
     <p><i>The following concepts are disarmingly subtle. I've seen incredibly
     smart people assume they knew them and then perpetually stumble over
@@ -217,14 +217,14 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
     the object doesn't move relative to the gripper ($^GX^O$ is constant) when
     the gripper is closed.  Then we can:
       <ul style="margin:0"><li>move the gripper in the world, $X^G$, to an
-      appropriate pose relative to the object: $^OX^G$.</li>
+      appropriate pose relative to the object: $^OX^{G_{grasp}}$.</li>
       <li>close the gripper.</li>
       <li>move the gripper+object to the desired pose, $X^O = X^{O_d}$.</li>
       <li>open the gripper, and retract the hand.</li>
       </ul>
     To simplify the problem of approaching the object (without colliding with
     it) and retracting from the object, we will insert a "pregrasp pose",
-    $X^{G_{pre}}$, above the object as an intermediate step.
+    $^OX^{G_{pregrasp}}$, above the object as an intermediate step.
     </div>
 
     <p>Clearly, programming this strategy requires good tools for working with
@@ -375,15 +375,16 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       simply query the parent of the gripper frame in the kinematic tree, and
       recursively compose the transforms until we get to the world frame.</p>
 
-      <figure>
+      <figure id="kinematic_frames">
         <img style="width:40%;margin-right:40px"
         src="figures/kinematic_frames_iiwa.png"/><img style="width:40%"
         src="figures/kinematic_frames_gripper.png"/>
-        <figcaption>Kinematic frames on the iiwa (left) and the WSG (right).
-        For each frame, the <span style="color:red">positive $x$ axis is in
+        <figcaption>Kinematic frames on the iiwa (left) and the WSG (right). For
+        each frame, the <span style="color:red">positive $x$ axis is in
         red</span>, the <span style="color:green">positive $y$ axis is in
         green</span>, and the <span style="color:blue">positive $z$ axis is in
-        blue</span>.</figcaption>
+        blue</span>.  It's (hopefully) easy to remember: XYZ $\Leftrightarrow$
+        RGB.</figcaption>
       </figure>
 
       <example><h1>Forward kinematics for the gripper frame</h1>
@@ -632,8 +633,9 @@ plant.num_velocities() = 6</pre></code></p>
       6$. But assigning an integer rank to a matrix doesn't tell the entire
       story; for a real robot with (noisy) floating-point joint positions, as
       the matrix gets <i>close</i> to losing rank, (pseudo-)inverse starts to
-      "blow-up".  A better metric, then, is to watch the smallest singular
-      value; as this approaches zero, the norm of the pseudo-inverse will
+      "blow-up".  A better metric, then, is to watch the smallest <a
+      href="https://en.wikipedia.org/wiki/Singular_value_decomposition">singular
+      value</a>; as this approaches zero, the norm of the pseudo-inverse will
       approach infinity.</p>
 
       <example><h1>Invertibility of the gripper Jacobian</h1>
@@ -654,24 +656,26 @@ plant.num_velocities() = 6</pre></code></p>
         <p>Another good way to find the singularities are to use your
         pseudo-inverse controller to send gripper spatial velocity commands that
         drive the gripper to the limits of the robot's workspace.  Try it and
-        see!  In fact, this is the common case, and one that we want to work
-        hard to avoid.</p>
+        see!  In fact, this is the common case, and one that will work hard to
+        avoid.</p>
 
       </example>
 
       <p>Configurations $q$ for which $\rank(J(q_{iiwa})) < 6$ for a frame of
       interest (like our gripper frame $G$) are called <i>kinematic
-      singularities</i>.  Try to avoid them if you can!  The iiwa has many
-      virtues, but admittedly its kinematic workspace is not one of them. Trust
-      me, if you try to get a big Kuka to reach into a little kitchen sink all
-      day, every day, then you will spend a non-trivial amount of time thinking
-      about avoiding singularities.</p>
+      singularities</i>.  Try to avoid going near them if you can!  The iiwa has
+      many virtues, but admittedly its kinematic workspace is not one of them.
+      Trust me, if you try to get a big Kuka to reach into a little kitchen sink
+      all day, every day, then you will spend a non-trivial amount of time
+      thinking about avoiding singularities.</p>
 
       <p>In practice, things can get a lot better if we stop bolting our robot
       base to a fixed location in the world.  Mobile bases add complexity, but
       they are wonderful for improving the kinematic workspace of a robot.</p>
 
     </subsection>
+
+    <!--
 
     <subsection><h1>Nullspace of the Jacobian</h1>
     
@@ -702,11 +706,68 @@ plant.num_velocities() = 6</pre></code></p>
       humanoid, or perhaps even a dexterous hand.</p>
 
     </subsection>
+
+    -->
   </section>
 
   <section><h1>Defining the grasp and pre-grasp poses</h1>
   
-  <p><i>TODO: snapshot of the gripper relative to the object.  Back out a reasonable grasp pose (gripper position = object + some z, orientation straight down).  Pre-grasp pose is +more z. </i></p>
+    <p>I'm going to put my red foam brick on the table.  Its geometry is <a
+    href="https://github.com/RobotLocomotion/drake/blob/master/examples/manipulation_station/models/061_foam_brick.sdf#L21">defined</a>
+    as a 7.5cm x 5cm x 5cm box.  For reference, the distance between the fingers
+    on our gripper in the default "open" position is 10.7cm.  The "palm" of the
+    gripper is ??cm from the body origin, and the fingers are ??cm long.</p>
+    
+    <p>To make things easy to start, I'll promise to set the object down on the
+    table with the object frame's $z$-axis pointing up (aligned with the world
+    $z$ axis), and you can assume it is resting on the table safely within the
+    workspace of the robot.  But I reserve the right to give the object
+    arbitrary initial yaw.  Don't worry, you might have noticeed that the
+    seventh joint of the iiwa will let you rotate your gripper around quite
+    nicely (well beyond what my human wrist can do).</p>
+    
+    <p>Observe that visually the box has rotational symmetry -- I could always
+    rotate the box 90 degrees around its $x$-axis and you wouldn't be able to
+    tell the difference.  We'll think about the consequences of that more in the
+    next chapter when we start using perception.  But for now, we are ok using
+    the omniscient "cheat port" from the simulator which gives us the
+    unambiguous pose of the brick.</p>
+
+    <figure>
+      <todo>Update this with a figure that includes the object and object
+      frame.</todo>
+      <img style="width:40%" src="figures/kinematic_frames_gripper.png"/>
+      <figcaption>The gripper frame and the object frame.  For each frame, the
+      <span style="color:red">positive $x$ axis is in red</span>, the <span
+      style="color:green">positive $y$ axis is in green</span>, and the <span
+      style="color:blue">positive $z$ axis is in blue</span> (XYZ $\Leftrightarrow$
+      RGB).</figcaption>
+    </figure>
+
+    <p>Take a careful look at the gripper frame in the figure above, using the
+    colors to understand the axes.  Here is my thinking:  Given the size of the
+    hand and the object, I want the <i>desired</i> position (in meters) of the
+    object in the gripper frame, $$^{G_{grasp}}p^O = \begin{bmatrix} 0 \\ 0.075
+    \\ 0 \end{bmatrix}, \qquad ^{G_{pregrasp}}p^O = \begin{bmatrix} 0 \\ 0.2 \\
+    0 \end{bmatrix}.$$  Recall that the logic behind a <i>pregrasp</i> pose is
+    to first move to safely above the object, if our only gripper motion that is
+    very close to the object is a straight translation from the pregrasp pose to
+    the grasp pose and back, then it allows us to mostly avoid having to think
+    about collisions (for now).  I want the orientation of my gripper to be set
+    so that the positive $z$ axis of the object aligns with the negative $y$
+    axis of the gripper frame, and the positive $x$ axis of the object aligns
+    with the negative $z$ axis of the gripper.  We can accomplish that with
+    $$^{G_{grasp}}R^O = \text{MakeXRotation}\left(\frac{\pi}{2}\right)
+    \text{MakeZRotation} \left(\frac{\pi}{2}\right).$$  I admit I had my right
+    hand in the air for that one!  Our pregrasp pose will have the same
+    orientation as our grasp pose.</p>
+
+    <example><h1>Computing grasp and pregrasp poses</h1>
+    
+      <p><i>TODO: Random brick pose.  Compute the grasp/pregrasp pose.  Draw the
+      gripper in that pose.</i></p>
+    
+    </example>
   
   </section>
 
