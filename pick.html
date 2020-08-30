@@ -716,13 +716,13 @@ plant.num_velocities() = 6</pre></code></p>
     href="https://github.com/RobotLocomotion/drake/blob/master/examples/manipulation_station/models/061_foam_brick.sdf#L21">defined</a>
     as a 7.5cm x 5cm x 5cm box.  For reference, the distance between the fingers
     on our gripper in the default "open" position is 10.7cm.  The "palm" of the
-    gripper is ??cm from the body origin, and the fingers are ??cm long.</p>
+    gripper is 3.625cm from the body origin, and the fingers are 8.2cm long.</p>
     
     <p>To make things easy to start, I'll promise to set the object down on the
     table with the object frame's $z$-axis pointing up (aligned with the world
     $z$ axis), and you can assume it is resting on the table safely within the
     workspace of the robot.  But I reserve the right to give the object
-    arbitrary initial yaw.  Don't worry, you might have noticeed that the
+    arbitrary initial yaw.  Don't worry, you might have noticed that the
     seventh joint of the iiwa will let you rotate your gripper around quite
     nicely (well beyond what my human wrist can do).</p>
     
@@ -747,7 +747,7 @@ plant.num_velocities() = 6</pre></code></p>
     <p>Take a careful look at the gripper frame in the figure above, using the
     colors to understand the axes.  Here is my thinking:  Given the size of the
     hand and the object, I want the <i>desired</i> position (in meters) of the
-    object in the gripper frame, $$^{G_{grasp}}p^O = \begin{bmatrix} 0 \\ 0.075
+    object in the gripper frame, $$^{G_{grasp}}p^O = \begin{bmatrix} 0 \\ 0.12
     \\ 0 \end{bmatrix}, \qquad ^{G_{pregrasp}}p^O = \begin{bmatrix} 0 \\ 0.2 \\
     0 \end{bmatrix}.$$  Recall that the logic behind a <i>pregrasp</i> pose is
     to first move to safely above the object, if our only gripper motion that is
@@ -764,14 +764,84 @@ plant.num_velocities() = 6</pre></code></p>
 
     <example><h1>Computing grasp and pregrasp poses</h1>
     
-      <p><i>TODO: Random brick pose.  Compute the grasp/pregrasp pose.  Draw the
-      gripper in that pose.</i></p>
-    
+      <figure>
+        <img style="width:40%" src="figures/grasp_pose.png"/>
+      </figure>
+  
+      <p>Here is a simple example of loading a floating Schunk gripper and a
+      brick, computing the grasp / pregrasp pose (drawing out each
+      transformation clearly), and rendering the hand relative to the
+      object.</p>
+
+      <p><a target="pick"
+        href="https://colab.research.google.com/github/RussTedrake/manipulation/blob/master/pick.ipynb#scrollTo=QuFmomDOxoAR"><img
+        src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
+        </p>
+
+      <p>I hope you can see the value of having good notation at work here.  My
+      right hand was in the air when I was deciding what a suitable relative
+      pose for the object in the hand should be (when writing the notes).  But
+      once that was decided, I went to type it in and everything just
+      worked.</p>
+
     </example>
   
   </section>
 
-  <section><h1>A pick and place trajectory</h1></section>
+  <section><h1>A pick and place trajectory</h1>
+  
+    <p>We're getting close.  We have our desired gripper poses, and we know how
+    to change the gripper pose instantaneously using spatial velocity commands.
+    Now we need to specify how we want the gripper poses to change over time, so
+    that we can convert our gripper poses into spatial velocity commands.</p>
+
+    <div>For our first pass, we will implement this in the form of a trajectory.
+    Actually, we will produce a handful of trajectories, one for each of the:
+    <ul>
+      <li>desired gripper positions,</li>
+      <li>desired gripper orientations, and</li>
+      <li>desired gripper finger positions (open and close).</li>
+    </div>
+
+    <p>There are a number of ways one might represent a trajectory
+    (mathematically or computationally).  We have a pretty good collection of
+    <a
+    href="https://drake.mit.edu/doxygen_cxx/namespacedrake_1_1trajectories.html">trajectory</a>
+    classes available in Drake.  Many of them are implemented as <a
+    href="https://en.wikipedia.org/wiki/Spline_(mathematics)">splines</a> --
+    piecewise polynomial functions of time.</p>
+
+    <p>First let's think about just the timing.  We'll start everything at time,
+    $t=0$, and list the rest of our times as absolute (time from zero).  That's
+    when the robot wakes up and sees the brick.  Let's define $t_{pregrasp}$
+    next.  How long should we take to transition from the starting pose to the
+    pregrasp pose?  A really good answer might depend on the exact joint speed
+    limits of the robot, but we're not trying to move fast yet.  Let's pick a
+    conservative time that is proportional to the total Euclidean distance that
+    the hand will travel, say $$t_{pregrasp} = 5.0
+    \left\|^{G_0}p^{G_{pregrasp}}\right\|_2.$$ </p>
+
+    <todo>timeline graphic here, from time zero, to pre-grasp, to grasp, to
+    </todo>
+
+    <p>The rest of the timeline can follow quickly.  $t_{grasp} = t_{pregrasp} +
+    5.0,$ etc.  Once we have the timeline, then the simplest strategy we can
+    take is to simply linearly interpolate between the desired positions at each
+    point in the timeline.  That would be called a "<a href="https://en.wikipedia.org/wiki/First-order_hold">first-order hold</a>".</p>
+
+    <example><h1>Grasping with trajectories</h1>
+    
+      <p>There are a number of ways to visualize the trajectory when it's
+      connected to 3D.  Plotted as a function of time.  Plotted as a function of
+      space.  But my favorite is as an animation!</p>
+
+      <p>Colab</p>
+
+      <!-- one set of plots for position, another for orientation, and a third for gripper.  + an animation with MultibodyGeometryToPose. -->
+    
+    </example>
+
+  </section>
 
   <section><h1>Differential inverse kinematics with constraints</h1>
 
