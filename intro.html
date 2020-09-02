@@ -55,11 +55,11 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
   <a style="float:right; margin-top:-80px;" target="intro" href="https://colab.research.google.com/github/RussTedrake/manipulation/blob/master/intro.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open Corresponding Notebook In Colab"/></a>
   <div style="clear:right;"></div>
     
-  <p>It's worth taking time to appreciate just how amazingly well humans are
-  able to perform tasks with our hands.  Tasks that often feel mundane to us --
-  loading the dishwasher, chopping vegetables, folding laundry -- remain as
-  incredibly challenging tasks for robots and are at the very forefront of
-  robotics research.</p>
+  <p>It's worth taking time to appreciate just how amazingly well we are able to
+  perform tasks with our hands.  Tasks that often feel mundane to us -- loading
+  the dishwasher, chopping vegetables, folding laundry -- remain as incredibly
+  challenging tasks for robots and are at the very forefront of robotics
+  research.</p>
     
   <todo>Can I do an illustration of the dish task with a human, ala
   alberto/francois artwork?  https://fhogan.github.io/img/hybrid_behavior.png
@@ -69,14 +69,14 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
   the sink and placing it into the dishwasher.  Clearly you first have to
   perceive that there is a plate in the sink and that it is accessible. Getting
   your hand to the plate likely requires navigating your hand around the
-  geometry of the sink and other dishes, and the act of actually picking it up
+  geometry of the sink and other dishes.  The act of actually picking it up
   might require a fairly subtle maneuver where you have to tip up the plate,
-  sliding it along your fingers and along the sink/dishes in order to get a
+  sliding it along your fingers and then along the sink/dishes in order to get a
   reasonable grasp on it.  Presumably as you lift it out of the sink, you'd like
   to mostly avoid collisions between the plate and the sink, which suggests a
   reasonable understanding of the size/extent of the plate (though I actually
   think robots today are too afraid of collisions).  Even placing the plate into
-  the dishwasher is pretty subtle; you might think that you would align the
+  the dishwasher is pretty subtle.  You might think that you would align the
   plate with the slats and then slide it in, but I think humans are more clever
   than that.  A seemingly better strategy is to loosen your grip on the plate,
   come in at an angle and intentionally contact one side of the slat, letting
@@ -92,7 +92,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
     </video>
     <figcaption>
     A robot picking up a plate from a potentially cluttered sink (left: in
-    simulation, right: in reality).  This examples is from the <a
+    simulation, right: in reality).  This example is from the <a
     href="https://www.tri.global/news/tri-taking-on-the-hard-problems-in-manipulation-re-2019-6-27">manipulation
     team at the Toyota Research Institute</a>.
     </figcaption>
@@ -105,18 +105,18 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
   or other great areas in robotics, the most interesting problems in
   manipulation require significant interactions between perception, planning,
   and control. This includes both geometric perception to understand the local
-  geometry of the objects and environment, but also semantic perception to
-  understand what opportunities for manipulation are available in the scene.
-  Planning typically includes both reasoning about the kinematic and dynamic
-  constraints of the task (how to I command my rigid seven degree-of-freedom arm
-  to reach into the drawer?) as well as higher-level task planning (to get milk
+  geometry of the objects and environment and semantic perception to understand
+  what opportunities for manipulation are available in the scene. Planning
+  typically includes reasoning about the kinematic and dynamic constraints of
+  the task (how to I command my rigid seven degree-of-freedom arm to reach into
+  the drawer?).  But it also includes higher-level task planning (to get milk
   into my cup, I need to open the fridge, then grab the bottle, then unscrew the
-  lid, then pour... and perhaps even put it all back when I'm done); the
+  lid, then pour... and perhaps even put it all back when I'm done).  The
   low-level begs for representations using real numbers, but the higher levels
   feel more logical and discrete.  At perhaps the lowest level, our hands are
   making and breaking contact with the world either directly or through tools,
   exerting forces, rapidly and easily transitioning between sticking and sliding
-  frictional regimes -- these alone are incredible rich and difficult problems
+  frictional regimes -- these alone are incredibly rich and difficult problems
   from the perspective of dynamics and control.</p>
   
     
@@ -133,7 +133,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
     object from one bin and placing it into another bin -- one version of the
     famous "pick and place" problem -- is a great application for robotic
     manipulation.  Robots have done this for decades in factories with carefully
-    curated parts.  In just the last few years, we've seen a new generation of
+    curated parts.  In the last few years, we've seen a new generation of
     pick-and-place systems that use deep learning for perception, and can work
     well with much more diverse sets of objects, especially if the
     location/orientation of the placement need not be very accurate.  This can
@@ -143,7 +143,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
     object(s) to be picked.</p>
   
     <p>The goal for these notes, however, is to examine the much broader view of
-    manipulation that what is captured by the pick and place problem.  Even our
+    manipulation than what is captured by the pick and place problem.  Even our
     thought experiment of loading the dishwasher -- arguably a more advanced
     type of pick and place -- requires much more from the perception, planning,
     and control systems.  But the diversity of tasks that humans (and hopefully
@@ -156,9 +156,9 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
     paper<elib>Mason18</elib>.</p>
       
     <p>It's also important to recognize that manipulation research today looks
-    very different than manipulation research looked like in the 1980's and
-    1990's.  During that time there was a strong and beautiful focus on
-    "manipulation as grasping", with seminal work on, for instance, the
+    very different than manipulation research looked like in the 1980s and
+    1990s.  During that time there was a strong and beautiful focus on
+    "manipulation as grasping," with seminal work on, for instance, the
     kinematics/dynamics of multi-fingered hands assuming a stable grasp on an
     object.  Sometimes still, I hear people use the term "grasping" as almost
     synonymous with manipulation.  But please realize that the goals of
@@ -172,15 +172,15 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
   <section><h1>Open-world manipulation</h1>
     
     <p>Perhaps because humans are so good at manipulation, our expectations in
-    terms of performance and robustness for these tasks is extremely high.  It's
-    not enough to be able to load one set of plates in a laboratory environment
-    into a dishwasher reliably.  We'd like to be able to manipulate basically
-    any plate that someone might put in the sink.  And we'd like the system to
-    be able to work in any kitchen, despite various geometric configurations,
-    lighting conditions, etc.  The challenge of achieving and verifying
-    robustness of a complex manipulation stack with physics, perception,
-    planning, and control in the loop is already daunting.  But how do we
-    provide test coverage for every kitchen in the world?</p>
+    terms of performance and robustness for these tasks are extremely high.
+    It's not enough to be able to load one set of plates in a laboratory
+    environment into a dishwasher reliably.  We'd like to be able to manipulate
+    basically any plate that someone might put in the sink.  And we'd like the
+    system to be able to work in any kitchen, despite various geometric
+    configurations, lighting conditions, etc.  The challenge of achieving and
+    verifying robustness of a complex manipulation stack with physics,
+    perception, planning, and control in the loop is already daunting.  But how
+    do we provide test coverage for every kitchen in the world?</p>
   
     <p>The idea that the world has infinite variability (there will never be a
     point at which you have seen every possible kitchen) is often referred to as
@@ -242,8 +242,8 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
 <section><h1>These notes are interactive</h1>
     
     <p>By leveraging the power of simulation, and the new availability of free
-    online interactive compute makes, I having been working to make these notes
-    more than a bunch of static text.  Each chapter will have working code
+    online interactive compute, I am trying to make these notes more than what
+    you would find in a traditional text.  Each chapter will have working code
     examples, which you can run immediately (no installation required) on <a
     href="https://colab.research.google.com/">Google's Colaboratory</a>, or
     download/install and run on your local machine (see the <a
@@ -304,7 +304,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
     simulation (of our robot dynamics, sensors, actuators and its environment)
     is not enough.  Another major challenge in manipulation is the potential
     number and complexity of autonomy components (perception, planning, and
-    control) that we need to assemble in order to do the tasks.  A major goals
+    control) that we need to assemble in order to do the tasks.  A major goal
     of these notes is to attempt to bridle this complexity, to the extent
     possible.</p>
       

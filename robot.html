@@ -246,7 +246,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
         motor coordinates we get: $$\frac{I_{arm}}{n} \ddot{q}_{motor} =
         \tau_{gravity} + n\tau_{motor}.$$  If we divide through by $n$, and take
         into account the fact that the motor itself has inertia (e.g. from the
-        large spinning magnets) that is not effected by the gear ratio, then we
+        large spinning magnets) that is not affected by the gear ratio, then we
         obtain: $$\left(I_{motor} + \frac{I_{arm}}{n^2}\right) \ddot{q}_{motor}
         = \frac{\tau_{gravity}}{n} + \tau_{motor}.$$</p>
           
@@ -442,7 +442,7 @@ alt="Open In Colab"/></a>
       
       <p>The best way to visualize the results of a physics engine is with a 2D
       or 3D visualizer.  For that, we need to add the system which curates the
-      geometry of a scene; in Drake with call it the <code>SceneGraph</code>.
+      geometry of a scene; in Drake we call it the <code>SceneGraph</code>.
       Once we have a <code>SceneGraph</code>, then there are a number of
       different visualizers and sensors that we can add to the system to
       actually render the scene.</p>
