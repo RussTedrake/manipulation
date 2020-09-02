@@ -22,7 +22,10 @@ def setup_manipulation(*, manipulation_sha, drake_version, drake_build):
             'https://github.com/RussTedrake/manipulation.git', path])
 
     # Checkout the sha.
-    subprocess.run(['git', 'checkout', manipulation_sha], cwd=path);
+    subprocess.run(['git', 'checkout', manipulation_sha], cwd=path)
+
+    # Run install_prereqs.sh
+    subprocess.run([f"{path}/scripts/setup/ubuntu/18.04/install_prereqs.sh"])
 
     # Set the path (if necessary).
     spec = importlib.util.find_spec('manipulation')
