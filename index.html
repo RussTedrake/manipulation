@@ -70,9 +70,11 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       <li>Simple grippers</li>
       <li>Soft/underactuated hands</li>
       <li>Other end effectors</li>
+      <li>If you haven't seen it...</li>
     </ul>
     <li><a href=robot.html#section3>Sensors</a></li>
     <li><a href=robot.html#section4>Putting it all together</a></li>
+    <li><a href=robot.html#section5>Exercises</a></li>
   </ul>
   <li><a href="pick.html">Chapter 3: Basic Pick and Place</a></li>
   <ul>
@@ -223,10 +225,10 @@ Point Clouds</a></li>
   controls-related research has also led the field to be relatively conservative
   in their assumptions and problem formulations; the requirements for robotic
   manipulation break these assumptions.  For example, robust control typically
-  assumes that dynamics that are (nearly) smooth and uncertainty that can be
+  assumes dynamics that are (nearly) smooth and uncertainty that can be
   represented by simple distributions or simple sets; but in robotic
-  manipulation we must deal with the non-smooth mechanics of contact and
-  uncertainty the comes from varied lighting conditions, and different numbers
+  manipulation, we must deal with the non-smooth mechanics of contact and
+  uncertainty that comes from varied lighting conditions, and different numbers
   of objects with unknown geometry and dynamics.  In practice, no
   state-of-the-art robotic manipulation system to date (that I know of) uses
   rigorous control theory to design even the low-level feedback that determines
@@ -253,13 +255,13 @@ Point Clouds</a></li>
   <p>Finally, it feels that the time is ripe for robotic manipulation to have a
   real and dramatic impact in the world, in fields from logistics to home
   robots.  Over the last few years, we've seen UAVs/drones transition from
-  academic curiosities into consumer products; autonomous cars have been
-  transitioning from academic research to industry now, at least in terms of
-  dollars invested.  Manipulation feels like the next big thing that will
-  transition from robotic research to practice. It's still a bit risky for a
-  venture capitalist to invest in, but nobody doubts the size of the market once
-  we have the technology.  How lucky are we to potentially be able to play a
-  role in that transition?</p>
+  academic curiosities into consumer products.  Even more recently, autonomous
+  driving has transitioned from academic research to industry, at least in
+  terms of dollars invested.  Manipulation feels like the next big thing that
+  will make the leap from robotic research to practice. It's still a bit risky
+  for a venture capitalist to invest in, but nobody doubts the size of the
+  market once we have the technology.  How lucky are we to potentially be able
+  to play a role in that transition?</p>
   
   <p>So this is where the notes begin... we are at an incredible crossroads
   between learning and control and robotics with an opportunity to have
@@ -270,12 +272,13 @@ Point Clouds</a></li>
   <section><h1>A manipulation toolbox</h1>
   
     <p>Another explicit goal of these lecture notes is to provide high-quality
-    implementations of the most useful tools in a manipulation scientists'
+    implementations of the most useful tools in a manipulation scientist's
     toolbox.  When I am forced to choose between mathematical clarity and
     runtime performance, the clear formulation is always my first priority; I
-    will include a performant formulation, too, or try to give pointers to
-    alternatives.  Manipulation research is moving quickly, and I aim to evolve
-    these notes to keep pace.  I hope that the software components provided in
+    will try to include a performant formulation, too, if possible or try to
+    give pointers to alternatives.  Manipulation research is moving quickly, and
+    I aim to evolve these notes to keep pace.  I hope that the software
+    components provided in
     <drake></drake> and in these notes can be directly useful to you in your own
     work.</p>
   

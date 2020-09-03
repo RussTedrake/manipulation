@@ -1,0 +1,32 @@
+# -*- mode: python -*-
+# vi: set ft=python :
+
+# Copyright 2020 Massachusetts Institute of Technology.
+# Licensed under the BSD 3-Clause License. See LICENSE.TXT for details.
+
+load("//htmlbook/tools/python:defs.bzl", "rt_py_library")
+
+rt_py_library(
+    name = "test_reflected_inertia",
+    srcs = [
+        "test_reflected_inertia.py",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+rt_py_library(
+    name = "test_manipulation_io",
+    srcs = [
+        "test_manipulation_io.py",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+rt_py_library(
+    name = "test_survey",
+    srcs = [
+        "test_survey.py",
+    ],
+    visibility = ["//visibility:public"],
+)
+
