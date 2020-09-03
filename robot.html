@@ -58,14 +58,14 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
   href="https://en.wikipedia.org/wiki/Mecha">mech</a>.  I want to make sure you
   understand the robot hardware that we've selected for these notes, and how it
   compares to the other hardware available today.  You should also come away
-  with an understanding of how we simulate the robot and what commands that you
+  with an understanding of how we simulate the robot and what commands you
   can send to the robot interface.</p>
     
   <p>Although we are going to focus on one particular set of hardware for these
   notes, one of the great things about modern robotics is that many of the tools
   we will develop over the course of these notes are quite general, and can be
   transferred from one robot to another easily.  I could imagine a future
-  version of these notes where you really do get you build out your robot in
+  version of these notes where you really do get to build out your robot in
   this chapter, and use your customized robot for the remaining chapters!</p>
     
   <section><h1>Arms</h1>
@@ -83,10 +83,10 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       
       <p>This is made possible by the proliferation of some common file formats
       for describing our robots.  Unfortunately, the field has not converged on
-      a single preferred format (yet), and each of them have their quirks.
-      Drake currently loads <a href="http://wiki.ros.org/urdf">Universal Robot
+      a single preferred format (yet), and each of them have their quirks. Drake
+      currently loads <a href="http://wiki.ros.org/urdf">Universal Robot
       Description Format</a> (URDF) and <a
-      href="http://sdformat.org/">Simulation Description Format </a> (SDF); the
+      href="http://sdformat.org/">Simulation Description Format</a> (SDF); the
       Drake developers have been trying to upstream improvements to SDF rather
       than start yet another format.</p>
         
@@ -118,7 +118,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
     href="https://www.kuka.com/en-us/products/robotics-systems/industrial-robots/lbr-iiwa">consistent
     with the manufacturer</a>, but it looks wrong to me every time!).  To better
     understand why, let us start by understanding the difference between most
-    robots, which are position-controlled, and the handfuls of robots that have
+    robots, which are position-controlled, and the handful of robots that have
     accepted the additional cost and complexity to provide torque sensing and
     control.</p>
     
@@ -164,19 +164,19 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
 
         <p>How can we overcome this challenge of not having a good model of the
         transmission dynamics?  Regulating the current or speed of the motor
-        only requires sensors on the motor; if we add more sensors on the output
-        side of the transmission, then we can use high-gain feedback to try to
-        directly regulate the joint, instead of the motor.  Importantly,
-        although the torques due to the transmission are not known precisely,
-        they are also not arbitrary -- for instance they will never add energy
-        into the system.  Most importantly, we can be confident that there is a
-        <i>monotonically increasing</i> relationship between the current that we
-        put into the motor and the torque at the joint, and ultimately the
-        acceleration of the joint.  Note that I chose the term monotonic
-        carefully, meaning "non-decreasing" but <i>not</i> implying "strictly
-        increasing", because, for instance, when a joint is starting from rest,
-        static friction will resist small torques without having any
-        acceleration at the output.</p>
+        only requires sensors on the motor side of the transmission; if we add
+        more sensors on the output side of the transmission, then we can use
+        high-gain feedback to try to directly regulate the joint, instead of the
+        motor.  Importantly, although the torques due to the transmission are
+        not known precisely, they are also not arbitrary -- for instance they
+        will never add energy into the system.  Most importantly, we can be
+        confident that there is a <i>monotonically increasing</i> relationship
+        between the current that we put into the motor and the torque at the
+        joint, and ultimately the acceleration of the joint.  Note that I chose
+        the term monotonic carefully, meaning "non-decreasing" but <i>not</i>
+        implying "strictly increasing", because, for instance, when a joint is
+        starting from rest, static friction will resist small torques without
+        having any acceleration at the output.</p>
 
         <p>The most common sensor to add to the joint is a position sensor --
         typically an encoder or potentiometer -- these are inexpensive,
@@ -218,11 +218,11 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
         the PID gains for each joint are often chosen independently for each
         joint, and are constant (not <a
         href="https://en.wikipedia.org/wiki/Gain_scheduling">gain-scheduled</a>
-        ). Wouldn't you expect for the torques required for e.g. a robot arm at
-        full extension holding a milk jug might be very different than the
-        torques required when it is unloaded in a vertical hanging position?
-        Surprisingly, the required gains/torques might not be as different as
-        one would think.</p>
+        ). Wouldn't you expect for the motor commands required for e.g. a robot
+        arm at full extension holding a milk jug might be very different than
+        the motor commands required when it is unloaded in a vertical hanging
+        position? Surprisingly, the required gains/commands might not be as
+        different as one would think.</p>
           
         <p>Electric motors are most efficient at high speeds (often > 100 or
         1,000 rotations per minute).  We probably don't actually want our robots
@@ -240,7 +240,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
         $$I_{arm} \ddot{q} = \tau_{gravity} + \tau,$$ where $I_{arm}$ is the
         moment of inertia. For example, for a <a
         href="http://underactuated.mit.edu/pend.html"
-        target="underactuated">simple pendulum</a>, we might have have $$ml^2
+        target="underactuated">simple pendulum</a>, we might have $$ml^2
         \ddot{q} = - mgl\sin{q} + \tau.$$  But the applied joint torque $\tau$
         actually comes from the motor -- if we write this equation in terms of
         motor coordinates we get: $$\frac{I_{arm}}{n} \ddot{q}_{motor} =
@@ -263,7 +263,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
         inertial coupling of the other joints in the manipulator</a>.  The motor
         inertia, on the other hand, is constant.  For large gear ratios, this
         means the dynamics of the joint are less dependent on the nonlinear
-        effects of joint position and velocity, making it relatively easier to
+        effects of joint position and velocity, making it relatively easy to
         tune constant feedback gains that perform well in all
         configurations.</p>
         
@@ -286,7 +286,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       drives to keep the arm light but having large motors in the base.  And
       just in the last few years, we've seen progress in high-torque outrunner
       and frameless motors bringing in a new generation of low-cost,
-      direct-drive robots: e.g. MIT Cheetah <elib>Wensing17</elib>, <a
+      "quasi-direct-drive" robots: e.g. MIT Cheetah <elib>Wensing17</elib>, <a
       href="http://rll.berkeley.edu/blue/">Berkeley Blue</a>, and <a
       href="https://www.halodi.com/">Halodi Eve</a>.</p>
 
@@ -309,13 +309,13 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       href="https://en.wikipedia.org/wiki/Strain_gauge">strain gauges</a>
       integrated into the transmission.  However there is a trade-off between
       the stiffness of the transmission and the accuracy of the force/torque
-      measurement -- the iiwa transmission includes an explicit "Flex Spline"
-      with a stiffness around 5000 Nm/rad <elib>Wedler12</elib>.  Taking this
-      idea to an extreme, Gill Pratt proposed "series-elastic actuators" that
-      have even lower stiffness springs in the transmission, and proposed
-      measuring joint position on both the motor and joint sides of the
-      transmission to estimate the applied torques <elib>Pratt95b</elib>.  For
-      example, the <a
+      measurement <elib>Kashiri17</elib> -- the iiwa transmission includes an
+      explicit "Flex Spline" with a stiffness around 5000 Nm/rad
+      <elib>Wedler12</elib>.  Taking this idea to an extreme, Gill Pratt
+      proposed "series-elastic actuators" that have even lower stiffness springs
+      in the transmission, and proposed measuring joint position on both the
+      motor and joint sides of the transmission to estimate the applied torques
+      <elib>Pratt95b</elib>.  For example, the <a
       href="https://en.wikipedia.org/wiki/Baxter_(robot)">Baxter</a> and Sawyer
       robots from Rethink use series elastic actuators; I don't think they've
       published the spring stiffness values but similarly-motivated
@@ -323,7 +323,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       href=http://docs.hebi.us/hardware.html>HEBI robotics are closer to 100
       Nm/rad</a>.  Even for the iiwa actuators, the joint elasticity is
       significant enough that the low-level controllers go to great length to
-      take it into account explicitly it in order to achieve high-performance
+      take it into account explicitly in order to achieve high-performance
       control of the joints<elib>Albu-Schaffer07</elib>.  We will discuss these
       details when we get to the chapter covering <a
       href="manipulator.html">manipulator control</a>.</p>
@@ -647,7 +647,24 @@ alt="Open In Colab"/></a></p>
 
     </subsection>
 
-    <todo>iishikawa hand.  best robot ever.</todo>
+    <subsection><h1>If you haven't seen it...</h1>
+
+      <p>One time I was attending an event where the registration form asked us
+      "what is your favorite robot of all time, real or fictional".  That is a
+      tough question for someone who loves robots! But the answer I gave was a super cool "high-speed multifingered hand" by
+      the <a href="http://ishikawa-vision.org/fusion/index-e.html">Ishikawa group</a>; a project that started turning out
+      amazing results back in 2004! The "overclocked" the hand -- sending more current for short durations than would be
+      reasonable for any longer applications -- and also used high-speed cameras to achieve these results. And they had a <a
+        href="http://ishikawa-vision.org/fusion/RubikManipulation/index-e.html">Rubik's cube demo</a>, too, in 2017.</p>
+
+      <figure>
+      <iframe width="560" height="315" src="https://www.youtube.com/embed/-KxjVlaLBmk" frameborder="0"
+        allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+      </figure>
+      
+      <p>So good!</p>
+
+    </subsection>
 
   </section>
 
