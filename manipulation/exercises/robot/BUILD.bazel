@@ -13,11 +13,3 @@ rt_py_library(
     ],
     visibility = ["//visibility:public"],
 )
-
-rt_py_library(
-    name = "test_manipulation_io",
-    srcs = [
-        "test_manipulation_io.py",
-    ],
-    visibility = ["//visibility:public"],
-)
