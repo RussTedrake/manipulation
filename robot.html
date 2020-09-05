@@ -384,44 +384,33 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       model-based design philosophy, <code>MultibodyPlant</code> also provides
       an interface as a <code>System</code>, with input and output ports.</p>
       
-      <table align="center" cellpadding="0" cellspacing="0">
-<tr align="center">
-<td style="vertical-align:middle"><table cellspacing="0" cellpadding="0">
-<tr>
-<td align="right" style="padding:5px 0px 5px 0px">applied_generalized_force&rarr;</td></tr>
-<tr>
-<td align="right" style="padding:5px 0px 5px 0px">applied_spatial_force&rarr;</td></tr>
-<tr>
-<td align="right" style="padding:5px 0px 5px 0px"><em style="color:gray">model_instance_name[i]</em>_actuation&rarr;</td></tr>
-<tr>
-<td align="right" style="padding:5px 0px 5px 0px"><span style="color:green">geometry_query</span>&rarr;</td></tr>
-</table>
-</td><td align="center" style="border:solid;padding-left:20px;padding-right:20px;vertical-align:middle" bgcolor="#F0F0F0"><a class="el" href="https://drake.mit.edu/doxygen_cxx/classdrake_1_1multibody_1_1_multibody_plant.html" title="MultibodyPlant is a Drake system framework representation (see systems::System) for the model of a ph...">MultibodyPlant</a></td><td style="vertical-align:middle"><table cellspacing="0" cellpadding="0">
-<tr>
-<td align="left" style="padding:5px 0px 5px 0px">&rarr; continuous_state</td></tr>
-<tr>
-<td align="left" style="padding:5px 0px 5px 0px">&rarr; body_poses</td></tr>
-<tr>
-<td align="left" style="padding:5px 0px 5px 0px">&rarr; body_spatial_velocities</td></tr>
-<tr>
-<td align="left" style="padding:5px 0px 5px 0px">&rarr; body_spatial_accelerations</td></tr>
-<tr>
-<td align="left" style="padding:5px 0px 5px 0px">&rarr; generalized_acceleration</td></tr>
-<tr>
-<td align="left" style="padding:5px 0px 5px 0px">&rarr; reaction_forces</td></tr>
-<tr>
-<td align="left" style="padding:5px 0px 5px 0px">&rarr; contact_results</td></tr>
-<tr>
-<td align="left" style="padding:5px 0px 5px 0px">&rarr; <em style="color:gray">model_instance_name[i]</em>_continuous_state</td></tr>
-<tr>
-<td align="left" style="padding:5px 0px 5px 0px">&rarr; <em style="color:gray"> model_instance_name[i]</em>_generalized_acceleration</td></tr>
-<tr>
-<td align="left" style="padding:5px 0px 5px 0px">&rarr; <em style="color:gray"> model_instance_name[i]</em>_generalized_contact_forces</td></tr>
-<tr>
-<td align="left" style="padding:5px 0px 5px 0px">&rarr; <span style="color:green">geometry_pose</span></td></tr>
-</table>
-</td></tr>
-</table>
+      <div>
+        <script src="htmlbook/js-yaml.min.js"></script>
+        <script type="text/javascript">
+        var sys = jsyaml.load(`
+name: MultibodyPlant
+input_ports:
+- applied_generalized_force
+- applied_spatial_force
+- <em style="color:gray">model_instance_name[i]</em>_actuation
+- <span style="color:green">geometry_query</span>
+output_ports:
+- continuous_state
+- body_poses
+- body_spatial_velocities
+- body_spatial_accelerations
+- generalized_acceleration
+- reaction_forces
+- contact_results
+- <em style="color:gray">model_instance_name[i]</em>_continuous_state
+- '<em style="color:gray">
+  model_instance_name[i]</em>_generalized_acceleration'
+- '<em style="color:gray">
+  model_instance_name[i]</em>_generalized_contact_forces'
+- <span style="color:green">geometry_pose</span>`);
+        document.write(system_html(sys, "https://drake.mit.edu/doxygen_cxx/classdrake_1_1multibody_1_1_multibody_plant.html"));
+        </script>
+      </div> 
       
       <p>As you might expect for something as complex and general as a physics
       engine, it has many input and output ports; most of them are optional.
@@ -447,24 +436,20 @@ alt="Open In Colab"/></a>
       different visualizers and sensors that we can add to the system to
       actually render the scene.</p>
       
-<table align="center" cellpadding="0" cellspacing="0">
-<tr align="center">
-<td style="vertical-align:middle"><table cellspacing="0" cellpadding="0">
-<tr>
-<td align="right" style="padding:5px 0px 5px 0px">source_pose{0}&rarr;</td></tr>
-<tr>
-<td align="right" style="padding:5px 0px 5px 0px">...&rarr;</td></tr>
-<tr>
-<td align="right" style="padding:5px 0px 5px 0px">source_pose{N-1}&rarr;</td></tr>
-</table>      
-</td><td align="center" style="border:solid;padding-left:20px;padding-right:20px;vertical-align:middle" bgcolor="#F0F0F0"><a class="el" href="https://drake.mit.edu/doxygen_cxx/classdrake_1_1geometry_1_1_scene_graph.html" title="SceneGraph serves as the nexus for all geometry (and geometry-based operations) in a Diagram.">SceneGraph</a></td><td style="vertical-align:middle"><table cellspacing="0" cellpadding="0">
-<tr>
-<td align="left" style="padding:5px 0px 5px 0px">&rarr; lcm_visualization</td></tr>
-<tr>
-<td align="left" style="padding:5px 0px 5px 0px">&rarr; query</td></tr>
-</table>
-</td></tr>
-</table>
+      <div>
+        <script type="text/javascript">
+        var sys = jsyaml.load(`
+name: SceneGraph
+input_ports:
+- source_pose{0}
+- ...
+- source_pose{N-1}
+output_ports:
+- lcm_visualization
+- query`);
+        document.write(system_html(sys, "https://drake.mit.edu/doxygen_cxx/classdrake_1_1geometry_1_1_scene_graph.html"));
+        </script>
+      </div>       
       
       <example><h1>Visualizing the scene</h1>
       
@@ -697,63 +682,40 @@ alt="Open In Colab"/></a></p>
     our perception, planning, and, higher-level control systems.  All together,
     the <code>ManipulationStation</code> system looks like this:</p>
     
-    <table align="center" cellpadding="0" cellspacing="0">
-<tr align="center">
-<td style="vertical-align:middle"><table cellspacing="0" cellpadding="0">
-<tr>
-<td align="right" style="padding:5px 0px 5px 0px">iiwa_position&rarr;</td></tr>
-<tr>
-<td align="right" style="padding:5px 0px 5px 0px">iiwa_feedforward_torque&rarr;</td></tr>
-<tr>
-<td align="right" style="padding:5px 0px 5px 0px">wsg_position&rarr;</td></tr>
-<tr>
-<td align="right" style="padding:5px 0px 5px 0px">wsg_force_limit&rarr;</td></tr>
-</table>
-</td><td align="center" style="border:solid;padding-left:20px;padding-right:20px;vertical-align:middle" bgcolor="#F0F0F0"><a class="el" href="https://drake.mit.edu/doxygen_cxx/classdrake_1_1examples_1_1manipulation__station_1_1_manipulation_station.html" title="A system that represents the complete manipulation station, including exactly one robotic arm (a Kuka...">ManipulationStation</a></td><td style="vertical-align:middle"><table cellspacing="0" cellpadding="0">
-<tr>
-<td align="left" style="padding:5px 0px 5px 0px">&rarr; iiwa_position_commanded</td></tr>
-<tr>
-<td align="left" style="padding:5px 0px 5px 0px">&rarr; iiwa_position_measured</td></tr>
-<tr>
-<td align="left" style="padding:5px 0px 5px 0px">&rarr; iiwa_velocity_estimated</td></tr>
-<tr>
-<td align="left" style="padding:5px 0px 5px 0px">&rarr; iiwa_state_estimated</td></tr>
-<tr>
-<td align="left" style="padding:5px 0px 5px 0px">&rarr; iiwa_torque_commanded</td></tr>
-<tr>
-<td align="left" style="padding:5px 0px 5px 0px">&rarr; iiwa_torque_measured</td></tr>
-<tr>
-<td align="left" style="padding:5px 0px 5px 0px">&rarr; iiwa_torque_external</td></tr>
-<tr>
-<td align="left" style="padding:5px 0px 5px 0px">&rarr; wsg_state_measured</td></tr>
-<tr>
-<td align="left" style="padding:5px 0px 5px 0px">&rarr; wsg_force_measured</td></tr>
-<tr>
-<td align="left" style="padding:5px 0px 5px 0px">&rarr; camera_[NAME]_rgb_image</td></tr>
-<tr>
-<td align="left" style="padding:5px 0px 5px 0px">&rarr; camera_[NAME]_depth_image</td></tr>
-<tr>
-<td align="left" style="padding:5px 0px 5px 0px">&rarr; <b style="color:orange">camera_[NAME]_label_image</b></td></tr>
-<tr>
-<td align="left" style="padding:5px 0px 5px 0px">&rarr; ...</td></tr>
-<tr>
-<td align="left" style="padding:5px 0px 5px 0px">&rarr; camera_[NAME]_rgb_image</td></tr>
-<tr>
-<td align="left" style="padding:5px 0px 5px 0px">&rarr; camera_[NAME]_depth_image</td></tr>
-<tr>
-<td align="left" style="padding:5px 0px 5px 0px">&rarr; <b style="color:orange">camera_[NAME]_label_image</b></td></tr>
-<tr>
-<td align="left" style="padding:5px 0px 5px 0px">&rarr; <b style="color:orange">pose_bundle</b></td></tr>
-<tr>
-<td align="left" style="padding:5px 0px 5px 0px">&rarr; <b style="color:orange">contact_results</b></td></tr>
-<tr>
-<td align="left" style="padding:5px 0px 5px 0px">&rarr; <b style="color:orange">plant_continuous_state</b></td></tr>
-<tr>
-<td align="left" style="padding:5px 0px 5px 0px">&rarr; <b style="color:orange">geometry_poses</b></td></tr>
-</table>
-</td></tr>
-</table>
-    
+    <div>
+      <script type="text/javascript">
+      var sys = jsyaml.load(`
+name: ManipulationStation
+input_ports:
+- iiwa_position
+- iiwa_feedforward_torque (optional)
+- wsg_position
+- wsg_force_limit (optional)
+output_ports:
+- iiwa_position_commanded
+- iiwa_position_measured
+- iiwa_velocity_estimated
+- iiwa_state_estimated
+- iiwa_torque_commanded
+- iiwa_torque_measured
+- iiwa_torque_external
+- wsg_state_measured
+- wsg_force_measured
+- camera_[NAME]_rgb_image
+- camera_[NAME]_depth_image
+- <b style="color:orange">camera_[NAME]_label_image</b>
+- ...
+- camera_[NAME]_rgb_image
+- camera_[NAME]_depth_image
+- <b style="color:orange">camera_[NAME]_label_image</b>
+- <b style="color:orange">pose_bundle</b>
+- <b style="color:orange">contact_results</b>
+- <b style="color:orange">plant_continuous_state</b>
+- <b style="color:orange">geometry_poses</b>`);
+      document.write(system_html(sys, "https://drake.mit.edu/doxygen_cxx/classdrake_1_1examples_1_1manipulation__station_1_1_manipulation_station.html"));
+      </script>
+    </div>
+
     <p>This model also defines the abstraction between the simulation and the
     real hardware.  We offer an almost identical system, the
     <code>ManipulationStationHardwareInterface</code>.  If you replace this
@@ -763,48 +725,32 @@ alt="Open In Colab"/></a></p>
     colored <b><span style="color:orange">orange</span></b> on the
     <code>ManipulationStation</code> system.</p>
   
-  <table align="center" cellpadding="0" cellspacing="0">
-<tr align="center">
-<td style="vertical-align:middle"><table cellspacing="0" cellpadding="0">
-<tr>
-<td align="right" style="padding:5px 0px 5px 0px">iiwa_position&rarr;</td></tr>
-<tr>
-<td align="right" style="padding:5px 0px 5px 0px">iiwa_feedforward_torque&rarr;</td></tr>
-<tr>
-<td align="right" style="padding:5px 0px 5px 0px">wsg_position&rarr;</td></tr>
-<tr>
-<td align="right" style="padding:5px 0px 5px 0px">wsg_force_limit&rarr;</td></tr>
-</table>
-</td><td align="center" style="border:solid;padding-left:20px;padding-right:20px;vertical-align:middle" bgcolor="#F0F0F0"><a class="el" href="https://drake.mit.edu/doxygen_cxx/classdrake_1_1examples_1_1manipulation__station_1_1_manipulation_station_hardware_interface.html" title="A System that connects via message-passing to the hardware manipulation station.">ManipulationStation<br/>HardwareInterface</a></td><td style="vertical-align:middle"><table cellspacing="0" cellpadding="0">
-<tr>
-<td align="left" style="padding:5px 0px 5px 0px">&rarr; iiwa_position_commanded</td></tr>
-<tr>
-<td align="left" style="padding:5px 0px 5px 0px">&rarr; iiwa_position_measured</td></tr>
-<tr>
-<td align="left" style="padding:5px 0px 5px 0px">&rarr; iiwa_velocity_estimated</td></tr>
-<tr>
-<td align="left" style="padding:5px 0px 5px 0px">&rarr; iiwa_torque_commanded</td></tr>
-<tr>
-<td align="left" style="padding:5px 0px 5px 0px">&rarr; iiwa_torque_measured</td></tr>
-<tr>
-<td align="left" style="padding:5px 0px 5px 0px">&rarr; iiwa_torque_external</td></tr>
-<tr>
-<td align="left" style="padding:5px 0px 5px 0px">&rarr; wsg_state_measured</td></tr>
-<tr>
-<td align="left" style="padding:5px 0px 5px 0px">&rarr; wsg_force_measured</td></tr>
-<tr>
-<td align="left" style="padding:5px 0px 5px 0px">&rarr; camera_[NAME]_rgb_image</td></tr>
-<tr>
-<td align="left" style="padding:5px 0px 5px 0px">&rarr; camera_[NAME]_depth_image</td></tr>
-<tr>
-<td align="left" style="padding:5px 0px 5px 0px">&rarr; ...</td></tr>
-<tr>
-<td align="left" style="padding:5px 0px 5px 0px">&rarr; camera_[NAME]_rgb_image</td></tr>
-<tr>
-<td align="left" style="padding:5px 0px 5px 0px">&rarr; camera_[NAME]_depth_image</td></tr>
-</table>
-</td></tr>
-</table>
+    <div>
+      <script type="text/javascript">
+      var sys = jsyaml.load(`
+name: ManipulationStationHardwareInterface
+input_ports:
+- iiwa_position
+- iiwa_feedforward_torque
+- wsg_position
+- wsg_force_limit (optional)
+output_ports:
+- iiwa_position_commanded
+- iiwa_position_measured
+- iiwa_velocity_estimated
+- iiwa_torque_commanded
+- iiwa_torque_measured
+- iiwa_torque_external
+- wsg_state_measured
+- wsg_force_measured
+- camera_[NAME]_rgb_image
+- camera_[NAME]_depth_image
+- ...
+- camera_[NAME]_rgb_image
+- camera_[NAME]_depth_image`);
+      document.write(system_html(sys, "https://drake.mit.edu/doxygen_cxx/classdrake_1_1examples_1_1manipulation__station_1_1_manipulation_station_hardware_interface.html"));
+      </script>
+    </div>    
   
   <p>The <code>ManipulationStationHardwareInterface</code> is also a diagram,
   but rather than being made up of the simulation components like
