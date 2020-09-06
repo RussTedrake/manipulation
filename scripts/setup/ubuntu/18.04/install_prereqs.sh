@@ -85,6 +85,7 @@ EOF
 locale-gen en_US.UTF-8
 
 LC_CTYPE=en_US.UTF-8 LANG=en_US.UTF-8 pip3 install --disable-pip-version-check $(cat <<EOF
+altair
 gradescope-utils
 open3d
 timeout-decorator
