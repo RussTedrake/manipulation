@@ -66,7 +66,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
   move it to a desired position/orientation on the table.  I want to defer the
   <i>perception</i> problem for one chapter, and will let you assume that you
   have access to a perfect measurement of the current position/orientation of
-  the brick.  Even without perception, completing this task this requires us to
+  the brick.  Even without perception, completing this task requires us to
   build up a basic toolkit for geometry and kinematics; it's a natural place to
   start.</p>
 
@@ -104,10 +104,10 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
 
     <p>Perhaps the most fundamental concept in geometry is the concept of a
     point.  Points occupy a position in space, and they can have names, e.g.
-    point $A$, $C$, or more descriptive names like $B_{com}$ for the center of
-    mass of body $B$. We'll denote the position of the point as $p^A$; that's
-    $p$ for position, and not for point, because other geometric quantities can
-    also have a position.</p>
+    point $A$, $C$, or more descriptive names like $B_{cm}$ for the center of
+    mass of body $B$. We'll denote the position of the point by using a position
+    vector $p^A$; that's $p$ for position, and not for point, because other
+    geometric quantities can also have a position.</p>
 
     <p>But let's be more careful.  Position is actually a relative quantity.
     Really, we should only ever write the position of two points relative to
@@ -116,13 +116,14 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
     off once we start transforming points.</p>
     
     <p>Every time we describe the (relative) position as a vector of numbers, we
-    need to be explicit about the coordinate system.  All of our coordinate
-    systems here will follow the "right-hand rule". We'll give a coordinate
-    system, coordinate frame, or just <i>frame</i>, a name, too, like $F$.  If I
-    want to write the position of point $C$ relative to point $A$, expressed in
-    frame $F$, I will write $[^Ap^C]_F$.  The brackets come in because we'll
-    sometimes what to refer to the elements of the position, e.g. $[^Ap_i^C]_F$
-    is the $i$th element.</p>
+    need to be explicit about the coordinate frame we are using, specifically
+    the "expressed-in" frame. All of our frames are defined by orthogonal unit
+    vectors that follow the "right-hand rule". We'll give a frame a name, too,
+    like $F$.  If I want to write the position of point $C$ relative to point
+    $A$, expressed in frame $F$, I will write $[^Ap^C]_F$. The brackets are used
+    here for clarity, and because we'll sometimes want to refer individual
+    components of a vector, e.g. $[^Ap_i^C]_F$ is the $i$th component of a
+    position vector in $\Re^3$, or for Cartesian vectors we could use subscript $x$, $y$, $z$ to denote each component.</p>
     
     <p>That is seriously heavy notation.  I don't love it myself, but it's
     the most durable I've got, and we'll have shorthand for when the context is
@@ -207,7 +208,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
     <p>Now that we have the notation, we can formulate our approach to the basic
     pick and place problem.  Let us call our object, $O$, and our gripper, $G$.
     Our idealized perception sensor tells us $^WX^O$.  Let's create a frame
-    $O_d$ to denote the describe the "desired" pose of the object, $^WX^{O_d}$.
+    $O_d$ to describe the "desired" pose of the object, $^WX^{O_d}$.
     So pick and place manipulation is simply trying to make $X^O = X^{O_d}$.</p>
     
     <todo>Add a figure here (after Terry's PR lands).</todo>
@@ -245,24 +246,30 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
     Here are the basic rules of algebra for our spatial quantities:  
     <ul>
       <li>Positions expressed in the same frame can be added when their
-      reference and target symbols match: $$[^Ap^B]_F + [^Bp^C]_F = [^Ap^C]_F.$$
-      The additive inverse is well defined: $$[^Ap^B]_F = - [^Bp^A]_F.$$ Those
-      should be pretty intuitive; make sure you confirm them for yourself.</li>
+      reference and target symbols match: \begin{equation}[^Ap^B]_F + [^Bp^C]_F
+      = [^Ap^C]_F.\end{equation} The additive inverse is well defined:
+      \begin{equation}[^Ap^B]_F = - [^Bp^A]_F.\end{equation} Those should be
+      pretty intuitive; make sure you confirm them for yourself.</li>
       <li>Multiplication by a rotation can be used to change the "expressed in"
-      frame: $$[^Ap^B]_G = {^GR^F} [^Ap^B]_F.$$  You might be surprised that a
-      rotation alone is enough to change the expressed-in frame, but it's true.
-      The position of the expressed-in frame does <i>not</i>
-      effect the relative position between two points.</li>
+      frame: \begin{equation}[^Ap^B]_G = {^GR^F} [^Ap^B]_F.\end{equation}  You
+      might be surprised that a rotation alone is enough to change the
+      expressed-in frame, but it's true. The position of the expressed-in frame
+      does <i>not</i> affect the relative position between two points.</li>
       <li>Rotations can be multiplied when their reference and target symbols
-      match: $${^AR^B} {^BR^C} = {^AR^C}.$$  The inverse operation is also
-      simply defined: $$[^AR^B]^{-1} = {^BR^A}.$$  When the rotation is
-      represented as a rotation matrix, this is literally the matrix inverse,
-      and since rotation matrices are orthonormal, we also have
-      $R^{-1}=R^T.$</li>
+      match: \begin{equation}{^AR^B} {^BR^C} = {^AR^C}.\end{equation}  The
+      inverse operation is also simply defined: \begin{equation}[^AR^B]^{-1} =
+      {^BR^A}.\end{equation} When the rotation is represented as a rotation
+      matrix, this is literally the matrix inverse, and since rotation matrices
+      are orthonormal, we also have $R^{-1}=R^T.$</li>
       <li>Transforms bundle this up into a single, convenient notation when
       positions are relative to a frame (and the same frame they are expressed
-      in): $${^Gp^A} = {^GX^F} {^Fp^A} = {^Gp^F} + {^GR^F}{^Fp^A}.$$</li>
-      <li>Transforms compose: $${^AX^B} {^BX^C} = {^AX^C},$$  and have an inverse $$[^AX^B]^{-1} = {^BX^A}.$$</li>
+      in): \begin{equation}{^Gp^A} = {^GX^F} {^Fp^A} = {^Gp^F} + [^Fp^A]_G
+      = {^Gp^F} + {^GR^F}{^Fp^A}.\end{equation}</li>
+      <li>Transforms compose: \begin{equation}{^AX^B} {^BX^C} =
+      {^AX^C},\end{equation}  and have an inverse \begin{equation}[^AX^B]^{-1} =
+      {^BX^A}.\end{equation}  Please note that for transforms, we generally do
+      <i>not</i> have that $X^{-1}$ is $X^T,$ though it still has a simple form.
+    </li>
     </ul></div>
 
     <p>In practice, transforms are implemented using <a
@@ -295,7 +302,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
   <section><h1>Forward kinematics</h1>
   
     <p>The spatial algebra gets us pretty close to what we need for our pick and
-    place algorithm.  But remember that the interface we have to the robot
+    place algorithm.  But remember that the interface we have with the robot
     reports measured joint positions, and expects commands in the form of joint
     positions.  So our remaining task is to convert between joint angles and
     cartesian frames.  We'll do this in steps, the first step is to go from
@@ -308,9 +315,9 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
     the robot, we would use $q$ for the entire configuration vector, and use
     e.g. $q_{robot}$ for the subset of the vector corresponding to the robot's
     joint positions. Therefore, the goal of forward kinematics is to produce a
-    map: $$X^B = f_{kin}^B(q),$$ for any body $B$ (or any other frame we have
-    attached to the scene).  Our spatial notation and spatial algebra makes this
-    computation relatively straight-forward.</p>
+    map: \begin{equation}X^B = f_{kin}^B(q),\end{equation} for any body $B$ (or
+    any other frame we have attached to the scene).  Our spatial notation and
+    spatial algebra makes this computation relatively straight-forward.</p>
 
     <subsection><h1>The kinematic tree</h1>
 
@@ -405,7 +412,7 @@ gripper = plant.GetBodyByName("body")
 pose = plant.EvalBodyPoseInWorld(context, gripper)</pre></code>
         Behind the scenes, the <code>MultibodyPlant</code> is doing all of the
         spatial algebra we described above to return the pose (and also some
-        clever caching because you can reuse much of the computation when if you
+        clever caching because you can reuse much of the computation when you
         want to evaluate the pose of another frame on the same robot).  
         </p>
 
@@ -466,13 +473,14 @@ pose = plant.EvalBodyPoseInWorld(context, gripper)</pre></code>
     differential rotations.  Without any loss of generality, we can represent
     the rate of change in pose using a six-element vector for <a
     href="https://drake.mit.edu/doxygen_cxx/group__multibody__spatial__vectors.html"><i>spatial
-    velocity</i></a>: $$^BV^C = \begin{bmatrix} ^B\omega^C \\ ^B\text{v}^C
-    \end{bmatrix}.$$ $^BV^C$ is the spatial velocity of frame $C$ in frame $B$,
-    $^B\omega^C \in \Re^3$ is the <i>angular velocity</i> (of frame $C$ in frame
-    $B$), and $^B\text{v}^C \in \Re^3$ is the <i>translational velocity</i>.  So
-    there are actually <b>many</b> different kinematic Jacobians, depending on
-    which representation of 3D orientation you are using on the right-hand side
-    and on the left-hand side of equation \eqref{eq:jacobian}.</p>
+    velocity</i></a>: \begin{equation}^BV^C = \begin{bmatrix} ^B\omega^C \\
+    ^B\text{v}^C \end{bmatrix}.\end{equation} $^BV^C$ is the spatial velocity of
+    frame $C$ in frame $B$, $^B\omega^C \in \Re^3$ is the <i>angular
+    velocity</i> (of frame $C$ in frame $B$), and $^B\text{v}^C \in \Re^3$ is
+    the <i>translational velocity</i>.  So there are actually <b>many</b>
+    different kinematic Jacobians, depending on which representation of 3D
+    orientation you are using on the right-hand side and on the left-hand side
+    of equation \eqref{eq:jacobian}.</p>
 
     <p>There is one more velocity to be aware of: I'll use $v$ to denote the
     generalized velocity vector of the plant.  While a spatial velocity $^BV^C$
@@ -561,10 +569,10 @@ plant.num_velocities() = 6</pre></code></p>
     
     <p>There is important structure in Eq \eqref{eq:jacobian}.  Make sure you
     didn't miss it.  The relationship between joint velocities and end-effector
-    velocities is (configuration-dependent) linear: $$V^G = J^G(q)v.$$  Maybe
-    this gives us what we need to produce changes in gripper frame $G$?  If I
-    have a desired gripper frame velocity $V^{G_d}$, then how about commanding a
-    joint velocity $v = [J^G(q)]^{-1} V^{G_d}$?</p>
+    velocities is (configuration-dependent) linear: \begin{equation}V^G =
+    J^G(q)v.\end{equation}  Maybe this gives us what we need to produce changes
+    in gripper frame $G$?  If I have a desired gripper frame velocity $V^{G_d}$,
+    then how about commanding a joint velocity $v = [J^G(q)]^{-1} V^{G_d}$?</p>
 
     <subsection><h1>The Jacobian pseudo-inverse</h1>
 
@@ -580,7 +588,8 @@ plant.num_velocities() = 6</pre></code></p>
       To choose one of them (the minimum-norm solution), we can consider using
       the <a
       href="https://en.wikipedia.org/wiki/Moore%E2%80%93Penrose_inverse">Moore-Penrose
-      pseudo-inverse</a>, $J^+$, instead: $$v = [J^G(q)]^+V^{G_d}.$$</p>
+      pseudo-inverse</a>, $J^+$, instead: \begin{equation}v =
+      [J^G(q)]^+V^{G_d}.\end{equation}</p>
 
       <p>The pseudo-inverse is a beautiful mathematical concept.  When the $J$
       is square and full-rank, the pseudo-inverse returns the true inverse of
