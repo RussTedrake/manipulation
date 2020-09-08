@@ -253,11 +253,13 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
         <p>It's interesting to note that, even though the mass of the motors
         might make up only a small fraction of the total mass of the robot, for
         highly geared robots they can play a significant role in the dynamics of
-        the joints.  The "reflected inertia" of the arm at the motor is cut by
-        the square of the gear ratio; or the "reflected inertia" of the motor at
-        the arm is multiplied by the square of the gear ratio.  This has
-        interesting consequences -- as we move to the multi-link case, we will
-        see that the inertia of the arm is a <a
+        the joints. We use the term <i>reflected inertia</i> to denote the
+        inertial load that is felt on the opposite side of a transmission, due
+        to the scaling effect of the transmission. The "reflected inertia" of
+        the arm at the motor is cut by the square of the gear ratio; or the
+        "reflected inertia" of the motor at the arm is multiplied by the square
+        of the gear ratio.  This has interesting consequences -- as we move to
+        the multi-link case, we will see that the inertia of the arm is a <a
         href="http://underactuated.mit.edu/multibody.html"
         target="underactuated">state-dependent function that captures the
         inertial coupling of the other joints in the manipulator</a>.  The motor
