@@ -812,6 +812,15 @@ plant.num_velocities() = 6</pre></code></p>
       <li>desired gripper finger positions (open and close).</li>
     </div>
 
+    <figure>
+      <img style="width:70%" src="figures/pick_sketch.png"/>
+      <figcaption>Keyframes of the gripper.  The robot's base will be at the
+      origin, so we're looking over the (invisible) robot's shoulder here.  The
+      hand starts in the "initial" pose near the center, moves to the "prepick"
+      to "pick" to "prepick" to "preplace" to "place" and finally back to
+      "preplace".</figcaption>
+    </figure>
+
     <p>There are a number of ways one might represent a trajectory
     (mathematically or computationally).  We have a pretty good collection of
     <a
