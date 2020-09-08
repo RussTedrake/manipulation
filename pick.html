@@ -439,7 +439,11 @@ pose = plant.EvalBodyPoseInWorld(context, gripper)</pre></code>
         between them.  In order to make the spatial algebra efficient, we use
         rotation matrices in our <code>RigidTransform</code>, but in order to
         have a more compact representation of configuration we use unit
-        quaternions in our configuration vector, $q$.</p>
+        quaternions in our configuration vector, $q$.  You can think of unit
+        quaternions as a form of axis angles that have been carefully normalized
+        to be unit length and have magical properties. My favorite careful
+        description of quaternions is probably chapter 1 of
+        <elib>Stillwell08</elib>.</p>
 
         <p>As a result, for this example, the software implementation of the
         function $f_{kin}^B$ is precisely the function that converts the
