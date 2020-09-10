@@ -120,10 +120,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
     the "expressed-in" frame. All of our frames are defined by orthogonal unit
     vectors that follow the "right-hand rule". We'll give a frame a name, too,
     like $F$.  If I want to write the position of point $C$ relative to point
-    $A$, expressed in frame $F$, I will write $[^Ap^C]_F$. The brackets are used
-    here for clarity, and because we'll sometimes want to refer individual
-    components of a vector, e.g. $[^Ap_i^C]_F$ is the $i$th component of a
-    position vector in $\Re^3$, or for Cartesian vectors we could use subscript $x$, $y$, $z$ to denote each component.</p>
+    $A$, expressed in frame $F$, I will write $^Ap^C_F$. Sometimes we have many points, and want to refer to the $i$th point in a list; in this case we will use brackets for clarity, e.g. $[^Ap_i^C]_F$ is the $i$th position in a list of positions.  If I ever want to get just a single coordinate of that vector, e.g. the $x$ component, then I'll use $^Ap^C_{F_x}$.</p>
     
     <p>That is seriously heavy notation.  I don't love it myself, but it's
     the most durable I've got, and we'll have shorthand for when the context is
@@ -139,13 +136,13 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
     for body $i$.</p>
 
     <p>Frames have a position, too -- it coincides with the frame origin.  So it
-    is perfectly valid to write $[^Wp^A]_W$ to denote the position of point $A$
+    is perfectly valid to write $^Wp^A_W$ to denote the position of point $A$
     relative to the origin of the world frame, expressed in the world frame.
     Here is where the shorthand comes in.  If the position of a quantity is
     relative to a frame, and expressed in the same frame, then we can safely
-    omit the brackets and the subscript.  $^Fp^A \equiv [^Fp^A]_F$. Furthermore,
+    omit the brackets and the subscript.  $^Fp^A \equiv {^Fp^A_F}$. Furthermore,
     if the "relative to" field is omitted, then we assume that the point is
-    relative to $W$, so $p^A \equiv [^Wp^A]_W$.</p>
+    relative to $W$, so $p^A \equiv ^Wp^A_W$.</p>
 
     <figure>
       <img style="width:60%" src="figures/notation.svg"></img>
@@ -246,12 +243,12 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
     Here are the basic rules of algebra for our spatial quantities:  
     <ul>
       <li>Positions expressed in the same frame can be added when their
-      reference and target symbols match: \begin{equation}[^Ap^B]_F + [^Bp^C]_F
-      = [^Ap^C]_F.\end{equation} The additive inverse is well defined:
-      \begin{equation}[^Ap^B]_F = - [^Bp^A]_F.\end{equation} Those should be
+      reference and target symbols match: \begin{equation}^Ap^B_F + ^Bp^C_F
+      = ^Ap^C_F.\end{equation} The additive inverse is well defined:
+      \begin{equation}^Ap^B_F = - ^Bp^A_F.\end{equation} Those should be
       pretty intuitive; make sure you confirm them for yourself.</li>
       <li>Multiplication by a rotation can be used to change the "expressed in"
-      frame: \begin{equation}[^Ap^B]_G = {^GR^F} [^Ap^B]_F.\end{equation}  You
+      frame: \begin{equation}^Ap^B_G = {^GR^F} ^Ap^B_F.\end{equation}  You
       might be surprised that a rotation alone is enough to change the
       expressed-in frame, but it's true. The position of the expressed-in frame
       does <i>not</i> affect the relative position between two points.</li>
@@ -263,7 +260,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       are orthonormal, we also have $R^{-1}=R^T.$</li>
       <li>Transforms bundle this up into a single, convenient notation when
       positions are relative to a frame (and the same frame they are expressed
-      in): \begin{equation}{^Gp^A} = {^GX^F} {^Fp^A} = {^Gp^F} + [^Fp^A]_G
+      in): \begin{equation}{^Gp^A} = {^GX^F} {^Fp^A} = {^Gp^F} + ^Fp^A_G
       = {^Gp^F} + {^GR^F}{^Fp^A}.\end{equation}</li>
       <li>Transforms compose: \begin{equation}{^AX^B} {^BX^C} =
       {^AX^C},\end{equation}  and have an inverse \begin{equation}[^AX^B]^{-1} =
@@ -352,8 +349,8 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       (fixed) transforms from the child body frame to the joint frame,
       $^{M}X^C$, and from the joint frame to the parent frame, $^PX^{F}$.
       Altogether, we can compute the configuration transform between any one
-      body and its parent, $$^PX^C(q) = \left[^PX^F\right] \left[^FX^M(q)\right]
-      \left[^MX^C\right].$$</p>
+      body and its parent, $$^PX^C(q) = ^PX^F {^FX^M(q)}
+      {^MX^C}.$$</p>
 
       <example><h1>Specifying the kinematic tree in URDF</h1></example>
 
@@ -470,24 +467,64 @@ pose = plant.EvalBodyPoseInWorld(context, gripper)</pre></code>
     referred to as "Jacobians" in many fields; in robotics it's rare to refer to
     derivatives of the kinematics as anything else.</p>
 
-    <p>All of the subtlety, again, comes in because of the multiple
+    <div>All of the subtlety, again, comes in because of the multiple
     representations that we have for 3D rotations (rotation matrix, unit
     quaternions, ...).  While there is no one best representation for 3D
     rotations, it <i>is</i> possible to have one canonical representation for
-    differential rotations.  Without any loss of generality, we can represent
-    the rate of change in pose using a six-element vector for <a
+    differential rotations.  Therefore, without any loss of generality, we can
+    represent the rate of change in pose using a six-element vector for <a
     href="https://drake.mit.edu/doxygen_cxx/group__multibody__spatial__vectors.html"><i>spatial
-    velocity</i></a>: \begin{equation}^BV^C = \begin{bmatrix} ^B\omega^C \\
-    ^B\text{v}^C \end{bmatrix}.\end{equation} $^BV^C$ is the spatial velocity of
-    frame $C$ in frame $B$, $^B\omega^C \in \Re^3$ is the <i>angular
-    velocity</i> (of frame $C$ in frame $B$), and $^B\text{v}^C \in \Re^3$ is
-    the <i>translational velocity</i>.  So there are actually <b>many</b>
-    different kinematic Jacobians, depending on which representation of 3D
-    orientation you are using on the right-hand side and on the left-hand side
-    of equation \eqref{eq:jacobian}.</p>
+    velocity</i></a>: \begin{equation}^AV^B_C = \begin{bmatrix} ^A\omega^B_C \\
+    ^A\text{v}^B_C \end{bmatrix}.\end{equation} $^AV^B_C$ is the spatial
+    velocity of frame $B$ relative to frame $A$ expressed in frame $C$,
+    $^A\omega^B_C \in \Re^3$ is the <i>angular velocity</i> (of frame $B$
+    relative frame $A$ expressed in frame $C$), and $^A\text{v}^B_C \in \Re^3$
+    is the <i>translational velocity</i> (along with the same shorthands as for
+    positions).  Translational and rotational velocities are simply vectors, so
+    they can be operated on just like positions:<ul>
+      <li>Spatial velocities add (when the frames match): \begin{equation}
+      ^A\text{v}^B_F + {^B\text{v}^C_F} = {^A\text{v}^C_F}, \qquad
+      {^A\omega^B_F} + {^B\omega^C_F} = {^A\omega^C_F},\end{equation} and have
+      the additive inverse. For the translational velocity, the addition is perhaps known from high-school physics; for the angular velocity I consider it quite surprising, and <a href="#angular_velocity_addition"></a>deserves to be verified</a>.</li>
+      <li>Rotation matrices can be used to change between the "expressed-in"
+      frames <b>when those frames are fixed</b>: \begin{equation}
+      {^A\text{v}^B_G} = {^GR^F} {^A\text{v}^B_F}, \qquad {^A\omega^B_G} =
+      {^GR^F} {^A\omega^B_F}, \qquad \text{when } ^G\dot{R}^F=0.\end{equation}
+      </li>
+      <li><details><summary>If the relative pose between two frames is not fixed, then we get
+        slightly more complicated formulas involving vector cross products; they
+        are derived from the derivative of the transform equation and the
+        chain rule.  (Click the triangle to expand those details, but consider skipping them for now!)</summary>
+        The angular velocity vector is related to the time-derivative of a
+        rotation matrix via the skew-symmetric (as verified by differentiating
+        $RR^T=I$) matrix: \begin{equation} \dot{R}R^T = \dot{R}R^{-1} =
+        \begin{bmatrix} 0 & -\omega_z & \omega_y \\ \omega_z & 0 & -\omega_x \\
+        -\omega_y & \omega_x & 0 \end{bmatrix}.\end{equation} Multiplying a
+        vector by this matrix can be written as a vector-cross product:
+        \begin{equation} \dot{R}R^T p = \dot{R}R^{-1} p = \omega \times
+        p.\end{equation}  Therefore, differentiating $${^Gp^A} = {^GX^F} {^Fp^A}
+        = {^Gp^F} + {^GR^F}{^Fp^A},$$ yields \begin{align} {^G\text{v}^A} =&
+        {^G\text{v}^F} + {^G\dot{R}^F}{^Fp^A} + {^GR^F}{^F\text{v}^A} \nonumber
+        \\ =& {^G\text{v}^F} + {^G\omega^F}\times{^GR^F}{^Fp^A} +
+        {^GR^F}{^F\text{v}^A}.\end{align}  <!--Similarly, differentiating
+        ${^AR^C} = {^AR^B}{^BR^C}$ yields--></details></li>
+    </ul>
+    </div>
+
+
+    <!--
+    <p>Why is it that we can get away with just three elements for spatial
+    velocity, but not for rotations?  In short, this is because a three element
+    vector has both a direction (which we use to denote the axis) and a
+    magnitude.  Using the magnitude to denote an angle is degenerate because our
+    representation should be periodic in $2\pi$, but using them for angular
+    velocities doesn't have this problem. Using sine of the angle resolves it,
+    but we also need to store the cosine; that's <a
+    href="https://en.wikipedia.org/w/index.php?title=Quaternions_and_spatial_rotation&section=14#The_hypersphere_of_rotations">precisely
+    what happens</a> in the unit quaternions!</p>  -->
 
     <p>There is one more velocity to be aware of: I'll use $v$ to denote the
-    generalized velocity vector of the plant.  While a spatial velocity $^BV^C$
+    generalized velocity vector of the plant.  While a spatial velocity $^AV^B$
     is six elements, a translational or angular velocity, $^B\text{v}^C$ or
     $^B\omega^C$, is three elements, the generalized velocity vector is whatever
     size it needs to be to encode the time derivatives of the configuration
@@ -544,17 +581,21 @@ plant.num_velocities() = 6</pre></code></p>
 
     </example>
 
-    <p>You may hear the terms "analytic Jacobian", which refers to the explicit
-    partial derivative of the forward kinematics, and "geometric Jacobian" which
-    replaces 3D rotations on the left-hand side with spatial velocities.  In
-    Drake's <code>MultibodyPlant</code>, we have decided to err on the side of
-    clarity, and offer 
+    <p>Due to the multiple possible representations of 3D rotation, and the
+    potential difference between $\dot{q}$ and $v$, there are actually
+    <b>many</b> different kinematic Jacobians possible.  You may hear the terms
+    "analytic Jacobian", which refers to the explicit partial derivative of the
+    forward kinematics (as written in \eqref{eq:jacobian}), and "geometric
+    Jacobian" which replaces 3D rotations on the left-hand side with spatial
+    velocities.  In Drake's <code>MultibodyPlant</code>, we currently offer the geometric Jacobian versions via
     <ul>
       <li> <code>CalcJacobianAngularVelocity</code>,</li>
       <li><code>CalcJacobianTranslationalVelocity</code>, and</li>
       <li><code>CalcJacobianSpatialVelocity</code>,</li>
-    </ul> each taking an argument to specify whether you'd like the Jacobian
-    with respect to $\dot{q}$ or $v$.</p>
+    </ul> with each taking an argument to specify whether you'd like the
+    Jacobian with respect to $\dot{q}$ or $v$. If you're really like the
+    analytical Jacobian, you could get it (much less efficiently) using our
+    support for automatic differentiation.</p>
 
     <example><h1>Kinematic Jacobians for pick and place</h1>
     
@@ -865,6 +906,8 @@ plant.num_velocities() = 6</pre></code></p>
 
   </section>
 
+  <section><h1>Putting it all together</h1></section>
+
   <section><h1>Differential inverse kinematics with constraints</h1>
 
     <p>We had to move very slowly in the example above.  </p>
@@ -880,7 +923,33 @@ plant.num_velocities() = 6</pre></code></p>
 
   <section><h1>A simpler pick and place trajectory</h1></section>
 
-  <section><h1>Putting it all together</h1></section>
+
+  <section><h1>Exercises</h1>
+  
+  <exercise><h1>Spatial frames and positions.</h1>
+  
+    <figure><img style="width:60%" src="data/grasp_frames.png"/></figure>
+
+    <div>I've rendered the gripper and the brick with their corresponding body
+    frames.  Given the configuration displayed in the figure, which is a
+    possible value for ${^Gp^O}$?
+    <ol type="a">
+      <li>[0.2, 0, -.2]</li> <!-- p_GO_W -->
+      <li>[0, 0.3, .1]</li>  <!-- p_GO_G -->
+      <li>[0, -.3, .1]</li>  <!-- p_OG_O -->
+    </ol>
+    Which is a possible value for ${^Gp^O_W}$?
+    </div>
+  
+  </exercise>
+  
+  <exercise id="angular_velocity_addition"><h1>The additive property of angular velocity vectors.</h1>
+  
+    <p>TODO(russt): Fill this in.</p>
+
+  </exercise>
+
+  </section>
 
 </chapter>
 <!-- EVERYTHING BELOW THIS LINE IS OVERWRITTEN BY THE INSTALL SCRIPT -->
