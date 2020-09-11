@@ -1,8 +1,0 @@
-# -*- python -*-
-
-load("//htmlbook/tools/python:defs.bzl", "rt_py_test")
-
-rt_py_test(
-    name = "viz_test",
-    srcs = ["viz_test.py"],
-)
