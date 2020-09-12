@@ -1136,20 +1136,62 @@ plant.num_velocities() = 6</pre></code></p>
 
     <subsection><h1>Adding position and acceleration constraints</h1>
 
-      <p>\begin{align} \min_{v_n} && \left|J^G(q)v_n -
-        V^{G_d}\right|^2_2, \\ \subjto && v_{min} \le v_n \le v_{max}, \nonumber \\ && q_{min} \le q + h v_n \le q_{max}, \nonumber \\
-        && \dot{v}_{min} \le \frac{v_n - v}{h} \le \dot{v}_{max}. \nonumber
-        \end{align}</p>
+      <p>We can easily add more constraints to our QP, without significantly
+      increasing the complexity, as long as they are linear in the decision
+      variables.  So how should we add constraints on the joint position and
+      acceleration?</p>        
+
+      <p>The natural approach is to make a first-order approximation of these
+      constraints.  To do that, the controller needs some characteristic time step / timescale to relate its velocity decisions to positions and accelerations.  We'll denote that time step as $h$.</p>
+      
+      <p>The controller already accepts the current measured joint positions $q$
+      as an input; let us now also take the current measured joint velocities
+      $v$ as a second input.  And we'll use $v_n$ for our decision variable --
+      the next velocity to command.  Using a simple <a
+      href="https://en.wikipedia.org/wiki/Euler_method">Euler approximation</a>
+      of position and first-order derivative for acceleration gives us the
+      following optimization problem: \begin{align} \min_{v_n} \quad &
+      \left|J^G(q)v_n - V^{G_d}\right|^2_2, \\ \subjto \quad & v_{min} \le v_n
+      \le v_{max}, \nonumber \\ & q_{min} \le q + h v_n \le q_{max}, \nonumber
+      \\ & \dot{v}_{min} \le \frac{v_n - v}{h} \le \dot{v}_{max}. \nonumber
+      \end{align}</p>
 
     </subsection>
 
     <subsection><h1>Joint centering</h1>
   
-      <p>Discuss analytic centering.  Add a term to the objective in the
-      nullspace of our current objective.</p>
+      <p><i>(Need to finish/clean up the writing here)</i>.  Our Jacobian is 6x7.  We have extra degrees of freedom.  Not only an
+      opportunity, but a responsibility.  If we don't tell them what we want
+      them to do, then you might not like what you get.  Discuss analytic
+      centering.  Add a term to the objective in the nullspace of our current
+      objective.</p>
 
-      <example><h1>Jacobian-based control with constraints</h1></example>
-       
+      <p>Here is one way to formulate it.  If we had no end-effector goals, then
+      we might write the controller $v = K(q_0 - q)$, a proportional control
+      that would drive the robot to its nominal configuration.  In the
+      unconstrained control case, there is a very elegant way of implementing
+      this controller as a "secondary" control, guaranteed not to interfere with
+      our primary end-effector spatial velocity controller, by projecting it
+      into the nullspace of $J^G$.  We can use almost the same trick here.</p>
+      
+      <p>Denote $P(q)$ as an orthonormal basis for the kernel of a Jacobian $J$.
+      Traditionally in robotics we implemented this using the pseudo-inverse: $P
+      = (I - J)J^+$, but many linear algebra packages now provide methods to
+      obtain one more directly.  Adding $Pv \approx Pk(q_0 - q)$ as a secondary
+      objective can be accomplished with \begin{align}\min_{v_n} \quad &
+      \left|J^G(q)v_n - V^{G_d}\right|^2_2 + \epsilon \left|P(q)\left(v_n -
+      K(q_0 - q)\right)\right|^2_2, \\ \subjto \quad &
+      \text{constraints}.\nonumber\end{align} Note the scalar $\epsilon$ that
+      we've placed in front of the secondary objective.  There is something
+      important to understand here.  If we do not have any constraints, then we
+      can remove $\epsilon$ completely -- the secondary task will in no way
+      interfere with the primary task of tracking the spatial velocity. However,
+      if there are constraints, then these constraints can cause the two
+      objectives to clash.  So we pick $\epsilon \ll 1$ to give the primary
+      objective relatively more weight.  But don't make it too small, because
+      that might make the numerics bad for your solver.  I'd say $\epsilon ~=
+      0.01$ is just about right.</p>
+
     </subsection>
 
     <subsection><h1>Alternative formulations</h1>
@@ -1163,13 +1205,12 @@ plant.num_velocities() = 6</pre></code></p>
       <b>must</b> move in the same <i>direction</i> as the commanded spatial
       velocity.  If we are up against constraints, then we may slow down, but we
       will not deviate from the commanded path.  It would be a pity to spend a
-      long time carefully planning collision-free paths for your end-effector
-      (which we will study soon), only to have your controller treat the path as
-      merely a suggestion.</p>
+      long time carefully planning collision-free paths for your end-effector,
+      only to have your controller treat the path as merely a suggestion.</p>
 
-      <p>While we could simply add the direction constraint to the mathematical
-      program above, but we can actually write an equivalent program with less
-      decision variables...</p>
+      <p>\begin{align} \max_{v_n, \alpha} \quad & \alpha, \\ \subjto \quad &
+      J^G(q)v_n = \alpha V^{G_d}, \nonumber \\ & 0 \le \alpha \le 1, \nonumber
+      \\ & \text{additional constraints}. \nonumber \end{align}</p>
 
       <example><h1>Drake's DifferentialInverseKinematics</h1>
       
