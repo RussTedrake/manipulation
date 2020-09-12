@@ -14,4 +14,20 @@ rt_py_library(
     visibility = ["//visibility:public"],    
 )
 
+rt_py_library(
+    name = "test_planar_manipulator",
+    srcs = [
+        "test_planar_manipulator.py",
+    ],
+    visibility = ["//visibility:public"],    
+)
+
+rt_py_library(
+    name = "plot_planar_manipulator",
+    srcs = [
+        "plot_planar_manipulator.py",
+    ],
+    visibility = ["//visibility:public"],    
+)
+
 
