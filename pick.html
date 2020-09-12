@@ -733,17 +733,15 @@ plant.num_velocities() = 6</pre></code></p>
 
       <example><h1>Are kinematic singularities real?</h1>
 
-      <!--
-        <figure>
-        <iframe style="transform: scale(0.2,0.2);" src="data/two_link_singularities.html"></iframe>
-        </figure>
-      -->
-      
         <p>A natural question when discussing singularities is whether they are somehow real, or whether they are somehow an artifact of the analysis.  Perhaps it is useful to look at an extremely simple case.</p>
 
         <p>Imagine a two-link arm, where each link has length one.  Then the kinematics reduce to $$p^G = \begin{bmatrix} c_0 + c_{0+1} \\ s_0 + s_{0 + 1} \end{bmatrix},$$  where I've used the (very common) shorthard $s_0$ for $\sin(q_0)$ and $s_{0+1}$ for $\sin(q_0+q_1)$, etc.  The Jacobian is $$J^G(q) = \begin{bmatrix} -s_0 - s_{0+1} & -s_{0 + 1} \\ c_0 + c_{0 + 1} & c_{0 + 1} \end{bmatrix},$$ and as expected, it loses rank when the arm is at full extension (e.g. when $q_0 = q_1 = 0$ which implies the first row is zero).</p>
-        
-        <p><a href="data/two_link_singularities.html">Let's move the robot along the $x$-axis</a>, by taking $q_0(t) = 1-t,$ and $q_1(t) = -2 + 2t$.  This clearly visits the singularity $q_0 = q_1 = 0$ at time 1, and then leaves again without trouble.  The resulting trajectory is $$p^G(t) = \begin{bmatrix} 2\cos(1-t) \\ 0 \end{bmatrix}.$$</p>
+
+        <figure>
+          <iframe style="border:0;height:300px;width:400px;" src="data/two_link_singularities.html"></iframe>
+        </figure>
+
+        <p>Let's move the robot along the $x$-axis, by taking $q_0(t) = 1-t,$ and $q_1(t) = -2 + 2t$.  This clearly visits the singularity $q_0 = q_1 = 0$ at time 1, and then leaves again without trouble.  In fact, it does all this with a <i>constant</i> joint velocity!  The resulting trajectory is $$p^G(t) = \begin{bmatrix} 2\cos(1-t) \\ 0 \end{bmatrix}.$$</p>
 
         <p>There are a few things to understand.  At the singularity, there is nothing that the robot can do to move its gripper farther in positive $x$ -- that singularity is real.  But it is also true that there is no way for the robot to move instantaneously back in the direction of $-x.$ The Jacobian analysis is not an approximation, it is a perfect description of the relationship between joint velocities and gripper velocities.  However, just because you cannot achieve an instantaneous velocity in the backwards direction, it does not mean you cannot get there!</p>
 

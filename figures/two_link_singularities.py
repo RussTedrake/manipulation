@@ -14,13 +14,14 @@ plant.Finalize()
 
 viz = ConnectPlanarSceneGraphVisualizer(builder,
                                         scene_graph,
+                                        show=False,
                                         xlim=[-.2, 2.2],
-                                        ylim=[-1., 1.],
-                                        show=False)
+                                        ylim=[-1., 1.])
+viz.fig.set_size_inches([3, 2.5])
 diagram = builder.Build()
 context = diagram.CreateDefaultContext()
 
-T = 5.
+T = 2.
 q = PiecewisePolynomial.FirstOrderHold(
     [0, T], np.array([[-np.pi / 2.0 + 1., -np.pi / 2.0 - 1.], [-2., 2.]]))
 plant_context = plant.GetMyContextFromRoot(context)
@@ -36,3 +37,6 @@ ani = viz.get_recording_as_animation(repeat=False)
 f = open("two_link_singularities.html", "w")
 f.write(ani.to_jshtml())
 f.close()
+
+# Then I edited the style in to
+# <img style="height:200px" id="_anim
