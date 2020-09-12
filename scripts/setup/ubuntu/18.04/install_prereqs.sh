@@ -84,16 +84,6 @@ EOF
 
 locale-gen en_US.UTF-8
 
-LC_CTYPE=en_US.UTF-8 LANG=en_US.UTF-8 pip3 install --disable-pip-version-check $(cat <<EOF
-altair
-gradescope-utils
-open3d
-plotly
-timeout-decorator
-torch
-EOF
-)
-
 jupyter nbextension enable --system --py widgetsnbextension
 
 if [[ -z "${LANG:-}" && -z "${LC_ALL:-}" ]]; then
