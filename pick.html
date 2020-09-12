@@ -659,6 +659,16 @@ plant.num_velocities() = 6</pre></code></p>
         MultibodyPlant for the gripper Jacobian, and compute the joint
         velocities that will implement a desired gripper spatial velocity.</p>
 
+        <div>
+          <script type="text/javascript">
+          var pinv = { "name": "PseudoInverseController", 
+            "input_ports" : ["iiwa_position"],
+            "output_ports" : ["iiwa_velocity_command"]
+            };
+          document.write(system_html(pinv));
+          </script>
+        </div>
+
         <p>To keep things simple for this first example, we'll just command a
         constant gripper spatial velocity, and only run the simulation for a few
         seconds.</p>
@@ -733,17 +743,41 @@ plant.num_velocities() = 6</pre></code></p>
 
       <example><h1>Are kinematic singularities real?</h1>
 
-        <p>A natural question when discussing singularities is whether they are somehow real, or whether they are somehow an artifact of the analysis.  Perhaps it is useful to look at an extremely simple case.</p>
+        <p>A natural question when discussing singularities is whether they are
+        somehow real, or whether they are somehow an artifact of the analysis.
+        Perhaps it is useful to look at an extremely simple case.</p>
 
-        <p>Imagine a two-link arm, where each link has length one.  Then the kinematics reduce to $$p^G = \begin{bmatrix} c_0 + c_{0+1} \\ s_0 + s_{0 + 1} \end{bmatrix},$$  where I've used the (very common) shorthard $s_0$ for $\sin(q_0)$ and $s_{0+1}$ for $\sin(q_0+q_1)$, etc.  The Jacobian is $$J^G(q) = \begin{bmatrix} -s_0 - s_{0+1} & -s_{0 + 1} \\ c_0 + c_{0 + 1} & c_{0 + 1} \end{bmatrix},$$ and as expected, it loses rank when the arm is at full extension (e.g. when $q_0 = q_1 = 0$ which implies the first row is zero).</p>
+        <p>Imagine a two-link arm, where each link has length one.  Then the
+        kinematics reduce to $$p^G = \begin{bmatrix} c_0 + c_{0+1} \\ s_0 + s_{0
+        + 1} \end{bmatrix},$$  where I've used the (very common) shorthard $s_0$
+        for $\sin(q_0)$ and $s_{0+1}$ for $\sin(q_0+q_1)$, etc.  The Jacobian is
+        $$J^G(q) = \begin{bmatrix} -s_0 - s_{0+1} & -s_{0 + 1} \\ c_0 + c_{0 +
+        1} & c_{0 + 1} \end{bmatrix},$$ and as expected, it loses rank when the
+        arm is at full extension (e.g. when $q_0 = q_1 = 0$ which implies the
+        first row is zero).</p>
 
         <figure>
           <iframe style="border:0;height:300px;width:400px;" src="data/two_link_singularities.html"></iframe>
         </figure>
 
-        <p>Let's move the robot along the $x$-axis, by taking $q_0(t) = 1-t,$ and $q_1(t) = -2 + 2t$.  This clearly visits the singularity $q_0 = q_1 = 0$ at time 1, and then leaves again without trouble.  In fact, it does all this with a <i>constant</i> joint velocity!  The resulting trajectory is $$p^G(t) = \begin{bmatrix} 2\cos(1-t) \\ 0 \end{bmatrix}.$$</p>
+        <p>Let's move the robot along the $x$-axis, by taking $q_0(t) = 1-t,$
+        and $q_1(t) = -2 + 2t$.  This clearly visits the singularity $q_0 = q_1
+        = 0$ at time 1, and then leaves again without trouble.  In fact, it does
+        all this with a <i>constant</i> joint velocity ($\dot{q}_0=-1,
+        \dot{q}_1=2$)!  The resulting trajectory is $$p^G(t) = \begin{bmatrix}
+        2\cos(1-t) \\ 0 \end{bmatrix}.$$</p>
 
-        <p>There are a few things to understand.  At the singularity, there is nothing that the robot can do to move its gripper farther in positive $x$ -- that singularity is real.  But it is also true that there is no way for the robot to move instantaneously back in the direction of $-x.$ The Jacobian analysis is not an approximation, it is a perfect description of the relationship between joint velocities and gripper velocities.  However, just because you cannot achieve an instantaneous velocity in the backwards direction, it does not mean you cannot get there!</p>
+        <p>There are a few things to understand.  At the singularity, there is
+        nothing that the robot can do to move its gripper farther in positive
+        $x$ -- that singularity is real.  But it is also true that there is no
+        way for the robot to move instantaneously back in the direction of $-x.$
+        The Jacobian analysis is not an approximation, it is a perfect
+        description of the relationship between joint velocities and gripper
+        velocities.  However, just because you cannot achieve an instantaneous
+        velocity in the backwards direction, it does not mean you cannot get
+        there!  At $t=1$, even though the joint velocities are constant, and the
+        Jacobian is singular, the robot is <i>accelerating</i> in $-x$,
+        $\ddot{p}^G_{W_x}(t) = -2\cos(1-t).$</p>
 
       </example>
 
@@ -864,69 +898,158 @@ plant.num_velocities() = 6</pre></code></p>
 
   <section><h1>A pick and place trajectory</h1>
   
-    <p>We're getting close.  We have our desired gripper poses, and we know how
-    to change the gripper pose instantaneously using spatial velocity commands.
-    Now we need to specify how we want the gripper poses to change over time, so
-    that we can convert our gripper poses into spatial velocity commands.</p>
+    <p>We're getting close.  We know how to produce desired gripper poses, and
+    we know how to change the gripper pose instantaneously using spatial
+    velocity commands. Now we need to specify how we want the gripper poses to
+    change over time, so that we can convert our gripper poses into spatial
+    velocity commands.</p>
 
-    <div>For our first pass, we will implement this in the form of a trajectory.
-    Actually, we will produce a handful of trajectories, one for each of the:
-    <ul>
-      <li>desired gripper positions,</li>
-      <li>desired gripper orientations, and</li>
-      <li>desired gripper finger positions (open and close).</li>
-    </div>
+    <p>Let's define all of the "keyframe" poses that we'd like the gripper to
+    travel through, and time that it should visit each one.  The following colab
+    example does precisely that.</p>
 
-    <figure>
-      <img style="width:70%" src="figures/pick_sketch.png"/>
-      <figcaption>Keyframes of the gripper.  The robot's base will be at the
-      origin, so we're looking over the (invisible) robot's shoulder here.  The
-      hand starts in the "initial" pose near the center, moves to the "prepick"
-      to "pick" to "prepick" to "preplace" to "place" and finally back to
-      "preplace".</figcaption>
-    </figure>
+    <example><h1>A plan "sketch"</h1>
 
+      <p><a target="pick"
+        href="https://colab.research.google.com/github/RussTedrake/manipulation/blob/master/pick.ipynb#scrollTo=zYuRDF6mSBx5"><img
+        src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
+        </p>
+
+      <figure>
+        <img style="width:70%" src="figures/pick_sketch.png"/>
+        <figcaption>Keyframes of the gripper.  The robot's base will be at the
+        origin, so we're looking over the (invisible) robot's shoulder here. The
+        hand starts in the "initial" pose near the center, moves to the
+        "prepick" to "pick" to "prepick" to "clearance" to "preplace" to "place"
+        and finally back to "preplace".</figcaption>
+      </figure>
+
+      <todo>timeline graphic here, from time zero, to pre-grasp, to grasp, to
+      </todo>
+
+      <p>How did I choose the times?  I started everything at time, $t=0$, and
+      listed the rest of our times as absolute (time from zero). That's when the
+      robot wakes up and sees the brick.  How long should we take to transition
+      from the starting pose to the pregrasp pose?  A really good answer might
+      depend on the exact joint speed limits of the robot, but we're not trying
+      to move fast yet.  Instead I chose a conservative time that is
+      proportional to the total Euclidean distance that the hand will travel,
+      say $k=10~s/m$ (aka $10~cm/s$): $$t_{pregrasp} = k
+      \left\|^{G_0}p^{G_{pregrasp}}\right\|_2.$$  I just chose a fixed duration
+      of 2 seconds for the transitions from pregrasp to grasp and back, and also
+      left 2 seconds with the gripper stationary for the segments where the
+      fingers needs to open/close.</p>
+  
+    </example>
+
+    <div>To fill in the details -- defining a gripper pose for all $t$ -- we'll
+    convert these keyframes into a proper <i>trajectory</i>, $X^G(t), \forall t
+    \in [t_{initial}, t_{postpick}].$ Actually, we will produce a handful of
+    trajectories, one for each of the:
+      <ul>
+        <li>desired gripper positions,</li>
+        <li>desired gripper orientations, and</li>
+        <li>desired gripper finger positions (open and close).</li>
+      </div>
+  
     <p>There are a number of ways one might represent a trajectory
     (mathematically or computationally).  We have a pretty good collection of
     <a
     href="https://drake.mit.edu/doxygen_cxx/namespacedrake_1_1trajectories.html">trajectory</a>
     classes available in Drake.  Many of them are implemented as <a
     href="https://en.wikipedia.org/wiki/Spline_(mathematics)">splines</a> --
-    piecewise polynomial functions of time.</p>
-
-    <p>First let's think about just the timing.  We'll start everything at time,
-    $t=0$, and list the rest of our times as absolute (time from zero).  That's
-    when the robot wakes up and sees the brick.  Let's define $t_{pregrasp}$
-    next.  How long should we take to transition from the starting pose to the
-    pregrasp pose?  A really good answer might depend on the exact joint speed
-    limits of the robot, but we're not trying to move fast yet.  Let's pick a
-    conservative time that is proportional to the total Euclidean distance that
-    the hand will travel, say at $5~cm/s$: $$t_{pregrasp} = 20.0
-    \left\|^{G_0}p^{G_{pregrasp}}\right\|_2.$$ </p>
-
-    <todo>timeline graphic here, from time zero, to pre-grasp, to grasp, to
-    </todo>
-
-    <p>The rest of the timeline can follow quickly.  $t_{grasp} = t_{pregrasp} +
-    5.0,$ etc.  Once we have the timeline, then the simplest strategy we can
-    take is to simply linearly interpolate between the desired positions at each
-    point in the timeline.  That would be called a "<a href="https://en.wikipedia.org/wiki/First-order_hold">first-order hold</a>".</p>
+    piecewise polynomial functions of time.  Interpolating between orientations
+    requires some care, but for positions we can do a simple linear
+    interpolation between each of our keyframes.  That would be called a "<a
+    href="https://en.wikipedia.org/wiki/First-order_hold">first-order hold</a>",
+    and it's implemented in Drake's <a
+    href="https://drake.mit.edu/doxygen_cxx/classdrake_1_1trajectories_1_1_piecewise_polynomial.html">PiecewisePolynomial</a>
+    class.  For rotations, we'll use something called "spherical linear
+    interpolation" or <a href="https://en.wikipedia.org/wiki/Slerp">slerp</a>,
+    which is implemented in Drake's <a
+    href="https://drake.mit.edu/doxygen_cxx/classdrake_1_1trajectories_1_1_piecewise_quaternion_slerp.html">PiecewiseQuaternionSlerp</a>.</p>
 
     <example><h1>Grasping with trajectories</h1>
     
       <p>There are a number of ways to visualize the trajectory when it's
-      connected to 3D.  Plotted as a function of time.  Plotted as a function of
-      space.  But my favorite is as an animation!</p>
+      connected to 3D.  I've plotted the <i>position</i> trajectory as a
+      function of time below.<p>  
 
-      <p>Colab</p>
+      <p><a target="pick"
+        href="https://colab.research.google.com/github/RussTedrake/manipulation/blob/master/pick.ipynb#scrollTo=zYuRDF6mSBx5"><img
+        src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
+        </p>
 
-      <!-- one set of plots for position, another for orientation, and a third for gripper.  + an animation with MultibodyGeometryToPose. -->
-    
+      <figure>
+        <img width="60%" src="data/gripper_position_trajectory.svg"/>
+<!--        <iframe scrolling="no" style="border:none;" seamless="seamless"
+        height=400 width="100%" src="data/gripper_position_trajectory.html"/> -->
+      </figure>
+
+      <p></p>With 3D data, you can <a
+      href="data/gripper_position_trajectory.html">plot it in 3D</a>.  But my
+      favorite approach is as <a href="data/gripper_trajectory.html">an
+      animation in our 3D renderer</a>!  Make sure you try the "Open
+      controls>Animation" interface.  You can pause it and then scrub through
+      the trajectory using the time slider.</p>
+
+      <p>For a super interesting discussion on how we might visualize the 4D
+      quaternions as creatures trapped in 3D, you might enjoy <a
+      href="https://eater.net/quaternions">this series of "explorable"
+      videos</a>.</p>
     </example>
 
   </section>
 
-  <section><h1>Putting it all together</h1></section>
+  <section><h1>Putting it all together</h1>
+  
+    <p>We can slightly generalize our PseudoInverseController to have additional
+    input ports for the gripper position and gripper orientation (in our first
+    version, the spatial velocity command was just hard-coded in the
+    controller).</p>
+
+    <div>
+      <script type="text/javascript">
+      var pinv = { "name": "PseudoInverseController", 
+        "input_ports" : ["omega_WG", "v_WG", "iiwa_position"],
+        "output_ports" : ["iiwa_velocity_command"]
+        };
+      document.write(system_html(pinv));
+      </script>
+    </div>
+
+    <p>So far, our trajectories are position and orientation trajectories.  Our
+    controller needs translational velocity and angular velocity commands.
+    Fortunately, the trajectory classes we have use support differentiating the
+    trajectories.  In fact, the <code>PiecewiseQuaternionSlerp</code> is clever
+    enough to return the derivative of the 4-element quaternion trajectory as a
+    3-element angular velocity trajectory.  The rest is just a matter of wiring
+    up the system diagram.</p>
+
+    <example><h1>The full pick and place demo.</h1>
+    
+      <p>The next few cells of the notebook should get you a pretty satisfying
+      result.  <a href="data/pick.html">Click here to watch it without doing the
+      work</a>.</p>
+
+      <p><a target="pick"
+        href="https://colab.research.google.com/github/RussTedrake/manipulation/blob/master/pick.ipynb#scrollTo=AeKMhIacWZ00"><img
+        src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
+        </p>
+
+      <figure>
+        <img width="100%" src="data/pick_diagram.svg"/>
+      </figure>
+
+      <p>It's worth scrutinizing the result.  For instance, if you examine the
+      context at the final time, how close did it come to the desired final
+      gripper position?  Are you happy with the joint positions?  If you ran
+      that same trajectory in reverse, then back and forth (as an industrial
+      robot might), would you expect errors to accumulate?</p>
+
+    </example>
+
+  </section>
 
   <section><h1>Differential inverse kinematics with constraints</h1>
 
