@@ -1026,7 +1026,7 @@ plant.num_velocities() = 6</pre></code></p>
     3-element angular velocity trajectory.  The rest is just a matter of wiring
     up the system diagram.</p>
 
-    <example><h1>The full pick and place demo.</h1>
+    <example><h1>The full pick and place demo</h1>
     
       <p>The next few cells of the notebook should get you a pretty satisfying
       result.  <a href="data/pick.html">Click here to watch it without doing the
@@ -1053,19 +1053,134 @@ plant.num_velocities() = 6</pre></code></p>
 
   <section><h1>Differential inverse kinematics with constraints</h1>
 
-    <p>We had to move very slowly in the example above.  </p>
+    <p>Our solution above works in many cases.  We could potentially move on.
+    But with just a little more work, we can get a much more robust solution...
+    one that we will be happy with for many chapters to come.</p>
+
+    <p>So what's wrong with the pseudo-inverse controller?  You won't be
+    surprised when I say that it does not perform well around singularities.
+    When the minimum singular value of the Jacobian gets small, that means that
+    some values in the inverse get very large.  If you ask our controller to
+    track a seemingly reasonable end-effector spatial velocity, then you might
+    have extremely large velocity commands that result.</p>
+
+    <p>There are other important limitations, though, which are perhaps more
+    subtle. The real robot has constraints, very real constraints on the joint
+    angles, velocities, accelerations, and torques.  If you, for instance, a
+    velocity command to the iiwa controller that cannot be followed, that
+    velocity will be clipped.  In the mode we are running the iiwa
+    (joint-impedance mode), the iiwa doesn't know anything about your
+    end-effector goals.  So it will very likely simply saturate your velocity
+    commands independently joint by joint.  The result, I'm afraid, will not be
+    as convenient as a slower end-effector trajectory.  Your end-effector could
+    run wildly off course.</p>
+
+    <p>Since we know the limits of the iiwa, a better approach is to take these
+    constraints into account at the level of our controller.  It's relatively
+    straight-forward to take position, velocity, and acceleration constraints
+    into account; torques would require much more (namely a full dynamics model)
+    so we won't worry about them yet here.</p>
 
     <subsection><h1>Pseudo-inverse as an optimization</h1>
+
+      <p>I introduced the pseudo-inverse as having almost magical properties: it
+      returns an exact solution when one is available, or the best possible
+      solution (in the least-squares norm) when one is not.  These properties
+      can all be understood by realizing that the pseudo-inverse is just the
+      optimal solution to a least-squares optimization problem: \begin{equation}
+      \min_v \left|J^G(q)v - V^{G_d}\right|^2_2. \end{equation}  When I write an
+      optimization of this form, I will refer to $v$ as the decision
+      variable(s), and I will use $v^*$ to denote the optimal solution (the
+      value of the decision variables that minimizes the cost).  Here we have
+      $$v^* = \left[ J^G(q) \right]^+V^{G_d}.$$</p>
+
+      <p>Optimization is an incredibly rich topic, and we will put many tools
+      from optimization theory to use over the course of this text.  For a
+      beautiful rigorous but accessible treatment of convex optimization, I
+      highly recommend <elib>Boyd04a</elib>; it is free online and even reading
+      the first chapter can be incredibly valuable.  For a very short
+      introduction to using optimization in Drake, please take a look at the
+      tutorials on "Solving Mathematical Programs" linked from the Drake <a
+      href="http://drake.mit.edu">front page</a>.  I use the term "mathematical
+      program" almost synonymously with "optimization problem".  Mathematical
+      program is slightly more appropriate if we don't actually have an
+      objective; only constraints.</p>
     
+    </subsection>
+
+    <subsection><h1>Adding velocity constraints</h1>
+    
+      <p>Once we understand our existing solution through the lens of
+      optimization, we have a natural route to generalizing our approach to
+      explicitly reason about the constraints.  The velocity constraints are the
+      most straight-forward to add.  \begin{align} \min_v && \left|J^G(q)v -
+      V^{G_d}\right|^2_2, \\ \subjto && v_{min} \le v \le v_{max}. \nonumber
+      \end{align}  You can read this as "find me the joint velocities that
+      achieve my desired gripper spatial velocity as closely as possible, but
+      satisfy my joint limit constraints."  The solution to this can be much
+      better than what you would get from solving the unconstrained optimization
+      and then simply trimming any velocities to respect the constraints after
+      the fact.</p>
+
+      <p>This is, admittedly, a harder problem to solve in general.  The
+      solution is cannot be described using only the pseudo-inverse of the
+      Jacobian.  Rather, we are going to solve this (small) optimization problem
+      directly in our controller every time it is evaluated.  This problem has a
+      convex quadratic objective and linear constraints, so it falls into the
+      class of convex Quadratic Programming (QP).  This is a particularly nice
+      of optimization problems where we have very strong numerical tools.</p>
+
+      <example><h1>Jacobian-based control with velocity constraints</h1></example>
+    
+    </subsection>
+
+    <subsection><h1>Adding position and acceleration constraints</h1>
+
+      <p>\begin{align} \min_{v_n} && \left|J^G(q)v_n -
+        V^{G_d}\right|^2_2, \\ \subjto && v_{min} \le v_n \le v_{max}, \nonumber \\ && q_{min} \le q + h v_n \le q_{max}, \nonumber \\
+        && \dot{v}_{min} \le \frac{v_n - v}{h} \le \dot{v}_{max}. \nonumber
+        \end{align}</p>
+
+    </subsection>
+
+    <subsection><h1>Joint centering</h1>
+  
+      <p>Discuss analytic centering.  Add a term to the objective in the
+      nullspace of our current objective.</p>
+
+      <example><h1>Jacobian-based control with constraints</h1></example>
+       
+    </subsection>
+
+    <subsection><h1>Alternative formulations</h1>
+    
+      <p>Once we have embraced the idea of solving a small optimization problem
+      in our control loop, many other formulations are possible, too.  You will
+      find many in the literature.  Minimizing the least-squares distance
+      between the commanded spatial velocity and the resulting velocity might
+      not actually be the best solution.  The formulation we have been using
+      heavily in Drake adds an additional constraint that our solution
+      <b>must</b> move in the same <i>direction</i> as the commanded spatial
+      velocity.  If we are up against constraints, then we may slow down, but we
+      will not deviate from the commanded path.  It would be a pity to spend a
+      long time carefully planning collision-free paths for your end-effector
+      (which we will study soon), only to have your controller treat the path as
+      merely a suggestion.</p>
+
+      <p>While we could simply add the direction constraint to the mathematical
+      program above, but we can actually write an equivalent program with less
+      decision variables...</p>
+
+      <example><h1>Drake's DifferentialInverseKinematics</h1>
+      
+      </example>
+       
     </subsection>
 
     <todo>Find a home for inverse kinematics, including nonlinear optimization
     and closed-form solutions (e.g. IK-fast)</todo>
 
   </section>
-
-  <section><h1>A simpler pick and place trajectory</h1></section>
-
 
   <section><h1>Exercises</h1>
   

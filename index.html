@@ -32,6 +32,10 @@
     <p style="font-size: 18px;"><a href="http://people.csail.mit.edu/russt/">Russ Tedrake</a></p>
     <p style="font-size: 14px; text-align: right;"> 
       &copy; Russ Tedrake, 2020<br/>
+      Last modified <span id="last_modified"></span>.</br>
+      <script>
+      var d = new Date(document.lastModified);
+      document.getElementById("last_modified").innerHTML = d.getFullYear() + "-" + (d.getMonth()+1) + "-" + d.getDate();</script>
       <a href="misc.html">How to cite these notes, use annotations, and give feedback.</a><br/>
     </p>
   </header>
@@ -98,9 +102,12 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
     <li><a href=pick.html#section10>Differential inverse kinematics with constraints</a></li>
     <ul>
       <li>Pseudo-inverse as an optimization</li>
+      <li>Adding velocity constraints</li>
+      <li>Adding position and acceleration constraints</li>
+      <li>Joint centering</li>
+      <li>Alternative formulations</li>
     </ul>
-    <li><a href=pick.html#section11>A simpler pick and place trajectory</a></li>
-    <li><a href=pick.html#section12>Exercises</a></li>
+    <li><a href=pick.html#section11>Exercises</a></li>
   </ul>
 <p style="margin-bottom: 0; text-decoration: underline;font-variant: small-caps;"><b>Perception (Note: I'm going to refactor the remaining chapters)</b></p>
   <li><a href="pixels.html">Chapter 4: Color Images, Depth Images, and
