@@ -155,29 +155,24 @@ python3 -c 'import pydrake; print(pydrake.__file__)</code></pre></div>
       <p>and install the prerequisites using the platform-specific installation script provided:</p>
 
       <div class="bionic"><pre class="highlight"><code>sudo manipulation/scripts/setup/ubuntu/18.04/install_prereqs.sh
+pip3 install --upgrade --requirement ./requirements.txt
 export PYTHONPATH=`pwd`/manipulation:${PYTHONPATH}</code></pre></div>
 
       <div class="mac"><pre class="highlight"><code>manipulation/scripts/setup/mac/install_prereqs.sh
+pip3 install --upgrade --requirement ./requirements.txt
 export PYTHONPATH=`pwd`/manipulation:${PYTHONPATH}</code></pre></div>
 
     </subsection>
 
     <subsection><h1>Run Jupyter Notebook</h1>
 
-      <div><pre class="highlight"><code>cd manipulation
-jupyter notebook</code></pre></div>
+      <p>You'll likely want to start from the manipulation root directory.  Then launch your notebook with:</p>
+
+      <div><pre class="highlight"><code>jupyter notebook</code></pre></div>
 
       <p>The examples for each chapter that has them will be in a .ipynb file
       right alongside the chapter's html file, and the notebook exercises are
       all located in the<code>exercises</code> subdirectory.  
-<todo>
-      You might try opening
-      examples/double_pendulum/dynamics.ipynb to get started.  Have
-      fun!</p>
-
-      <pysrc>manipulation/depth_camera_demo/show_camera.py</pysrc>
-
-</todo>
     </subsection>
 
   </section>
