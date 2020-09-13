@@ -14,7 +14,12 @@ rt_ipynb_test(
 
 rt_py_test(
     name = "two_link_singularities",
-   data = ["//manipulation/models:double_pendulum.urdf"],
-   srcs = ["two_link_singularities.py"],
-   deps = ["//manipulation:manipulation"]
+    data = ["//manipulation/models:double_pendulum.urdf"],
+    srcs = ["two_link_singularities.py"],
+    deps = ["//manipulation:manipulation"]
+)
+
+rt_py_test(
+    name = "scaling_spatial_velocity",
+    srcs = ["scaling_spatial_velocity.py"],
 )
