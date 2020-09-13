@@ -1209,9 +1209,10 @@ plant.num_velocities() = 6</pre></code></p>
       heavily in Drake adds an additional constraint that our solution
       <b>must</b> move in the same <i>direction</i> as the commanded spatial
       velocity.  If we are up against constraints, then we may slow down, but we
-      will not deviate from the commanded path.  It would be a pity to spend a
-      long time carefully planning collision-free paths for your end-effector,
-      only to have your controller treat the path as merely a suggestion.</p>
+      will not deviate (instantaneously) from the commanded path.  It would be a
+      pity to spend a long time carefully planning collision-free paths for your
+      end-effector, only to have your controller treat the path as merely a
+      suggestion.  Note, however, that your plan playback system still needs to be smart enough to realize that the slow-down occurred (open-loop velocity commands are not enough).</p>
 
       <p>\begin{align} \max_{v_n, \alpha} \quad & \alpha, \\ \subjto \quad &
       J^G(q)v_n = \alpha V^{G_d}, \nonumber \\ & 0 \le \alpha \le 1, \nonumber

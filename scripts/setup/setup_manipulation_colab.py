@@ -27,6 +27,9 @@ def setup_manipulation(*, manipulation_sha, drake_version, drake_build):
     # Run install_prereqs.sh
     subprocess.run([f"{path}/scripts/setup/ubuntu/18.04/install_prereqs.sh"])
 
+    # Run pip install
+    subprocess.run(["pip3", "install", "--disable-pip-version-check", "--requirement", "manipulation/requirements.txt"]);
+
     # Set the path (if necessary).
     spec = importlib.util.find_spec('manipulation')
     if spec is None:
