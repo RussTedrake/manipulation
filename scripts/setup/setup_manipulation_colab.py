@@ -28,7 +28,10 @@ def setup_manipulation(*, manipulation_sha, drake_version, drake_build):
     subprocess.run([f"{path}/scripts/setup/ubuntu/18.04/install_prereqs.sh"])
 
     # Run pip install
-    subprocess.run(["pip3", "install", "--disable-pip-version-check", "--requirement", "manipulation/requirements.txt"]);
+    subprocess.run(["pip3", "install", "--disable-pip-version-check", "--requirement", "/opt/manipulation/requirements.txt"])
+
+    # Install pyngrok (for working with meshcat)
+    subprocess.run(["pip3", "install", "pyngrok"])
 
     # Set the path (if necessary).
     spec = importlib.util.find_spec('manipulation')

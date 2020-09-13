@@ -34,7 +34,7 @@ pandocfilters>=1.4.2; sys_platform == 'darwin'
 parso>=0.7.0; sys_platform == 'darwin'
 pexpect>=4.8.0; sys_platform == 'darwin'
 pickleshare>=0.7.5; sys_platform == 'darwin'
-plotly>=4.10.0
+plotly>=4.4.1
 prometheus-client>=0.8.0; sys_platform == 'darwin'
 prompt-toolkit>=3.0.5; sys_platform == 'darwin'
 ptyprocess>=0.6.0; sys_platform == 'darwin'
