@@ -50,6 +50,7 @@ rt_ipynb_test(
 rt_ipynb_test(
     name = "pose",
     srcs = ["pose.ipynb"],
+    tags = ["no-sandbox"], # from vtk-test-tags() in drake
 )
 
 filegroup(

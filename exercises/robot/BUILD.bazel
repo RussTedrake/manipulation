@@ -1,0 +1,26 @@
+# -*- mode: python -*-
+# vi: set ft=python :
+
+# Copyright 2020 Massachusetts Institute of Technology.
+# Licensed under the BSD 3-Clause License. See LICENSE.TXT for details.
+
+load("//htmlbook/tools/jupyter:defs.bzl", "rt_ipynb_test")
+
+rt_ipynb_test(
+    name = "manipulation_station_io",
+    deps = [
+        "//manipulation/exercises:grader",
+        "//manipulation/exercises/robot:test_manipulation_io",
+    ],
+    srcs = ["manipulation_station_io.ipynb"],
+)
+
+rt_ipynb_test(
+    name = "reflected_inertia",
+    deps = [
+        "//manipulation/exercises:grader",
+        "//manipulation/exercises/robot:test_reflected_inertia",
+        "//manipulation/exercises/robot:test_survey",
+    ],
+    srcs = ["reflected_inertia.ipynb"],
+)

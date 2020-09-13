@@ -52,7 +52,7 @@ six>=1.15.0; sys_platform == 'darwin'
 snowballstemmer>=2.0.0
 terminado>=0.8.3; sys_platform == 'darwin'
 testpath>=0.4.4; sys_platform == 'darwin'
-timeout-decorator>=0.4.1; sys_platform == 'darwin'
+timeout-decorator>=0.4.1
 torch>=1.5.0; sys_platform == 'darwin'
 tornado>=6.0.4; sys_platform == 'darwin'
 traitlets>=4.3.3; sys_platform == 'darwin'
