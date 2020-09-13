@@ -47,6 +47,11 @@ rt_ipynb_test(
     srcs = ["pick.ipynb"],
 )
 
+rt_ipynb_test(
+    name = "pose",
+    srcs = ["pose.ipynb"],
+)
+
 filegroup(
     name = "chapters",
     srcs = ["chapters.json"],
