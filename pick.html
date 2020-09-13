@@ -1117,7 +1117,7 @@ plant.num_velocities() = 6</pre></code></p>
       V^{G_d}\right|^2_2, \\ \subjto && v_{min} \le v \le v_{max}. \nonumber
       \end{align}  You can read this as "find me the joint velocities that
       achieve my desired gripper spatial velocity as closely as possible, but
-      satisfy my joint limit constraints."  The solution to this can be much
+      satisfy my joint velocity constraints."  The solution to this can be much
       better than what you would get from solving the unconstrained optimization
       and then simply trimming any velocities to respect the constraints after
       the fact.</p>
@@ -1160,11 +1160,11 @@ plant.num_velocities() = 6</pre></code></p>
 
     <subsection><h1>Joint centering</h1>
   
-      <p><i>(Need to finish/clean up the writing here)</i>.  Our Jacobian is 6x7.  We have extra degrees of freedom.  Not only an
-      opportunity, but a responsibility.  If we don't tell them what we want
-      them to do, then you might not like what you get.  Discuss analytic
-      centering.  Add a term to the objective in the nullspace of our current
-      objective.</p>
+      <p><i>(Need to finish/clean up the writing here)</i>.  Our Jacobian is $6
+      times 7$.  We have extra degrees of freedom.  Not only an opportunity, but
+      a responsibility.  If we don't tell them what we want them to do, then you
+      might not like what you get.  Discuss analytic centering.  Add a term to
+      the objective in the nullspace of our current objective.</p>
 
       <p>Here is one way to formulate it.  If we had no end-effector goals, then
       we might write the controller $v = K(q_0 - q)$, a proportional control
@@ -1191,6 +1191,11 @@ plant.num_velocities() = 6</pre></code></p>
       objective relatively more weight.  But don't make it too small, because
       that might make the numerics bad for your solver.  I'd say $\epsilon ~=
       0.01$ is just about right.</p>
+
+      <p>There are more sophisticated methods if one wishes to establish a
+      strict task prioritization in the presence of constraints (e.g.
+      <elib>Flacco15+Escande14</elib>), but for th simple prioritization we have
+      formulated here, the penalty method is quite reasonable.</p>
 
     </subsection>
 
@@ -1221,6 +1226,10 @@ plant.num_velocities() = 6</pre></code></p>
        
       <p>We will use this implementation of differential inverse kinematics
       whenever we need to command the end-effector in the next few chapters.</p>
+
+      <todo>We could add collision-avoidance constraints naturally here, too.
+      But I haven't introduced those ideas yet, so instead I should link forward
+      to the relevant exposition once it exists.</todo>
 
     </subsection>
 
