@@ -1210,12 +1210,18 @@ plant.num_velocities() = 6</pre></code></p>
 
       <p>\begin{align} \max_{v_n, \alpha} \quad & \alpha, \\ \subjto \quad &
       J^G(q)v_n = \alpha V^{G_d}, \nonumber \\ & 0 \le \alpha \le 1, \nonumber
-      \\ & \text{additional constraints}. \nonumber \end{align}</p>
+      \\ & \text{additional constraints}. \nonumber \end{align}  You should
+      immediately ask yourself: is it reasonable to scale a spatial velocity by
+      a scalar?  That's another great <a
+      href="#scaled_spatial_velocity">exercise</a>. </p>
 
       <example><h1>Drake's DifferentialInverseKinematics</h1>
       
       </example>
        
+      <p>We will use this implementation of differential inverse kinematics
+      whenever we need to command the end-effector in the next few chapters.</p>
+
     </subsection>
 
     <todo>Find a home for inverse kinematics, including nonlinear optimization
@@ -1242,10 +1248,17 @@ plant.num_velocities() = 6</pre></code></p>
   
   </exercise>
   
-  <exercise id="angular_velocity_addition"><h1>The additive property of angular velocity vectors.</h1>
+  <exercise id="angular_velocity_addition"><h1>The additive property of angular
+  velocity vectors.</h1>
   
     <p>TODO(russt): Fill this in.</p>
 
+  </exercise>
+
+  <exercise id="scaled_spatial_velocity"><h1>Scaling spatial velocity</h1>
+  
+    <p>TODO(russt): Fill this in.</p>
+  
   </exercise>
 
   </section>
