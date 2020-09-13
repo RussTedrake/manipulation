@@ -3,7 +3,6 @@
     "intro",
     "robot",
     "pick",
-    "pixels",
     "pose",
     "deep_perception",
     "grasping",
@@ -25,9 +24,6 @@
   ],
   "parts_format": "dict(first chapter id, name of the part)",
   "parts" : {
-    "pixels": "Perception (Note: I'm going to refactor the remaining chapters)",
-    "grasping": "Planning",
-    "manipulator": "Control",
     "drake": "Appendix"
   },
   "other_potential_parts" : [

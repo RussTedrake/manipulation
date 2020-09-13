@@ -3,8 +3,8 @@
 <html>
 
   <head>
-    <title>Robotic Manipulation: Pose Estimation and Tracking</title>
-    <meta name="Robotic Manipulation: Pose Estimation and Tracking" content="text/html; charset=utf-8;" />
+    <title>Robotic Manipulation: Geometric Pose Estimation</title>
+    <meta name="Robotic Manipulation: Geometric Pose Estimation" content="text/html; charset=utf-8;" />
     <link rel="canonical" href="http://manipulation.csail.mit.edu/pose.html" />
 
     <script src="https://hypothes.is/embed.js" async></script>
@@ -47,71 +47,151 @@ at MIT</a>. They will be updated throughout the Fall 2020 semester.  <!-- <a
 href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos are available on YouTube</a>.--></p> 
 
 <table style="width:100%;"><tr style="width:100%">
-  <td style="width:33%;text-align:left;"><a class="previous_chapter" href=pixels.html>Previous Chapter</a></td>
+  <td style="width:33%;text-align:left;"><a class="previous_chapter" href=pick.html>Previous Chapter</a></td>
   <td style="width:33%;text-align:center;"><a href=index.html>Table of contents</a></td>
   <td style="width:33%;text-align:right;"><a class="next_chapter" href=deep_perception.html>Next Chapter</a></td>
 </tr></table>
 
 
 <!-- EVERYTHING ABOVE THIS LINE IS OVERWRITTEN BY THE INSTALL SCRIPT -->
-<chapter style="counter-reset: chapter 4"><h1>Pose Estimation and Tracking</h1>
+<chapter style="counter-reset: chapter 3"><h1>Geometric Pose Estimation</h1>
 
-  <p>There is no question that deep learning has had an enormous impact in perception -- one might even say that it has enabling the current surge in manipulation advances.  And we will certainly cover it in these notes.  But when I've heard colleagues say that "all perception these days is based on deep learning", I can't help but cry foul.  There has been another surge of progress in the last few years that has been happening in parallel -- the revolution in geometric reasoning -- fueled by applications in autonomous driving and augmented reality in addition to manipulation.  Most advanced manipulation systems these days combine both "deep perception" and "geometric perception".</p>
+  <p>In the last chapter, we developed an initial solution to moving objects
+  around, but we made one major assumption that would prevent us from using it
+  on a real robot: we assumed that we knew the initial pose of the object.  This
+  chapter is going to be our first pass at removing that assumption, by
+  developing tools to estimate that pose using the information obtained from the
+  robot's depth cameras.  The tools we develop here will be most useful when you
+  are trying to manipulate <i>known objects</i> (e.g. you have a mesh file of
+  their geometry) and are in a relatively <i>uncluttered</i> environment.  But
+  they will also form a baseline for the more sophisticated methods we will
+  study.</p>
 
-  <section><h1>Depth sensors</h1>
+  <p>The approach that we'll take here is very geometric.  This is in contrast
+  to, and very complimentary with, approached that are more fundamentally driven
+  by data.  There is no question that deep learning has had an enormous impact
+  in perception -- one might even say that it has enabling the current surge in
+  manipulation advances.  And we will certainly cover it in these notes.  But
+  when I've heard colleagues say that "all perception these days is based on
+  deep learning", I can't help but cry foul.  There has been another surge of
+  progress in the last few years that has been happening in parallel -- the
+  revolution in geometric reasoning -- fueled by applications in autonomous
+  driving and augmented reality in addition to manipulation.  Most advanced
+  manipulation systems these days combine both "deep perception" and "geometric
+  perception".</p>
+
+  <section><h1>Cameras and depth sensors</h1>
   
-    <p>Primarily RGB-D (ToF vs projected texture stereo vs ...) cameras and Lidar</p>
+    <p>Just as we had many choices when selecting the robot arm and hand, we
+    have many choices for instrumenting our robot/environment with sensors. Even
+    more so than our robot arms, the last few years have seen incredible
+    improvements in the quality and reductions in cost and size for these
+    sensors.  This is largely thanks to the cell phone industry, but the race
+    for autonomous cars has been fueling high-end sensors as well.</p>
 
-    <p>The cameras we are using in this course are <a href="https://software.intel.com/en-us/realsense/d400">Intel RealSense D415</a>....</p>
+    <p>These changes in hardware quality have causes sometimes dramatic changes
+    in our algorithmic approaches.  For example, estimation can be much easier
+    when the frame rate of our sensors is high enough that not much can change
+    in the world between two images; this undoubtedly contributed to the
+    revolutions in simultaneous localization and mapping (SLAM) we have seen
+    over the last decade or so.</p>
+
+    <p>One might think that the most important sensors for manipulation are the
+    touch sensors (you might even be right!).  But in practice today, most of
+    the emphasis is on camera-based and/or range sensing.  At very least, we
+    should consider this first, since our touch sensors won't do us much good if
+    we don't know where in the world we need to touch.</p>
+
+    <p>Traditional cameras, which we think of as a sensor that outputs a color
+    image at some framerate, play an important role.  But robotics makes heavy
+    use of sensors that make an explicit measurement of the distance (between
+    the camera and the world) or depth; sometimes in addition to color and
+    sometimes in lieu of color.  Admittedly, some researchers think we should
+    only rely on color images.</p>
+
+    <subsection><h1>Depth sensors</h1>
+    
+      <p>Primarily RGB-D (ToF vs projected texture stereo vs ...) cameras and Lidar</p>
+
+      <p>The cameras we are using in this course are <a href="https://software.intel.com/en-us/realsense/d400">Intel RealSense D415</a>....</p>
+
+      <p>Monocular depth.</p>
+
+    </subsection>
 
     <subsection><h1>Simulation</h1>
     
       <p>There are a number of levels of fidelity at which one can simulate a camera like the D415.  We'll start our discussion here using an "ideal" depth camera simulation -- the pixels returned represent the true geometric depth in the direction of each pixel coordinate.  In <drake></drake> that is represented by the <code>RgbdSensor</code> system, which can be wired up directly to the <code>SceneGraph</code>.</p>
 
-      <table align="center" cellpadding="0" cellspacing="0">
-        <tr align="center">
-        <td><table cellspacing="0" cellpadding="0">
-        <tr>
-        <td align="right" style="padding:5px 0px 5px 0px">geometry_query &rarr;</td></tr>
-        </table>
-        </td><td align="center" style="border:solid;padding-left:20px;padding-right:20px" bgcolor="#F0F0F0"><a class="el" href="https://drake.mit.edu/doxygen_cxx/classdrake_1_1systems_1_1sensors_1_1_rgbd_sensor.html" title="A meta-sensor that houses RGB, depth, and label cameras, producing their corresponding images based o...">RgbdSensor</a></td><td><table cellspacing="0" cellpadding="0">
-        <tr>
-        <td align="left" style="padding:5px 0px 5px 0px">&rarr; color_image </td></tr>
-        <tr>
-        <td align="left" style="padding:5px 0px 5px 0px">&rarr; depth_image_32f </td></tr>
-        <tr>
-        <td align="left" style="padding:5px 0px 5px 0px">&rarr; depth_image_16u </td></tr>
-        <tr>
-        <td align="left" style="padding:5px 0px 5px 0px">&rarr; label_image </td></tr>
-        <tr>
-        <td align="left" style="padding:5px 0px 5px 0px">&rarr; X_WB </td></tr>
-        </table>
-        </td></tr>
-        </table>
+      <div>
+        <script src="htmlbook/js-yaml.min.js"></script>
+        <script type="text/javascript">
+        var sys = jsyaml.load(`
+name: RgbdSensor
+input_ports:
+- geometry_query
+output_ports:
+- color_image
+- depth_image_32f
+- depth_image_16u
+- label_image
+- X_WB`);
+        document.write(system_html(sys, "https://drake.mit.edu/doxygen_cxx/classdrake_1_1systems_1_1sensors_1_1_rgbd_sensor.html"));
+        </script>
+      </div>
 
-        <example class="drake"><h1>Simulating an RGB-D camera</h1>
+      <example class="drake"><h1>Simulating an RGB-D camera</h1>
 
-          <p>As a simple example of depth cameras in drake, I've constructed a scene with a single object (the mustard bottle from the <a href="https://github.com/RobotLocomotion/models/tree/master/ycb">YCB dataset</a>), and added an <code>RgbdSensor</code> to the diagram.  Once this is wired up, we can simply evaluate the output ports in order to obtain the color and depth images:</p>
+        <p>As a simple example of depth cameras in drake, I've constructed a
+        scene with a single object (the mustard bottle from the <a
+        href="https://github.com/RobotLocomotion/models/tree/master/ycb">YCB
+        dataset</a>), and added an <code>RgbdSensor</code> to the diagram.  Once
+        this is wired up, we can simply evaluate the output ports in order to
+        obtain the color and depth images:</p>
     
-          <pysrc>manipulation/depth_camera_demo/show_camera.py</pysrc>
+        <pysrc>manipulation/depth_camera_demo/show_camera.py</pysrc>
     
-          <p>Remember that, in addition to looking at the source code if you like, you can always inspect the block diagram to understand what is happen at the "systems level":</p>
+        <p>Remember that, in addition to looking at the source code if you like,
+        you can always inspect the block diagram to understand what is happen at
+        the "systems level":</p>
 
-          <pysrc>manipulation/depth_camera_demo/show_diagram.py</pysrc>
+        <pysrc>manipulation/depth_camera_demo/show_diagram.py</pysrc>
 
-          <p>(Note that these demos need to have the <code>demo.py</code> file that lives in the same directory to run).  <todo>Fix this!</todo></p>
+        <p>(Note that these demos need to have the <code>demo.py</code> file
+        that lives in the same directory to run).  <todo>Fix this!</todo></p>
         </example>
     
-        <p>In the <code>ManipulationStation</code> simulation of the entire robot system for class, the <code>RgbdSensors</code> have already been added.  <a href="https://drake.mit.edu/doxygen_cxx/classdrake_1_1examples_1_1manipulation__station_1_1_manipulation_station.html">You can see image output ports for each of the cameras are already exported as output ports for the station.</a> </p>
+        <p>In the <code>ManipulationStation</code> simulation of the entire
+        robot system for class, the <code>RgbdSensors</code> have already been
+        added.  <a
+        href="https://drake.mit.edu/doxygen_cxx/classdrake_1_1examples_1_1manipulation__station_1_1_manipulation_station.html">You
+        can see image output ports for each of the cameras are already exported
+        as output ports for the station.</a> </p>
         
-        <p>Real depth sensors, of course, are far from ideal -- and errors in depth returns are not simple Gaussian noise, but rather are dependent on the lighting conditions, the surface normals of the object, and the visual material properties of the object, among other things.  We will examine real sensor data, and higher fidelity simulation models of the depth cameras, after we start understanding some of the basic operations.</p>
+        <p>Real depth sensors, of course, are far from ideal -- and errors in
+        depth returns are not simple Gaussian noise, but rather are dependent on
+        the lighting conditions, the surface normals of the object, and the
+        visual material properties of the object, among other things.  We will
+        examine real sensor data, and higher fidelity simulation models of the
+        depth cameras, after we start understanding some of the basic
+        operations.</p>
 
-        <p>Please also note that, although the depth output of the RgbdSensor is ideal, this sensor also outputs a color image.  It's much harder to talk about an ideal color image, as colors change with material properties and lighting conditions (including reflections and shadows).  In the example above, I've told drake to just use the simplest OpenGL-based renderer.  But <drake></drake> does support a number of more advanced rendering options that we will leverage in the chapters on "deep perception", which make significantly more use of the RGB channels.</p>
+        <p>Please also note that, although the depth output of the RgbdSensor is
+        ideal, this sensor also outputs a color image.  It's much harder to talk
+        about an ideal color image, as colors change with material properties
+        and lighting conditions (including reflections and shadows).  In the
+        example above, I've told drake to just use the simplest OpenGL-based
+        renderer.  But <drake></drake> does support a number of more advanced
+        rendering options that we will leverage in the chapters on "deep
+        perception", which make significantly more use of the RGB channels.</p>
     </subsection>
   </section>
 
   <section><h1>Representations for geometry</h1>
-    
+
+    <!--Color Images, Depth Images, and
+      Point Clouds-->
+
     <p>Depth image, point cloud, triangulated mesh, signed distance functions, (+ surfels, occupancy maps, ...)</p>
 
     <p>The data returned by a depth camera takes the form of an image, where each pixel value is a single number that represents the distance between the camera and the nearest object in the environment along the pixel direction.  If we combine this with the basic information about the camera's intrisic (e.g. lens parameters) and extrinsic (e.g. position and orientation in space) parameters of the camera, then we can transform this <i>depth image representation</i> into a collection of points in three dimensions, called the <i>point cloud representation</i>.  As depth sensors have become so pervasive the field has built up libraries of tools for performing basic goemetric operations operate on point clouds, and that can be used to transform back and forth between representations.  In these notes, we'll use the <a href="http://www.open3d.org/">Open3D</a> library (note that many older projects used the <a href="http://pointclouds.org/">Point Cloud Library (PCL)</a>, which is now defunct but still has some very useful documentation).</p>
@@ -249,7 +329,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
 <!-- EVERYTHING BELOW THIS LINE IS OVERWRITTEN BY THE INSTALL SCRIPT -->
 
 <table style="width:100%;"><tr style="width:100%">
-  <td style="width:33%;text-align:left;"><a class="previous_chapter" href=pixels.html>Previous Chapter</a></td>
+  <td style="width:33%;text-align:left;"><a class="previous_chapter" href=pick.html>Previous Chapter</a></td>
   <td style="width:33%;text-align:center;"><a href=index.html>Table of contents</a></td>
   <td style="width:33%;text-align:right;"><a class="next_chapter" href=deep_perception.html>Next Chapter</a></td>
 </tr></table>
