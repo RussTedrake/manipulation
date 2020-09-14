@@ -21,8 +21,6 @@ class TestRobotPainter(unittest.TestCase):
         thetas = self.notebook_locals['thetas']
         # carry out computation
         output_frames = f(thetas, X_WC, X_WG)
-        # import pdb
-        # pdb.set_trace()
 
         # test all key positions match radius
         for i, frame_i in enumerate(output_frames):
@@ -57,7 +55,6 @@ class TestRobotPainter(unittest.TestCase):
         self.assertTrue(isinstance(traj_w_G_test, PiecewisePolynomial))
 
         # use student's answer on first problem to construct trajectories
-
         key_frame_pos = []
         for kf in key_frames:
             key_frame_pos.append(kf.translation())
