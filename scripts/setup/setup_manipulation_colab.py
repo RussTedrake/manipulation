@@ -28,11 +28,12 @@ def setup_manipulation(*, manipulation_sha, drake_version, drake_build):
     subprocess.run([f"{path}/scripts/setup/ubuntu/18.04/install_prereqs.sh"])
 
     # Run pip install
-    subprocess.run(["pip3", "install", "--disable-pip-version-check", "--requirement", "/opt/manipulation/requirements.txt"])
+    subprocess.run(["pip3", "install", "--requirement", "/opt/manipulation/requirements.txt"])
 
-    # Install pyngrok (for working with meshcat)
-    subprocess.run(["pip3", "install", "pyngrok"])
-
+    # Install colab specific requirements
+    subprocess.run(["apt", "install", "xvfb"])
+    subprocess.run(["pip3", "install", "pyngrok pyvirtualdisplay"])
+ 
     # Set the path (if necessary).
     spec = importlib.util.find_spec('manipulation')
     if spec is None:
@@ -45,10 +46,3 @@ def setup_manipulation(*, manipulation_sha, drake_version, drake_build):
     assert path in spec.origin, (
         "Installation failed.  find_spec is locating manipulation, but not "
         "in the expected path.")
-
-def setup_rendering():
-    subprocess.run(["apt", "install", "xvfb"])
-    subprocess.run(["pip3", "install", "pyvirtualdisplay"])
-    from pyvirtualdisplay import Display
-    display = Display(visible=0, size=(1400, 900))
-    display.start()
