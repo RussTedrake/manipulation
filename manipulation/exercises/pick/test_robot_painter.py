@@ -11,7 +11,7 @@ class TestRobotPainter(unittest.TestCase):
         super().__init__(test_name)
         self.notebook_locals = notebook_locals
 
-    @weight(2.0)
+    @weight(4)
     @timeout_decorator.timeout(1.)
     def test_key_frames(self):
         """compose_circualr_key_frames"""
@@ -45,7 +45,7 @@ class TestRobotPainter(unittest.TestCase):
                 self.assertLessEqual(center_err, 1e-6,
                                      'key frame orientations incorrect!')
 
-    @weight(1.0)
+    @weight(2)
     @timeout_decorator.timeout(1.)
     def test_trajectories(self):
         """construct_v_w_trajectories"""
