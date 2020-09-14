@@ -4,6 +4,7 @@ from gradescope_utils.autograder_utils.decorators import weight
 import numpy as np
 from pydrake.all import PiecewiseQuaternionSlerp, PiecewisePolynomial
 
+
 class TestRobotPainter(unittest.TestCase):
 
     def __init__(self, test_name, notebook_locals):
@@ -26,19 +27,23 @@ class TestRobotPainter(unittest.TestCase):
         for i, frame_i in enumerate(output_frames):
             if i == 0:
                 # check if the first frame is the gripper's current frame
-                dist = np.linalg.norm(frame_i.translation() - X_WG.translation())
-                self.assertLessEqual(dist, 1e-6, 'first key frame position incorrenct!')
+                dist = np.linalg.norm(frame_i.translation() -
+                                      X_WG.translation())
+                self.assertLessEqual(dist, 1e-6,
+                                     'first key frame position incorrenct!')
             else:
                 # check if the radius is correct
                 pos_cur = frame_i.translation()
                 r_cur = np.linalg.norm(pos_cur - X_WC.translation())
-                self.assertLessEqual(abs(radius - r_cur), 1e-6, 'key frame positions incorrenct!')
+                self.assertLessEqual(abs(radius - r_cur), 1e-6,
+                                     'key frame positions incorrenct!')
 
                 # check if +z of each frame points toward the center
                 z_cur = frame_i.rotation().matrix()[0:3, 2]
-                test_center = z_cur*radius + pos_cur
+                test_center = z_cur * radius + pos_cur
                 center_err = np.linalg.norm(test_center - X_WC.translation())
-                self.assertLessEqual(center_err, 1e-6, 'key frame orientations incorrect!')
+                self.assertLessEqual(center_err, 1e-6,
+                                     'key frame orientations incorrect!')
 
     @weight(1.0)
     @timeout_decorator.timeout(1.)
@@ -47,7 +52,7 @@ class TestRobotPainter(unittest.TestCase):
         f = self.notebook_locals['construct_v_w_trajectories']
         key_frames = self.notebook_locals['test_key_frames']
         times = self.notebook_locals['times']
-        
+
         # Make the trajectories
         traj_v_G_test, traj_w_G_test = f(times, key_frames)
 
@@ -60,12 +65,12 @@ class TestRobotPainter(unittest.TestCase):
             key_frame_pos.append(kf.translation())
         key_frame_pos = np.asarray(key_frame_pos)
         key_frame_ori = [pose.rotation().matrix() for pose in key_frames]
-    
+
         traj_position = PiecewisePolynomial.FirstOrderHold(
-           times, key_frame_pos.T)
+            times, key_frame_pos.T)
         traj_rotation = PiecewiseQuaternionSlerp(times, key_frame_ori)
         traj_vG_true = traj_position.MakeDerivative()
         traj_wG_true = traj_rotation.MakeDerivative()
 
-        self.assertTrue( traj_wG_true.isApprox(traj_w_G_test, tol=1e-3) )
-        self.assertTrue( traj_vG_true.isApprox(traj_v_G_test, tol=1e-3) )
+        self.assertTrue(traj_wG_true.isApprox(traj_w_G_test, tol=1e-3))
+        self.assertTrue(traj_vG_true.isApprox(traj_v_G_test, tol=1e-3))

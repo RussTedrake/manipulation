@@ -2,7 +2,9 @@ import unittest
 import timeout_decorator
 from gradescope_utils.autograder_utils.decorators import weight
 import numpy as np
-from pydrake.all import PiecewiseQuaternionSlerp, PiecewisePolynomial, RigidTransform, RotationMatrix
+from pydrake.all import (PiecewiseQuaternionSlerp, PiecewisePolynomial,
+                         RigidTransform, RotationMatrix)
+
 
 class TestRigidTransforms(unittest.TestCase):
 
@@ -13,11 +15,11 @@ class TestRigidTransforms(unittest.TestCase):
     @weight(1)
     @timeout_decorator.timeout(1.)
     def test_X_WB(self):
-        """testing X_WB"""
+        """Testing X_WB"""
         f = self.notebook_locals['compute_X_WB']
 
         # construct a test case
-        theta1, theta2, theta3 = np.pi/3.0, np.pi/6.0, np.pi/4.0
+        theta1, theta2, theta3 = np.pi / 3.0, np.pi / 6.0, np.pi / 4.0
         R_WA = RotationMatrix.MakeXRotation(theta1)
         R_AB = RotationMatrix.MakeZRotation(theta2)
         R_CB = RotationMatrix.MakeYRotation(theta3)
@@ -36,11 +38,11 @@ class TestRigidTransforms(unittest.TestCase):
     @weight(1)
     @timeout_decorator.timeout(1.)
     def test_X_CW(self):
-        """testing X_CW"""
+        """Testing X_CW"""
         f = self.notebook_locals['compute_X_CW']
 
         # construct a test case
-        theta1, theta2, theta3 = np.pi/3.0, np.pi/6.0, np.pi/4.0
+        theta1, theta2, theta3 = np.pi / 3.0, np.pi / 6.0, np.pi / 4.0
         R_WA = RotationMatrix.MakeXRotation(theta1)
         R_AB = RotationMatrix.MakeZRotation(theta2)
         R_CB = RotationMatrix.MakeYRotation(theta3)
@@ -58,11 +60,10 @@ class TestRigidTransforms(unittest.TestCase):
         test_result = test_result.GetAsMatrix4()
         self.assertTrue(np.allclose(test_result, np.eye(4)))
 
-
     @weight(2)
     @timeout_decorator.timeout(1.)
     def test_grasp_pose(self):
-        """testing grasp pose"""
+        """Testing grasp pose"""
         f = self.notebook_locals['design_grasp_pose']
         X_WO = self.notebook_locals['X_WO']
 
