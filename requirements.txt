@@ -8,7 +8,7 @@ decorator>=4.4.2; sys_platform == 'darwin'
 defusedxml>=0.6.0; sys_platform == 'darwin'
 entrypoints>=0.3; sys_platform == 'darwin'
 future>=0.18.2; sys_platform == 'darwin'
-gradescope-utils>=0.4.0; sys_platform == 'darwin'
+gradescope-utils>=0.4.0
 importlib-metadata>=1.6.1; sys_platform == 'darwin'
 ipykernel>=5.3.0; sys_platform == 'darwin'
 ipython>=7.15.0; sys_platform == 'darwin'
