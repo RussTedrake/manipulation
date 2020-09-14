@@ -21,6 +21,7 @@ build --incompatible_visibility_private_attributes_at_definition=yes
 build --legacy_external_runfiles=no
 build --strict_filesets=yes
 
+build --test_env=DISPLAY
 build --test_env=GRB_LICENSE_FILE
 build --test_env=LANG=en_US.UTF-8
 build --test_env=LC_ALL=en_US.UTF-8
