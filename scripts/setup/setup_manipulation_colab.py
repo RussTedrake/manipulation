@@ -32,7 +32,7 @@ def setup_manipulation(*, manipulation_sha, drake_version, drake_build):
 
     # Install colab specific requirements
     subprocess.run(["apt", "install", "xvfb"])
-    subprocess.run(["pip3", "install", "pyngrok pyvirtualdisplay"])
+    subprocess.run(["pip3", "install", "pyngrok", "pyvirtualdisplay"])
  
     # Set the path (if necessary).
     spec = importlib.util.find_spec('manipulation')
