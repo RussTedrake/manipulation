@@ -23,11 +23,17 @@ rt_py_library(
 )
 
 rt_py_library(
-    name = "plot_planar_manipulator",
+    name = "test_painter",
     srcs = [
-        "plot_planar_manipulator.py",
+        "test_robot_painter.py",
     ],
     visibility = ["//visibility:public"],    
 )
 
-
+rt_py_library(
+    name = "test_rigid_transforms",
+    srcs = [
+        "test_rigid_transforms.py",
+    ],
+    visibility = ["//visibility:public"],    
+)
