@@ -7,6 +7,14 @@
 load("//htmlbook/tools/python:defs.bzl", "rt_py_library")
 
 rt_py_library(
+    name = "test_differential_ik",
+    srcs = [
+        "test_differential_ik.py",
+    ],
+    visibility = ["//visibility:public"],    
+)
+
+rt_py_library(
     name = "test_simple_qp",
     srcs = [
         "test_simple_qp.py",
