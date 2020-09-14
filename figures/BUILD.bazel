@@ -12,6 +12,16 @@ rt_ipynb_test(
     srcs = ["grasp_frames.ipynb"],
 )
 
+rt_ipynb_test(
+    name = "meshcat_plot_surface",
+    srcs = ["meshcat_plot_surface.ipynb"],
+)
+
+rt_py_test(
+    name = "scaling_spatial_velocity",
+    srcs = ["scaling_spatial_velocity.py"],
+)
+
 rt_py_test(
     name = "two_link_singularities",
     data = ["//manipulation/models:double_pendulum.urdf"],
@@ -19,7 +29,3 @@ rt_py_test(
     deps = ["//manipulation:manipulation"]
 )
 
-rt_py_test(
-    name = "scaling_spatial_velocity",
-    srcs = ["scaling_spatial_velocity.py"],
-)
