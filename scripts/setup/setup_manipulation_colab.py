@@ -45,3 +45,10 @@ def setup_manipulation(*, manipulation_sha, drake_version, drake_build):
     assert path in spec.origin, (
         "Installation failed.  find_spec is locating manipulation, but not "
         "in the expected path.")
+
+def setup_rendering():
+    subprocess.run(["apt", "install", "xvfb"])
+    subprocess.run(["pip3", "install", "pyvirtualdisplay"])
+    from pyvirtualdisplay import Display
+    display = Display(visible=0, size=(1400, 900))
+    display.start()
