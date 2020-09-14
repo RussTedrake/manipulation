@@ -1,0 +1,53 @@
+# -*- mode: python -*-
+# vi: set ft=python :
+
+# Copyright 2020 Massachusetts Institute of Technology.
+# Licensed under the BSD 3-Clause License. See LICENSE.TXT for details.
+
+load("//htmlbook/tools/jupyter:defs.bzl", "rt_ipynb_test")
+
+rt_ipynb_test(
+    name = "planar_manipulator",
+    deps = [
+        "//manipulation/exercises:grader",
+        "//manipulation/exercises/pick:test_planar_manipulator",
+        "//manipulation/exercises/pick:plot_planar_manipulator",        
+    ],
+    srcs = ["planar_manipulator.ipynb"],
+)
+
+rt_ipynb_test(
+    name = "rigid_transforms",
+    deps = [
+        "//manipulation/exercises:grader",
+        "//manipulation/exercises/pick:test_rigid_transforms",
+    ],
+    srcs = ["rigid_transforms.ipynb"],
+)
+
+rt_ipynb_test(
+    name = "robot_painter",
+    deps = [
+        "//manipulation/exercises:grader",
+        "//manipulation/exercises/pick:test_robot_painter",
+    ],
+    srcs = ["robot_painter.ipynb"],
+)
+
+rt_ipynb_test(
+    name = "intro_to_qp",
+    deps = [
+        "//manipulation/exercises:grader",
+        "//manipulation/exercises/pick:test_simple_qp",
+    ],
+    srcs = ["intro_to_qp.ipynb"],
+)
+
+rt_ipynb_test(
+    name = "differential_ik_optimization",
+    deps = [
+        "//manipulation/exercises:grader",
+        "//manipulation/exercises/pick:test_differential_ik",
+    ],
+    srcs = ["differential_ik_optimization.ipynb"],
+)
