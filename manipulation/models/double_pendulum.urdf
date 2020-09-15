@@ -4,7 +4,7 @@
  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
  xsi:schemaLocation="http://drake.mit.edu ../../doc/drakeURDF.xsd" name="SimpleDoublePendulum">
   <material name="black">
-    <color rgba="0 0 0 1" />
+    <color rgba="0.3 0.3 0.3 1" />
   </material>
   <material name="MITred">
     <color rgba=".6 .2 .2 1" />
