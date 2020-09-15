@@ -6,8 +6,12 @@ from urllib.request import urlretrieve
 
 
 def setup_drake(*, version, build):
-    urlretrieve(f"https://drake-packages.csail.mit.edu/drake/{build}/drake-{version}/setup_drake_colab.py",
-                "setup_drake_colab.py")
+    if build == "continuous":  # This is a hack!
+        urlretrieve(f"https://drake-packages.csail.mit.edu/drake/nightly/drake-20200915/setup_drake_colab.py",
+                    "setup_drake_colab.py")
+    else:
+        urlretrieve(f"https://drake-packages.csail.mit.edu/drake/{build}/drake-{version}/setup_drake_colab.py",
+                    "setup_drake_colab.py")
     from setup_drake_colab import setup_drake
     setup_drake(version=version, build=build)
 
