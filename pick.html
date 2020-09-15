@@ -1158,7 +1158,7 @@ plant.num_velocities() = 6</pre></code></p>
 
     </subsection>
 
-    <subsection><h1>Joint centering</h1>
+    <subsection id="joint_centering"><h1>Joint centering</h1>
   
       <p><i>(Need to finish/clean up the writing here)</i>.  Our Jacobian is $6
       times 7$.  We have extra degrees of freedom.  Not only an opportunity, but
@@ -1187,7 +1187,7 @@ plant.num_velocities() = 6</pre></code></p>
       can remove $\epsilon$ completely -- the secondary task will in no way
       interfere with the primary task of tracking the spatial velocity. However,
       if there are constraints, then these constraints can cause the two
-      objectives to clash.  So we pick $\epsilon \ll 1$ to give the primary
+      objectives to clash (<a href="#competing_objectives">Exercise</a>).  So we pick $\epsilon \ll 1$ to give the primary
       objective relatively more weight.  But don't make it too small, because
       that might make the numerics bad for your solver.  I'd say $\epsilon ~=
       0.01$ is just about right.</p>
@@ -1319,6 +1319,40 @@ plant.num_velocities() = 6</pre></code></p>
         <li> Using your own constraints, implement a virtual wall in the end-effector space using optimization-based differential IK controller. </li>
       </ol>
   </exercise>  
+
+  <exercise id="competing_objectives"><h1>Competing objectives</h1>
+
+    <p>In the section on <a href="#joint_centering">joint centering</a>, I
+    claimed that an secondary objective might compete with a primary objective
+    if they are linked through constraints.  To see this, consider the following
+    optimization problem \begin{align*}\min_{x,y} \quad (x-5)^2 +
+    (y+3)^2.\end{align*}  Clearly, the optimal solution is given by $x^*=5,
+    y^*=-3$.  Moreover, the objective are separable.  The addition of the second
+    objective, $(y+3)^2$, did not in any way impact the solution of the
+    first.</p>
+    
+    <p>Now consider the constrained optimization \begin{align*}\min_{x,y} \quad&
+    (x-5)^2 + (y+3)^2 \\ \subjto \quad& x - y \le 6. \end{align*} If the second
+    objective was removed, then we would still have $x^*=5$.  What is the result
+    of the optimization as written (it's only a few lines of code, if you want
+    to do it that way)?  <!-- answer: 4, -2 --> I think you'll find that these
+    "orthogonal" objectives actually compete!</p>
+
+    <p>What happens if you change the problem to \begin{align*}\min_{x,y} \quad&
+    (x-5)^2 + \frac{1}{100}(y+3)^2 \\ \subjto \quad& x - y \le 6? \end{align*}
+    I think you'll find that solution is quite close to $x^*=5$, but also that
+    $y^*$ is quite different than that $y^*=0$ one would obtain if the
+    "secondary" objective was omitted completely.</p>
+
+    <p>Note that if the constraint was not active at the optimal solution (e.g.
+    $x=5, y=-3$ satisfied the constraints), then the objectives do not
+    compete.</p>
+
+    <p>This seems like an overly simple example.  But I think you'll find that
+    it is actually quite similar to what is happening in the nullspace objective
+    formulation above.</p>
+
+  </exercise>
 
   </section>
 
