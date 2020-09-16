@@ -63,14 +63,23 @@ class TestRobotPainter(unittest.TestCase):
         key_frame_pos = []
         for kf in key_frames:
             key_frame_pos.append(kf.translation())
+        # isApprox is not robust against value types. Trajectories constructed
+        # by RotationMatrix and numpy 3x3 matrices returns false even they
+        # are the same
+        # dirty fix: check against both
         key_frame_pos = np.asarray(key_frame_pos)
-        key_frame_ori = [pose.rotation().matrix() for pose in key_frames]
+        key_frame_ori = [pose.rotation() for pose in key_frames]
+        key_frame_ori_mat = [pose.rotation().matrix() for pose in key_frames]
 
         traj_position = PiecewisePolynomial.FirstOrderHold(
             times, key_frame_pos.T)
         traj_rotation = PiecewiseQuaternionSlerp(times, key_frame_ori)
+        traj_rotation_mat = PiecewiseQuaternionSlerp(times, key_frame_ori_mat)
         traj_vG_true = traj_position.MakeDerivative()
         traj_wG_true = traj_rotation.MakeDerivative()
+        traj_wG_true_mat = traj_rotation_mat.MakeDerivative()
 
-        self.assertTrue(traj_wG_true.isApprox(traj_w_G_test, tol=1e-3))
+        self.assertTrue(
+            traj_wG_true.isApprox(traj_w_G_test, tol=1e-3) or
+            traj_wG_true_mat.isApprox(traj_w_G_test, tol=1e-3))
         self.assertTrue(traj_vG_true.isApprox(traj_v_G_test, tol=1e-3))
