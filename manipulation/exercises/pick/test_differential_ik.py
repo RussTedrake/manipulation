@@ -157,7 +157,7 @@ class TestDifferentialIK(unittest.TestCase):
             f_eval.append(f(J_G_lst[i], V_G_desired, None, None, None))
         f_eval = np.array(f_eval).squeeze()
 
-        self.assertLessEqual(np.linalg.norm(f_target - np.stack(f_eval)), 1e-6,
+        self.assertLessEqual(np.linalg.norm(f_target - np.stack(f_eval)), 1e-3,
                              'DiffIKQP input-output response is not correct')
 
     @weight(6)
@@ -311,7 +311,7 @@ class TestDifferentialIK(unittest.TestCase):
             f_eval.append(f(J_G_lst[i], V_G_desired, None, None, p_now_lst[i]))
         f_eval = np.array(f_eval).squeeze()
 
-        self.assertLessEqual(np.linalg.norm(f_target - np.stack(f_eval)), 2e-5,
+        self.assertLessEqual(np.linalg.norm(f_target - np.stack(f_eval)), 1e-3,
                              'DiffIKQP_Wall implementation is not correct.')
 
         # 2. Check that it cannot find solutions when it shouldn't.
