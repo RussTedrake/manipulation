@@ -2,7 +2,8 @@ import unittest
 import timeout_decorator
 from gradescope_utils.autograder_utils.decorators import weight
 import numpy as np
-from pydrake.all import PiecewiseQuaternionSlerp, PiecewisePolynomial
+from pydrake.all import (PiecewiseQuaternionSlerp, PiecewisePolynomial,
+                         ToleranceType)
 
 
 class TestRobotPainter(unittest.TestCase):
@@ -63,8 +64,9 @@ class TestRobotPainter(unittest.TestCase):
         key_frame_pos = []
         for kf in key_frames:
             key_frame_pos.append(kf.translation())
+
         key_frame_pos = np.asarray(key_frame_pos)
-        key_frame_ori = [pose.rotation().matrix() for pose in key_frames]
+        key_frame_ori = [pose.rotation() for pose in key_frames]
 
         traj_position = PiecewisePolynomial.FirstOrderHold(
             times, key_frame_pos.T)
@@ -72,5 +74,11 @@ class TestRobotPainter(unittest.TestCase):
         traj_vG_true = traj_position.MakeDerivative()
         traj_wG_true = traj_rotation.MakeDerivative()
 
-        self.assertTrue(traj_wG_true.isApprox(traj_w_G_test, tol=1e-3))
-        self.assertTrue(traj_vG_true.isApprox(traj_v_G_test, tol=1e-3))
+        self.assertTrue(
+            traj_wG_true.isApprox(traj_w_G_test,
+                                  tol=1e-3,
+                                  tol_type=ToleranceType.absolute))
+        self.assertTrue(
+            traj_vG_true.isApprox(traj_v_G_test,
+                                  tol=1e-3,
+                                  tol_type=ToleranceType.absolute))
