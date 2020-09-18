@@ -72,15 +72,15 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
   <p>The approach that we'll take here is very geometric.  This is in contrast
   to, and very complimentary with, approached that are more fundamentally driven
   by data.  There is no question that deep learning has had an enormous impact
-  in perception -- one might even say that it has enabling the current surge in
-  manipulation advances.  And we will certainly cover it in these notes.  But
+  in perception -- it's fair to say that it has enabling the current surge in
+  manipulation advances -- and we will certainly cover it in these notes.  But
   when I've heard colleagues say that "all perception these days is based on
   deep learning", I can't help but cry foul.  There has been another surge of
-  progress in the last few years that has been happening in parallel -- the
-  revolution in geometric reasoning -- fueled by applications in autonomous
-  driving and augmented reality in addition to manipulation.  Most advanced
-  manipulation systems these days combine both "deep perception" and "geometric
-  perception".</p>
+  progress in the last few years that has been happening in parallel: the
+  revolution in geometric reasoning, fueled by applications in autonomous
+  driving and virtual/augmented reality in addition to manipulation.  Most
+  advanced manipulation systems these days combine both "deep perception" and
+  "geometric perception".</p>
 
   <section><h1>Cameras and depth sensors</h1>
   
@@ -93,10 +93,10 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
 
     <p>These changes in hardware quality have causes sometimes dramatic changes
     in our algorithmic approaches.  For example, estimation can be much easier
-    when the frame rate of our sensors is high enough that not much can change
-    in the world between two images; this undoubtedly contributed to the
-    revolutions in simultaneous localization and mapping (SLAM) we have seen
-    over the last decade or so.</p>
+    when the resolution and frame rate of our sensors is high enough that not
+    much can change in the world between two images; this undoubtedly
+    contributed to the revolutions in the field of "simultaneous localization
+    and mapping" (SLAM) we have seen over the last decade or so.</p>
 
     <p>One might think that the most important sensors for manipulation are the
     touch sensors (you might even be right!).  But in practice today, most of
@@ -119,11 +119,19 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
 
       <p>Monocular depth.</p>
 
+      <todo>How the kinect works in 2 minutes: https://www.youtube.com/watch?v=uq9SEJxZiUg</todo>
+
     </subsection>
 
     <subsection><h1>Simulation</h1>
     
-      <p>There are a number of levels of fidelity at which one can simulate a camera like the D415.  We'll start our discussion here using an "ideal" depth camera simulation -- the pixels returned represent the true geometric depth in the direction of each pixel coordinate.  In <drake></drake> that is represented by the <code>RgbdSensor</code> system, which can be wired up directly to the <code>SceneGraph</code>.</p>
+      <p>There are a number of levels of fidelity at which one can simulate a
+      camera like the D415.  We'll start our discussion here using an "ideal"
+      RGB-D camera simulation -- the pixels returned in the depth image
+      represent the true geometric depth in the direction of each pixel
+      coordinate.  In <drake></drake> that is represented by the
+      <code>RgbdSensor</code> system, which can be wired up directly to the
+      <code>SceneGraph</code>.</p>
 
       <div>
         <script src="htmlbook/js-yaml.min.js"></script>
@@ -142,7 +150,26 @@ output_ports:
         </script>
       </div>
 
+      <p>The signals and systems abstraction here is encapsulating a lot of
+      complexity.  Inside the implementation of that system is a complete
+      rendering engine, like one that you will find in high-end computer games.
+      Drake actually support multiple rendering engines; for the purposes of
+      this class we will primarily use an OpenGL-based renderer that is suitable
+      for real-time simulation.  In our research we also use Drake's rendering
+      API to connect to high-end <a
+      href="https://en.wikipedia.org/wiki/Physically_based_rendering">physically-based
+      rendering (PBR)</a> based on ray tracing, such as the <a
+      href="https://www.blender.org/features/rendering/">Cycles renderer
+      provided by Blender</a>.  These are most useful when we are trying to
+      render higher quality images e.g. to <i>train</i> a deep perception
+      system; we will discuss them in the deep perception chapters.</p>
+
       <example class="drake"><h1>Simulating an RGB-D camera</h1>
+
+        <p><a target="pose"
+          href="https://colab.research.google.com/github/RussTedrake/manipulation/blob/master/pose.ipynb#scrollTo=7q0A14bAilIX"><img
+          src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
+          </p>
 
         <p>As a simple example of depth cameras in drake, I've constructed a
         scene with a single object (the mustard bottle from the <a
@@ -150,61 +177,94 @@ output_ports:
         dataset</a>), and added an <code>RgbdSensor</code> to the diagram.  Once
         this is wired up, we can simply evaluate the output ports in order to
         obtain the color and depth images:</p>
+
+        <figure><img src="data/mustard.svg"/></figure>
     
         <p>Remember that, in addition to looking at the source code if you like,
-        you can always inspect the block diagram to understand what is happen at
-        the "systems level":</p>
+        you can always inspect the block diagram to understand what is happening
+        at the "systems level".  <a href="data/depth_camera_diagram.svg">Here is the diagram</a> used in this example.</p>
 
-        <p>(Note that these demos need to have the <code>demo.py</code> file
-        that lives in the same directory to run).  <todo>Fix this!</todo></p>
-        </example>
+      </example>
     
-        <p>In the <code>ManipulationStation</code> simulation of the entire
-        robot system for class, the <code>RgbdSensors</code> have already been
-        added.  <a
-        href="https://drake.mit.edu/doxygen_cxx/classdrake_1_1examples_1_1manipulation__station_1_1_manipulation_station.html">You
-        can see image output ports for each of the cameras are already exported
-        as output ports for the station.</a> </p>
+      <p>In the <code>ManipulationStation</code> simulation of the entire robot
+      system for class, the <code>RgbdSensors</code> have already been added,
+      and their output ports exposed as outputs for the station.</p>
         
-        <p>Real depth sensors, of course, are far from ideal -- and errors in
-        depth returns are not simple Gaussian noise, but rather are dependent on
-        the lighting conditions, the surface normals of the object, and the
-        visual material properties of the object, among other things.  We will
-        examine real sensor data, and higher fidelity simulation models of the
-        depth cameras, after we start understanding some of the basic
-        operations.</p>
-
-        <p>Please also note that, although the depth output of the RgbdSensor is
-        ideal, this sensor also outputs a color image.  It's much harder to talk
-        about an ideal color image, as colors change with material properties
-        and lighting conditions (including reflections and shadows).  In the
-        example above, I've told drake to just use the simplest OpenGL-based
-        renderer.  But <drake></drake> does support a number of more advanced
-        rendering options that we will leverage in the chapters on "deep
-        perception", which make significantly more use of the RGB channels.</p>
+      <p>Real depth sensors, of course, are far from ideal -- and errors in
+      depth returns are not simple Gaussian noise, but rather are dependent on
+      the lighting conditions, the surface normals of the object, and the visual
+      material properties of the object, among other things.  The color channels
+      are an approximation, too.  Even our high-end renderers can only do as
+      well as the geometries, materials and lighting sources that we add to our
+      scene, and it is very hard to capture all of the nuances of a real
+      environment.  We will examine real sensor data, and the gaps between
+      modeled sensors and real sensors, after we start understanding some of the
+      basic operations.</p>
     </subsection>
   </section>
 
   <section><h1>Representations for geometry</h1>
 
-    <!--Color Images, Depth Images, and
-      Point Clouds-->
-
     <p>Depth image, point cloud, triangulated mesh, signed distance functions, (+ surfels, occupancy maps, ...)</p>
 
-    <p>The data returned by a depth camera takes the form of an image, where each pixel value is a single number that represents the distance between the camera and the nearest object in the environment along the pixel direction.  If we combine this with the basic information about the camera's intrisic (e.g. lens parameters) and extrinsic (e.g. position and orientation in space) parameters of the camera, then we can transform this <i>depth image representation</i> into a collection of points in three dimensions, called the <i>point cloud representation</i>.  As depth sensors have become so pervasive the field has built up libraries of tools for performing basic goemetric operations operate on point clouds, and that can be used to transform back and forth between representations.  In these notes, we'll use the <a href="http://www.open3d.org/">Open3D</a> library (note that many older projects used the <a href="http://pointclouds.org/">Point Cloud Library (PCL)</a>, which is now defunct but still has some very useful documentation).</p>
+    <p>The data returned by a depth camera takes the form of an image, where
+    each pixel value is a single number that represents the distance between the
+    camera and the nearest object in the environment along the pixel direction.
+    If we combine this with the basic information about the camera's intrinsic
+    parameters (e.g. lens parameters, stored in the <a
+    href="https://drake.mit.edu/doxygen_cxx/classdrake_1_1systems_1_1sensors_1_1_camera_info.html"><code>CameraInfo</code></a>
+    class in Drake) then we can transform this <i>depth image representation</i>
+    into a collection of 3D points, $s_i$.  I use $s$ here because they are
+    commonly referred to as the "scene points" in the algorithms we will present
+    below.  These points have a pose and (optionally) a color value or other
+    information attached.  This is known as a <i>point cloud representation</i>.
+    By default, their pose is described in the camera frame, $^CX^{s_i}$, but
+    the <code>DepthImageToPointCloud</code> system in Drake also accepts $^PX^C$
+    to make it easy to transform them into another frame (such as the world
+    frame).</p>  
+    
+    <div>
+      <script src="htmlbook/js-yaml.min.js"></script>
+      <script type="text/javascript">
+      var sys = jsyaml.load(`
+name: DepthImageToPointCloud
+input_ports:
+- depth_image
+- color_image (optional)
+- camera_pose (optional)
+output_ports:
+- point_cloud`);
+      document.write(system_html(sys, "http://drake.mit.edu/doxygen_cxx/classdrake_1_1perception_1_1_depth_image_to_point_cloud.html"));
+      </script>
+    </div>
+    
+    <p>As depth sensors have become so pervasive the field has built up
+    libraries of tools for performing basic goemetric operations operate on
+    point clouds, and that can be used to transform back and forth between
+    representations.  We can implement many of of the basic operations directly
+    in Drake, but I would recommend the <a
+    href="http://www.open3d.org/">Open3D</a> library if you need more (I have an
+    example of transferring data from the Drake image and point cloud
+    representations into Open3D <a href="manipulation/open3d/">here</a>).  Many
+    older projects used the <a href="http://pointclouds.org/">Point Cloud
+    Library (PCL)</a>, which is now defunct but still has some very useful
+    documentation.</p>
 
-    <example class="drake"><h1>Getting RGB-D values into Open3D</h1>
-
-      <p>Here the the mustard bottle example again, but this time we push the images coming out of <drake></drake> into the Open3D representation:</p>
-
-      <pysrc>manipulation/depth_camera_demo/show_open3d_rgbd.py</pysrc>
-    </example>
-
-    <p>It's important to realize that the conversion of a depth image into a point cloud does loose some information -- specifically the information about the ray that was cast from the camera to arrive at that point.  In addition to declaring "there is geometry at this point", the depth image also implies that "there is no geometry in the straight line path between camera and this point".  We will make use of this information in some of our algorithms, so don't discard the depth images completely!  More generally, we will find that each of the different geometry representations have strengths and weaknesses -- it is very common to keep multiple representations around and to convert back and forth between them.</p>
+    <p>It's important to realize that the conversion of a depth image into a
+    point cloud does loose some information -- specifically the information
+    about the ray that was cast from the camera to arrive at that point.  In
+    addition to declaring "there is geometry at this point", the depth image
+    combined with the camera pose also implies that "there is no geometry in the
+    straight line path between camera and this point".  We will make use of this
+    information in some of our algorithms, so don't discard the depth images
+    completely!  More generally, we will find that each of the different
+    geometry representations have strengths and weaknesses -- it is very common
+    to keep multiple representations around and to convert back and forth
+    between them.</p>
 
   </section>
 
+  <!--
   <section><h1>Working with point clouds</h1>
 
     <p>First, let us get a few simulated point clouds to work with.  We can use either <drake></drake> or Open3d to convert the depth image into a point cloud; we'll use Drake for this step here simply because we already have the camera parameters in the Drake format.  Although we can call the conversion functions directly, we can also add a system that does the conversion for us in the systems framework:</p>
@@ -227,12 +287,6 @@ output_ports:
     </table>
 
     <p>You can infer from the optional input ports on this system that point cloud representations can potentially include color values for each of the Cartesian points.  The following example will get us a few point clouds to work with.</p>
-
-    <example class="drake"><h1>Getting a simulated point cloud</h1>
-
-      <pysrc>manipulation/depth_camera_demo/show_open3d_pointcloud.py</pysrc>
-
-    </example>
 
     <todo>Combine all point clouds via https://drake.mit.edu/pydrake/pydrake.systems.perception.html?highlight=pointcloud#pydrake.systems.perception.PointCloudConcatenation</todo>
 
@@ -267,6 +321,7 @@ output_ports:
     </subsection>
 
   </section>
+  -->
 
   <section><h1>Geometric pose estimation</h1>
 

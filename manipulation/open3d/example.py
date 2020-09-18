@@ -1,5 +1,4 @@
 import numpy as np
-import open3d as o3d
 
 from pydrake.common import FindResourceOrThrow, set_log_level
 from pydrake.geometry.render import (DepthCameraProperties, MakeRenderEngineVtk,
@@ -12,7 +11,7 @@ from pydrake.systems.framework import DiagramBuilder
 from pydrake.systems.sensors import RgbdSensor
 
 
-def DepthCameraDemoSystem():
+def DepthCameraExampleSystem():
     builder = DiagramBuilder()
 
     # If you have trouble finding resources, you can enable trace logging
@@ -75,16 +74,3 @@ def DepthCameraDemoSystem():
     diagram = builder.Build()
     diagram.set_name("depth_camera_demo_system")
     return diagram
-
-
-def create_open3d_rgbd_image(color_image, depth_image):
-    color_image = o3d.geometry.Image(np.copy(
-        color_image.data[:, :, :3]))  # No alpha
-    depth_image = o3d.geometry.Image(np.squeeze(np.copy(depth_image.data)))
-    rgbd_image = o3d.geometry.RGBDImage.create_from_color_and_depth(
-        color=color_image,
-        depth=depth_image,
-        depth_scale=1.0,
-        depth_trunc=3.0,
-        convert_rgb_to_intensity=False)
-    return rgbd_image
