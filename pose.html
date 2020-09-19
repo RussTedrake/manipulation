@@ -180,6 +180,15 @@ output_ports:
 
         <figure><img src="data/mustard.svg"/></figure>
     
+        <p><img style="height:200px;float:right;margin-left:10px"
+        src="data/mustard_meshcat.png"/> Please make sure you spend a minute
+        with the MeshCat visualization (<a href="data/mustard.html">available
+        here</a>).  You'll see a camera and the camera frame, and you'll see the
+        mustard bottle as always... but it might look a little funny.  That's
+        because I'm displaying both the ground truth mustard bottle model
+        <i>and</i> the point cloud rendered from the cameras.  You can use the
+        MeshCat GUI to uncheck the ground truth visualization (image right), and you'll be able to see just the point cloud.</p>
+
         <p>Remember that, in addition to looking at the source code if you like,
         you can always inspect the block diagram to understand what is happening
         at the "systems level".  <a href="data/depth_camera_diagram.svg">Here is the diagram</a> used in this example.</p>
@@ -189,7 +198,7 @@ output_ports:
       <p>In the <code>ManipulationStation</code> simulation of the entire robot
       system for class, the <code>RgbdSensors</code> have already been added,
       and their output ports exposed as outputs for the station.</p>
-        
+
       <p>Real depth sensors, of course, are far from ideal -- and errors in
       depth returns are not simple Gaussian noise, but rather are dependent on
       the lighting conditions, the surface normals of the object, and the visual
@@ -207,6 +216,37 @@ output_ports:
       especially on the edges of objects (or on reflective objects) are a common
       sighting in raw depth data.  This figure is reproduced from
       <elib>Sweeney18a</elib>.</figcaption></figure>
+    </subsection>
+
+    <subsection><h1>Occlusions and partial views</h1>
+    
+      <p>The view of the mustard bottle in the example above makes one primary
+      challenge of working with cameras very clear. Cameras don't get to see
+      everything!  They only get line of sight.  If you want to get points from
+      the back of the mustard bottle, you'll need to move the camera.  And if
+      the mustard bottle is sitting on the table, you'll have to pick it up if
+      you ever want to see the bottom.  This situation gets even worse in
+      cluttered scenes, where we have our views of the bottle <i>occluded</i> by
+      other objects.  Even when the scene is not cluttered, a head-mounted or
+      table-mounted camera is often blocked by the robot's hand when it goes to
+      do manipulation -- the moments when you would like the sensors to be at
+      their best is often when they give no information!</p>
+
+      <p>It is quite common to mount a depth camera on the robot's wrist in
+      order to help with the partial views.  But it doesn't completely resolve
+      the problem.  All of our depth sensors have both a maximum range and a
+      minimum range.  The RealSense D415 returns matches from about 0.3m to
+      1.5m.  That means for the last 30cm of the approach to the object --
+      again, where we might like our cameras to be at their best -- the object
+      effectively disappears!</p>
+
+      <figure><img style="width:80%" src="data/dishloading_cameras.svg">
+      <figcaption>When luxury permits, we try to put as many cameras as we can
+      into the robot's environment.  In this dish-loading testbed at <a
+      href="https://www.tri.global/news/tri-taking-on-the-hard-problems-in-manipulation-re-2019-6-27">TRI</a>
+      where we put a total of eight cameras into the scene (it still doesn't
+      resolve the occlusion problem).</figcaption></figure>
+
     </subsection>
   </section>
 
@@ -332,7 +372,80 @@ output_ports:
 
   <section><h1>Geometric pose estimation</h1>
 
-    <p>For many manipulation tasks, our goal is to estimate the pose of a particular known object in the scene.  In the extreme case, we might have a perfect mesh model of the object that we want to manipulation, and our task is to find the subset of the point cloud that can "fit" best to the known model.</p>
+    <p>Let us address the primary objective of the chapter -- we have a known object somewhere in the robot's workspace, we've obtained a point cloud from our depth cameras.  How do we estimate the pose of the object, $X^O$?</p>
+
+    <subsection><h1>Point cloud registration with known correspondences</h1>
+    
+      <p><img style="height:90px;float:left;margin-right:10px"
+      src="data/icp_model_points_sketch.png"/>One very natural and well-studied
+      formulation of this problem comes from the literature on <a
+      href="https://en.wikipedia.org/wiki/Point_set_registration">point cloud
+      registration</a> (also known as point set registration or scan matching).
+      Given two point clouds, point cloud registration aims to find a rigid
+      transform that optimally aligns the two point clouds.  For our purposes,
+      that suggests that our "model" for the object should also take the form of
+      a point cloud (at least for now).  We'll describe that object with a list
+      of <i>model points</i>, $m_i$, with their pose described in the object
+      frame: $^OX^{m_i}.$ </p>
+
+      <p>Our second point cloud will be the <i>scene points</i>, $s_i$, that we
+      obtain from our depth camera, transformed (via the camera intrinsics) into
+      the camera coordinates, $^CX^{s_i}$.</p>  
+      
+      <p>Let us assume, for now, that we also know $X^C.$  Is this reasonable?
+      In the case of a wrist-mounted camera, this would amount to solving the
+      forward kinematics of the arm.  In an environment-mounted camera, this is
+      about knowing the pose of the cameras in the world.  Small errors in
+      estimating those poses, though, can lead to large artifacts in the
+      estimated point clouds.  We therefore take great care to perform <a
+      href="station.html">camera extrinsics calibration</a>; I've linked to our
+      calibration code in the <a href="station.html">appendix</a>.  Note that if
+      you have a mobile manipulation platform (an arm mounted on a moving base),
+      then all of these discussions still apply, but you likely will perform all
+      of your registration in the robot's frame instead of the world frame.</p>
+
+      <p>The second <b>major assumption</b> that we will make in this section is
+      "known correspondences".  This is <i>not</i> a reasonable assumption in
+      practice, but it helps us get started.  The assumption is that we know
+      which scene point corresponds with which model point.  Combined with the
+      assumption that we have a one-to-one mapping between scene points and
+      model points, we can encode this assumption -- for just this subsection --
+      as assuming $m_i \equiv s_i$.</p>
+
+      <p>As a result, the point cloud registration problem is simply an
+      (inverse) kinematics problem.  We can write the model points and the scene
+      points in a common frame (here the world frame), $$p^{m_i} = X^O
+      {^Op^{m_i}} = X^C {^Cp^{s_i}},$$leaving a single unknown transform, $X^O$,
+      for which we must solve.</p>
+
+      <p>What does a solution for $X^O$ look like?  Each model point gives us
+      three constraints, when $p^{s_i} \in \Re^3.$  The exact number of unknowns
+      depends on the particular representation we choose for the pose, but
+      almost always this problem is dramatically over-constrained.  Treating
+      each point as hard constraints on the relative pose would also be very
+      susceptible to measurement noise.  As a result, it will serve us better to
+      try to find a pose that describes the data, e.g., in a least-squares
+      sense: $$\min_{X^O} \sum_i \| X^O {^Op^{m_i}} - X^C {^Cp^{s_i}}\|^2.$$</p>
+
+      <p>To proceed, let's pick a particular representation for the pose to work
+      with.  I will use 3x3 rotation matrices here; the approach I'll describe
+      below also has an equivalent in quaternion form<elib>Horn87</elib>.  To
+      write the optimization above using the coefficients of the rotation matrix
+      and the translation as decision variables, I have: \begin{align}
+      \min_{p^O, R^O} \quad& \sum_i \| p^O + R^O{^Op^{m_i}} - X^C
+      {^Cp^{s_i}}\|^2, \\ \subjto \quad& R^T = R^{-1}, \quad \det(R) = +1.
+      \nonumber \end{align}  The constraints are needed because not every 3x3
+      matrix is a valid rotation matrix; satisfying these constraints ensures
+      that $R$ <i>is</i> a valid rotation matrix.  In fact, the constraint $R^T
+      = R^{-1}$ is almost enough by itself; it implies that $\det(R) = \pm 1.$
+      But a matrix that satisfies that constraint with $\det(R) = -1$ is called
+      an "<a href="https://en.wikipedia.org/wiki/Improper_rotation">improper
+      rotation</a>", or a rotation plus a reflection across the axis of
+      rotation.</p>
+
+
+    
+    </subsection>
 
     <subsection><h1>Iterative Closest Point (ICP)</h1>
 
@@ -383,6 +496,43 @@ output_ports:
 
   <section><h1>Tracking</h1>
   
+  </section>
+
+  <section id="exercises"><h1>Exercises</h1>
+  
+    <exercise><h1>How many points do you need?</h1>
+    
+      <p>Consider the problem of point cloud registration with known
+      correspondences.  I said that, in most cases, we have far more points than
+      we have decision variables, and therefore treating each as an equality
+      constraint would make the problem over-constrained.  That raises a natural
+      question: what is the minimal number of points required to uniquely
+      specify a pose?  In 2D?  In 3D?  (The answer might not be what you might
+      first think!)</p>
+
+      <!-- 2 points is sufficient in 2D.  3 in 3D.  The disconnect to our
+      intuition (e.g. how many points required to specify a plane), is because
+      these points have unique IDs from the correspondences.  And reflections
+      aren't allowed.  -->
+    
+    </exercise>
+
+    <exercise><h1>Rotational symmetries</h1>
+
+      <p>We have a beautiful formulation for the point cloud registration
+      problem with known correspondences -- it has a quadratic objective and
+      (with the determinant constraint relaxed) a quadratic equality constraint.
+      Sometimes we have objects that are rotationally symmetric -- think of box
+      that is a perfect cube.  How can the quadratic objective capture a problem
+      where there should be equally good solutions at rotations that are 90
+      degrees apart?</p>
+
+      <!-- Answer:  It can't!  And this can't happen in our formulation, because
+      there is no such thing as rotational symmetry when we've assumed known and
+      one-to-one correspondences. -->
+
+    </exerciste>
+
   </section>
 
 </chapter>
