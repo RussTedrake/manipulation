@@ -5,13 +5,22 @@
 # Licensed under the BSD 3-Clause License. See LICENSE.TXT for details.
 
 load("//htmlbook/tools/python:defs.bzl", "rt_py_library")
+load("//htmlbook/tools/python:defs.bzl", "rt_py_test")
 
 rt_py_library(
     name = "manipulation",
     srcs = [
         "__init__.py",
+        "meshcat_utils.py",
         "utils.py",
     ],
     imports = [".."],
     visibility = ["//visibility:public"],
+)
+
+rt_py_test(
+    name = "test_meshcat_utils",
+    srcs = ["test/test_meshcat_utils.py"],
+    deps = ["manipulation"],
+    imports = [".."],
 )
