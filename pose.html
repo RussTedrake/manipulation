@@ -210,7 +210,7 @@ output_ports:
       modeled sensors and real sensors, after we start understanding some of the
       basic operations.</p>
 
-      <figure><img src="data/Sweeney18a_fig3.png"/><figcaption>Real depth
+      <figure><img style="width:95%" src="data/Sweeney18a_fig3.png"/><figcaption>Real depth
       sensors are messy.  The red pixels in the far right image are missed
       returns -- the depth sensor returned "maximum depth".  Missed returns,
       especially on the edges of objects (or on reflective objects) are a common
@@ -416,7 +416,13 @@ output_ports:
       (inverse) kinematics problem.  We can write the model points and the scene
       points in a common frame (here the world frame), $$p^{m_i} = X^O
       {^Op^{m_i}} = X^C {^Cp^{s_i}},$$leaving a single unknown transform, $X^O$,
-      for which we must solve.</p>
+      for which we must solve.  In the previous chapter I argued for using
+      differential kinematics instead of inverse kinematics; why is my story
+      different here?  Differential kinematics can still be useful for
+      perception, for example if we want to track the pose of an object after we
+      acquire it's initial pose.  But unlike the robot case, where we can read
+      the joint sensors to get our current state, in perception we need to solve
+      this harder problem at least once.</p>
 
       <p>What does a solution for $X^O$ look like?  Each model point gives us
       three constraints, when $p^{s_i} \in \Re^3.$  The exact number of unknowns
@@ -443,22 +449,96 @@ output_ports:
       rotation</a>", or a rotation plus a reflection across the axis of
       rotation.</p>
 
+      <p>Let's think about the type of optimization problem we've formulated so
+      far.  Given our decision to use rotation matrices, the term $p^O +
+      R^O{^Op^{m_i}} - X^C {^Cp^{s_i}}$ is linear in the decision variables
+      (think $Ax \approx b$), making the objective a convex quadratic.  How
+      about the constraints?  The first constraint is a quadratic equality
+      constraint (to see it, rewrite it as $RR^T=I$ which gives 9 constraints,
+      each quadratic in the elements of $R$).  The determinant constraint is
+      cubic in the elements of $R$.</p>
 
+      <example><h1>Rotation-only point registration in 2D</h1>
+        
+        <p>I would like you to have a graphical sense for this optimization
+        problem, but it's hard to plot the objective function with 9+3 decision
+        variables.  To whittle it down to the essentials that I can plot, let's
+        consider the case where the scene points are known to differ from the
+        model points by a rotation only (this is famously known as <a
+        href="https://en.wikipedia.org/wiki/Wahba%27s_problem">the Wahba
+        problem</a>).  To further simplify, let's consider the problem in 2D
+        instead of 3D.</p>
+
+        <p>In 2D, we can actually linearly parameterize a rotation matrix with
+        just two variables:  $$R = \begin{bmatrix} a & -b \\ b &
+        a\end{bmatrix}.$$  With this parameterization, the constraints $RR^T=I$
+        and the determinant constraints are identical; they both require that
+        $a^2 + b^2 = 1.$</p>
+
+        <figure><img style="width:80%" src="data/wahba2d.png"/></figure><figcaption>The $x$ and
+        $y$ axes of this plot correspond to the parameters $a$, and $b$,
+        respectively, that define the 2D rotation matrix, $R$.  The green
+        quadratic bowl is the objective $\sum_i \| R {p^{m_i}} - p^{s_i}\|^2,$
+        and the red open cylinder is the rotation matrix constraint.  <a
+        href="https://www.geogebra.org/3d/pn628maw">Click here for the
+        interactive version.</a></figcaption>
+
+        <p>Is that what you expected?  I generated this plot using just two
+        model/scene points, but adding more will only change the shape of the
+        quadratic, but not it's minimum.  And on the <a
+        href="https://www.geogebra.org/3d/pn628maw">interactive version</a> of
+        the plot, I've added a slider so that you control the parameter,
+        $\theta$, that represents the ground truth rotation described by $R$.
+        Try it out!</p>
+
+        <p>In the case with no noise in the measurements (e.g. the scene points
+        are exactly the model points modified by a rotation matrix), then the
+        minimum of the objective function already satisfies the constraint.  But
+        if you add just a little noise to the points, then this is no longer
+        true, and the constraint starts to play an important role.</p>
+      </example>
+
+      <p>The geometry should be roughly the same in 3D, though clearly in much
+      higher dimensions.  But I hope that the plot makes it perhaps a little
+      less surprising that this problem has an elegant numerical solution based
+      on the singular value decomposition (SVD), with once caveat.  We have to
+      drop the determinant constraint, which is the nastiest of the bunch.
+      Dropping or simplifying a troublesome constraint is a common strategy in
+      optimization; we call it a <a
+      href="https://en.wikipedia.org/wiki/Relaxation_(approximation)">relaxation</a>
+      of the original problem.</p>
     
+      <p>To obtain the solution to the relaxed problem, \begin{align}
+      \min_{p\in\Re^3,R\in\Re^{3\times3}} \quad & \sum_i \| p + R \hspace{.1cm}
+      {^Op^{m_i}} - p^{s_i}\|^2, \\ \subjto \quad & RR^T = I,\end{align} first
+      we define the <i>mean</i> model and scene points, $\bar{m}$ and $\bar{s}$
+      with positions given by $$^Op^\bar{m} = \frac{1}{N} \sum_i^N {^Op^{m_i}},
+      \qquad p^\bar{s} = \frac{1}{N} \sum_i^N p^{s_i}.$$  Compose the data
+      matrix $$W = \sum_i (^Op^{m_i} - {^Op^\bar{m}}) (p^{s_i} - p^\bar{s})^T,
+      $$ and use SVD to compute $W = U \Sigma V^T$.  As if by magic, the optimal
+      solution is \begin{gather*} R^* = U V^T, \\ p^* = {^Op^\bar{m}} - R^*
+      p^\bar{s}.\end{gather*} There many derivations available in the
+      literature, see <elib>Haralick89</elib>
+      (section 3) for one of my favorites.  Note: because we have relaxed the
+      determinant constraint, this formulation can return an improper rotation
+      matrix.  If this is the case, which can be checked if the determinant of
+      $R^*$ is -1, you must negate the third column of $V$, then recompute
+      $R^*$.</p>  <todo>Add exercise on the reflection case.</todo>
+
+      <p>The exact same math works if the correspondences are given, but are not
+      one-to-one.  What is important 
+      to understand is that, once the
+      correspondences are given, then we have an efficient and robust numerical
+      solution to estimating the pose.</p>
+
     </subsection>
 
     <subsection><h1>Iterative Closest Point (ICP)</h1>
 
+<!--
       <p>One of the famous and often used (despite it's well-known limitations) is the interative closest point algorithm.  We'll start with the simplest version of it -- where instead of localizing a mesh model to the point cloud data, we will try localize two point clouds relative to each other. This is commonly referred to as "point-to-point ICP", "point cloud registration", or the "point correspondence problem".</p>
 
-      <figure>
-        <img src="figures/ICP_cartoon.jpg" width="80%"/>
-        <figcaption>Model points and scene points.</figcaption>
-      </figure>
-
-      <p>Let us denote the points on our model as $m_i \in M$, and the points obtained from our sensor as $s_i \in S$.  Even when we are assuming our point clouds are ideal (noise free), we will have a number of challenges: there is no reason to expect every point in $M$ to appear in $S$ (e.g., because our camera is viewing just one side of the object, or may be partially occluded), and there is no reason to believe that every element in $S$ corresponds to one of the points in $M$ (there may be other objects in the scene).  So a major task in ICP is to attempt to solve this <i>correspondence</i> problem.  But before we do, let us understand the case where the correspondences are magically given -- specifically we will assume that for every point of interest in the scene, $s_i$, we have a map $C$ such that $c_i$ is the index into the list of model points -- so $s_i$ corresponds with $m_{c_i}$.  Once these are given, our task is to recover the rigid body transformation that describes the relative pose of the model in the scene: \[ \min_{R \in SO(3), t \in \mathbb{R}^3} \sum_i^N \| Rs_i + t - m_{c_i} \|^2, \] where $R$ is 3x3 rotation matrix and $t$ is a 3x1 translation vector.  At first glance, this looks like a nice optimization problem -- the decision variables $R$ and $t$ enter linearly in the inside term, so it is almost another simple least-squares problem. The trick is the constraint that $R$ must be a rotation matrix.  Therefore, we could equivalently have written \begin{align*} \min_{R \in \mathbb{R}^{3x3}, t \in \mathbb{R}^3} && \sum_i^N \| Rs_i + t - m_{c_i} \|^2, \\ \subjto && R^T = R^{-1}, \det(R) = 1. \end{align*} Surprisingly, if we ignore the determinant constraint, then this seeming difficult (quadratically constrainted quadratic program) has a clean numerical solution -- once again given (once again) by SVD.  Define the mean model and scene points $$\bar{m} = \frac{1}{N} \sum_i^N m_{c_i}, \qquad \bar{s} = \frac{1}{N} \sum_i^N s_i.$$  Compose the data matrix $$W = \sum_i (m_{c_i} - \bar{m}) (s_i - \bar{s})^T, $$ and use SVD to compute $W = U \Sigma V^T$.  Magically, the optimal solution is \begin{gather*} R^* = U V^T, \\ 
-      t^* = \bar{m} - R \bar{s}.\end{gather*} Sometimes this formulation of gives a Householder reflection matrix instead of a rotation matrix.  If this is the case, which can be checked if the determinant of $R^*$ is -1, you must negate the third column of $V$, then recompute $R^*$.
-      There many derivations available in the literature, see <elib>Haralick89</elib> (section 3) for one of my favorites.  What is important for us to understand is that, once the correspondences are given, then we have an efficient and robust numerical solution to estimating the pose.</p>
+      <p>Let us denote the points on our model as $m_i \in M$, and the points obtained from our sensor as $s_i \in S$.  Even when we are assuming our point clouds are ideal (noise free), we will have a number of challenges: there is no reason to expect every point in $M$ to appear in $S$ (e.g., because our camera is viewing just one side of the object, or may be partially occluded), and there is no reason to believe that every element in $S$ corresponds to one of the points in $M$ (there may be other objects in the scene).  So a major task in ICP is to attempt to solve this <i>correspondence</i> problem.  </p>
 
       <p>Let us now consider the other half of the problem.  What if the pose, given by $R$ and $t$, was known... then can we back out the optimal correspondences?  If we aim to maximize our reconstruction objective, then the optimal correspondences are given by $$c_i = \argmin_{j \in N_m}\| R s_i + t - m_{c_j} \|^2,$$  where $N_m$ is the number of model points.  In words, we want to find the point in the model that is the closest in Euclidean distance to the transformed scene points.  This is the famous "nearest neighbor" problem, and we have good numerical solutions (often using the aforementioned special data structures) for it.</p>
 
@@ -469,7 +549,8 @@ output_ports:
       <p>Intuition about these local minima has motivated a number of ICP variants, include point to plane ICP, normal ICP, ICP that use color information, feature-based ICP, etc.</p>
 
       <p>Maybe more fundamental, though, is the fact that I don't think the ICP objective, even if we could optimize it perfectly is quite right.  (TODO: add the example of a long thin book).  And there is information that we have, which should aid in estimating the pose, which is not present in the point cloud (like the location of the cameras).</p>
-    
+-->
+
     </subsection>
 
     <todo>Add a simple example and a homework problem/exercise.</todo>
