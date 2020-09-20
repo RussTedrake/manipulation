@@ -538,23 +538,46 @@ output_ports:
       substitute the right-hand side in for $p$ in our objective and solve for
       $R$ by itself.</p> 
       
-      <p>To find $R$, compose the data matrix $$W = \sum_{i=1}^{N_s}
-      (^Op^{m_{c_i}} - {^Op^\bar{m}}) (p^{s_i} - p^\bar{s})^T, $$ and use SVD to
-      compute $W = U \Sigma V^T$.  The optimal solution is \begin{gather*} R^* =
-      U V^T, \\ p^* = {^Op^\bar{s}} - R^* p^\bar{m}.\end{gather*} This may seem
-      like magic, but the SVD just gives the optimal projection back onto the
-      rotation matrices.  There many derivations available in the literature,
+      <p>To find $R$, compose the data matrix $$W = \sum_{i=1}^{N_s} (p^{s_i} -
+      p^\bar{s}) (^Op^{m_{c_i}} - {^Op^\bar{m}})^T, $$ and use SVD to compute $W
+      = U \Sigma V^T$.  The optimal solution is \begin{gather*} R^* = U V^T, \\
+      p^* = {^Op^\bar{s}} - R^* p^\bar{m}.\end{gather*} This may seem like
+      magic, but the SVD just gives the optimal projection back onto the
+      orthonormal matrices.  There many derivations available in the literature,
       see <elib>Haralick89</elib> (section 3) for one of my favorites.  Note:
       because we have relaxed the determinant constraint, this formulation can
       return an improper rotation matrix.  If this is the case, which can be
       checked if the determinant of $R^*$ is -1, you must negate the third
       column of $V$, then recompute $R^*$.</p>  
       
+      <example class="drake"><h1>Point cloud registration with known
+      correspondences</h1>
+
+        <figure><img style="width:70%; margin-top:-20px; margin-bottom:-20px"
+        src="data/pose_from_known_correspondences.svg"/> </figure>
+
+        <p>In the example code, I've made a random object (based on a random set
+        of points in the $x$-$y$ plane), and perturbed it by a random 2D
+        transform.  The blue points are the model points in the model
+        coordinates, and the red points are the scene points.  The green dashed
+        lines represent the (perfect) correspondences.  On the right, I've
+        plotted both points again, but this time using the estimated pose to put
+        them both in the world frame.  As expected, the algorithm perfectly
+        recovers the ground truth transformation.</p>
+
+        <!-- TODO: update this scrollTo -->
+        <p><a target="pose"
+          href="https://colab.research.google.com/github/RussTedrake/manipulation/blob/master/pose.ipynb#scrollTo=7q0A14bAilIX"><img
+          src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
+          </p>
+
+      </example>
+
       <todo>Add exercise on the reflection case.</todo>
 
       <todo>Confirm or disprove: i think that this is just the least squares
-      solution to the unconstrained problem, then projected back to the rotation
-      matrices (with the SVD).</todo>
+      solution to the unconstrained problem, then projected back to the
+      orthonormal matrices (with the SVD).</todo>
 
       <p>What is important to understand is that once the
       correspondences are given we have an efficient and robust numerical
@@ -594,6 +617,33 @@ output_ports:
       expectation maximization.  It is important to understand that this is a
       local solution to a non-convex optimization problem.  So it is subject to
       getting stuck in local minima.</p>
+
+
+      <example class="drake"><h1>Iterative Closest Point</h1>
+  
+          <figure>
+            <iframe style="border:0;height:300px;width:400px;" src="data/iterative_closest_point.html"></iframe>
+          </figure>
+  
+          <p>Here is ICP running on the random 2D objects.  Blue are the model
+          points, red are the scene points, green dashed lines are the
+          correspondences.  I encourage you to run the code yourself.</p>  
+            
+          <p>I've included one of the animation where it happens to converge to
+          the true optimal solution.  But it gets stuck in a local minima more
+          often than not!  I hope that stepping through will help your
+          intuition.  Remember that once the correspondences are correct, the
+          pose estimation will recover the exact solution.  So every one of
+          those steps before convergence has at least a few bad
+          correspondences.  Look closely!</p>
+  
+          <!-- TODO: update this scrollTo -->
+          <p><a target="pose"
+            href="https://colab.research.google.com/github/RussTedrake/manipulation/blob/master/pose.ipynb#scrollTo=7q0A14bAilIX"><img
+            src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
+            </p>
+  
+        </example>      
       
       <!--<todo>Thanks to the geometric nature of the
       problem, many of these local minima are graphical and intuitive.  (Will
@@ -617,6 +667,8 @@ output_ports:
     <subsection><h1>Dealing with outliers</h1>
 
       <todo>Ransac</todo>
+
+      <todo>Max distance on closest points</todo>
     
       <todo>Truncated least-squares.  Greg's work.  Teaser.</todo>
     
@@ -628,9 +680,11 @@ output_ports:
   
     </subsection>
   
-    <subsection><h1>Alternative formulations</h1>
+    <subsection><h1>Soft correspondences</h1>
 
-      <todo>Coherent Point Drift (CPD) and FilterReg</todo>
+      <todo>Coherent Point Drift (CPD), e.g. equation 7.</todo>
+
+      <todo>FilterReg</todo>
 
     </subsection>
   
