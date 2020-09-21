@@ -16,6 +16,7 @@
     "misc"
   ],
   "other_potential_chapters": [ 
+    "tracking",
     "belief-space planning",
     "Teleoperation and Imitation Learning; Interfaces.  Inputs (keyboard + mouse, HTC Vive, data gloves...).  Feedback (VR, haptic feedback).",
     "system id / intuitive physics",
