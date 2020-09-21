@@ -370,333 +370,367 @@ output_ports:
   </section>
   -->
 
-  <section><h1>Geometric pose estimation</h1>
-
-    <p>Let us address the primary objective of the chapter -- we have a known object somewhere in the robot's workspace, we've obtained a point cloud from our depth cameras.  How do we estimate the pose of the object, $X^O$?</p>
-
-    <subsection><h1>Point cloud registration with known correspondences</h1>
+  <section><h1>Point cloud registration with known correspondences</h1>
     
-      <p><img style="height:90px;float:left;margin-right:10px"
-      src="data/icp_model_points_sketch.png"/>One very natural and well-studied
-      formulation of this problem comes from the literature on <a
-      href="https://en.wikipedia.org/wiki/Point_set_registration">point cloud
-      registration</a> (also known as point set registration or scan matching).
-      Given two point clouds, point cloud registration aims to find a rigid
-      transform that optimally aligns the two point clouds.  For our purposes,
-      that suggests that our "model" for the object should also take the form of
-      a point cloud (at least for now).  We'll describe that object with a list
-      of <i>model points</i>, $m_i$, with their pose described in the object
-      frame: $^OX^{m_i}.$ </p>
+    <p>Let us begin to address the primary objective of the chapter -- we have a
+    known object somewhere in the robot's workspace, we've obtained a point
+    cloud from our depth cameras.  How do we estimate the pose of the object,
+    $X^O$?</p>
 
-      <p>Our second point cloud will be the <i>scene points</i>, $s_i$, that we
-      obtain from our depth camera, transformed (via the camera intrinsics) into
-      the camera coordinates, $^CX^{s_i}$.  I'll use $N_m$ and $N_s$ for the number of model and scene points, respectively.</p>  
+    <p><img style="height:90px;float:left;margin-right:10px"
+    src="data/icp_model_points_sketch.png"/>One very natural and well-studied
+    formulation of this problem comes from the literature on <a
+    href="https://en.wikipedia.org/wiki/Point_set_registration">point cloud
+    registration</a> (also known as point set registration or scan matching).
+    Given two point clouds, point cloud registration aims to find a rigid
+    transform that optimally aligns the two point clouds.  For our purposes,
+    that suggests that our "model" for the object should also take the form of a
+    point cloud (at least for now).  We'll describe that object with a list of
+    <i>model points</i>, $m_i$, with their pose described in the object frame:
+    $^OX^{m_i}.$ </p>
+
+    <p>Our second point cloud will be the <i>scene points</i>, $s_i$, that we
+    obtain from our depth camera, transformed (via the camera intrinsics) into
+    the camera coordinates, $^CX^{s_i}$.  I'll use $N_m$ and $N_s$ for the
+    number of model and scene points, respectively.</p>  
       
-      <p>Let us assume, for now, that we also know $X^C.$  Is this reasonable?
-      In the case of a wrist-mounted camera, this would amount to solving the
-      forward kinematics of the arm.  In an environment-mounted camera, this is
-      about knowing the pose of the cameras in the world.  Small errors in
-      estimating those poses, though, can lead to large artifacts in the
-      estimated point clouds.  We therefore take great care to perform <a
-      href="station.html">camera extrinsics calibration</a>; I've linked to our
-      calibration code in the <a href="station.html">appendix</a>.  Note that if
-      you have a mobile manipulation platform (an arm mounted on a moving base),
-      then all of these discussions still apply, but you likely will perform all
-      of your registration in the robot's frame instead of the world frame.</p>
+    <p>Let us assume, for now, that we also know $X^C.$  Is this reasonable? In
+    the case of a wrist-mounted camera, this would amount to solving the forward
+    kinematics of the arm.  In an environment-mounted camera, this is about
+    knowing the pose of the cameras in the world.  Small errors in estimating
+    those poses, though, can lead to large artifacts in the estimated point
+    clouds.  We therefore take great care to perform <a
+    href="station.html">camera extrinsics calibration</a>; I've linked to our
+    calibration code in the <a href="station.html">appendix</a>.  Note that if
+    you have a mobile manipulation platform (an arm mounted on a moving base),
+    then all of these discussions still apply, but you likely will perform all
+    of your registration in the robot's frame instead of the world frame.</p>
 
-      <p>The second <b>major assumption</b> that we will make in this section is
-      "known correspondences".  This is <i>not</i> a reasonable assumption in
-      practice, but it helps us get started.  The assumption is that we know
-      which scene point corresponds with which model point.  I'll use a
-      correspondence vector $c \in [1,N_m]^{N_s}$, where $c_i = j$ denotes that
-      scene point $s_i$ corresponds with model point $m_j$.  Note that we do not
-      assume that these correspondence are one-to-one.  Every scene point
-      corresponds to some model point, but the converse is not true, and
-      multiple scene points may correspond to the same model point.</p>
+    <p>The second <b>major assumption</b> that we will make in this section is
+    "known correspondences".  This is <i>not</i> a reasonable assumption in
+    practice, but it helps us get started.  The assumption is that we know which
+    scene point corresponds with which model point.  I'll use a correspondence
+    vector $c \in [1,N_m]^{N_s}$, where $c_i = j$ denotes that scene point $s_i$
+    corresponds with model point $m_j$.  Note that we do not assume that these
+    correspondence are one-to-one.  Every scene point corresponds to some model
+    point, but the converse is not true, and multiple scene points may
+    correspond to the same model point.</p>
 
-      <p>As a result, the point cloud registration problem is simply an
-      (inverse) kinematics problem.  We can write the model points and the scene
-      points in a common frame (here the world frame), $$p^{m_{c_i}} = X^O
-      {^Op^{m_{c_i}}} = X^C {^Cp^{s_i}},$$leaving a single unknown transform,
-      $X^O$, for which we must solve.  In the previous chapter I argued for
-      using differential kinematics instead of inverse kinematics; why is my
-      story different here?  Differential kinematics can still be useful for
-      perception, for example if we want to track the pose of an object after we
-      acquire it's initial pose.  But unlike the robot case, where we can read
-      the joint sensors to get our current state, in perception we need to solve
-      this harder problem at least once.</p>
+    <p>As a result, the point cloud registration problem is simply an (inverse)
+    kinematics problem.  We can write the model points and the scene points in a
+    common frame (here the world frame), $$p^{m_{c_i}} = X^O {^Op^{m_{c_i}}} =
+    X^C {^Cp^{s_i}},$$leaving a single unknown transform, $X^O$, for which we
+    must solve.  In the previous chapter I argued for using differential
+    kinematics instead of inverse kinematics; why is my story different here?
+    Differential kinematics can still be useful for perception, for example if
+    we want to track the pose of an object after we acquire it's initial pose.
+    But unlike the robot case, where we can read the joint sensors to get our
+    current state, in perception we need to solve this harder problem at least
+    once.</p>
 
-      <p>What does a solution for $X^O$ look like?  Each model point gives us
-      three constraints, when $p^{s_i} \in \Re^3.$  The exact number of unknowns
-      depends on the particular representation we choose for the pose, but
-      almost always this problem is dramatically over-constrained.  Treating
-      each point as hard constraints on the relative pose would also be very
-      susceptible to measurement noise.  As a result, it will serve us better to
-      try to find a pose that describes the data, e.g., in a least-squares
-      sense: $$\min_{X^O} \sum_{i=1}^{N_s} \| X^O {^Op^{m_{c_i}}} - X^C {^Cp^{s_i}}\|^2.$$</p>
+    <p>What does a solution for $X^O$ look like?  Each model point gives us
+    three constraints, when $p^{s_i} \in \Re^3.$  The exact number of unknowns
+    depends on the particular representation we choose for the pose, but almost
+    always this problem is dramatically over-constrained.  Treating each point
+    as hard constraints on the relative pose would also be very susceptible to
+    measurement noise.  As a result, it will serve us better to try to find a
+    pose that describes the data, e.g., in a least-squares sense: $$\min_{X^O}
+    \sum_{i=1}^{N_s} \| X^O {^Op^{m_{c_i}}} - X^C {^Cp^{s_i}}\|^2.$$</p>
 
-      <p>To proceed, let's pick a particular representation for the pose to work
-      with.  I will use 3x3 rotation matrices here; the approach I'll describe
-      below also has an equivalent in quaternion form<elib>Horn87</elib>.  To
-      write the optimization above using the coefficients of the rotation matrix
-      and the translation as decision variables, I have: \begin{align}
-      \min_{p^O, R^O} \quad& \sum_{i=1}^{N_s} \| p^O + R^O{^Op^{m_{c_i}}} - X^C
-      {^Cp^{s_i}}\|^2, \\ \subjto \quad& R^T = R^{-1}, \quad \det(R) = +1.
-      \nonumber \end{align}  The constraints are needed because not every 3x3
-      matrix is a valid rotation matrix; satisfying these constraints ensures
-      that $R$ <i>is</i> a valid rotation matrix.  In fact, the constraint $R^T
-      = R^{-1}$ is almost enough by itself; it implies that $\det(R) = \pm 1.$
-      But a matrix that satisfies that constraint with $\det(R) = -1$ is called
-      an "<a href="https://en.wikipedia.org/wiki/Improper_rotation">improper
-      rotation</a>", or a rotation plus a reflection across the axis of
-      rotation.</p>
+    <p>To proceed, let's pick a particular representation for the pose to work
+    with.  I will use 3x3 rotation matrices here; the approach I'll describe
+    below also has an equivalent in quaternion form<elib>Horn87</elib>.  To
+    write the optimization above using the coefficients of the rotation matrix
+    and the translation as decision variables, I have: \begin{align} \min_{p^O,
+    R^O} \quad& \sum_{i=1}^{N_s} \| p^O + R^O{^Op^{m_{c_i}}} - X^C
+    {^Cp^{s_i}}\|^2, \\ \subjto \quad& R^T = R^{-1}, \quad \det(R) = +1.
+    \nonumber \end{align}  The constraints are needed because not every 3x3
+    matrix is a valid rotation matrix; satisfying these constraints ensures that
+    $R$ <i>is</i> a valid rotation matrix.  In fact, the constraint $R^T =
+    R^{-1}$ is almost enough by itself; it implies that $\det(R) = \pm 1.$ But a
+    matrix that satisfies that constraint with $\det(R) = -1$ is called an "<a
+    href="https://en.wikipedia.org/wiki/Improper_rotation">improper
+    rotation</a>", or a rotation plus a reflection across the axis of
+    rotation.</p>
 
-      <p>Let's think about the type of optimization problem we've formulated so
-      far.  Given our decision to use rotation matrices, the term $p^O +
-      R^O{^Op^{m_{c_i}}} - X^C {^Cp^{s_i}}$ is linear in the decision variables
-      (think $Ax \approx b$), making the objective a convex quadratic.  How
-      about the constraints?  The first constraint is a quadratic equality
-      constraint (to see it, rewrite it as $RR^T=I$ which gives 9 constraints,
-      each quadratic in the elements of $R$).  The determinant constraint is
-      cubic in the elements of $R$.</p>
+    <p>Let's think about the type of optimization problem we've formulated so
+    far.  Given our decision to use rotation matrices, the term $p^O +
+    R^O{^Op^{m_{c_i}}} - X^C {^Cp^{s_i}}$ is linear in the decision variables
+    (think $Ax \approx b$), making the objective a convex quadratic.  How about
+    the constraints?  The first constraint is a quadratic equality constraint
+    (to see it, rewrite it as $RR^T=I$ which gives 9 constraints, each quadratic
+    in the elements of $R$).  The determinant constraint is cubic in the
+    elements of $R$.</p>
 
-      <example><h1>Rotation-only point registration in 2D</h1>
+    <example><h1>Rotation-only point registration in 2D</h1>
         
-        <p>I would like you to have a graphical sense for this optimization
-        problem, but it's hard to plot the objective function with 9+3 decision
-        variables.  To whittle it down to the essentials that I can plot, let's
-        consider the case where the scene points are known to differ from the
-        model points by a rotation only (this is famously known as <a
-        href="https://en.wikipedia.org/wiki/Wahba%27s_problem">the Wahba
-        problem</a>).  To further simplify, let's consider the problem in 2D
-        instead of 3D.</p>
+      <p>I would like you to have a graphical sense for this optimization
+      problem, but it's hard to plot the objective function with 9+3 decision
+      variables.  To whittle it down to the essentials that I can plot, let's
+      consider the case where the scene points are known to differ from the
+      model points by a rotation only (this is famously known as <a
+      href="https://en.wikipedia.org/wiki/Wahba%27s_problem">the Wahba
+      problem</a>).  To further simplify, let's consider the problem in 2D
+      instead of 3D.</p>
 
-        <p>In 2D, we can actually linearly parameterize a rotation matrix with
-        just two variables:  $$R = \begin{bmatrix} a & -b \\ b &
-        a\end{bmatrix}.$$  With this parameterization, the constraints $RR^T=I$
-        and the determinant constraints are identical; they both require that
-        $a^2 + b^2 = 1.$</p>
+      <p>In 2D, we can actually linearly parameterize a rotation matrix with
+      just two variables:  $$R = \begin{bmatrix} a & -b \\ b & a\end{bmatrix}.$$
+      With this parameterization, the constraints $RR^T=I$ and the determinant
+      constraints are identical; they both require that $a^2 + b^2 = 1.$</p>
 
-        <figure><img style="width:80%" src="data/wahba2d.png"/></figure><figcaption>The $x$ and
-        $y$ axes of this plot correspond to the parameters $a$, and $b$,
-        respectively, that define the 2D rotation matrix, $R$.  The green
-        quadratic bowl is the objective $\sum_i \| R {p^{m_{c_i}}} - p^{s_i}\|^2,$
-        and the red open cylinder is the rotation matrix constraint.  <a
-        href="https://www.geogebra.org/3d/pn628maw">Click here for the
-        interactive version.</a></figcaption>
+      <figure><img style="width:80%"
+      src="data/wahba2d.png"/></figure><figcaption>The $x$ and $y$ axes of this
+      plot correspond to the parameters $a$, and $b$, respectively, that define
+      the 2D rotation matrix, $R$.  The green quadratic bowl is the objective
+      $\sum_i \| R {p^{m_{c_i}}} - p^{s_i}\|^2,$ and the red open cylinder is
+      the rotation matrix constraint.  <a
+      href="https://www.geogebra.org/3d/pn628maw">Click here for the interactive
+      version.</a></figcaption>
 
-        <p>Is that what you expected?  I generated this plot using just two
-        model/scene points, but adding more will only change the shape of the
-        quadratic, but not it's minimum.  And on the <a
-        href="https://www.geogebra.org/3d/pn628maw">interactive version</a> of
-        the plot, I've added a slider so that you control the parameter,
-        $\theta$, that represents the ground truth rotation described by $R$.
-        Try it out!</p>
+      <p>Is that what you expected?  I generated this plot using just two
+      model/scene points, but adding more will only change the shape of the
+      quadratic, but not it's minimum.  And on the <a
+      href="https://www.geogebra.org/3d/pn628maw">interactive version</a> of the
+      plot, I've added a slider so that you control the parameter, $\theta$,
+      that represents the ground truth rotation described by $R$. Try it
+      out!</p>
 
-        <p>In the case with no noise in the measurements (e.g. the scene points
-        are exactly the model points modified by a rotation matrix), then the
-        minimum of the objective function already satisfies the constraint.  But
-        if you add just a little noise to the points, then this is no longer
-        true, and the constraint starts to play an important role.</p>
-      </example>
+      <p>In the case with no noise in the measurements (e.g. the scene points
+      are exactly the model points modified by a rotation matrix), then the
+      minimum of the objective function already satisfies the constraint.  But
+      if you add just a little noise to the points, then this is no longer true,
+      and the constraint starts to play an important role.</p>
+    </example>
 
-      <p>The geometry should be roughly the same in 3D, though clearly in much
-      higher dimensions.  But I hope that the plot makes it perhaps a little
-      less surprising that this problem has an elegant numerical solution based
-      on the singular value decomposition (SVD), with once caveat.  We have to
-      drop the determinant constraint, which is the nastiest of the bunch.
-      Dropping or simplifying a troublesome constraint is a common strategy in
-      optimization; we call it a <a
-      href="https://en.wikipedia.org/wiki/Relaxation_(approximation)">relaxation</a>
-      of the original problem.</p>
+    <p>The geometry should be roughly the same in 3D, though clearly in much
+    higher dimensions.  But I hope that the plot makes it perhaps a little less
+    surprising that this problem has an elegant numerical solution based on the
+    singular value decomposition (SVD).</p>
     
-      <p>What about translations?  There is a super important insight that
-      allows us to decouple the optimization of rotations from the optimization
-      of translations.  The insight is this: <i>the <b>relative</b> position
-      between points is effected by rotation, but not by translation</i>.
-      Therefore, if we write the points relative to some canonical point on the
-      object, we can solve for rotations alone.  Once we have the rotation, then
-      we can back out the translations easily.  For our least squares objective,
-      there is even a "correct" canonical point to use -- the
-      <i>central point</i> (like the center of mass if all points have equal
-      mass) under the Euclidean metric.</p>
+    <p>What about translations?  There is a super important insight that allows
+    us to decouple the optimization of rotations from the optimization of
+    translations.  The insight is this: <i>the <b>relative</b> position between
+    points is effected by rotation, but not by translation</i>. Therefore, if we
+    write the points relative to some canonical point on the object, we can
+    solve for rotations alone.  Once we have the rotation, then we can back out
+    the translations easily.  For our least squares objective, there is even a
+    "correct" canonical point to use -- the <i>central point</i> (like the
+    center of mass if all points have equal mass) under the Euclidean
+    metric.</p>
 
-      <p>Therefore, to obtain the solution to the relaxed problem, \begin{align}
-      \min_{p\in\Re^3,R\in\Re^{3\times3}} \quad & \sum_{i=1}^{N_s} \| p + R
-      \hspace{.1cm} {^Op^{m_{c_i}}} - p^{s_i}\|^2, \\ \subjto \quad & RR^T =
-      I,\end{align} first we define the central model and scene points,
-      $\bar{m}$ and $\bar{s}$, with positions given by $$^Op^\bar{m} =
-      \frac{1}{N_s} \sum_{i=1}^{N_s} {^Op^{m_{c_i}}}, \qquad p^\bar{s} =
-      \frac{1}{N_s} \sum_{i=1}^{N_s} p^{s_i}.$$  If you are curious, these come
-      from taking the gradient of the <a
-      href="https://en.wikipedia.org/wiki/Lagrange_multiplier">Lagrangian</a>
-      with respect to $p$, and setting it equal to zero: $$\sum_{i=1}^{N_s} 2 (p
-      + R \hspace{.1cm} {^Op^{m_{c_i}}} - p^{s_i}) = 0 \Rightarrow p^* =
-      \frac{1}{N_s} \sum_{i=1}^{N_s} {^Op^{s_i}} - R^*\left(\frac{1}{N_s}
-      \sum_{i=1}^{N_s} {^Op^{m_{c_i}}}\right),$$ but don't forget the geometric
-      interpretation above.  This is just another way to see that we can
-      substitute the right-hand side in for $p$ in our objective and solve for
-      $R$ by itself.</p> 
+    <p>Therefore, to obtain the solution to the problem, \begin{align}
+    \min_{p\in\Re^3,R\in\Re^{3\times3}} \quad & \sum_{i=1}^{N_s} \| p + R
+    \hspace{.1cm} {^Op^{m_{c_i}}} - p^{s_i}\|^2, \\ \subjto \quad & RR^T =
+    I,\end{align} first we define the central model and scene points, $\bar{m}$
+    and $\bar{s}$, with positions given by $$^Op^\bar{m} = \frac{1}{N_s}
+    \sum_{i=1}^{N_s} {^Op^{m_{c_i}}}, \qquad p^\bar{s} = \frac{1}{N_s}
+    \sum_{i=1}^{N_s} p^{s_i}.$$  If you are curious, these come from taking the
+    gradient of the <a
+    href="https://en.wikipedia.org/wiki/Lagrange_multiplier">Lagrangian</a>
+    with respect to $p$, and setting it equal to zero: $$\sum_{i=1}^{N_s} 2 (p +
+    R \hspace{.1cm} {^Op^{m_{c_i}}} - p^{s_i}) = 0 \Rightarrow p^* =
+    \frac{1}{N_s} \sum_{i=1}^{N_s} {^Op^{s_i}} - R^*\left(\frac{1}{N_s}
+    \sum_{i=1}^{N_s} {^Op^{m_{c_i}}}\right),$$ but don't forget the geometric
+    interpretation above.  This is just another way to see that we can
+    substitute the right-hand side in for $p$ in our objective and solve for $R$
+    by itself.</p> 
       
-      <p>To find $R$, compose the data matrix $$W = \sum_{i=1}^{N_s} (p^{s_i} -
-      p^\bar{s}) (^Op^{m_{c_i}} - {^Op^\bar{m}})^T, $$ and use SVD to compute $W
-      = U \Sigma V^T$.  The optimal solution is \begin{gather*} R^* = U V^T, \\
-      p^* = {^Op^\bar{s}} - R^* p^\bar{m}.\end{gather*} This may seem like
-      magic, but the SVD just gives the optimal projection back onto the
-      orthonormal matrices.  There many derivations available in the literature,
-      see <elib>Haralick89</elib> (section 3) for one of my favorites.  Note:
-      because we have relaxed the determinant constraint, this formulation can
-      return an improper rotation matrix.  If this is the case, which can be
-      checked if the determinant of $R^*$ is -1, you must negate the third
-      column of $V$, then recompute $R^*$.</p>  
+    <p>To find $R$, compose the data matrix $$W = \sum_{i=1}^{N_s} (p^{s_i} -
+    p^\bar{s}) (^Op^{m_{c_i}} - {^Op^\bar{m}})^T, $$ and use SVD to compute $W =
+    U \Sigma V^T$.  The optimal solution is \begin{gather*} R^* = U D V^T,\\ p^*
+    = {^Op^\bar{s}} - R^* p^\bar{m},\end{gather*} where $D$ is the diagonal
+    matrix with entries $[1, 1, \det(UV^T)]$ <elib>Myronenko09</elib>.  This may
+    seem like magic, but replacing the singular values in SVD with ones gives
+    the optimal projection back onto the orthonormal matrices, and the diagonal
+    matrix ensures that we do not get an improper rotation. There many
+    derivations available in the literature, but many of them drop the
+    determinant constraint instead of handling the improper rotation. See
+    <elib>Haralick89</elib> (section 3) for one of my early favorites.</p>  
       
-      <example class="drake"><h1>Point cloud registration with known
-      correspondences</h1>
+    <example class="drake"><h1>Point cloud registration with known
+    correspondences</h1>
 
-        <figure><img style="width:70%; margin-top:-20px; margin-bottom:-20px"
-        src="data/pose_from_known_correspondences.svg"/> </figure>
+      <figure><img style="width:70%; margin-top:-20px; margin-bottom:-20px"
+      src="data/pose_from_known_correspondences.svg"/> </figure>
 
-        <p>In the example code, I've made a random object (based on a random set
-        of points in the $x$-$y$ plane), and perturbed it by a random 2D
-        transform.  The blue points are the model points in the model
-        coordinates, and the red points are the scene points.  The green dashed
-        lines represent the (perfect) correspondences.  On the right, I've
-        plotted both points again, but this time using the estimated pose to put
-        them both in the world frame.  As expected, the algorithm perfectly
-        recovers the ground truth transformation.</p>
+      <p>In the example code, I've made a random object (based on a random set
+      of points in the $x$-$y$ plane), and perturbed it by a random 2D
+      transform.  The blue points are the model points in the model coordinates,
+      and the red points are the scene points.  The green dashed lines represent
+      the (perfect) correspondences.  On the right, I've plotted both points
+      again, but this time using the estimated pose to put them both in the
+      world frame.  As expected, the algorithm perfectly recovers the ground
+      truth transformation.</p>
 
-        <p><a target="pose"
-          href="https://colab.research.google.com/github/RussTedrake/manipulation/blob/master/pose.ipynb#scrollTo=9QDyRMCyb_gL"><img
-          src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
+      <p><a target="pose"
+      href="https://colab.research.google.com/github/RussTedrake/manipulation/blob/master/pose.ipynb#scrollTo=9QDyRMCyb_gL"><img
+      src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open
+      In Colab"/></a>
           </p>
 
-      </example>
+    </example>
 
-      <todo>Add exercise on the reflection case.</todo>
+    <todo>Add exercise on the reflection case.</todo>
 
-      <todo>Confirm or disprove: i think that this is just the least squares
-      solution to the unconstrained problem, then projected back to the
-      orthonormal matrices (with the SVD).</todo>
+    <todo>Confirm or disprove: i think that this is just the least squares
+    solution to the unconstrained problem, then projected back to the
+    orthonormal matrices (with the SVD).</todo>
 
-      <p>What is important to understand is that once the
-      correspondences are given we have an efficient and robust numerical
-      solution to estimating the pose.</p>
+    <p>What is important to understand is that once the correspondences are
+    given we have an efficient and robust numerical solution to estimating the
+    pose.</p>
 
-    </subsection>
+  </section>
 
-    <subsection><h1>Iterative Closest Point (ICP)</h1>
+  <section><h1>Iterative Closest Point (ICP)</h1>
 
-      <p>So how do we get the correspondences?  In fact, if we were given the
-      pose of the object, then figuring out the correspondences is actually
-      easy: the corresponding point on the model is just the nearest neighbor /
-      closest point to the scene point when they are transformed into a common
-      frame.</p>
+    <p>So how do we get the correspondences?  In fact, if we were given the pose
+    of the object, then figuring out the correspondences is actually easy: the
+    corresponding point on the model is just the nearest neighbor / closest
+    point to the scene point when they are transformed into a common frame.</p>
 
-      <p>This observation suggests a natural iterative scheme, where we start
-      with some initial guess of the object pose and compute the correspondences
-      via closest points, then use those correspondences to update the estimated
-      pose.  This is one of the famous and often used (despite its well-known
-      limitations) algorithms for point cloud registration: the iterative
-      closest point (ICP) algorithm.</p>
+    <p>This observation suggests a natural iterative scheme, where we start with
+    some initial guess of the object pose and compute the correspondences via
+    closest points, then use those correspondences to update the estimated pose.
+    This is one of the famous and often used (despite its well-known
+    limitations) algorithms for point cloud registration: the iterative closest
+    point (ICP) algorithm.</p>
 
-      <p>To be precise, let's use $\hat{X}^O$ to denote our estimate of the
-      object pose, and $\hat{c}$ to denote our estimated correspondences.  The
-      "closest-point" step is given by $$\forall i, \hat{c}_i = \argmin_{j \in
-      N_m}\| \hat{X}^O {^Op^{m_{c_i}}} - p^{s_i} \|^2.$$  
-      In words, we want to find the point in the model that is the closest in
-      Euclidean distance to the transformed scene points.  This is the famous
-      "nearest neighbor" problem, and we have good numerical solutions (using
-      optimized data structures) for it.  For instance, Open3D uses <a
-      href="https://github.com/mariusmuja/flann">FLANN</a><elib>Muja09</elib>.</p>
+    <p>To be precise, let's use $\hat{X}^O$ to denote our estimate of the object
+    pose, and $\hat{c}$ to denote our estimated correspondences.  The
+    "closest-point" step is given by $$\forall i, \hat{c}_i = \argmin_{j \in
+    N_m}\| \hat{X}^O {^Op^{m_{c_i}}} - p^{s_i} \|^2.$$  In words, we want to
+    find the point in the model that is the closest in Euclidean distance to the
+    transformed scene points.  This is the famous "nearest neighbor" problem,
+    and we have good numerical solutions (using optimized data structures) for
+    it.  For instance, Open3D uses <a
+    href="https://github.com/mariusmuja/flann">FLANN</a><elib>Muja09</elib>.</p>
 
-      <p>Although solving for the pose and the correspondences jointly is very
-      difficult, ICP leverages the idea if we solve for them independently, then
-      both parts have good solutions.  Iterative algorithms like this are a
-      common approach taken in optimization for e.g. bilinear optimization or
-      expectation maximization.  It is important to understand that this is a
-      local solution to a non-convex optimization problem.  So it is subject to
-      getting stuck in local minima.</p>
+    <p>Although solving for the pose and the correspondences jointly is very
+    difficult, ICP leverages the idea if we solve for them independently, then
+    both parts have good solutions.  Iterative algorithms like this are a common
+    approach taken in optimization for e.g. bilinear optimization or expectation
+    maximization.  It is important to understand that this is a local solution
+    to a non-convex optimization problem.  So it is subject to getting stuck in
+    local minima.</p>
 
-
-      <example class="drake"><h1>Iterative Closest Point</h1>
+    <example class="drake"><h1>Iterative Closest Point</h1>
   
-          <figure>
-            <iframe style="border:0;height:300px;width:400px;" src="data/iterative_closest_point.html"></iframe>
-          </figure>
+      <figure>
+        <iframe style="border:0;height:300px;width:400px;" src="data/iterative_closest_point.html"></iframe>
+      </figure>
   
-          <p>Here is ICP running on the random 2D objects.  Blue are the model
-          points, red are the scene points, green dashed lines are the
-          correspondences.  I encourage you to run the code yourself.</p>  
+      <p>Here is ICP running on the random 2D objects.  Blue are the model
+      points, red are the scene points, green dashed lines are the
+      correspondences.  I encourage you to run the code yourself.</p>  
             
-          <p>I've included one of the animation where it happens to converge to
-          the true optimal solution.  But it gets stuck in a local minima more
-          often than not!  I hope that stepping through will help your
-          intuition.  Remember that once the correspondences are correct, the
-          pose estimation will recover the exact solution.  So every one of
-          those steps before convergence has at least a few bad
-          correspondences.  Look closely!</p>
+      <p>I've included one of the animation where it happens to converge to the
+      true optimal solution.  But it gets stuck in a local minima more often
+      than not!  I hope that stepping through will help your intuition.
+      Remember that once the correspondences are correct, the pose estimation
+      will recover the exact solution.  So every one of those steps before
+      convergence has at least a few bad correspondences.  Look closely!</p>
   
-          <p><a target="pose"
-            href="https://colab.research.google.com/github/RussTedrake/manipulation/blob/master/pose.ipynb#scrollTo=AHfxMwrvb1mz"><img
-            src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
-            </p>
+      <p><a target="pose"
+      href="https://colab.research.google.com/github/RussTedrake/manipulation/blob/master/pose.ipynb#scrollTo=AHfxMwrvb1mz"><img
+      src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open
+      In Colab"/></a></p>
   
-        </example>      
+    </example>      
       
-      <!--<todo>Thanks to the geometric nature of the
-      problem, many of these local minima are graphical and intuitive.  (Will
-      insert a few examples here).</todo> -->
+    <!--<todo>Thanks to the geometric nature of the problem, many of these local
+      minima are graphical and intuitive.  (Will insert a few examples
+      here).</todo> -->
 
-      <p>Intuition about these local minima has motivated a number of ICP
-      variants, include point to plane ICP, normal ICP, ICP that use color
-      information, feature-based ICP, etc.</p>
+    <p>Intuition about these local minima has motivated a number of ICP
+    variants, include point to plane ICP, normal ICP, ICP that use color
+    information, feature-based ICP, etc.</p>
 
  <!---     
       <p>Maybe more fundamental, though, is the fact that I don't think the ICP objective, even if we could optimize it perfectly is quite right.  (TODO: add the example of a long thin book).  And there is information that we have, which should aid in estimating the pose, which is not present in the point cloud (like the location of the cameras).</p>
 -->
-      <todo>Add a simple example and a homework problem/exercise.</todo>
+    <todo>Add a simple example and a homework problem/exercise.</todo>
 
-    </subsection>
+  </section>
 
-    <subsection><h1>Pairwise distance</h1>
+  <!--
+  <section><h1>Pairwise distance</h1>
+    
+  </section>
+-->
+
+  <section><h1>Dealing with partial views and outliers</h1>
+
+    <p>The example above is sufficient to demonstrate the problems that ICP can
+    have with local minima.  But we have so far been dealing with unreasonably
+    perfect point clouds.  <!-- call out to point cloud segmentation.
+    <elib>Nguyen13</elib> --></p>
+
+
+    <todo>An example showing how large an effect the outliers can have.</todo>
+
+    <p>There are a variety of ways that one might mitigate the effect of
+    outliers in ICP.  The simplest strategy is to simply impose a maximum
+    distance in correspondence step -- if the nearest model point is too far
+    away to a particular scene point, then don't include it in the pose
+    estimation step.</p>
+
+    <subsection><h1>Random sample consensus (RANSAC)</h1>
     
     </subsection>
 
-    <subsection><h1>Dealing with outliers</h1>
-
-      <todo>Ransac</todo>
-
-      <todo>Max distance on closest points</todo>
+    <subsection><h1>Point cloud segmentation</h1>
     
-      <todo>Truncated least-squares.  Greg's work.  Teaser.</todo>
+      <todo> normal estimation, plane fitting, etc.</todo>
+
+    </subsection>
+
+    <subsection><h1>Generalizing correspondence</h1>
+    
+      <todo>  Model on scene?  Scene on model?  Pic of the dish robot picking a mug
+      in the cluttered sink?</todo>
     
     </subsection>
 
-    <subsection><h1>Non-penetration and "free-space" constraints</h1>
-  
-      <p>Dense articulated real-time tracking (DART).</p>
-  
-    </subsection>
-  
     <subsection><h1>Soft correspondences</h1>
 
       <todo>Coherent Point Drift (CPD), e.g. equation 7.</todo>
-
+  
       <todo>FilterReg</todo>
-
-    </subsection>
-  
-    <subsection><h1>Global registration</h1>
   
     </subsection>
   
+    <subsection><h1>Truncated least-squares</h1>
+
+      <p>The real dream is to get rid of the alternations, and solve for the
+      correspondences and pose simultaneously.</p>
+
+      <todo>Greg's work.  Teaser.</todo>
+
+      <todo>Truncated least-squares plot.</todo>
+
+      <todo>Mention global optimizers (GoICP, Super4PCS) here?</todo>
+
+    </subsection>
+    
   </section>
 
-
-  <section><h1>Tracking</h1>
+  <section><h1>Non-penetration and "free-space" constraints</h1>
+  
+    <p>Dense articulated real-time tracking (DART).</p>
   
   </section>
+  
+  <section><h1>Looking ahead</h1>
+  
+    <p>Identifying correspondences between point clouds has been a major theme
+    in this chapter -- and we haven't completely solved it.  This is one of the
+    many places where deep learning has a lot to offer.  We will discuss
+    deep learning approaches for (dense) correspondences (e.g.
+    <elib>Florence18a</elib>) soon!</p>
 
+  </section>
+  
   <section id="exercises"><h1>Exercises</h1>
   
     <exercise><h1>How many points do you need?</h1>
@@ -730,7 +764,7 @@ output_ports:
       there is no such thing as rotational symmetry when we've assumed known and
       one-to-one correspondences. -->
 
-    </exerciste>
+    </exercise>
 
   </section>
 
