@@ -199,26 +199,29 @@ output_ports:
       system for class, the <code>RgbdSensors</code> have already been added,
       and their output ports exposed as outputs for the station.</p>
 
-      <p>Real depth sensors, of course, are far from ideal -- and errors in
-      depth returns are not simple Gaussian noise, but rather are dependent on
-      the lighting conditions, the surface normals of the object, and the visual
-      material properties of the object, among other things.  The color channels
-      are an approximation, too.  Even our high-end renderers can only do as
-      well as the geometries, materials and lighting sources that we add to our
-      scene, and it is very hard to capture all of the nuances of a real
-      environment.  We will examine real sensor data, and the gaps between
-      modeled sensors and real sensors, after we start understanding some of the
-      basic operations.</p>
+      <subsection><h1>Sensor noise and depth dropouts</h1>
 
-      <figure><img style="width:95%" src="data/Sweeney18a_fig3.png"/><figcaption>Real depth
-      sensors are messy.  The red pixels in the far right image are missed
-      returns -- the depth sensor returned "maximum depth".  Missed returns,
-      especially on the edges of objects (or on reflective objects) are a common
-      sighting in raw depth data.  This figure is reproduced from
-      <elib>Sweeney18a</elib>.</figcaption></figure>
-    </subsection>
+        <p>Real depth sensors, of course, are far from ideal -- and errors in
+        depth returns are not simple Gaussian noise, but rather are dependent on
+        the lighting conditions, the surface normals of the object, and the
+        visual material properties of the object, among other things.  The color
+        channels are an approximation, too.  Even our high-end renderers can
+        only do as well as the geometries, materials and lighting sources that
+        we add to our scene, and it is very hard to capture all of the nuances
+        of a real environment.  We will examine real sensor data, and the gaps
+        between modeled sensors and real sensors, after we start understanding
+        some of the basic operations.</p>
 
-    <subsection><h1>Occlusions and partial views</h1>
+        <figure><img style="width:95%"
+        src="data/Sweeney18a_fig3.png"/><figcaption>Real depth sensors are
+        messy.  The red pixels in the far right image are missed returns -- the
+        depth sensor returned "maximum depth".  Missed returns, especially on
+        the edges of objects (or on reflective objects) are a common sighting in
+        raw depth data.  This figure is reproduced from
+        <elib>Sweeney18a</elib>.</figcaption></figure>
+
+      </subsection>
+      <subsection><h1>Occlusions and partial views</h1>
     
       <p>The view of the mustard bottle in the example above makes one primary
       challenge of working with cameras very clear. Cameras don't get to see
@@ -617,7 +620,7 @@ output_ports:
     <example class="drake"><h1>Iterative Closest Point</h1>
   
       <figure>
-        <iframe style="border:0;height:300px;width:400px;" src="data/iterative_closest_point.html"></iframe>
+        <iframe style="border:0;height:300px;width:400px;" src="data/iterative_closest_point.html?height=240px"></iframe>
       </figure>
   
       <p>Here is ICP running on the random 2D objects.  Blue are the model
@@ -649,7 +652,6 @@ output_ports:
  <!---     
       <p>Maybe more fundamental, though, is the fact that I don't think the ICP objective, even if we could optimize it perfectly is quite right.  (TODO: add the example of a long thin book).  And there is information that we have, which should aid in estimating the pose, which is not present in the point cloud (like the location of the cameras).</p>
 -->
-    <todo>Add a simple example and a homework problem/exercise.</todo>
 
   </section>
 
@@ -663,17 +665,41 @@ output_ports:
 
     <p>The example above is sufficient to demonstrate the problems that ICP can
     have with local minima.  But we have so far been dealing with unreasonably
-    perfect point clouds.  <!-- call out to point cloud segmentation.
-    <elib>Nguyen13</elib> --></p>
+    perfect point clouds.</p>
 
+    <example class="drake"><h1>ICP with messy point clouds</h1>
+  
+      <p>I've added a number of parameters for you to play with in the notebook to add outliers, to add noise, and/or to restrict the points to a partial view.  Please try them by themselves and in combination.</p>
 
-    <todo>An example showing how large an effect the outliers can have.</todo>
+      <!-- todo: update the hash -->
+      <p><a target="pose"
+        href="https://colab.research.google.com/github/RussTedrake/manipulation/blob/master/pose.ipynb#scrollTo=AHfxMwrvb1mz"><img
+        src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open
+        In Colab"/></a></p>
+  
+      <figure style="margin-top:-40px;">
+        <iframe style="border:0;height:300px;width:400px;" src="data/icp_outliers.html?height=240px"></iframe>
+        <figcaption>A sample run of ICP with outliers.</figcaption>
+      </figure>
+  
+      <figure>
+        <iframe style="border:0;height:300px;width:400px;" src="data/icp_noise.html?height=240px"></iframe>
+        <figcaption>A sample run of ICP with Gaussian noise added to the scene points.</figcaption>
+      </figure>
+
+      <figure>
+        <iframe style="border:0;height:300px;width:400px;" src="data/icp_partial_view.html?height=240px"></iframe>
+        <figcaption>A sample run of ICP with scene points limited to a partial view.  They aren't all this bad, but when I saw that one, I couldn't resist using it as the example!</figcaption>
+      </figure>
+  
+    </example>      
+    <todo>An example showing the effect of noise and outliers.</todo>
 
     <p>There are a variety of ways that one might mitigate the effect of
     outliers in ICP.  The simplest strategy is to simply impose a maximum
     distance in correspondence step -- if the nearest model point is too far
-    away to a particular scene point, then don't include it in the pose
-    estimation step.</p>
+    away to a particular scene point, then don't include that scene point in the
+    pose estimation step.</p>
 
     <subsection><h1>Random sample consensus (RANSAC)</h1>
     
@@ -682,11 +708,14 @@ output_ports:
     <subsection><h1>Point cloud segmentation</h1>
     
       <todo> normal estimation, plane fitting, etc.</todo>
-
+<!-- call out to point cloud segmentation.
+    <elib>Nguyen13</elib> -->
     </subsection>
 
     <subsection><h1>Generalizing correspondence</h1>
     
+
+
       <todo>  Model on scene?  Scene on model?  Pic of the dish robot picking a mug
       in the cluttered sink?</todo>
     
@@ -723,11 +752,39 @@ output_ports:
   
   <section><h1>Looking ahead</h1>
   
-    <p>Identifying correspondences between point clouds has been a major theme
-    in this chapter -- and we haven't completely solved it.  This is one of the
-    many places where deep learning has a lot to offer.  We will discuss
-    deep learning approaches for (dense) correspondences (e.g.
-    <elib>Florence18a</elib>) soon!</p>
+    <p>Although I very much appreciate the ability to think rigorously about
+    these geometric approaches, we need to think critically about whether we are
+    solving for the right objectives.</p>
+    
+    <p>Even if we stay in the realm of pure geometry, it is not clear that a
+    least-squares objective with equal weights on the points is correct. Imagine
+    a tall skinny book laying flat on the table -- we might only get a very
+    small number of returns from the edges of the book, but those returns
+    contain proportionally much more information than the slew of returns we
+    might get from the book cover.  It is no problem to include relative weights
+    in the estimation objectives we have formulated here, but we don't yet have
+    very successful geometry-based algorithms for deciding what those weights
+    should be in any general way.  (There has been a lot of research in this
+    direction, but it's a hard problem.)</p>
+
+    <p>Please realize, though, that as beautiful as geometry is, we are so far
+    all but ignoring the most important information that we have: the color
+    values!  While it is possible to put color and other features into an
+    ICP-style pipeline, it is very hard to write a simple distance metric in
+    color space (the raw color values for a single object might be very
+    different in different lighting conditions, and the color values of
+    different objects can look very similar).  Advances in computer vision,
+    especially those based on deep learning over the last few years, have
+    brought new life to this problem.  When I asked my students recently "If you
+    had to give up one of the channels, either depth or color, which would you
+    give up?" the answer was a resounding "I'd give up depth; don't take away my
+    color!"  That's a big change from just a few years ago.</p>
+
+    <p>But deep learning and geometry can (should?) work nicely together. For
+    example, identifying correspondences between point clouds has been a major
+    theme in this chapter -- and we haven't completely solved it.  This is one
+    of the many places where the color values and deep learning have a lot to
+    offer <elib>Florence18a</elib>.  We'll turn our attention to them soon!</p>
 
   </section>
   
@@ -763,6 +820,26 @@ output_ports:
       <!-- Answer:  It can't!  And this can't happen in our formulation, because
       there is no such thing as rotational symmetry when we've assumed known and
       one-to-one correspondences. -->
+
+    </exercise>
+
+    <exercise><h1>ICP with random initializations</h1>
+
+      <p>If you run the ICP example code which has randomized object geometry
+      and ground truth object pose, you can't help but notice that the algorithm
+      does a quite reasonable job of estimating translation, but (at least for
+      the geometries I've generated here) does a fairly lousy job with rotation.
+      One mitigation is to run ICP multiple times with different initial
+      estimates of the rotation.  This is a reasonable strategy for any
+      nonconvex optimization problem with local minima, but is particularly
+      useful here since even when the point clouds are quite complex, the
+      dimensionality of the search space is low.  In particular, we can generate
+      a reasonable coverage of 2D or even 3D rotations with a modest number of
+      samples (for 3D, consider using
+      <code>UniformlyRandomRotationMatrix</code>).  Furthermore, running ICP
+      from multiple initial conditions can be done in parallel.</p>
+
+      <p>Try implementing ICP from multiple initial estimates $\hat{X}^O$, sampling only in rotation.  If you only keep the best one (lowest estimation error), then how much does it improve the performance over a single ICP run?</p>
 
     </exercise>
 

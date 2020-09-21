@@ -6,24 +6,12 @@ _Perception, Planning, and Control_
 
 ![](https://github.com/RussTedrake/manipulation/workflows/CI/badge.svg)
 
-## To Download and Install Drake
+## Installation
 
-_macOS Mojave (10.14) and macOS Catalina (10.15)_
-
-```zsh
-curl -O https://drake-packages.csail.mit.edu/drake/nightly/drake-latest-mac.tar.gz
-tar -xf drake-latest-mac.tar.gz
-mv drake /opt/drake
-/opt/drake/share/drake/setup/install_prereqs
-```
-
-_Ubuntu 18.04 (Bionic)_
+Please follow the installation instructions in drake.html.  Make sure that you have done a recursive checkout in this repository, or have run
 
 ```bash
-wget https://drake-packages.csail.mit.edu/drake/nightly/drake-latest-bionic.tar.gz
-tar -xf drake-latest-bionic.tar.gz
-mv drake /opt/drake
-sudo /opt/drake/share/drake/setup/install_prereqs
+git submodule update --init --recursive
 ```
 
 ## To Run the Unit Tests
@@ -31,14 +19,12 @@ sudo /opt/drake/share/drake/setup/install_prereqs
 _macOS Mojave (10.14) and macOS Catalina (10.15)_
 
 ```zsh
-./scripts/setup/mac/install_prereqs.sh
 bazel test //...
 ```
 
 _Ubuntu 18.04 (Bionic)_
 
 ```bash
-sudo ./scripts/setup/ubuntu/18.04/install_prereqs.sh
 bazel test //...
 ```
 
@@ -46,3 +32,12 @@ bazel test //...
 
 Russ Tedrake. _Robot Manipulation: Perception, Planning, and Control (Course
 Notes for MIT 6.881)._ Downloaded on [date] from <http://manipulation.mit.edu/>.
+
+
+## Notes / tips / tricks
+
+In most notebooks I launch a single meshcat server (as a subprocess) in the first cell.  Especially when I'm working in VS Code, I end up with an accumulation of meshcat server instances hanging around.  Running an occasional
+```bash
+pkill -f meshcat
+```
+will clean them up.
