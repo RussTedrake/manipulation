@@ -19,6 +19,11 @@ rt_ipynb_test(
 )
 
 rt_ipynb_test(
+    name = "messy_icp",
+    srcs = ["messy_icp.ipynb"],
+)
+
+rt_ipynb_test(
     name = "qp_diff_ik",
     data = ["//manipulation/models:double_pendulum.urdf"],
     deps = ["//manipulation"],

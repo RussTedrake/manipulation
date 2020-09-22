@@ -733,6 +733,25 @@ output_ports:
 
       <todo>RANSAC example</todo>
 
+      <p>There is another important and clever idea to know.  Remember the
+      important observation that we can decouple the solution for rotation and
+      translation by exploiting the fact that the <i>relative</i> position
+      between points depends on the rotation but is invariant to translation.
+      We can take that idea one step further and note that the <i>relative
+      <b>distance</b></i> between points is actually invariant to both rotation
+      <i>and</i> translation.  This has traditionally be used to separate the
+      estimation of scale from the estimation of translation and rotation (I've
+      decided to ignore scaling throughout this chapter, since it doesn't make
+      immediate sense for our proposed problem).  In <elib>Yang20a</elib> they
+      proposed that this can also be used to prune outliers even before we have
+      an initial pose estimate.  If the distance between a <i>pair</i> of points
+      in the scene is unlike any distance between any pair of points in the
+      model, then one of those two points is an outlier.  Finding the maximum
+      set of inliers by this metric would correspond to finding the maximum
+      clique in a graph.  Unfortunately, finding optimal cliques is probably too
+      expensive for large point clouds, so in <elib>Yang20a</elib> conservative
+      approximations are used instead.</p>
+
     </subsection>
 
     <subsection><h1>Point cloud segmentation</h1>
@@ -846,9 +865,11 @@ output_ports:
       {^Op^{m_j}}, \quad p^{\bar{s}} = \frac{1}{N_C} \sum_{i,j} C_{ij} p^{s_i},
       \quad N_C = \sum_{i,j} C_{ij},$$ and the data matrix now: $$W = \sum_{i,j}
       C_{ij} \left(p^{s_i} - p^{\bar{s}}\right)^T \left({^Op^{m_j}} -
-      {^Op^{\bar{m}}}\right).$$  You won't see the sums explicitly in the code,
-      because each of those steps has a particularly nice matrix form if we
-      collect the points into a matrix with one point per column.</p>
+      {^Op^{\bar{m}}}\right).$$  The rest of the updates, for extracting $R$
+      using SVD and solving for $p$ given $R$, are the same.  You won't see the
+      sums explicitly in the code, because each of those steps has a
+      particularly nice matrix form if we collect the points into a matrix with
+      one point per column.</p>
 
       <p>The probabilistic interpretation also gives us a strategy for
       determining the covariance of the Gaussians on each iteration.
@@ -860,13 +881,13 @@ output_ports:
       <todo>Example with CPD</todo>
 
       <p>The word on the street is the CPD is considerably more robust than ICP
-      with its hard correspondences, but it is also more expensive to compute
-      all of the pairwise distances for large point clouds.  It is also harder
-      to make use of efficient nearest neighbor data structures.  In
-      <elib>Gao18a</elib>, we point out that a small reformulation (thinking of
-      the scene points as inducing a distribution over the model points, instead
-      of vice versa) can get us back to summing over the scene points only and
-      efficient nearest neighbors.  It enjoys many of the robustness benefits of
+      with its hard correspondences; the Gaussian model mitigates the effect of
+      outliers by setting their correspondence weight to nearly zero.  But it is
+      also more expensive to compute all of the pairwise distances for large
+      point clouds.  In <elib>Gao18a</elib>, we point out that a small
+      reformulation (thinking of the scene points as inducing a distribution
+      over the model points, instead of vice versa) can get us back to summing
+      over the scene points only.  It enjoys many of the robustness benefits of
       CPD, but also the performance of algorithms like ICP.</p>
 
       <todo>Example with FilterReg</todo>
@@ -875,12 +896,12 @@ output_ports:
   
     <subsection><h1>Truncated least-squares</h1>
 
+      <todo>Figure of Guassian vs the truncated least-squares.</todo>
+
       <p>The real dream is to get rid of the alternations, and solve for the
       correspondences and pose simultaneously.</p>
 
       <todo>Greg's work.  Teaser.</todo>
-
-      <todo>Truncated least-squares plot.</todo>
 
       <todo>Mention global optimizers (GoICP, Super4PCS) here?</todo>
 
