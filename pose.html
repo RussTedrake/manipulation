@@ -665,11 +665,17 @@ output_ports:
 
     <p>The example above is sufficient to demonstrate the problems that ICP can
     have with local minima.  But we have so far been dealing with unreasonably
-    perfect point clouds.</p>
+    perfect point clouds.  Point cloud registration is an important topic in
+    many fields, and not all of the approaches you will find in the literature
+    are well suited to dealing with the messy point clouds we have to deal with
+    in robotics.</p>
 
     <example class="drake"><h1>ICP with messy point clouds</h1>
   
-      <p>I've added a number of parameters for you to play with in the notebook to add outliers, to add noise, and/or to restrict the points to a partial view.  Please try them by themselves and in combination.</p>
+      <p>I've added a number of parameters for you to play with in the notebook
+      to add outliers (scene points that do not actually correspond to any model
+      point), to add noise, and/or to restrict the points to a partial view.
+      Please try them by themselves and in combination.</p>
 
       <!-- todo: update the hash -->
       <p><a target="pose"
@@ -679,12 +685,14 @@ output_ports:
   
       <figure style="margin-top:-40px;">
         <iframe style="border:0;height:300px;width:400px;" src="data/icp_outliers.html?height=240px"></iframe>
-        <figcaption>A sample run of ICP with outliers.</figcaption>
+        <figcaption>A sample run of ICP with outliers (modeled as additional
+        points drawn from a uniform distribution over the
+        workspace).</figcaption>
       </figure>
   
       <figure>
         <iframe style="border:0;height:300px;width:400px;" src="data/icp_noise.html?height=240px"></iframe>
-        <figcaption>A sample run of ICP with Gaussian noise added to the scene points.</figcaption>
+        <figcaption>A sample run of ICP with Gaussian noise added to the positions of the scene points.</figcaption>
       </figure>
 
       <figure>
@@ -693,23 +701,66 @@ output_ports:
       </figure>
   
     </example>      
-    <todo>An example showing the effect of noise and outliers.</todo>
 
-    <p>There are a variety of ways that one might mitigate the effect of
-    outliers in ICP.  The simplest strategy is to simply impose a maximum
-    distance in correspondence step -- if the nearest model point is too far
-    away to a particular scene point, then don't include that scene point in the
-    pose estimation step.</p>
-
-    <subsection><h1>Random sample consensus (RANSAC)</h1>
+    <subsection><h1>Detecting outliers</h1>
     
+      <p>Once we have a reasonable estimate, $X^O$, then detecting outliers is
+      straight-forward.  Each scene point contributes a term to the objective
+      function according to the (squared) distance between the scene point and
+      its corresponding model point.  Scene points that have a large distance
+      can be labeled as outliers and removed from the point cloud, allowing us
+      to refine the pose estimate without these distractors.  You will find that
+      many ICP implementations, such as <a
+      href="http://www.open3d.org/docs/release/python_api/open3d.registration.registration_icp.html">this
+      one from Open3d</a> include a "maximum correspondence distance" parameter
+      for this purpose.</p>
+
+      <p>This leaves us with a "chicken or the egg" problem -- we need a
+      reasonable estimate of the pose to detect outliers, but for very messy
+      point clouds it may be hard to get a reasonable estimate in the presence
+      of those outliers.  So where do we begin?  One common approach that was
+      traditionally used with ICP is an algorithm called RANdom SAmple Consensus
+      (RANSAC) <elib>Fischler81</elib>.  In RANSAC, we select a number of random
+      (typically quite small) subsets of "seed" points, and compute a pose
+      estimate for each.  The subset with the largest number of "inliers" --
+      points that are below the maximum correspondence distance -- is considered
+      the winning set and can be used to start the ICP algorithm.
+      </p>
+
+      <todo>RANSAC example</todo>
+
     </subsection>
 
     <subsection><h1>Point cloud segmentation</h1>
     
+      <p>Not all outliers are due to bad returns from the depth camera, very
+      often they due to other objects in the scene.  Even in the most basic
+      case, our object of interest will be resting on a table or in a bin.  If
+      we know the geometry of the table/bin a priori, then we can subtract away
+      points from that region.  Alternatively, we can <a
+      href="http://www.open3d.org/docs/release/tutorial/Basic/pointcloud.html#Crop-point-cloud">crop</a>
+      the point cloud to a region of interest.  This can be sufficient for very
+      simple or uncluttered scenes, and will be just enough for us to accomplish
+      our goal for this chapter.</p>
+
+      <p>More generally, if we have multiple objects in the scene, we may still
+      want to find the object of interest (mustard bottle?).  If we had truly
+      robust point cloud registration algorithms, then one could imagine that
+      the optimal registration would allow us to correspond the model points
+      with just a subset of the scene points; point cloud registration could
+      solve the object detection problem!  Unfortunately, our algorithms aren't
+      strong enough.</p>
+
+      <figure><img src="data/labelfusion_multi_object_scenes.png"/>
+        <figcaption>A multi-object scene from <a href="http://labelfusion.csail.mit.edu/">LabelFusion</a> <elib>Marion17</elib>.</figcaption>
+      </figure>
+
+      <p>As a result, we almost always use some other algorithm to "segment" the scene in a number of possible objects, and run registration independently on each segment.</p>      
+
       <todo> normal estimation, plane fitting, etc.</todo>
 <!-- call out to point cloud segmentation.
     <elib>Nguyen13</elib> -->
+
     </subsection>
 
     <subsection><h1>Generalizing correspondence</h1>
@@ -747,6 +798,10 @@ output_ports:
   <section><h1>Non-penetration and "free-space" constraints</h1>
   
     <p>Dense articulated real-time tracking (DART).</p>
+  
+  </section>
+
+  <section><h1>Putting it all together</h1>
   
   </section>
   
