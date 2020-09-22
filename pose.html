@@ -437,8 +437,12 @@ output_ports:
     always this problem is dramatically over-constrained.  Treating each point
     as hard constraints on the relative pose would also be very susceptible to
     measurement noise.  As a result, it will serve us better to try to find a
-    pose that describes the data, e.g., in a least-squares sense: $$\min_{X^O}
-    \sum_{i=1}^{N_s} \| X^O {^Op^{m_{c_i}}} - X^C {^Cp^{s_i}}\|^2.$$</p>
+    pose that describes the data, e.g., in a least-squares sense: $$\min_{X^O
+    \in \mathrm{SE}(3)} \sum_{i=1}^{N_s} \| X^O {^Op^{m_{c_i}}} - X^C
+    {^Cp^{s_i}}\|^2.$$  Here I have used the notation $\mathrm{SE}(3)$ for the
+    "<a href="http://planning.cs.uiuc.edu/node147.html">special Euclidean
+    group</a>," which is the standard notation saying the $X^O$ must be a valid
+    rigid transform.</p>
 
     <p>To proceed, let's pick a particular representation for the pose to work
     with.  I will use 3x3 rotation matrices here; the approach I'll describe
@@ -752,31 +756,120 @@ output_ports:
       strong enough.</p>
 
       <figure><img src="data/labelfusion_multi_object_scenes.png"/>
-        <figcaption>A multi-object scene from <a href="http://labelfusion.csail.mit.edu/">LabelFusion</a> <elib>Marion17</elib>.</figcaption>
+        <figcaption>A multi-object scene from <a
+        href="http://labelfusion.csail.mit.edu/">LabelFusion</a>
+        <elib>Marion17</elib>.</figcaption>
       </figure>
 
-      <p>As a result, we almost always use some other algorithm to "segment" the scene in a number of possible objects, and run registration independently on each segment.</p>      
-
+      <p>As a result, we almost always use some other algorithm to "segment" the
+      scene in a number of possible objects, and run registration independently
+      on each segment.  There are numerous geometric approaches to
+      segmentation<elib>Nguyen13</elib>.  But these days we tend to use neural
+      networks for segmentation, so I won't go into those details here.</p>
+      
       <todo> normal estimation, plane fitting, etc.</todo>
-<!-- call out to point cloud segmentation.
-    <elib>Nguyen13</elib> -->
 
     </subsection>
 
     <subsection><h1>Generalizing correspondence</h1>
     
+      <p>The problem of outliers or multiple objects in the scene challenges our
+      current approach to correspondences.  So far, we've used the notation $c_i
+      = j$ to represent the correspondence of <i>every</i> scene point to a
+      model point. But note the asymmetry in our algorithm so far (scene
+      $\Rightarrow$ model). I chose this direction because of the motivation of
+      partial views from the mustard bottle example from the chapter opening.
+      Once we start thinking about tables and other objects in the scene,
+      though, maybe we should have done model $\Rightarrow$ scene?  You should
+      verify for yourself that this would be a minor change to the ICP
+      algorithm.  But what if we have multiple objects <i>and</i> partial
+      views?</p>
 
-
-      <todo>  Model on scene?  Scene on model?  Pic of the dish robot picking a mug
-      in the cluttered sink?</todo>
+      <p>It would be simple enough to allow $c_i$ to take a special value for
+      "no correspondence", and indeed that helps.  In that case, we would hope
+      that, at the optimum, the scene points corresponding to the model of
+      interest would be mapped to their respective model points, and the scene
+      points from outliers and other objects get labelled as "no
+      correspondence".  The model points that from the occluded parts of the
+      object would simply not have any correspondences associated with them.</p>
+      
+      <p>There is an alternative notation that we can use which is slightly more
+      general.  Let's denote the correspondence matrix $C\in \{0,1\}^{N_s \times
+      N_m}$, with $C_{ij} = 1$ iff scene point $i$ corresponds with model point
+      $j$.  Using this notation, we can write our estimation step (given known
+      correspondences) as: $$\min_{X^O\in \mathrm{SE}(3)} \sum_{i=1}^{N_s}
+      \sum_{j=1}^{N_m} C_{ij} \|X^O {^Op^{m_j}} - p^{s_i}\|^2.$$ This subsumes
+      our previous approach: if $c_i = j$ then set $C_{ij} = 1$ and the rest of
+      the row equal to zero.  If the scene point $i$ is an outlier, then set the
+      entire row to zero.  The previous notation was a more compact
+      representation for the true asymmetry in the "closest point" computation
+      that we did above, and made it clear that we only needed to compute $N_s$
+      distances.  But this more general notation will take us to the next
+      round.</p>
     
     </subsection>
 
     <subsection><h1>Soft correspondences</h1>
 
-      <todo>Coherent Point Drift (CPD), e.g. equation 7.</todo>
-  
-      <todo>FilterReg</todo>
+      <p>What if we relax our strict binary notion of correspondences, and think
+      of them instead as correspondence weights $C_{ij} \in [0,1]$ instead of
+      $C_{ij} \in \{0, 1\}$?  This is the main idea behind the "coherent point
+      drift" (CPD) algorithm <elib>Myronenko10</elib>.  If you read the CPD
+      literature you will be immersed in a probabilistic exposition using a
+      Gaussian Mixture Model (GMM) as the representation.  The probabilistic
+      interpretation is useful, but don't let it confuse you; trust me that it's
+      the same thing.  To maximize the likelihood on a Gaussian, step one is
+      almost always to take the $\log$ because it is a monotonic function, which
+      gets you right back to our quadratic objective.</p>
+
+      <div>The probabilistic interpretation does give a natural mechanism for
+      setting the correspondence weights on each iteration of the algorithm, by
+      thinking of them as the probability of the scene points given the model
+      points: \begin{equation} C_{ij} = \frac{1}{a_i}
+      \exp^{-\frac{1}{2}\left\|\frac{X^O {^Op^{m_j}} - p^{s_i}}{\sigma^2}
+      \right\|^2},\end{equation} which is the standard density function for a
+      Gaussian, $\sigma$ is the and $a_i$ is the proper normalization constant
+      to make the probabilities sum to one.  It is also natural to encode the
+      probability of an outlier in this formulation (it simply modifies the
+      normalization constant).  <details><summary>Click to see the normalization
+      constant, but it's really an implementation detail.</summary> The
+      normalization works out to be \begin{equation}a_i = \sum_{j=1}^{N_m}
+      \exp^{-\frac{1}{2}\left\|\frac{X^O {^Op^{m_j}} - p^{s_i}}{\sigma^2}
+      \right\|^2} + (2\pi\sigma^2)^\frac{3}{2} \frac{w}{1-w}\frac{N_m}{N_s},
+      \end{equation} with $0 \le w \le 1$ the probability of a sample point
+      being an outlier <elib>Myronenko10</elib>.</details></div>
+
+      <p>The CPD algorithm is now very similar to ICP, alternating between
+      assigning the correspondence weights and updating the pose estimate.  The
+      pose estimation step is almost identical to the procedure above, with the
+      "central" points now $${^Op^{\bar{m}}} = \frac{1}{N_C} \sum_{i,j} C_{ij}
+      {^Op^{m_j}}, \quad p^{\bar{s}} = \frac{1}{N_C} \sum_{i,j} C_{ij} p^{s_i},
+      \quad N_C = \sum_{i,j} C_{ij},$$ and the data matrix now: $$W = \sum_{i,j}
+      C_{ij} \left(p^{s_i} - p^{\bar{s}}\right)^T \left({^Op^{m_j}} -
+      {^Op^{\bar{m}}}\right).$$  You won't see the sums explicitly in the code,
+      because each of those steps has a particularly nice matrix form if we
+      collect the points into a matrix with one point per column.</p>
+
+      <p>The probabilistic interpretation also gives us a strategy for
+      determining the covariance of the Gaussians on each iteration.
+      <elib>Myronenko10</elib> derives the $\sigma$ estimate as: (TODO: finish
+      converting this part of the derivation)<!-- $$\sigma^2 = \frac{1}{3 N_C}
+      \sum_{i,j} C_{ij} \left[\left(p^{s_i} - p^{\bar{s}}\right)^T \left(p^{s_i}
+      - p^{\bar{s}}\right) +  \right].$$ --> </p>
+
+      <todo>Example with CPD</todo>
+
+      <p>The word on the street is the CPD is considerably more robust than ICP
+      with its hard correspondences, but it is also more expensive to compute
+      all of the pairwise distances for large point clouds.  It is also harder
+      to make use of efficient nearest neighbor data structures.  In
+      <elib>Gao18a</elib>, we point out that a small reformulation (thinking of
+      the scene points as inducing a distribution over the model points, instead
+      of vice versa) can get us back to summing over the scene points only and
+      efficient nearest neighbors.  It enjoys many of the robustness benefits of
+      CPD, but also the performance of algorithms like ICP.</p>
+
+      <todo>Example with FilterReg</todo>
   
     </subsection>
   
