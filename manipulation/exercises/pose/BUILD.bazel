@@ -11,6 +11,9 @@ rt_py_library(
     srcs = [
         "test_pose_estimation.py",
     ],
+    deps = [
+        "//manipulation",
+    ],
     data = [
         "pcl_filtered.npy",
     ],
