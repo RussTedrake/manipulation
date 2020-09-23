@@ -1012,6 +1012,53 @@ output_ports:
 
     </exercise>
 
+    <exercise><h1>Planar Two-Point ICP</h1>
+      <p>We saw that ICP has many local minimas. But what are these local minimas, and can we say something about how wrong our initial guess has to be until we arrive at one of these local minima? Although the analysis can get complicated for general geometry, let's start by analyzing a simple example of a planar two-point ICP.</p> 
+
+      <figure><img style="width:90%", src="figures/exercises/icp_correspondence.png"/>
+      </figure>
+
+        
+      <p>The model points and the scene points are given as:</p>
+
+      $$p^{m_1}=\begin{pmatrix} 1 \\ 0 \end{pmatrix} \qquad   p^{m_2}=\begin{pmatrix} -1 \\ 0 \end{pmatrix} \qquad p^{s_1}=\begin{pmatrix} 1 \\ 0 \end{pmatrix} \qquad p^{s_2}=\begin{pmatrix} -1 \\ 0 \end{pmatrix}.$$
+
+      <p>The true correspondence is given by their numbering, but note that we don't know the true correspondence - ICP simply determines it based on nearest neighbors. Given our vanilla-ICP cost (sum of pairwise distances squared), we can parametrize the 2D pose $X^O$ with $p_x,p_y,a,b$ and write down the resulting optimization as:</p>
+      $$\begin{aligned}
+        \min_{p_x,p_y,a,b} \quad & \sum_i \bigg\| \begin{pmatrix} p_x \\ p_y \end{pmatrix} + \begin{pmatrix} a & -b \\ b & a \end{pmatrix} p^{m_i} - p^{s_i} \bigg\|^2 \\
+        \text{s.t.} \quad & a^2 + b^2 = 1. \end{aligned}$$
+
+      <ol type="a">
+        <li> When the initial guess for the pose results in the correct correspondences based on nearest-neighbors, show that the ICP cost is minimum when $p_x,p_y,b=0$ and  $a=1$. Describe the set of initial poses that results in convergence to the true solution. </li>
+        <li> When the initial guess results in a flipped correspondence, show that ICP cost is minimum when $p_x,p_y,b=0$ and $a=-1$. Describe the set of initial poses that results in convergence to this incorrect solution.</li>
+        <li> Remember that correspondence need not be one-to-one. In fact they are often not when computed based on nearest-neighbors. By constructing the data matrix $W$, show that when both scene points correspond to one model point, ICP gets stuck and does not achieve zero-cost. (HINT: You may assume that doing SVD on a zero matrix leads to identity matrices for $U$ and $V$).</li>
+      </ol>
+    </exercise>
+
+    <exercise><h1>Bunny ICP</h1>
+      <p>For this exercise, you will implement the ICP algorithm to match pointclouds of two Stanford bunnies. You will work exclusively in <a href="https://colab.research.google.com/github/RussTedrake/manipulation/blob/master/exercises/pose/bunny_icp.ipynb" target="_blank">this notebook</a>. You will be asked to complete the following steps:</p>
+      <ol type="a">
+        <li> Implement a method to compute the least-squares transform given the correspondences. </li>
+        <li> Implement the ICP algorithm using the least square transform method from part a. </li>
+      </ol>    
+    </exercise>
+
+    <exercise><h1>RANSAC</h1>
+      <p>For this exercise, you will remove the environmental background from the Stanford bunny pointcloud using the RANSAC algorithm. You will work exclusively in <a href="https://colab.research.google.com/github/RussTedrake/manipulation/blob/master/exercises/pose/ransac.ipynb" target="_blank">this notebook</a>. You will be asked to complete the following steps:</p>
+      <ol type="a">
+        <li> Implement the RANSAC algorithm. </li>
+        <li> Use the RANSAC algorithm to remove the planar surface from the scene point cloud.</li>
+      </ol>    
+    </exercise>
+
+    <exercise><h1>Pose Estimation</h1>
+      <p>Let's go back to the example from Chapter 3, but relax the assumption that we have the pose of the red foam brick. You will be given a simulated raw pointcloud from our previous setup from a depth camera. Your task is to perform segmentation on this raw pointcloud data, and perform ICP to estimate the pose of the brick. You will work exclusively in <a href="https://colab.research.google.com/github/RussTedrake/manipulation/blob/master/exercises/pose/pose_estimation_icp.ipynb" target="_blank">this notebook</a>. You will be asked to complete the following steps:</p>
+      <ol type="a">
+        <li> Perform segmentation on the raw pointcloud to remove the background. </li>
+        <li> Tweak an existing ICP implementation to correctly estimate the pose of the red foam brick.</li>
+      </ol>    
+    </exercise>
+
   </section>
 
 </chapter>
