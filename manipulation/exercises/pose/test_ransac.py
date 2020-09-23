@@ -50,7 +50,7 @@ class TestRANSAC(unittest.TestCase):
         self.fit_plane = self.notebook_locals['fit_plane']
 
     @weight(4)
-    @timeout_decorator.timeout(3.0)
+    @timeout_decorator.timeout(2.0)
     def test_ransac(self):
         """Test ransac method"""
         simple_cloud = np.array([[0, 1, 0], [0, 0, 0], [1, 0, 0], [1, 1, 0],
@@ -64,7 +64,7 @@ class TestRANSAC(unittest.TestCase):
                         "ransac implementation incorrect")
 
     @weight(2)
-    @timeout_decorator.timeout(3.0)
+    @timeout_decorator.timeout(2.0)
     def test_outlier_removal(self):
         """Test outlier removal"""
         # check whether outlier is in student's answer
