@@ -6,6 +6,27 @@ from pydrake.all import RigidTransform, RotationMatrix
 from sklearn.neighbors import NearestNeighbors
 
 
+def least_squares_transform(scene, model):
+    X_BA = RigidTransform()
+    mu_m = np.mean(model, axis=0)
+    mu_s = np.mean(scene, axis=0)
+
+    W = (scene - mu_s).T.dot(model - mu_m)
+    U, Sigma, Vh = np.linalg.svd(W)
+    R_star = U.dot(Vh)
+
+    if np.linalg.det(R_star) < 0:
+        Vh[-1] *= -1
+        R_star = U.dot(Vh)
+
+    t_star = mu_s - R_star.dot(mu_m)
+
+    X_BA.set_rotation(RotationMatrix(R_star))
+    X_BA.set_translation(t_star)
+
+    return X_BA
+
+
 class TestICP(unittest.TestCase):
 
     def __init__(self, test_name, notebook_locals):
@@ -32,21 +53,7 @@ class TestICP(unittest.TestCase):
         """Test least square transform"""
         f = self.notebook_locals["least_squares_transform"]
         X_BA_test = f(self.scene, self.model)
-
-        # correct implementation
-        mu_m = np.mean(self.model, axis=0)
-        mu_s = np.mean(self.scene, axis=0)
-
-        W = (self.scene - mu_s).T.dot(self.model - mu_m)
-        U, Sigma, Vh = np.linalg.svd(W)
-        R_star = U.dot(Vh)
-
-        if np.linalg.det(R_star) < 0:
-            Vh[-1] *= -1
-            R_star = U.dot(Vh)
-
-        t_star = mu_s - R_star.dot(mu_m)
-        X_BA_true = RigidTransform(RotationMatrix(R_star), t_star)
+        X_BA_true = least_squares_transform(self.scene, self.model)
 
         # check answer
         result = X_BA_true.inverse().multiply(X_BA_test)
@@ -60,8 +67,6 @@ class TestICP(unittest.TestCase):
         """Test icp implementation"""
         f = self.notebook_locals["icp"]
         nearest_neighbors = self.notebook_locals["nearest_neighbors"]
-        least_squares_transform = self.notebook_locals[
-            "least_squares_transform"]
 
         X_BA_test, mean_error_test, num_iters_test = f(self.scene, self.model)
 
@@ -77,8 +82,7 @@ class TestICP(unittest.TestCase):
             distances, indices = nearest_neighbors(
                 self.scene,
                 X_BA.multiply(self.model.T).T)
-            X_BA = RigidTransform(
-                least_squares_transform(self.scene, self.model[indices]))
+            X_BA = least_squares_transform(self.scene, self.model[indices])
             mean_error = np.mean(distances)
             if abs(mean_error -
                    prev_error) < tolerance or num_iters >= max_iterations:
@@ -87,4 +91,4 @@ class TestICP(unittest.TestCase):
 
         result = X_BA.multiply(X_BA_test.inverse())
         self.assertTrue(np.allclose(result.GetAsMatrix4(), np.eye(4)),
-                        'least square transform is incorrect')
+                        'icp implementation is incorrect')
