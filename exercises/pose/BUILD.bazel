@@ -1,0 +1,43 @@
+# -*- mode: python -*-
+# vi: set ft=python :
+
+# Copyright 2020 Massachusetts Institute of Technology.
+# Licensed under the BSD 3-Clause License. See LICENSE.TXT for details.
+
+load("//htmlbook/tools/jupyter:defs.bzl", "rt_ipynb_test")
+
+rt_ipynb_test(
+    name = "bunny_icp",
+    deps = [
+        "//manipulation",
+        "//manipulation/exercises:grader",
+        "//manipulation/exercises/pose:test_icp",
+    ],
+    data = [
+	"//manipulation/models/bunny:bun_zipper_res2.ply",
+    ],
+    srcs = ["bunny_icp.ipynb"],
+)
+
+rt_ipynb_test(
+    name = "ransac",
+    deps = [
+        "//manipulation",       
+        "//manipulation/exercises:grader",
+        "//manipulation/exercises/pose:test_ransac",
+    ],
+    data = [
+	"//manipulation/models/bunny:bun_zipper_res2.ply",
+    ],
+    srcs = ["ransac.ipynb"],
+)
+
+rt_ipynb_test(
+    name = "pose_estimation_icp",
+    deps = [
+        "//manipulation",       
+        "//manipulation/exercises:grader",
+        "//manipulation/exercises/pose:test_pose_estimation",
+    ],
+    srcs = ["pose_estimation_icp.ipynb"],
+)

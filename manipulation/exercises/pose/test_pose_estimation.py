@@ -14,7 +14,7 @@ class TestPoseEstimation(unittest.TestCase):
         self.notebook_locals = notebook_locals
 
     @weight(4)
-    @timeout_decorator.timeout(5.)
+    @timeout_decorator.timeout(2.)
     def test_filtered_pointcloud(self):
         """Test filtered pointcloud"""
         f = self.notebook_locals["scene_pcl_np_filtered"].tolist()
