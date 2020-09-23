@@ -1,0 +1,34 @@
+# -*- mode: python -*-
+# vi: set ft=python :
+
+# Copyright 2020 Massachusetts Institute of Technology.
+# Licensed under the BSD 3-Clause License. See LICENSE.TXT for details.
+
+load("//htmlbook/tools/python:defs.bzl", "rt_py_library")
+
+rt_py_library(
+    name = "test_pose_estimation",
+    srcs = [
+        "test_pose_estimation.py",
+    ],
+    data = [
+        "pcl_filtered.npy",
+    ],
+    visibility = ["//visibility:public"],    
+)
+
+rt_py_library(
+    name = "test_icp",
+    srcs = [
+        "test_icp.py",
+    ],
+    visibility = ["//visibility:public"],    
+)
+
+rt_py_library(
+    name = "test_ransac",
+    srcs = [
+        "test_ransac.py",
+    ],
+    visibility = ["//visibility:public"],    
+)
