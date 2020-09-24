@@ -186,12 +186,12 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
         typically an encoder or potentiometer -- these are inexpensive,
         accurate, and robust.  In practice, we think of these as providing
         (after some signal filtering/conditioning) accurate measurements of the
-        joint position and joint velocity -- joint accelerations can also be
-        obtained via differentiation but are generally considered more noisy and
-        less suitable for use in tight feedback loops.  This is sufficient for
-        accurately tracking desired position trajectories of the arm.  For each
-        joint, if we are given a desired trajectory $q^d(t)$, then I can track
-        this using <a
+        joint position and joint velocity via differentiation -- joint
+        accelerations can also be obtained via differentiating twice but are
+        generally considered more noisy and less suitable for use in tight
+        feedback loops.  This is sufficient for accurately tracking desired
+        position trajectories of the arm.  For each joint, if we are given a
+        desired trajectory $q^d(t)$, then I can track this using <a
         href="https://en.wikipedia.org/wiki/PID_controller">proportional-integral-derivative
         (PID) control</a>: $$\tau = k_p (q^d - q) + k_d (\dot{q}^d - \dot{q}) +
         k_i \int (q^d - q) dt,$$ with $k_p$, $k_d$, and $k_i$ being the
@@ -426,7 +426,7 @@ output_ports:
       
         <p>It's worth spending a few minutes with this example, which should
         help you understand not only the physics engine, but some of the basic
-        mechanics of working with simulations in drake.</p>
+        mechanics of working with simulations in Drake.</p>
 
         <p><a target="robot"
           href="https://colab.research.google.com/github/RussTedrake/manipulation/blob/master/robot.ipynb#scrollTo=Dl9NDxDR1Dh6"><img src="https://colab.research.google.com/assets/colab-badge.svg"
@@ -540,7 +540,7 @@ alt="Open In Colab"/></a></p>
     
     <example><h1>Robot hands</h1>
     
-      <p>We can explore different hand models in drake using the same sort of
+      <p>We can explore different hand models in Drake using the same sort of
       interface we used for the arms, though I don't have as many hand models
       here yet.  Let me know if your favorite hand isn't on the list!</p>
       
@@ -644,7 +644,7 @@ alt="Open In Colab"/></a></p>
       "what is your favorite robot of all time, real or fictional".  That is a
       tough question for someone who loves robots! But the answer I gave was a super cool "high-speed multifingered hand" by
       the <a href="http://ishikawa-vision.org/fusion/index-e.html">Ishikawa group</a>; a project that started turning out
-      amazing results back in 2004! The "overclocked" the hand -- sending more current for short durations than would be
+      amazing results back in 2004! They "overclocked" the hand -- sending more current for short durations than would be
       reasonable for any longer applications -- and also used high-speed cameras to achieve these results. And they had a <a
         href="http://ishikawa-vision.org/fusion/RubikManipulation/index-e.html">Rubik's cube demo</a>, too, in 2017.</p>
 

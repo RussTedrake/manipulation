@@ -120,18 +120,18 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
     off once we start transforming points.</p>
     
     <p>Every time we describe the (relative) position as a vector of numbers, we
-    need to be explicit about the coordinate frame we are using, specifically
+    need to be explicit about the frame we are using, specifically
     the "expressed-in" frame. All of our frames are defined by orthogonal unit
     vectors that follow the "right-hand rule". We'll give a frame a name, too,
     like $F$.  If I want to write the position of point $C$ relative to point
-    $A$, expressed in frame $F$, I will write $^Ap^C_F$. Sometimes we have many points, and want to refer to the $i$th point in a list; in this case we will use brackets for clarity, e.g. $[^Ap_i^C]_F$ is the $i$th position in a list of positions.  If I ever want to get just a single coordinate of that vector, e.g. the $x$ component, then I'll use $^Ap^C_{F_x}$.</p>
+    $A$, expressed in frame $F$, I will write $^Ap^C_F$. If I ever want to get just a single component of that vector, e.g. the $x$ component, then I'll use $^Ap^C_{F_x}$.</p>
     
     <p>That is seriously heavy notation.  I don't love it myself, but it's
     the most durable I've got, and we'll have shorthand for when the context is
     clear.</p>
 
     <p><img style="height:90px;float:left;margin-right:10px"
-    src="figures/coordinate_frames.png"/> There are a few very special frames.
+    src="figures/frames.png"/> There are a few very special frames.
     We use $W$ to denote the <i>world frame</i>.  We think about the world frame
     in Drake using vehicle coordinates (positive $x$ to the front, positive $y$
     to the <i>left</i>, and positive $z$ is up).  The other particularly special
@@ -174,7 +174,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
     <p>The Drake <a
     href="https://drake.mit.edu/doxygen_cxx/group__multibody__notation.html">
     documentation</a> also discusses how to use this notation in code. In short,
-    $[^Bp_i^A]_C$ is written <code>pi_BA_C</code>. It works, I promise.</p>
+    $^Bp^A_C$ is written <code>p_BA_C</code>. It works, I promise.</p>
 
     <!--
     <subsection><h1>Rotation representations</h1>
@@ -238,7 +238,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
   
     <p>Here is where we start to see the pay-off from our heavy notation, as we
     define the rules of converting positions, rotations, poses, etc. between
-    different coordinate frames.  Without the notation, this invariably involves
+    different frames.  Without the notation, this invariably involves
     me with my right hand in the air making the "right-hand rule", and my head
     twisting around in space.  With the notation, it's a simple matter of lining
     up the symbols properly, and we're more likely to get the right answer!</p>
@@ -247,28 +247,28 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
     Here are the basic rules of algebra for our spatial quantities:  
     <ul>
       <li>Positions expressed in the same frame can be added when their
-      reference and target symbols match: \begin{equation}^Ap^B_F + ^Bp^C_F
-      = ^Ap^C_F.\end{equation} The additive inverse is well defined:
-      \begin{equation}^Ap^B_F = - ^Bp^A_F.\end{equation} Those should be
+      reference and target symbols match: \begin{equation}{}^A!p^B_F + {}^Bp^C_F
+      = {}^Ap^C_F.\end{equation} The additive inverse is well defined:
+      \begin{equation}{}^Ap^B_F = - {}^Bp^A_F.\end{equation} Those should be
       pretty intuitive; make sure you confirm them for yourself.</li>
       <li>Multiplication by a rotation can be used to change the "expressed in"
-      frame: \begin{equation}^Ap^B_G = {^GR^F} ^Ap^B_F.\end{equation}  You
+      frame: \begin{equation}{}^Ap^B_G = {}^GR^F {}^Ap^B_F.\end{equation}  You
       might be surprised that a rotation alone is enough to change the
       expressed-in frame, but it's true. The position of the expressed-in frame
       does <i>not</i> affect the relative position between two points.</li>
       <li>Rotations can be multiplied when their reference and target symbols
-      match: \begin{equation}{^AR^B} {^BR^C} = {^AR^C}.\end{equation}  The
-      inverse operation is also simply defined: \begin{equation}[^AR^B]^{-1} =
-      {^BR^A}.\end{equation} When the rotation is represented as a rotation
+      match: \begin{equation}{}^AR^B \: {}^BR^C = {}^AR^C.\end{equation}  The
+      inverse operation is also simply defined: \begin{equation}[{}^AR^B]^{-1} =
+      {}^BR^A.\end{equation} When the rotation is represented as a rotation
       matrix, this is literally the matrix inverse, and since rotation matrices
       are orthonormal, we also have $R^{-1}=R^T.$</li>
       <li>Transforms bundle this up into a single, convenient notation when
       positions are relative to a frame (and the same frame they are expressed
-      in): \begin{equation}{^Gp^A} = {^GX^F} {^Fp^A} = {^Gp^F} + ^Fp^A_G
-      = {^Gp^F} + {^GR^F}{^Fp^A}.\end{equation}</li>
-      <li>Transforms compose: \begin{equation}{^AX^B} {^BX^C} =
-      {^AX^C},\end{equation}  and have an inverse \begin{equation}[^AX^B]^{-1} =
-      {^BX^A}.\end{equation}  Please note that for transforms, we generally do
+      in): \begin{equation}{}^Gp^A = {}^GX^F {}^Fp^A = {}^Gp^F + {}^Fp^A_G
+      = {}^Gp^F + {}^GR^F {}^Fp^A.\end{equation}</li>
+      <li>Transforms compose: \begin{equation}{}^AX^B {}^BX^C =
+      {}^AX^C,\end{equation}  and have an inverse \begin{equation}[{}^AX^B]^{-1}
+      = {}^BX^A.\end{equation}  Please note that for transforms, we generally do
       <i>not</i> have that $X^{-1}$ is $X^T,$ though it still has a simple form.
     </li>
     </ul></div>
@@ -278,19 +278,19 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
     coordinates</a>, but for now I'm happy to leave that as an implementation
     detail.</p>
 
-    <example><h1>From camera coordinates to world coordinates</h1>
+    <example><h1>From camera frame to world frame</h1>
       
       <todo>Add a figure here.</todo>
 
       <p>Imagine that I have a depth camera mounted in a fixed pose in my
       workspace.  Let's call the camera frame $C$ and denote its pose in the
-      world with $^WX^C$.  This pose is often called the camera
+      world with ${}^WX^C$.  This pose is often called the camera
       "extrinsics".</p>
 
-      <p>A depth camera returns points in the camera coordinates.  Therefore,
-      we'll write this position of point $P_i$ with $^Cp^{P_i}$.  If we want to
-      convert the point into the world coordinates, we simply have $$p^{P_i} =
-      X^C {^Cp^{P_i}}.$$</p>
+      <p>A depth camera returns points in the camera frame.  Therefore,
+      we'll write this position of point $P_i$ with ${}^Cp^{P_i}$.  If we want
+      to convert the point into the world frame, we simply have $$p^{P_i}
+      = X^C {}^Cp^{P_i}.$$</p>
 
       <p>This is a work-horse operation for us.  We often aim to merge points
       from multiple cameras (typically in the world frame), and always need to
@@ -348,13 +348,13 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       <p>Every <code>Joint</code> and "floating base" has some number of
       position variables associated with it -- a subset of the configuration
       vector $q$ -- and knows how to compute the configuration dependent
-      transform across the joint from the outboard frame $M$ to the inboard
-      frame $F$: $^{F}X^{M}(q)$.  Additionally, the kinematic tree defines the
-      (fixed) transforms from the child body frame to the joint frame,
-      $^{M}X^C$, and from the joint frame to the parent frame, $^PX^{F}$.
-      Altogether, we can compute the configuration transform between any one
-      body and its parent, $$^PX^C(q) = ^PX^F {^FX^M(q)}
-      {^MX^C}.$$</p>
+      transform across the joint from the child joint frame $J_C$ to the parent
+      joint frame $J_P$: ${}^{J_P}X^{J_C}(q)$.  Additionally, the kinematic tree
+      defines the (fixed) transforms from the child body frame to the joint
+      frame, ${}^{J_C}X^C$, and from the joint frame to the parent frame,
+      ${}^PX^{J_P}$. Altogether, we can compute the configuration transform
+      between any one body and its parent, $${}^PX^C(q) = {}^PX^{J_P} {}^{J_P}X^{J_C}(q)
+      {}^{J_C}X^C.$$</p>
 
       <example><h1>Specifying the kinematic tree in URDF</h1></example>
 
@@ -459,7 +459,7 @@ pose = plant.EvalBodyPoseInWorld(context, gripper)</pre></code>
   <section><h1>Differential kinematics (Jacobians)</h1>
 
     <p>The forward kinematics machinery gives us the ability to compute the pose
-    of the gripper and the pose of the object, both in world coordinates.  But
+    of the gripper and the pose of the object, both in the world frame.  But
     if our goal is to <i>move</i> the gripper to the object, then we should
     understand how changes in the joint angles relate to changes in the gripper
     pose.  This is traditionally referred to as "differential kinematics".</p>
@@ -476,24 +476,24 @@ pose = plant.EvalBodyPoseInWorld(context, gripper)</pre></code>
     quaternions, ...).  While there is no one best representation for 3D
     rotations, it <i>is</i> possible to have one canonical representation for
     differential rotations.  Therefore, without any loss of generality, we can
-    represent the rate of change in pose using a six-element vector for <a
+    represent the rate of change in pose using a six-component vector for <a
     href="https://drake.mit.edu/doxygen_cxx/group__multibody__spatial__vectors.html"><i>spatial
-    velocity</i></a>: \begin{equation}^AV^B_C = \begin{bmatrix} ^A\omega^B_C \\
-    ^A\text{v}^B_C \end{bmatrix}.\end{equation} $^AV^B_C$ is the spatial
+    velocity</i></a>: \begin{equation}{}^AV^B_C = \begin{bmatrix} {}^A\omega^B_C
+    \\ {}^A\text{v}^B_C \end{bmatrix}.\end{equation} ${}^AV^B_C$ is the spatial
     velocity of frame $B$ relative to frame $A$ expressed in frame $C$,
-    $^A\omega^B_C \in \Re^3$ is the <i>angular velocity</i> (of frame $B$
-    relative frame $A$ expressed in frame $C$), and $^A\text{v}^B_C \in \Re^3$
+    ${}^A\omega^B_C \in \Re^3$ is the <i>angular velocity</i> (of frame $B$
+    relative frame $A$ expressed in frame $C$), and ${}^A\text{v}^B_C \in \Re^3$
     is the <i>translational velocity</i> (along with the same shorthands as for
     positions).  Translational and rotational velocities are simply vectors, so
     they can be operated on just like positions:<ul>
       <li>Spatial velocities add (when the frames match): \begin{equation}
-      ^A\text{v}^B_F + {^B\text{v}^C_F} = {^A\text{v}^C_F}, \qquad
-      {^A\omega^B_F} + {^B\omega^C_F} = {^A\omega^C_F},\end{equation} and have
+      {}^A\text{v}^B_F + {}^B\text{v}^C_F = {}^A\text{v}^C_F, \qquad
+      {}^A\omega^B_F + {}^B\omega^C_F = {}^A\omega^C_F,\end{equation} and have
       the additive inverse. For the translational velocity, the addition is perhaps known from high-school physics; for the angular velocity I consider it quite surprising, and <a href="#angular_velocity_addition"></a>deserves to be verified</a>.</li>
       <li>Rotation matrices can be used to change between the "expressed-in"
       frames <b>when those frames are fixed</b>: \begin{equation}
-      {^A\text{v}^B_G} = {^GR^F} {^A\text{v}^B_F}, \qquad {^A\omega^B_G} =
-      {^GR^F} {^A\omega^B_F}, \qquad \text{when } ^G\dot{R}^F=0.\end{equation}
+      {}^A\text{v}^B_G = {}^GR^F {}^A\text{v}^B_F, \qquad {}^A\omega^B_G =
+      {}^GR^F {}^A\omega^B_F, \qquad \text{when } {}^G\dot{R}^F=0.\end{equation}
       </li>
       <li><details><summary>If the relative pose between two frames is not fixed, then we get
         slightly more complicated formulas involving vector cross products; they
@@ -506,22 +506,22 @@ pose = plant.EvalBodyPoseInWorld(context, gripper)</pre></code>
         -\omega_y & \omega_x & 0 \end{bmatrix}.\end{equation} Multiplying a
         vector by this matrix can be written as a vector-cross product:
         \begin{equation} \dot{R}R^T p = \dot{R}R^{-1} p = \omega \times
-        p.\end{equation}  Therefore, differentiating $${^Gp^A} = {^GX^F} {^Fp^A}
-        = {^Gp^F} + {^GR^F}{^Fp^A},$$ yields \begin{align} {^G\text{v}^A} =&
-        {^G\text{v}^F} + {^G\dot{R}^F}{^Fp^A} + {^GR^F}{^F\text{v}^A} \nonumber
-        \\ =& {^G\text{v}^F} + {^G\omega^F}\times{^GR^F}{^Fp^A} +
-        {^GR^F}{^F\text{v}^A}.\end{align}  <!--Similarly, differentiating
-        ${^AR^C} = {^AR^B}{^BR^C}$ yields--></details></li>
+        p.\end{equation}  Therefore, differentiating $${}^Gp^A = {}^GX^F {}^Fp^A
+        = {}^Gp^F + {}^GR^F] {}}^Fp^A,$$ yields \begin{align} {}^G\text{v}^A =&
+        {}^G\text{v}^F + {}^G\dot{R}^F {}^Fp^A + {}^GR^F {}^F\text{v}^A
+        \nonumber \\ =& {}^G\text{v}^F + {}^G\omega^F \times {}^GR^F {}^Fp^A +
+        {}^GR^F {}^F\text{v}^A.\end{align}  <!--Similarly, differentiating
+        ${}^AR^C = {}^AR^B {}^BR^C$ yields--></details></li>
     </ul>
     </div>
 
 
     <!--
-    <p>Why is it that we can get away with just three elements for spatial
-    velocity, but not for rotations?  In short, this is because a three element
-    vector has both a direction (which we use to denote the axis) and a
-    magnitude.  Using the magnitude to denote an angle is degenerate because our
-    representation should be periodic in $2\pi$, but using them for angular
+    <p>Why is it that we can get away with just three components for spatial
+    velocity, but not for rotations?  In short, this is because a three 
+    component vector has both a direction (which we use to denote the axis) and 
+    a magnitude.  Using the magnitude to denote an angle is degenerate because 
+    our representation should be periodic in $2\pi$, but using them for angular
     velocities doesn't have this problem. Using sine of the angle resolves it,
     but we also need to store the cosine; that's <a
     href="https://en.wikipedia.org/w/index.php?title=Quaternions_and_spatial_rotation&section=14#The_hypersphere_of_rotations">precisely
@@ -529,21 +529,21 @@ pose = plant.EvalBodyPoseInWorld(context, gripper)</pre></code>
 
     <p>There is one more velocity to be aware of: I'll use $v$ to denote the
     generalized velocity vector of the plant.  While a spatial velocity $^AV^B$
-    is six elements, a translational or angular velocity, $^B\text{v}^C$ or
-    $^B\omega^C$, is three elements, the generalized velocity vector is whatever
+    is six components, a translational or angular velocity, $^B\text{v}^C$ or
+    $^B\omega^C$, is three components, the generalized velocity vector is whatever
     size it needs to be to encode the time derivatives of the configuration
     variables, $q$.  For the iiwa welded to the world frame, that means it has
-    seven elements.  I've tried to be careful to typeset each of these v's
+    seven components.  I've tried to be careful to typeset each of these v's
     differently throughout the notes. Almost always the distinction is also
     clear from the context.</p>
 
     <example><h1>Don't assume $\dot{q} \equiv v$</h1>
     
-      <p>The unit quaternion representation is four elements, but these must
-      form a "unit vector" of length 1.  Rotation matrices are 9 elements, but
+      <p>The unit quaternion representation is four components, but these must
+      form a "unit vector" of length 1.  Rotation matrices are 9 components, but
       they must form an orthonormal matrix with $\det(R)=1$.  It's pretty great
       that for <i>changes</i> in rotation, we can use an <i>unconstrained</i>
-      three element vector, what we've called the angular velocity vector,
+      three component vector, what we've called the angular velocity vector,
       $\omega$.  And you really should use it; getting rid of that constraint
       makes both the math and the numerics better.</p>
 
@@ -627,7 +627,7 @@ plant.num_velocities() = 6</pre></code></p>
 
       <p>Any time you write a matrix inverse, it's important to check that the
       matrix is actually invertible.  As a first sanity check: what are the
-      dimensions of $J^G(q)$?  We know the spatial velocity has six elements.
+      dimensions of $J^G(q)$?  We know the spatial velocity has six components.
       Our gripper frame is welded directly on the last link of the iiwa, and the
       iiwa has seven positions, so we have $J^G(q_{iiwa}) \in \Re^{6x7}.$  The
       matrix is not square, so does not have an inverse.  But having <i>more</i>
@@ -652,7 +652,7 @@ plant.num_velocities() = 6</pre></code></p>
 
       <example><h1>Our first end-effector "controller"</h1>
       
-        <p>Let's write a a simple controller using the pseudo-inverse of the
+        <p>Let's write a simple controller using the pseudo-inverse of the
         Jacobian.  First, we'll write a new <code>LeafSystem</code> that defines
         one input port (for the iiwa measured position), and one output port
         (for the iiwa joint velocity command).  Inside that system, we'll ask
@@ -676,7 +676,7 @@ plant.num_velocities() = 6</pre></code></p>
         <p>Note that we do have to add one additional system into the diagram.
         The output of our controller is a desired joint velocity, but the input
         that the iiwa controller is expecting is a desired joint position.  So
-        we will insert an integrator inbetween.</p>
+        we will insert an integrator in between.</p>
 
         <p>I don't expect you to understand every line in this example, but it's
         worth finding the important lines and making sure you can change them
@@ -696,12 +696,13 @@ plant.num_velocities() = 6</pre></code></p>
     <subsection><h1>Invertibility of the Jacobian</h1>
 
       <p>There is a simple check to understand when the pseudo-inverse can give
-      an exact solution (achieving exactly the desired spatial velocity): the
-      Jacobian must be full <i>row</i>-rank.  In this case, we need $\rank(J) =
-      6$. But assigning an integer rank to a matrix doesn't tell the entire
-      story; for a real robot with (noisy) floating-point joint positions, as
-      the matrix gets <i>close</i> to losing rank, (pseudo-)inverse starts to
-      "blow-up".  A better metric, then, is to watch the smallest <a
+      an exact solution for any spatial velocity (achieving exactly the desired
+      spatial velocity): the Jacobian must be full <i>row</i>-rank.  In this
+      case, we need $\rank(J) = 6$. But assigning an integer rank to a matrix
+      doesn't tell the entire story; for a real robot with (noisy)
+      floating-point joint positions, as the matrix gets <i>close</i> to losing
+      rank, (pseudo-)inverse starts to "blow-up".  A better metric, then, is to
+      watch the smallest <a
       href="https://en.wikipedia.org/wiki/Singular_value_decomposition">singular
       value</a>; as this approaches zero, the norm of the pseudo-inverse will
       approach infinity.</p>
@@ -724,8 +725,8 @@ plant.num_velocities() = 6</pre></code></p>
         <p>Another good way to find the singularities are to use your
         pseudo-inverse controller to send gripper spatial velocity commands that
         drive the gripper to the limits of the robot's workspace.  Try it and
-        see!  In fact, this is the common case, and one that will work hard to
-        avoid.</p>
+        see!  In fact, this is the common case, and one that we will work hard
+        to avoid.</p>
 
       </example>
 
@@ -783,39 +784,6 @@ plant.num_velocities() = 6</pre></code></p>
 
     </subsection>
 
-    <!--
-
-    <subsection><h1>Nullspace of the Jacobian</h1>
-    
-      <p>I've already mentioned a very nice and important property of the
-      pseudo-inverse: in the case where there are multiple solutions, it will
-      return the minimum-norm solution.  Since we have seven joints to control a
-      six element spatial velocity, as long as we are away from kinematic
-      singularties, this means effectively that there is some subspace (in this
-      example it will have dimension at most one) in which the pseudo-inverse
-      effectively sets the velocity to zero.</p>
-
-      <p>Perhaps that's what we want.  But now that I've admitted my fear of
-      singularities, let me propose a different option.  What if we take that
-      subspace, which instantaneously has nothing to do with the task, and use
-      it to move the robot back towards a comfortable joint position far away
-      from singularities?</p>
-
-      <p>Nullspace</p>
-
-      <example><h1>Nullspace centering</h1>
-
-        <todo>Add centering to the jacobian controller.</todo>
-      </example>
-
-      <p>This is just one example of how we can use the nullspace to produce a
-      sort of hierarchy of controllers.  The payoff is modest on our seven DOF
-      robot, but it can become substantial when you are commanding an entire
-      humanoid, or perhaps even a dexterous hand.</p>
-
-    </subsection>
-
-    -->
   </section>
 
   <section><h1>Defining the grasp and pre-grasp poses</h1>
@@ -855,17 +823,17 @@ plant.num_velocities() = 6</pre></code></p>
     <p>Take a careful look at the gripper frame in the figure above, using the
     colors to understand the axes.  Here is my thinking:  Given the size of the
     hand and the object, I want the <i>desired</i> position (in meters) of the
-    object in the gripper frame, $$^{G_{grasp}}p^O = \begin{bmatrix} 0 \\ 0.12
-    \\ 0 \end{bmatrix}, \qquad ^{G_{pregrasp}}p^O = \begin{bmatrix} 0 \\ 0.2 \\
-    0 \end{bmatrix}.$$  Recall that the logic behind a <i>pregrasp</i> pose is
-    to first move to safely above the object, if our only gripper motion that is
-    very close to the object is a straight translation from the pregrasp pose to
-    the grasp pose and back, then it allows us to mostly avoid having to think
-    about collisions (for now).  I want the orientation of my gripper to be set
-    so that the positive $z$ axis of the object aligns with the negative $y$
-    axis of the gripper frame, and the positive $x$ axis of the object aligns
-    with the positive $z$ axis of the gripper.  We can accomplish that with
-    $$^{G_{grasp}}R^O = \text{MakeXRotation}\left(\frac{\pi}{2}\right)
+    object in the gripper frame, $${}^{G_{grasp}}p^O = \begin{bmatrix} 0 \\ 0.12
+    \\ 0 \end{bmatrix}, \qquad {}^{G_{pregrasp}}p^O = \begin{bmatrix} 0 \\ 0.2
+    \\ 0 \end{bmatrix}.$$  Recall that the logic behind a <i>pregrasp</i> pose
+    is to first move to safely above the object, if our only gripper motion that
+    is very close to the object is a straight translation from the pregrasp pose
+    to the grasp pose and back, then it allows us to mostly avoid having to
+    think about collisions (for now).  I want the orientation of my gripper to
+    be set so that the positive $z$ axis of the object aligns with the negative
+    $y$ axis of the gripper frame, and the positive $x$ axis of the object
+    aligns with the positive $z$ axis of the gripper.  We can accomplish that
+    with $${}^{G_{grasp}}R^O = \text{MakeXRotation}\left(\frac{\pi}{2}\right)
     \text{MakeZRotation} \left(\frac{\pi}{2}\right).$$  I admit I had my right
     hand in the air for that one!  Our pregrasp pose will have the same
     orientation as our grasp pose.</p>
@@ -935,10 +903,10 @@ plant.num_velocities() = 6</pre></code></p>
       to move fast yet.  Instead I chose a conservative time that is
       proportional to the total Euclidean distance that the hand will travel,
       say $k=10~s/m$ (aka $10~cm/s$): $$t_{pregrasp} = k
-      \left\|^{G_0}p^{G_{pregrasp}}\right\|_2.$$  I just chose a fixed duration
-      of 2 seconds for the transitions from pregrasp to grasp and back, and also
-      left 2 seconds with the gripper stationary for the segments where the
-      fingers needs to open/close.</p>
+      \left\|{}^{G_0}p^{G_{pregrasp}}\right\|_2.$$  I just chose a fixed
+      duration of 2 seconds for the transitions from pregrasp to grasp and back,
+      and also left 2 seconds with the gripper stationary for the segments where
+      the fingers needs to open/close.</p>
   
     </example>
 
@@ -1020,11 +988,11 @@ plant.num_velocities() = 6</pre></code></p>
 
     <p>So far, our trajectories are position and orientation trajectories.  Our
     controller needs translational velocity and angular velocity commands.
-    Fortunately, the trajectory classes we have use support differentiating the
+    Fortunately, the trajectory classes we have used support differentiating the
     trajectories.  In fact, the <code>PiecewiseQuaternionSlerp</code> is clever
-    enough to return the derivative of the 4-element quaternion trajectory as a
-    3-element angular velocity trajectory.  The rest is just a matter of wiring
-    up the system diagram.</p>
+    enough to return the derivative of the 4-component quaternion trajectory as
+    a 3-component angular velocity trajectory.  The rest is just a matter of
+    wiring up the system diagram.</p>
 
     <example><h1>The full pick and place demo</h1>
     
@@ -1066,8 +1034,8 @@ plant.num_velocities() = 6</pre></code></p>
 
     <p>There are other important limitations, though, which are perhaps more
     subtle. The real robot has constraints, very real constraints on the joint
-    angles, velocities, accelerations, and torques.  If you, for instance, a
-    velocity command to the iiwa controller that cannot be followed, that
+    angles, velocities, accelerations, and torques.  If you, for instance, send
+    a velocity command to the iiwa controller that cannot be followed, that
     velocity will be clipped.  In the mode we are running the iiwa
     (joint-impedance mode), the iiwa doesn't know anything about your
     end-effector goals.  So it will very likely simply saturate your velocity
@@ -1078,8 +1046,8 @@ plant.num_velocities() = 6</pre></code></p>
     <p>Since we know the limits of the iiwa, a better approach is to take these
     constraints into account at the level of our controller.  It's relatively
     straight-forward to take position, velocity, and acceleration constraints
-    into account; torques would require much more (namely a full dynamics model)
-    so we won't worry about them yet here.</p>
+    into account; torques would require a full dynamics model so we won't worry
+    about them yet here.</p>
 
     <subsection><h1>Pseudo-inverse as an optimization</h1>
 
@@ -1123,12 +1091,13 @@ plant.num_velocities() = 6</pre></code></p>
       the fact.</p>
 
       <p>This is, admittedly, a harder problem to solve in general.  The
-      solution is cannot be described using only the pseudo-inverse of the
+      solution cannot be described using only the pseudo-inverse of the
       Jacobian.  Rather, we are going to solve this (small) optimization problem
       directly in our controller every time it is evaluated.  This problem has a
       convex quadratic objective and linear constraints, so it falls into the
       class of convex Quadratic Programming (QP).  This is a particularly nice
-      of optimization problems where we have very strong numerical tools.</p>
+      class of optimization problems where we have very strong numerical
+      tools.</p>
 
       <example><h1>Jacobian-based control with velocity constraints</h1></example>
     
@@ -1176,7 +1145,7 @@ plant.num_velocities() = 6</pre></code></p>
       
       <p>Denote $P(q)$ as an orthonormal basis for the kernel of a Jacobian $J$.
       Traditionally in robotics we implemented this using the pseudo-inverse: $P
-      = (I - J)J^+$, but many linear algebra packages now provide methods to
+      = (I - JJ^+)$, but many linear algebra packages now provide methods to
       obtain one more directly.  Adding $Pv \approx Pk(q_0 - q)$ as a secondary
       objective can be accomplished with \begin{align}\min_{v_n} \quad &
       \left|J^G(q)v_n - V^{G_d}\right|^2_2 + \epsilon \left|P(q)\left(v_n -
