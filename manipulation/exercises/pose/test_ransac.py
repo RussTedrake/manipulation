@@ -2,7 +2,7 @@ import unittest
 import timeout_decorator
 from gradescope_utils.autograder_utils.decorators import weight
 import numpy as np
-from pydrake.all import RigidTransform, RotationMatrix
+from pydrake.all import (RigidTransform, RotationMatrix, RandomGenerator)
 from sklearn.neighbors import NearestNeighbors
 from copy import deepcopy
 
@@ -28,8 +28,12 @@ def ransac_solution(point_cloud,
 
     point_cloud_1 = np.ones((N, 4))
     point_cloud_1[:, :3] = point_cloud
+
+    generator = RandomGenerator(5)
+
     for i in range(max_iterations):
-        s = point_cloud[np.random.randint(N, size=sample_size)]
+        s = point_cloud[np.random.RandomState(generator()).randint(
+            N, size=sample_size)]
         m = model_fit_func(s)
         abs_distances = np.abs(np.dot(m, point_cloud_1.T))  # 1 x N
         inliner_count = np.sum(abs_distances < tolerance)

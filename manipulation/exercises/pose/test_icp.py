@@ -2,7 +2,8 @@ import unittest
 import timeout_decorator
 from gradescope_utils.autograder_utils.decorators import weight
 import numpy as np
-from pydrake.all import RigidTransform, RotationMatrix
+from pydrake.all import (RigidTransform, RotationMatrix, RandomGenerator,
+                         UniformlyRandomRotationMatrix)
 from sklearn.neighbors import NearestNeighbors
 
 
@@ -27,49 +28,56 @@ def least_squares_transform(scene, model):
     return X_BA
 
 
+def generate_random_transform(seed_num):
+    generator = RandomGenerator(seed_num)
+    R_BA = UniformlyRandomRotationMatrix(generator)
+    p_BA = np.random.RandomState(generator()).rand(3)
+    X_BA = RigidTransform(R_BA, p_BA)
+    return X_BA
+
+
 class TestICP(unittest.TestCase):
 
     def __init__(self, test_name, notebook_locals):
         super().__init__(test_name)
         self.notebook_locals = notebook_locals
-        # random rotation
-        theta_z, theta_y, theta_x = np.random.rand(3) * np.pi / 4
-        rot_z = RotationMatrix.MakeZRotation(theta_z)
-        rot_y = RotationMatrix.MakeZRotation(theta_y)
-        rot_x = RotationMatrix.MakeZRotation(theta_x)
-        R_BA = rot_z.multiply(rot_y).multiply(rot_x)
-        # random translation
-        dx, dy, dz = np.random.rand(3) * 1.0
-        p_BA = [dx, dy, dz]
-
-        X_BA = RigidTransform(R_BA, p_BA)
 
         self.model = self.notebook_locals["pointcloud_model"]
-        self.scene = X_BA.multiply(self.model.T).T
 
     @weight(3)
-    @timeout_decorator.timeout(1.)
+    @timeout_decorator.timeout(5.)
     def test_least_square(self):
         """Test least square transform"""
         f = self.notebook_locals["least_squares_transform"]
-        X_BA_test = f(self.scene, self.model)
-        X_BA_true = least_squares_transform(self.scene, self.model)
+        nearest_neighbors = self.notebook_locals["nearest_neighbors"]
 
-        # check answer
-        result = X_BA_true.inverse().multiply(X_BA_test)
+        # Run a batter of tests determinisitcally, making sure the test cases
+        # include an impropoer rotation case.
+        for i in range(10):
+            X_BA = generate_random_transform(i)
+            self.scene = X_BA.multiply(self.model.T).T
+            distances, indices = nearest_neighbors(self.scene, self.model)
 
-        self.assertTrue(np.allclose(result.GetAsMatrix4(), np.eye(4)),
-                        'least square transform is incorrect')
+            X_BA_test = f(self.scene, self.model[indices])
+            X_BA_true = least_squares_transform(self.scene, self.model[indices])
+
+            # check answer
+            result = X_BA_true.inverse().multiply(X_BA_test)
+
+            self.assertTrue(np.allclose(result.GetAsMatrix4(), np.eye(4)),
+                            'least square transform is incorrect')
 
     @weight(3)
-    @timeout_decorator.timeout(1.)
+    @timeout_decorator.timeout(5.)
     def test_icp(self):
         """Test icp implementation"""
         f = self.notebook_locals["icp"]
         nearest_neighbors = self.notebook_locals["nearest_neighbors"]
 
+        # It should be sufficient to test only one for ICP.
+        X_BA = generate_random_transform(7)
+        self.scene = X_BA.multiply(self.model.T).T
         X_BA_test, mean_error_test, num_iters_test = f(self.scene, self.model)
-
         num_iters = 0
         mean_error = 0.0
         max_iterations = 20
