@@ -28,6 +28,7 @@ def ransac_solution(point_cloud,
 
     point_cloud_1 = np.ones((N, 4))
     point_cloud_1[:, :3] = point_cloud
+    np.random.seed(7)
     for i in range(max_iterations):
         s = point_cloud[np.random.randint(N, size=sample_size)]
         m = model_fit_func(s)
