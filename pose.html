@@ -881,20 +881,88 @@ output_ports:
       <todo>Example with CPD</todo>
 
       <p>The word on the street is the CPD is considerably more robust than ICP
-      with its hard correspondences; the Gaussian model mitigates the effect of
-      outliers by setting their correspondence weight to nearly zero.  But it is
-      also more expensive to compute all of the pairwise distances for large
-      point clouds.  In <elib>Gao18a</elib>, we point out that a small
-      reformulation (thinking of the scene points as inducing a distribution
-      over the model points, instead of vice versa) can get us back to summing
-      over the scene points only.  It enjoys many of the robustness benefits of
-      CPD, but also the performance of algorithms like ICP.</p>
+      with its hard correspondences and quadratic objective; the Gaussian model
+      mitigates the effect of outliers by setting their correspondence weight to
+      nearly zero.  But it is also more expensive to compute all of the pairwise
+      distances for large point clouds.  In <elib>Gao18a</elib>, we point out
+      that a small reformulation (thinking of the scene points as inducing a
+      distribution over the model points, instead of vice versa) can get us back
+      to summing over the scene points only.  It enjoys many of the robustness
+      benefits of CPD, but also the performance of algorithms like ICP.</p>
 
       <todo>Example with FilterReg</todo>
-  
+
     </subsection>
-  
-    <subsection><h1>Truncated least-squares</h1>
+
+    <subsection><h1>Nonlinear optimization</h1>
+
+      <p>All of the algorithms we've discussed so far have exploited the SVD
+      solution to the pose estimate given correspondences, and alternate between
+      estimating the correspondences and estimating the pose.  There is another
+      important class of algorithms that attempt to solve for both
+      simultaneously.  This makes the optimization problem nonconvex, which
+      suggests they will still suffer from local minima like we saw in the
+      iterative algorithms.  But many authors argue that the solution times
+      using nonlinear solvers can be on par with the iterative algorithms (e.g.
+      <elib>Fitzgibbon03</elib>).</p>
+
+      <figure><img style="width:80%" src="data/robust_kernels.png"><figcaption>A
+        variety of objective functions for robust registration.  <a
+        href="https://www.geogebra.org/calculator/hcgacefe">Click here for the
+        interactive version</a>.</figcaption></figure>
+
+      <p>Another major advantage of using nonlinear optimization is that these
+      solvers can accommodate a wide variety of objective functions to achieve
+      the same sort of robustness to outliers that we saw from CPD.  I've
+      plotted a few of the popular objective functions above.  The primary
+      characteristic of these functions is that they taper, so that larger
+      distances eventually do not result in higher cost.  Importantly, like in
+      CPD, this means that we can consider all pairwise distances in our
+      objective, because if outliers add a constant value (e.g. 1) to the cost,
+      then they have no gradient with respect to the decision variables and no
+      impact on the optimal solution.  We can therefore write, for our favorite
+      loss function, $l(x)$, use objectives of the form, e.g. $$\min \sum_{i}
+      \left[ l\left(\min_j\| X^O {^Op^{m_j}} - p^{s_i} \|\right)\right].$$  And
+      what are the decision variables?  We can also exploit the additional
+      flexibility of the solvers to use minimal parameterizations -- e.g.
+      $\theta$ for rotations in 2D, or Euler angles for rotations in 3D.  The
+      objective function is more complicated but we can get rid of the
+      constraints.</p>
+
+      <subsubsection><h1>Precomputing distance functions</h1>
+      
+        <p>The nested $\min$ functions look a little intimidating from a
+        computational perspective.  But this form, coupled with the fact that in
+        our application the model points are fixed, actually enables a fantastic
+        optimization.  First, let's move our optimization into the model frame
+        by changing the inner term to $$\min_j \|^Op^{m_j} - {^OX^W
+        p^{s_i}}\|.$$  Now realize that for any 3D point $x$, we can precompute
+        the minimum distance from $x$ to any point on our model, call it
+        $\phi(x).$  This function of 3D space, sometimes called a <a
+        href="https://en.wikipedia.org/wiki/Distance_transform">distance
+        field</a>, and the closely related signed distance function (SDF) and <a
+        href="https://en.wikipedia.org/wiki/Level-set_method">level sets</a> are
+        a common representation in geometric modeling.  And they are precisely
+        what we need to quickly compute the cost from many scene points.</p>
+
+        <figure><img width="60%" src="data/deep_sdf_bunny.png"><figcaption>A
+        visualization of a "signed distance function" (SDF) representation of 3D
+        geometry.  Reproduced with permissions from
+        <elib>Park19</elib>.</figcaption></figure>
+      
+        <p>As the figure I've included above suggests, we can use the
+        precomputed distance functions to represent the minimum distance to a
+        mesh model instead of just a point cloud.  And with some care, we can
+        define alternative distance-like functions in 3D space that have smooth
+        subgradients which can work better with nonlinear optimization.  There
+        is a rich literature on this topic, e.g. <elib>Osher03</elib>.</p>
+
+      </subsubsection>
+
+    </subsection>
+
+
+    <subsection><h1>Global optimization</h1>
 
       <todo>Figure of Guassian vs the truncated least-squares.</todo>
 
@@ -911,7 +979,7 @@ output_ports:
 
   <section><h1>Non-penetration and "free-space" constraints</h1>
   
-    <p>Dense articulated real-time tracking (DART).</p>
+    <p>Dense articulated real-time tracking (DART) <elib>Schmidt15</elib>.</p>
   
   </section>
 
