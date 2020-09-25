@@ -1020,11 +1020,26 @@ output_ports:
 
     <subsection><h1>Global optimization</h1>
 
-      <p>Is there any hope of exploiting the beautiful structure that we found in the pose estimation with known correspondences with an algorithm that searches for correspondences and pose simultaneously?</p>
+      <p>Is there any hope of exploiting the beautiful structure that we found
+      in the pose estimation with known correspondences with an algorithm that
+      searches for correspondences and pose simultaneously?</p>
 
-      <todo>Greg's work.  Teaser.</todo>
+      <p>There are some algorithms that claim global optimality for the ICP
+      objective, typically using a branch and bound strategy
+      <elib>Gelfand05+Mellado14+Yang15</elib>, but we have been disappointed
+      with the performance of these on real point clouds.  We proposed another,
+      using branch and bound to explicitly enumerate the correspondences with a
+      truncated least-squares objective, and a tight relaxation of the SE(3)
+      constraints<elib>Izatt17b</elib>, but this method is still limited to
+      relatively small problems.</p>
 
-      <todo>Mention global optimizers (GoICP, Super4PCS) here?</todo>
+      <p>In recent work, TEASER <elib>Yang20a</elib> takes a different approach,
+      using the observation that truncated least squares can be optimized
+      efficiently for the case of scale and translation.  For rotations, they
+      solve a semi-definite relaxation of the truncated least-squares objective.
+      This relaxation is not guaranteed to be tight, but (like all of the convex
+      relaxations we describe in this chapter), it is easy to certify after the
+      fact whether the optimal solution satisfied the original constraints.</p>
 
     </subsection>
     
