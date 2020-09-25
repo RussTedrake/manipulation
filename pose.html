@@ -70,9 +70,9 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
   study.</p>
 
   <p>The approach that we'll take here is very geometric.  This is in contrast
-  to, and very complimentary with, approached that are more fundamentally driven
+  to, and very complimentary with, approaches that are more fundamentally driven
   by data.  There is no question that deep learning has had an enormous impact
-  in perception -- it's fair to say that it has enabling the current surge in
+  in perception -- it's fair to say that it has enabled the current surge in
   manipulation advances -- and we will certainly cover it in these notes.  But
   when I've heard colleagues say that "all perception these days is based on
   deep learning", I can't help but cry foul.  There has been another surge of
@@ -91,7 +91,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
     sensors.  This is largely thanks to the cell phone industry, but the race
     for autonomous cars has been fueling high-end sensors as well.</p>
 
-    <p>These changes in hardware quality have causes sometimes dramatic changes
+    <p>These changes in hardware quality have caused sometimes dramatic changes
     in our algorithmic approaches.  For example, estimation can be much easier
     when the resolution and frame rate of our sensors is high enough that not
     much can change in the world between two images; this undoubtedly
@@ -153,7 +153,7 @@ output_ports:
       <p>The signals and systems abstraction here is encapsulating a lot of
       complexity.  Inside the implementation of that system is a complete
       rendering engine, like one that you will find in high-end computer games.
-      Drake actually support multiple rendering engines; for the purposes of
+      Drake actually supports multiple rendering engines; for the purposes of
       this class we will primarily use an OpenGL-based renderer that is suitable
       for real-time simulation.  In our research we also use Drake's rendering
       API to connect to high-end <a
@@ -289,7 +289,7 @@ output_ports:
     </div>
     
     <p>As depth sensors have become so pervasive the field has built up
-    libraries of tools for performing basic goemetric operations operate on
+    libraries of tools for performing basic geometric operations operate on
     point clouds, and that can be used to transform back and forth between
     representations.  We can implement many of of the basic operations directly
     in Drake, but I would recommend the <a
@@ -301,7 +301,7 @@ output_ports:
     documentation.</p>
 
     <p>It's important to realize that the conversion of a depth image into a
-    point cloud does loose some information -- specifically the information
+    point cloud does lose some information -- specifically the information
     about the ray that was cast from the camera to arrive at that point.  In
     addition to declaring "there is geometry at this point", the depth image
     combined with the camera pose also implies that "there is no geometry in the
@@ -415,7 +415,7 @@ output_ports:
     scene point corresponds with which model point.  I'll use a correspondence
     vector $c \in [1,N_m]^{N_s}$, where $c_i = j$ denotes that scene point $s_i$
     corresponds with model point $m_j$.  Note that we do not assume that these
-    correspondence are one-to-one.  Every scene point corresponds to some model
+    correspondences are one-to-one.  Every scene point corresponds to some model
     point, but the converse is not true, and multiple scene points may
     correspond to the same model point.</p>
 
@@ -864,8 +864,8 @@ output_ports:
       "central" points now $${^Op^{\bar{m}}} = \frac{1}{N_C} \sum_{i,j} C_{ij}
       {^Op^{m_j}}, \quad p^{\bar{s}} = \frac{1}{N_C} \sum_{i,j} C_{ij} p^{s_i},
       \quad N_C = \sum_{i,j} C_{ij},$$ and the data matrix now: $$W = \sum_{i,j}
-      C_{ij} \left(p^{s_i} - p^{\bar{s}}\right)^T \left({^Op^{m_j}} -
-      {^Op^{\bar{m}}}\right).$$  The rest of the updates, for extracting $R$
+      C_{ij} \left(p^{s_i} - p^{\bar{s}}\right) \left({^Op^{m_j}} -
+      {^Op^{\bar{m}}}\right)^T.$$  The rest of the updates, for extracting $R$
       using SVD and solving for $p$ given $R$, are the same.  You won't see the
       sums explicitly in the code, because each of those steps has a
       particularly nice matrix form if we collect the points into a matrix with
@@ -938,7 +938,8 @@ output_ports:
         by changing the inner term to $$\min_j \|^Op^{m_j} - {^OX^W
         p^{s_i}}\|.$$  Now realize that for any 3D point $x$, we can precompute
         the minimum distance from $x$ to any point on our model, call it
-        $\phi(x).$  This function of 3D space, sometimes called a <a
+        $\phi(x).$  The term above is just $\phi({^OX^Wp^{s_i}}).$ This function
+        of 3D space, sometimes called a <a
         href="https://en.wikipedia.org/wiki/Distance_transform">distance
         field</a>, and the closely related signed distance function (SDF) and <a
         href="https://en.wikipedia.org/wiki/Level-set_method">level sets</a> are
@@ -955,7 +956,8 @@ output_ports:
         mesh model instead of just a point cloud.  And with some care, we can
         define alternative distance-like functions in 3D space that have smooth
         subgradients which can work better with nonlinear optimization.  There
-        is a rich literature on this topic, e.g. <elib>Osher03</elib>.</p>
+        is a rich literature on this topic; see <elib>Osher03</elib> for a nice
+        reference.</p>
 
       </subsubsection>
 
@@ -964,10 +966,7 @@ output_ports:
 
     <subsection><h1>Global optimization</h1>
 
-      <todo>Figure of Guassian vs the truncated least-squares.</todo>
-
-      <p>The real dream is to get rid of the alternations, and solve for the
-      correspondences and pose simultaneously.</p>
+      <p>Is there any hope of exploiting the beautiful structure that we found in the pose estimation with known correspondences with an algorithm that searches for correspondences and pose simultaneously?</p>
 
       <todo>Greg's work.  Teaser.</todo>
 
