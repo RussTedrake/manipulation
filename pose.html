@@ -421,9 +421,9 @@ output_ports:
 
     <p>As a result, the point cloud registration problem is simply an (inverse)
     kinematics problem.  We can write the model points and the scene points in a
-    common frame (here the world frame), $$p^{m_{c_i}} = X^O {^Op^{m_{c_i}}} =
-    X^C {^Cp^{s_i}},$$leaving a single unknown transform, $X^O$, for which we
-    must solve.  In the previous chapter I argued for using differential
+    common frame (here the world frame), $$p^{m_{c_i}} = X^O \: {}^Op^{m_{c_i}}
+    = X^C \: {}^Cp^{s_i},$$ leaving a single unknown transform, $X^O$, for which
+    we must solve.  In the previous chapter I argued for using differential
     kinematics instead of inverse kinematics; why is my story different here?
     Differential kinematics can still be useful for perception, for example if
     we want to track the pose of an object after we acquire it's initial pose.
@@ -438,8 +438,8 @@ output_ports:
     as hard constraints on the relative pose would also be very susceptible to
     measurement noise.  As a result, it will serve us better to try to find a
     pose that describes the data, e.g., in a least-squares sense: $$\min_{X^O
-    \in \mathrm{SE}(3)} \sum_{i=1}^{N_s} \| X^O {^Op^{m_{c_i}}} - X^C
-    {^Cp^{s_i}}\|^2.$$  Here I have used the notation $\mathrm{SE}(3)$ for the
+    \in \mathrm{SE}(3)} \sum_{i=1}^{N_s} \| X^O \: {}^Op^{m_{c_i}} - X^C \:
+    {}^Cp^{s_i}\|^2.$$  Here I have used the notation $\mathrm{SE}(3)$ for the
     "<a href="http://planning.cs.uiuc.edu/node147.html">special Euclidean
     group</a>," which is the standard notation saying the $X^O$ must be a valid
     rigid transform.</p>
@@ -449,8 +449,8 @@ output_ports:
     below also has an equivalent in quaternion form<elib>Horn87</elib>.  To
     write the optimization above using the coefficients of the rotation matrix
     and the translation as decision variables, I have: \begin{align} \min_{p^O,
-    R^O} \quad& \sum_{i=1}^{N_s} \| p^O + R^O{^Op^{m_{c_i}}} - X^C
-    {^Cp^{s_i}}\|^2, \\ \subjto \quad& R^T = R^{-1}, \quad \det(R) = +1.
+    R^O} \quad& \sum_{i=1}^{N_s} \| p^O + R^O \: {}^Op^{m_{c_i}} - X^C
+    \: {}^Cp^{s_i} \|^2, \\ \subjto \quad& R^T = R^{-1}, \quad \det(R) = +1.
     \nonumber \end{align}  The constraints are needed because not every 3x3
     matrix is a valid rotation matrix; satisfying these constraints ensures that
     $R$ <i>is</i> a valid rotation matrix.  In fact, the constraint $R^T =
@@ -469,7 +469,7 @@ output_ports:
     in the elements of $R$).  The determinant constraint is cubic in the
     elements of $R$.</p>
 
-    <example><h1>Rotation-only point registration in 2D</h1>
+    <example id="2D_rotation_only"><h1>Rotation-only point registration in 2D</h1>
         
       <p>I would like you to have a graphical sense for this optimization
       problem, but it's hard to plot the objective function with 9+3 decision
@@ -489,7 +489,7 @@ output_ports:
       src="data/wahba2d.png"/></figure><figcaption>The $x$ and $y$ axes of this
       plot correspond to the parameters $a$, and $b$, respectively, that define
       the 2D rotation matrix, $R$.  The green quadratic bowl is the objective
-      $\sum_i \| R {p^{m_{c_i}}} - p^{s_i}\|^2,$ and the red open cylinder is
+      $\sum_i \| R \: {}^O p^{m_{c_i}} - p^{s_i}\|^2,$ and the red open cylinder is
       the rotation matrix constraint.  <a
       href="https://www.geogebra.org/3d/pn628maw">Click here for the interactive
       version.</a></figcaption>
@@ -527,25 +527,25 @@ output_ports:
 
     <p>Therefore, to obtain the solution to the problem, \begin{align}
     \min_{p\in\Re^3,R\in\Re^{3\times3}} \quad & \sum_{i=1}^{N_s} \| p + R
-    \hspace{.1cm} {^Op^{m_{c_i}}} - p^{s_i}\|^2, \\ \subjto \quad & RR^T =
+    \: {}^Op^{m_{c_i}} - p^{s_i}\|^2, \\ \subjto \quad & RR^T =
     I,\end{align} first we define the central model and scene points, $\bar{m}$
-    and $\bar{s}$, with positions given by $$^Op^\bar{m} = \frac{1}{N_s}
-    \sum_{i=1}^{N_s} {^Op^{m_{c_i}}}, \qquad p^\bar{s} = \frac{1}{N_s}
+    and $\bar{s}$, with positions given by $${}^Op^\bar{m} = \frac{1}{N_s}
+    \sum_{i=1}^{N_s} {}^Op^{m_{c_i}}, \qquad p^\bar{s} = \frac{1}{N_s}
     \sum_{i=1}^{N_s} p^{s_i}.$$  If you are curious, these come from taking the
     gradient of the <a
     href="https://en.wikipedia.org/wiki/Lagrange_multiplier">Lagrangian</a>
     with respect to $p$, and setting it equal to zero: $$\sum_{i=1}^{N_s} 2 (p +
-    R \hspace{.1cm} {^Op^{m_{c_i}}} - p^{s_i}) = 0 \Rightarrow p^* =
-    \frac{1}{N_s} \sum_{i=1}^{N_s} {^Op^{s_i}} - R^*\left(\frac{1}{N_s}
-    \sum_{i=1}^{N_s} {^Op^{m_{c_i}}}\right),$$ but don't forget the geometric
-    interpretation above.  This is just another way to see that we can
-    substitute the right-hand side in for $p$ in our objective and solve for $R$
-    by itself.</p> 
+    R \: {}^Op^{m_{c_i}} - p^{s_i}) = 0 \Rightarrow p^* = \frac{1}{N_s}
+    \sum_{i=1}^{N_s} {}^Op^{s_i} - R^*\left(\frac{1}{N_s} \sum_{i=1}^{N_s}
+    {}^Op^{m_{c_i}}\right),$$ but don't forget the geometric interpretation
+    above.  This is just another way to see that we can substitute the
+    right-hand side in for $p$ in our objective and solve for $R$ by itself.</p>
+    
       
     <p>To find $R$, compose the data matrix $$W = \sum_{i=1}^{N_s} (p^{s_i} -
-    p^\bar{s}) (^Op^{m_{c_i}} - {^Op^\bar{m}})^T, $$ and use SVD to compute $W =
-    U \Sigma V^T$.  The optimal solution is \begin{gather*} R^* = U D V^T,\\ p^*
-    = {^Op^\bar{s}} - R^* p^\bar{m},\end{gather*} where $D$ is the diagonal
+    p^\bar{s}) ({}^Op^{m_{c_i} - {}^Op^\bar{m})^T, $$ and use SVD to compute $W
+    = U \Sigma V^T$.  The optimal solution is \begin{gather*} R^* = U D V^T,\\
+    p^* = {}^Op^\bar{s} - R^* p^\bar{m},\end{gather*} where $D$ is the diagonal
     matrix with entries $[1, 1, \det(UV^T)]$ <elib>Myronenko09</elib>.  This may
     seem like magic, but replacing the singular values in SVD with ones gives
     the optimal projection back onto the orthonormal matrices, and the diagonal
@@ -606,7 +606,7 @@ output_ports:
     <p>To be precise, let's use $\hat{X}^O$ to denote our estimate of the object
     pose, and $\hat{c}$ to denote our estimated correspondences.  The
     "closest-point" step is given by $$\forall i, \hat{c}_i = \argmin_{j \in
-    N_m}\| \hat{X}^O {^Op^{m_{c_i}}} - p^{s_i} \|^2.$$  In words, we want to
+    N_m}\| \hat{X}^O \: {}^Op^{m_{c_i}} - p^{s_i} \|^2.$$  In words, we want to
     find the point in the model that is the closest in Euclidean distance to the
     transformed scene points.  This is the famous "nearest neighbor" problem,
     and we have good numerical solutions (using optimized data structures) for
@@ -817,10 +817,10 @@ output_ports:
       N_m}$, with $C_{ij} = 1$ iff scene point $i$ corresponds with model point
       $j$.  Using this notation, we can write our estimation step (given known
       correspondences) as: $$\min_{X^O\in \mathrm{SE}(3)} \sum_{i=1}^{N_s}
-      \sum_{j=1}^{N_m} C_{ij} \|X^O {^Op^{m_j}} - p^{s_i}\|^2.$$ This subsumes
-      our previous approach: if $c_i = j$ then set $C_{ij} = 1$ and the rest of
-      the row equal to zero.  If the scene point $i$ is an outlier, then set the
-      entire row to zero.  The previous notation was a more compact
+      \sum_{j=1}^{N_m} C_{ij} \|X^O \: {}^Op^{m_j} - p^{s_i}\|^2.$$ This
+      subsumes our previous approach: if $c_i = j$ then set $C_{ij} = 1$ and the
+      rest of the row equal to zero.  If the scene point $i$ is an outlier, then
+      set the entire row to zero.  The previous notation was a more compact
       representation for the true asymmetry in the "closest point" computation
       that we did above, and made it clear that we only needed to compute $N_s$
       distances.  But this more general notation will take us to the next
@@ -845,7 +845,7 @@ output_ports:
       setting the correspondence weights on each iteration of the algorithm, by
       thinking of them as the probability of the scene points given the model
       points: \begin{equation} C_{ij} = \frac{1}{a_i}
-      \exp^{-\frac{1}{2}\left\|\frac{X^O {^Op^{m_j}} - p^{s_i}}{\sigma^2}
+      \exp^{-\frac{1}{2}\left\|\frac{X^O \: {}^Op^{m_j} - p^{s_i}}{\sigma^2}
       \right\|^2},\end{equation} which is the standard density function for a
       Gaussian, $\sigma$ is the and $a_i$ is the proper normalization constant
       to make the probabilities sum to one.  It is also natural to encode the
@@ -853,7 +853,7 @@ output_ports:
       normalization constant).  <details><summary>Click to see the normalization
       constant, but it's really an implementation detail.</summary> The
       normalization works out to be \begin{equation}a_i = \sum_{j=1}^{N_m}
-      \exp^{-\frac{1}{2}\left\|\frac{X^O {^Op^{m_j}} - p^{s_i}}{\sigma^2}
+      \exp^{-\frac{1}{2}\left\|\frac{X^O \: {}^Op^{m_j} - p^{s_i}}{\sigma^2}
       \right\|^2} + (2\pi\sigma^2)^\frac{3}{2} \frac{w}{1-w}\frac{N_m}{N_s},
       \end{equation} with $0 \le w \le 1$ the probability of a sample point
       being an outlier <elib>Myronenko10</elib>.</details></div>
@@ -862,10 +862,10 @@ output_ports:
       assigning the correspondence weights and updating the pose estimate.  The
       pose estimation step is almost identical to the procedure above, with the
       "central" points now $${^Op^{\bar{m}}} = \frac{1}{N_C} \sum_{i,j} C_{ij}
-      {^Op^{m_j}}, \quad p^{\bar{s}} = \frac{1}{N_C} \sum_{i,j} C_{ij} p^{s_i},
+      \: {}^Op^{m_j}, \quad p^{\bar{s}} = \frac{1}{N_C} \sum_{i,j} C_{ij} p^{s_i},
       \quad N_C = \sum_{i,j} C_{ij},$$ and the data matrix now: $$W = \sum_{i,j}
-      C_{ij} \left(p^{s_i} - p^{\bar{s}}\right) \left({^Op^{m_j}} -
-      {^Op^{\bar{m}}}\right)^T.$$  The rest of the updates, for extracting $R$
+      C_{ij} \left(p^{s_i} - p^{\bar{s}}\right) \left({}^Op^{m_j} -
+      {}^Op^{\bar{m}}\right)^T.$$  The rest of the updates, for extracting $R$
       using SVD and solving for $p$ given $R$, are the same.  You won't see the
       sums explicitly in the code, because each of those steps has a
       particularly nice matrix form if we collect the points into a matrix with
@@ -922,8 +922,8 @@ output_ports:
       then they have no gradient with respect to the decision variables and no
       impact on the optimal solution.  We can therefore write, for our favorite
       loss function, $l(x)$, use objectives of the form, e.g. $$\min \sum_{i}
-      \left[ l\left(\min_j\| X^O {^Op^{m_j}} - p^{s_i} \|\right)\right].$$  And
-      what are the decision variables?  We can also exploit the additional
+      \left[ l\left(\min_j\| X^O \: {}^Op^{m_j} - p^{s_i} \|\right)\right].$$
+      And what are the decision variables?  We can also exploit the additional
       flexibility of the solvers to use minimal parameterizations -- e.g.
       $\theta$ for rotations in 2D, or Euler angles for rotations in 3D.  The
       objective function is more complicated but we can get rid of the
@@ -935,8 +935,8 @@ output_ports:
         computational perspective.  But this form, coupled with the fact that in
         our application the model points are fixed, actually enables a fantastic
         optimization.  First, let's move our optimization into the model frame
-        by changing the inner term to $$\min_j \|^Op^{m_j} - {^OX^W
-        p^{s_i}}\|.$$  Now realize that for any 3D point $x$, we can precompute
+        by changing the inner term to $$\min_j \|{}^Op^{m_j} - {}^OX^W
+        p^{s_i}\|.$$  Now realize that for any 3D point $x$, we can precompute
         the minimum distance from $x$ to any point on our model, call it
         $\phi(x).$  The term above is just $\phi({^OX^Wp^{s_i}}).$ This function
         of 3D space, sometimes called a <a
@@ -978,6 +978,83 @@ output_ports:
 
   <section><h1>Non-penetration and "free-space" constraints</h1>
   
+    <p>We've explored two main lineages of algorithms for the pose estimation --
+    one based on the beautiful SVD solutions and the other based on nonlinear
+    optimization.  As we will see, non-penetration and free-space constraints
+    are, in most cases, non-convex constraints, so are a better match for the
+    nonlinear optimization approach.  But there are some examples of convex
+    non-penetration constraints (e.g., when points must not penetrate a
+    half-plane) and it <i>is</i> possible to include these in our convex
+    optimization approach.  I'll just show it in a simple example.</p>
+
+    <example><h1>Non-penetration of a half-plane via convex optimization</h1>
+    
+      <p>For simplicity, I will restrict this example to 2D, where we can
+      leverage our convenient form of the rotation matrices: $$R =
+      \begin{bmatrix} a & -b \\ b & a \end{bmatrix}.$$  Recall that the rotation
+      matrix constraints for this form reduce to $a^2+b^2=1$.  These are
+      non-convex constraints, but we can relax them to $a^2 + b^2 \le 1.$  This
+      is almost exactly the problem we visualized in <a
+      href="#2D_rotation_only">this earlier example</a>, except that we will add
+      translations here.  The relaxation is exactly changing the non-convex unit
+      circle constraint into the convex unit disk constraint.  Based on that
+      visualization, we have reason to be optimistic that the unit disk
+      relaxation could be tight.</p>
+
+      <p>Let's solve the following optimization: \begin{align*} \min_{p,a,b}
+      \quad & \sum_i \| p + R \: {}^Op^{m_{c_i}} - p^{s_i} \|^2, \\ \subjto
+      \quad & a^2 + b^2 \le 1, \\ & {}^W p^{m_i} \ge 0, \quad \forall i \in [1,
+      N_m], \end{align*} where $R$ depends on $a, b$ as above. Just as the
+      addition of constraints forced us to move from the pseudo-inverse solution
+      to a numerical optimization-based solution in the last chapter, the
+      solution to this problem is no longer given simply by SVD.  As formulated,
+      this optimization falls under the category of a Second-Order Cone Program
+      (SOCP), though we need to use a slack variable to put it into the standard
+      form with a linear objective.</p>
+
+      <p><a target="pose"
+        href="https://colab.research.google.com/github/RussTedrake/manipulation/blob/master/pose.ipynb#scrollTo=pO8WTJjEWJ0k"><img
+        src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open
+        In Colab"/></a></p>
+      
+      <p>Please be careful.  Now that we have a constraint that depends on $p$,
+      our original approach to solving for $R$ independently is no longer valid
+      (at least not without modification).  I've provided a simple implementation in colab.</p>
+      
+      <!--To add the objective efficiently in
+      code, we'll use properties of the matrix trace and $R^TR=I$ to observe
+      that \begin{equation} \sum_i \| p + R \: {}^Op^{m_{c_i}} - p^{s_i} \|^2 =
+      \| P + R M - S\|_F^2,\end{equation} where $P$, $M$, and $S$, are 2xN
+      matrices formed by horizontally stacking $p$, ${}^Op^{m_{c_i}}$, and
+      $p^{s_i}$, respectively.-->
+
+      <figure style="margin-top:-20px"><img style="width:70%"
+      src="data/constrained_convex_pose.svg"/><figcaption>The convex
+      approximation to the constrained pose estimation problem with known
+      correspondences.  I have added constraints that both the $x$ and $y$
+      positions of all of the points in the estimated pose must be greater than
+      $0$ in the world frame (as illustrated by the green
+      lines).</figcaption></figure>
+      
+      <p>This is a slightly exaggerated case, were the scene points are really
+      pulling the box into the constraints.  We can see that the relaxation is
+      <i>not</i> tight in this situation; the box is being shrunk slightly to
+      explain the data.</p>
+      
+      <p>Constrained optimizations like this can be made relatively efficient,
+      and are suitable for use in an ICP loop for modest-sized point clouds. But
+      the major limitation is that we can only take this approach for convex
+      non-penetration constraints (or convex approximations of the constraints),
+      like the "half-plane" constraints we used here.  It is probably not very
+      suitable for non-penetration between two objects in the scene.</p>
+
+      <p>For the record, the fact that I was able to easily add this example
+      here is actually pretty special.  I don't know of another toolbox that
+      brings together the advanced optimization algorithms with the geometry /
+      physics / dynamical systems in the way that Drake does.</p>
+
+    </example>
+
     <p>Dense articulated real-time tracking (DART) <elib>Schmidt15</elib>.</p>
   
   </section>
