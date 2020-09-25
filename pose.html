@@ -921,16 +921,70 @@ output_ports:
       objective, because if outliers add a constant value (e.g. 1) to the cost,
       then they have no gradient with respect to the decision variables and no
       impact on the optimal solution.  We can therefore write, for our favorite
-      loss function, $l(x)$, use objectives of the form, e.g. $$\min \sum_{i}
-      \left[ l\left(\min_j\| X^O \: {}^Op^{m_j} - p^{s_i} \|\right)\right].$$
+      loss function, $l(x)$, use objectives of the form, e.g. $$\min \sum_{i,j}
+      \left[ l\left(\| X^O \: {}^Op^{m_j} - p^{s_i} \|\right)\right].$$
       And what are the decision variables?  We can also exploit the additional
       flexibility of the solvers to use minimal parameterizations -- e.g.
       $\theta$ for rotations in 2D, or Euler angles for rotations in 3D.  The
       objective function is more complicated but we can get rid of the
       constraints.</p>
 
+      <example><h1>Nonlinear pose estimation with known correspondences</h1>
+
+        <p>To understand precisely what we are giving up, let's consider a
+        warm-up problem where we use nonlinear optimization on the minimal
+        parameterizations for the pose estimation problem.  As long as we don't
+        add any constraints, we can still separate the solutions for rotation
+        from the solutions from translation.  So consider the problem:
+        $$\min_\theta \sum_{j} \left\| \begin{bmatrix} \cos\theta & -\sin\theta
+        \\ \sin\theta & \cos\theta \end{bmatrix} \left({}^Op^{m_{c_i}} -
+        {}^Op^{\bar{m}}\right) - \left( p^{s_i} -
+        p^{\bar{s}}\right)\right\|^2.$$ We now have a complex, nonlinear
+        objective function.  Have we introduced local minima into the
+        problem?</p>
+
+        <p><img
+        style="height:100px;float:right;margin-left:10px;margin-right:10px"
+        src="data/model_points_circle.png"/> As a thought experiment, consider
+        the problem where all of our model points lie on a perfect circle.  For
+        any one scene point $i$, in the rotation-only optimization, the worst
+        case is when our estimate $\theta$ is 180 degrees ($\pi$ radians) away
+        from the optimal solution.  The cost for that point would be $4r^2$,
+        where $r$ is the radius of the circle.  In fact, using the law of
+        cosines, we can actually write the squared distance for the point for
+        any error, $\theta_{err} = \theta - \theta^*,$ as $$\text{distance}^2 =
+        r^2 + r^2 - 2 r^2 \cos\theta_{err}.$$  And in the case of the circle,
+        every other model point contributes the same cost. This is not a convex
+        function, but every minima is a globally optimal solution (just wrapped
+        around by $2\pi$.</p>
+        
+        <p>In fact, even if we have a more complicated, non-circular, geometry,
+        then this same argument holds.  Every point will incur and error as it
+        rotates around the circle, but may have a different radius.  The error
+        for all of the model points will decrease as $\cos\theta_{err}$ goes to
+        one.  So every minima is a globally optimal solution.  We haven't
+        actually introduced local minima (yet)!</p>
+
+        <p>It is the correspondences, and other constraints that we might add to
+        the problem, that really introduce local minima.</p>
+
+      </example>
+<!--
+      <example><h1>Nonlinear optimization for pose estimation</h1>
+
+      </example>
+-->
       <subsubsection><h1>Precomputing distance functions</h1>
       
+        <p>There is an exceptionally nice trick for speeding up the computation
+        in these nonlinear optimizations, but it does require us to go back to
+        thinking about the minimum distance from a scene point to the model, as
+        opposed to the pairwise distance between points.  This, I think, it not
+        a big sacrifice now that we have stopped enumerating correspondences
+        explicitly.  Let's slightly modify our objective above to be of the form
+        $$\min \sum_{i} \left[ l\left( \min_j \| X^O \: {}^Op^{m_j} - p^{s_i}
+        \|\right)\right].$$  In words, we can apply arbitrary robust loss function, but we will only apply it to the minimum distance between the scene point and the model.</p>
+
         <p>The nested $\min$ functions look a little intimidating from a
         computational perspective.  But this form, coupled with the fact that in
         our application the model points are fixed, actually enables a fantastic
