@@ -17,6 +17,11 @@ rt_ipynb_test(
     srcs = ["meshcat_plot_surface.ipynb"],
 )
 
+rt_ipynb_test(
+    name = "nonlinear_pose_estimation",
+    srcs = ["nonlinear_pose_estimation.ipynb"],
+)
+
 rt_py_test(
     name = "scaling_spatial_velocity",
     srcs = ["scaling_spatial_velocity.py"],

@@ -1000,6 +1000,15 @@ output_ports:
         a common representation in geometric modeling.  And they are precisely
         what we need to quickly compute the cost from many scene points.</p>
 
+        <figure><img width="48%" src="data/rectangle_points_distance.svg"/><img
+        width="48%"
+        src="data/rectangle_signed_distance.svg"/><figcaption>Contour plot of
+        the distance function for our point-based representation of the rectange
+        (left), and the <i>signed</i> distance function for our "mesh-based" 2D
+        rectangle.  The smoother distance contours in the mesh-based
+        representation can help alleviate some of the local minima problems we
+        observed above.</figcaption></figure>
+
         <figure><img width="60%" src="data/deep_sdf_bunny.png"><figcaption>A
         visualization of a "signed distance function" (SDF) representation of 3D
         geometry.  Reproduced with permissions from
@@ -1124,8 +1133,27 @@ output_ports:
 
     </example>
 
-    <p>Dense articulated real-time tracking (DART) <elib>Schmidt15</elib>.</p>
+    <subsection><h1>Free space constraints as non-penetration constraints</h1>
+
+      <p>There is another beautiful idea that I first saw in
+      <elib>Schmidt15</elib>...</p>
+    </p>
+
+      <figure><img width="60%" src="data/free_space.svg"/><figcaption>The rays
+      cast from the camera to the depth returns define a "free space obstacle"
+      that other objects should not penetrate.</figcaption></figure>
+    
+    </subsection>
   
+    <p>Ultimately, as much as I prefer the convex formulations with their
+    potential for deeper understanding (by us) and for stronger guarantees (for
+    the algorithms), the ability to add non-penetration constraints and
+    free-space constraints is simply too valuable to ignore.  I hope that, if
+    you come back to these notes in a year or two, I will be able to report that
+    we have strong results for these more complex formulations.  But for now, in
+    most applications, I will steer you towards the nonlinear optimization
+    approaches and taking advantage of these constraints.</p>
+
   </section>
 
   <section><h1>Putting it all together</h1>
