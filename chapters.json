@@ -4,6 +4,7 @@
     "robot",
     "pick",
     "pose",
+    "clutter",
     "deep_perception",
     "grasping",
     "trajectories",

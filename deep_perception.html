@@ -49,14 +49,14 @@ at MIT</a>. They will be updated throughout the Fall 2020 semester.  <!-- <a
 href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos are available on YouTube</a>.--></p> 
 
 <table style="width:100%;"><tr style="width:100%">
-  <td style="width:33%;text-align:left;"><a class="previous_chapter" href=pose.html>Previous Chapter</a></td>
+  <td style="width:33%;text-align:left;"><a class="previous_chapter" href=clutter.html>Previous Chapter</a></td>
   <td style="width:33%;text-align:center;"><a href=index.html>Table of contents</a></td>
   <td style="width:33%;text-align:right;"><a class="next_chapter" href=grasping.html>Next Chapter</a></td>
 </tr></table>
 
 
 <!-- EVERYTHING ABOVE THIS LINE IS OVERWRITTEN BY THE INSTALL SCRIPT -->
-<chapter style="counter-reset: chapter 4"><h1>Data-driven perception: object
+<chapter style="counter-reset: chapter 5"><h1>Data-driven perception: object
 detection, segmentation, and pose estimation</h1>
 
   <p>Our study of geometric perception gave us good tools for estimating the
@@ -139,15 +139,20 @@ detection, segmentation, and pose estimation</h1>
 
   </section>
 
-  <section><h1>Object recognition and detection</h1>
+  <section><h1>Object detection and segmentation</h1>
   
     <!--Get to bounding boxes.  yolo, etc.-->
-  
-  </section>
 
-  <section><h1>Pixel-wise segmentation</h1>
+    <!-- nice overview slides at http://cs231n.stanford.edu/slides/2020/lecture_12.pdf .  Videos at https://www.youtube.com/watch?v=vT1JzLTH4G4&list=PL3FW7Lu3i5JvHM8ljYj-zLfQRF3EO8sYv&index=1 -->
   
-  
+    <p>Fully Convolutional Networks (FCN) for semantic segmentation
+    <elib>Long15</elib>.  Girschink et al introduced "Regions with CNN Features"
+    (R-CNN), and then improvements to make it "Fast" and "Faster"
+    <elib>Girshick14+Girshick15+Ren15</elib>.  Mask R-CNN <elib>He17</elib>.  We will use the
+    latest implementation in <a
+    href="https://github.com/facebookresearch/detectron2">Detectron2</a> from
+    Facebook AI Research.</p>
+
   </section>
 
   <section><h1>Pose estimation</h1>
@@ -167,7 +172,7 @@ detection, segmentation, and pose estimation</h1>
 <!-- EVERYTHING BELOW THIS LINE IS OVERWRITTEN BY THE INSTALL SCRIPT -->
 
 <table style="width:100%;"><tr style="width:100%">
-  <td style="width:33%;text-align:left;"><a class="previous_chapter" href=pose.html>Previous Chapter</a></td>
+  <td style="width:33%;text-align:left;"><a class="previous_chapter" href=clutter.html>Previous Chapter</a></td>
   <td style="width:33%;text-align:center;"><a href=index.html>Table of contents</a></td>
   <td style="width:33%;text-align:right;"><a class="next_chapter" href=grasping.html>Next Chapter</a></td>
 </tr></table>

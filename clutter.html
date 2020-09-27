@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+
+<html>
+
+  <head>
+    <title>Robotic Manipulation: Bin Picking</title>
+    <meta name="Robotic Manipulation: Bin Picking" content="text/html; charset=utf-8;" />
+    <link rel="canonical" href="http://manipulation.csail.mit.edu/clutter.html" />
+
+    <script src="https://hypothes.is/embed.js" async></script>
+    <script type="text/javascript" src="htmlbook/book.js"></script>
+
+    <script src="htmlbook/mathjax-config.js" defer></script> 
+    <script type="text/javascript" id="MathJax-script" defer
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js">
+    </script>
+    <script>window.MathJax || document.write('<script type="text/javascript" src="htmlbook/MathJax/es5/tex-chtml.js" defer><\/script>')</script>
+
+    <link rel="stylesheet" href="htmlbook/highlight/styles/default.css">
+    <script src="htmlbook/highlight/highlight.pack.js"></script> <!-- http://highlightjs.readthedocs.io/en/latest/css-classes-reference.html#language-names-and-aliases -->
+    <script>hljs.initHighlightingOnLoad();</script>
+
+    <link rel="stylesheet" type="text/css" href="htmlbook/book.css" />
+  </head>
+
+<body onload="loadChapter('manipulation');">
+
+<div data-type="titlepage">
+  <header>
+    <h1><a href="index.html" style="text-decoration:none;">Robotic Manipulation</a></h1>
+    <p data-type="subtitle">Perception, Planning, and Control</p> 
+    <p style="font-size: 18px;"><a href="http://people.csail.mit.edu/russt/">Russ Tedrake</a></p>
+    <p style="font-size: 14px; text-align: right;"> 
+      &copy; Russ Tedrake, 2020<br/>
+      Last modified <span id="last_modified"></span>.</br>
+      <script>
+      var d = new Date(document.lastModified);
+      document.getElementById("last_modified").innerHTML = d.getFullYear() + "-" + (d.getMonth()+1) + "-" + d.getDate();</script>
+      <a href="misc.html">How to cite these notes, use annotations, and give feedback.</a><br/>
+    </p>
+  </header>
+</div>
+
+<p><b>Note:</b> These are working notes used for <a
+href="http://manipulation.csail.mit.edu/Fall2020/">a course being taught
+at MIT</a>. They will be updated throughout the Fall 2020 semester.  <!-- <a 
+href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos are available on YouTube</a>.--></p> 
+
+<table style="width:100%;"><tr style="width:100%">
+  <td style="width:33%;text-align:left;"><a class="previous_chapter" href=pose.html>Previous Chapter</a></td>
+  <td style="width:33%;text-align:center;"><a href=index.html>Table of contents</a></td>
+  <td style="width:33%;text-align:right;"><a class="next_chapter" href=deep_perception.html>Next Chapter</a></td>
+</tr></table>
+
+
+<!-- EVERYTHING ABOVE THIS LINE IS OVERWRITTEN BY THE INSTALL SCRIPT -->
+<chapter style="counter-reset: chapter 4"><h1>Bin Picking</h1>
+
+  <p>Our initial study of geometric perception gave us some powerful tools, but
+  also revealed some major limitations.  In the next chapter, we will begin
+  applying techniques from deep learning to overcome some of these.  Spoiler
+  alert: those methods are insatiable in their hunger for data.  So before we
+  get there, I'd like to take a brief excursion into a nice subproblem that
+  might help us feed that need.</p>
+
+  <p>In this chapter we'll consider the simplest version of the bin picking
+  problem: the robot has a bin full of random objects and simply needs to move
+  those objects from one bin to the other.  In the version we will consider
+  here, we'll be agnostic about what those objects are and about where they end
+  up in the other bin.  But we would like our solutions to achieve a reasonable
+  level of performance for a very wide variety of objects.  This turns out to be
+  a pretty convenient way to create a training ground for robot learning -- we
+  can set the robot up to move objects back and forth between bins all day and
+  night, and occasionally throw new objects into the bin to add diversity.</p>
+
+  <p>Bin picking has potentially very important applications in industries such
+  as logistics, and there are significantly more refined versions of this
+  problem. For example, we might need to pick only specific objects, and/or
+  place the objects in known position (e.g. for "packing").  But let's start
+  with the basic case.</p>
+
+  <todo>Consider moving / teaching this BEFORE geometric pose estimation.  It could actually be nice to introduce cameras / point clouds with this material instead of with pose estimation.</todo>
+
+  <section><h1>Generating random cluttered scenes</h1></section>
+
+  <section><h1>Grasp selection</h1>
+  
+    <!-- antipodal grasping -->
+  
+    <!-- do I need IK? -->
+  </section>
+
+  <section><h1>The corner cases</h1></section>
+
+  <section><h1>Deciding between "macro" actions</h1></section>
+
+  <section><h1>Putting it all together</h1></section>
+</chapter>
+<!-- EVERYTHING BELOW THIS LINE IS OVERWRITTEN BY THE INSTALL SCRIPT -->
+
+<table style="width:100%;"><tr style="width:100%">
+  <td style="width:33%;text-align:left;"><a class="previous_chapter" href=pose.html>Previous Chapter</a></td>
+  <td style="width:33%;text-align:center;"><a href=index.html>Table of contents</a></td>
+  <td style="width:33%;text-align:right;"><a class="next_chapter" href=deep_perception.html>Next Chapter</a></td>
+</tr></table>
+
+<div id="footer">
+  <hr>
+  <table style="width:100%;">
+    <tr><td><em>Robotic Manipulation</em></td><td style="text-align:right">&copy; Russ
+      Tedrake, 2020</td></tr>
+  </table>
+</div>
+
+
+</body>
+</html>

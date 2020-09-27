@@ -53,6 +53,11 @@ rt_ipynb_test(
     tags = ["no-sandbox"], # from vtk-test-tags() in drake
 )
 
+rt_ipynb_test(
+    name = "clutter",
+    srcs = ["clutter.ipynb"],
+)
+
 filegroup(
     name = "chapters",
     srcs = ["chapters.json"],
