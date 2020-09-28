@@ -55,7 +55,10 @@ rt_ipynb_test(
 
 rt_ipynb_test(
     name = "clutter",
+    data = ["//manipulation/models:061_foam_brick_collision_as_visual.sdf"],
     srcs = ["clutter.ipynb"],
+    deps = ["//manipulation"],
+    tags = ["no-sandbox"], # from vtk-test-tags() in drake
 )
 
 filegroup(
