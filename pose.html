@@ -426,7 +426,7 @@ output_ports:
     we must solve.  In the previous chapter I argued for using differential
     kinematics instead of inverse kinematics; why is my story different here?
     Differential kinematics can still be useful for perception, for example if
-    we want to track the pose of an object after we acquire it's initial pose.
+    we want to track the pose of an object after we acquire its initial pose.
     But unlike the robot case, where we can read the joint sensors to get our
     current state, in perception we need to solve this harder problem at least
     once.</p>
@@ -496,7 +496,7 @@ output_ports:
 
       <p>Is that what you expected?  I generated this plot using just two
       model/scene points, but adding more will only change the shape of the
-      quadratic, but not it's minimum.  And on the <a
+      quadratic, but not its minimum.  And on the <a
       href="https://www.geogebra.org/3d/pn628maw">interactive version</a> of the
       plot, I've added a slider so that you control the parameter, $\theta$,
       that represents the ground truth rotation described by $R$. Try it
@@ -517,7 +517,7 @@ output_ports:
     <p>What about translations?  There is a super important insight that allows
     us to decouple the optimization of rotations from the optimization of
     translations.  The insight is this: <i>the <b>relative</b> position between
-    points is effected by rotation, but not by translation</i>. Therefore, if we
+    points is affected by rotation, but not by translation</i>. Therefore, if we
     write the points relative to some canonical point on the object, we can
     solve for rotations alone.  Once we have the rotation, then we can back out
     the translations easily.  For our least squares objective, there is even a
@@ -543,7 +543,7 @@ output_ports:
     
       
     <p>To find $R$, compose the data matrix $$W = \sum_{i=1}^{N_s} (p^{s_i} -
-    p^\bar{s}) ({}^Op^{m_{c_i} - {}^Op^\bar{m})^T, $$ and use SVD to compute $W
+    p^\bar{s}) ({}^Op^{m_{c_i}} - {}^Op^\bar{m})^T, $$ and use SVD to compute $W
     = U \Sigma V^T$.  The optimal solution is \begin{gather*} R^* = U D V^T,\\
     p^* = {}^Op^\bar{s} - R^* p^\bar{m},\end{gather*} where $D$ is the diagonal
     matrix with entries $[1, 1, \det(UV^T)]$ <elib>Myronenko09</elib>.  This may
@@ -614,12 +614,12 @@ output_ports:
     href="https://github.com/mariusmuja/flann">FLANN</a><elib>Muja09</elib>.</p>
 
     <p>Although solving for the pose and the correspondences jointly is very
-    difficult, ICP leverages the idea if we solve for them independently, then
-    both parts have good solutions.  Iterative algorithms like this are a common
-    approach taken in optimization for e.g. bilinear optimization or expectation
-    maximization.  It is important to understand that this is a local solution
-    to a non-convex optimization problem.  So it is subject to getting stuck in
-    local minima.</p>
+    difficult, ICP leverages the idea that if we solve for them independently,
+    then both parts have good solutions.  Iterative algorithms like this are a
+    common approach taken in optimization for e.g. bilinear optimization or
+    expectation maximization.  It is important to understand that this is a
+    local solution to a non-convex optimization problem.  So it is subject to
+    getting stuck in local minima.</p>
 
     <example class="drake"><h1>Iterative Closest Point</h1>
   
@@ -739,7 +739,7 @@ output_ports:
       between points depends on the rotation but is invariant to translation.
       We can take that idea one step further and note that the <i>relative
       <b>distance</b></i> between points is actually invariant to both rotation
-      <i>and</i> translation.  This has traditionally be used to separate the
+      <i>and</i> translation.  This has traditionally been used to separate the
       estimation of scale from the estimation of translation and rotation (I've
       decided to ignore scaling throughout this chapter, since it doesn't make
       immediate sense for our proposed problem).  In <elib>Yang20a</elib> they
@@ -757,7 +757,7 @@ output_ports:
     <subsection><h1>Point cloud segmentation</h1>
     
       <p>Not all outliers are due to bad returns from the depth camera, very
-      often they due to other objects in the scene.  Even in the most basic
+      often they are due to other objects in the scene.  Even in the most basic
       case, our object of interest will be resting on a table or in a bin.  If
       we know the geometry of the table/bin a priori, then we can subtract away
       points from that region.  Alternatively, we can <a
@@ -809,7 +809,7 @@ output_ports:
       that, at the optimum, the scene points corresponding to the model of
       interest would be mapped to their respective model points, and the scene
       points from outliers and other objects get labelled as "no
-      correspondence".  The model points that from the occluded parts of the
+      correspondence".  The model points that are from the occluded parts of the
       object would simply not have any correspondences associated with them.</p>
       
       <p>There is an alternative notation that we can use which is slightly more
@@ -921,9 +921,9 @@ output_ports:
       objective, because if outliers add a constant value (e.g. 1) to the cost,
       then they have no gradient with respect to the decision variables and no
       impact on the optimal solution.  We can therefore write, for our favorite
-      loss function, $l(x)$, use objectives of the form, e.g. $$\min \sum_{i,j}
-      \left[ l\left(\| X^O \: {}^Op^{m_j} - p^{s_i} \|\right)\right].$$
-      And what are the decision variables?  We can also exploit the additional
+      loss function, $l(x)$, an objective of the form, e.g. $$\min \sum_{i,j}
+      \left[ l\left(\| X^O \: {}^Op^{m_j} - p^{s_i} \|\right)\right].$$ And what
+      are the decision variables?  We can also exploit the additional
       flexibility of the solvers to use minimal parameterizations -- e.g.
       $\theta$ for rotations in 2D, or Euler angles for rotations in 3D.  The
       objective function is more complicated but we can get rid of the
@@ -983,7 +983,7 @@ output_ports:
         a big sacrifice now that we have stopped enumerating correspondences
         explicitly.  Let's slightly modify our objective above to be of the form
         $$\min \sum_{i} \left[ l\left( \min_j \| X^O \: {}^Op^{m_j} - p^{s_i}
-        \|\right)\right].$$  In words, we can apply arbitrary robust loss function, but we will only apply it to the minimum distance between the scene point and the model.</p>
+        \|\right)\right].$$  In words, we can an apply arbitrary robust loss function, but we will only apply it to the minimum distance between the scene point and the model.</p>
 
         <p>The nested $\min$ functions look a little intimidating from a
         computational perspective.  But this form, coupled with the fact that in
@@ -1114,7 +1114,7 @@ output_ports:
       $0$ in the world frame (as illustrated by the green
       lines).</figcaption></figure>
       
-      <p>This is a slightly exaggerated case, were the scene points are really
+      <p>This is a slightly exaggerated case, where the scene points are really
       pulling the box into the constraints.  We can see that the relaxation is
       <i>not</i> tight in this situation; the box is being shrunk slightly to
       explain the data.</p>

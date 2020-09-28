@@ -144,7 +144,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
     relative to the origin of the world frame, expressed in the world frame.
     Here is where the shorthand comes in.  If the position of a quantity is
     relative to a frame, and expressed in the same frame, then we can safely
-    omit the brackets and the subscript.  $^Fp^A \equiv {^Fp^A_F}$. Furthermore,
+    omit the subscript.  $^Fp^A \equiv {^Fp^A_F}$. Furthermore,
     if the "relative to" field is omitted, then we assume that the point is
     relative to $W$, so $p^A \equiv ^Wp^A_W$.</p>
 
@@ -247,7 +247,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
     Here are the basic rules of algebra for our spatial quantities:  
     <ul>
       <li>Positions expressed in the same frame can be added when their
-      reference and target symbols match: \begin{equation}{}^A!p^B_F + {}^Bp^C_F
+      reference and target symbols match: \begin{equation}{}^Ap^B_F + {}^Bp^C_F
       = {}^Ap^C_F.\end{equation} The additive inverse is well defined:
       \begin{equation}{}^Ap^B_F = - {}^Bp^A_F.\end{equation} Those should be
       pretty intuitive; make sure you confirm them for yourself.</li>
@@ -258,17 +258,19 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       does <i>not</i> affect the relative position between two points.</li>
       <li>Rotations can be multiplied when their reference and target symbols
       match: \begin{equation}{}^AR^B \: {}^BR^C = {}^AR^C.\end{equation}  The
-      inverse operation is also simply defined: \begin{equation}[{}^AR^B]^{-1} =
-      {}^BR^A.\end{equation} When the rotation is represented as a rotation
-      matrix, this is literally the matrix inverse, and since rotation matrices
-      are orthonormal, we also have $R^{-1}=R^T.$</li>
+      inverse operation is also simply defined:
+      \begin{equation}\left[{}^AR^B\right]^{-1} = {}^BR^A.\end{equation} When
+      the rotation is represented as a rotation matrix, this is literally the
+      matrix inverse, and since rotation matrices are orthonormal, we also have
+      $R^{-1}=R^T.$</li>
       <li>Transforms bundle this up into a single, convenient notation when
       positions are relative to a frame (and the same frame they are expressed
       in): \begin{equation}{}^Gp^A = {}^GX^F {}^Fp^A = {}^Gp^F + {}^Fp^A_G
       = {}^Gp^F + {}^GR^F {}^Fp^A.\end{equation}</li>
       <li>Transforms compose: \begin{equation}{}^AX^B {}^BX^C =
-      {}^AX^C,\end{equation}  and have an inverse \begin{equation}[{}^AX^B]^{-1}
-      = {}^BX^A.\end{equation}  Please note that for transforms, we generally do
+      {}^AX^C,\end{equation}  and have an inverse
+      \begin{equation}\left[{}^AX^B\right]^{-1} = {}^BX^A.\end{equation}  Please
+      note that for transforms, we generally do
       <i>not</i> have that $X^{-1}$ is $X^T,$ though it still has a simple form.
     </li>
     </ul></div>
@@ -316,9 +318,10 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
     the robot, we would use $q$ for the entire configuration vector, and use
     e.g. $q_{robot}$ for the subset of the vector corresponding to the robot's
     joint positions. Therefore, the goal of forward kinematics is to produce a
-    map: \begin{equation}X^B = f_{kin}^B(q),\end{equation} for any body $B$ (or
-    any other frame we have attached to the scene).  Our spatial notation and
-    spatial algebra makes this computation relatively straight-forward.</p>
+    map: \begin{equation}X^G = f_{kin}^G(q).\end{equation}  Moreover, we'd like
+    to have forward kinematics available for any frame we have defined in the
+    scene.  Our spatial notation and spatial algebra makes this computation
+    relatively straight-forward.</p>
 
     <subsection><h1>The kinematic tree</h1>
 
@@ -350,11 +353,11 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       vector $q$ -- and knows how to compute the configuration dependent
       transform across the joint from the child joint frame $J_C$ to the parent
       joint frame $J_P$: ${}^{J_P}X^{J_C}(q)$.  Additionally, the kinematic tree
-      defines the (fixed) transforms from the child body frame to the joint
-      frame, ${}^{J_C}X^C$, and from the joint frame to the parent frame,
+      defines the (fixed) transforms from the joint frame to the child body
+      frame, ${}^CX^{J_C}$, and from the joint frame to the parent frame,
       ${}^PX^{J_P}$. Altogether, we can compute the configuration transform
-      between any one body and its parent, $${}^PX^C(q) = {}^PX^{J_P} {}^{J_P}X^{J_C}(q)
-      {}^{J_C}X^C.$$</p>
+      between any one body and its parent, $${}^PX^C(q) = {}^PX^{J_P}
+      {}^{J_P}X^{J_C}(q) {}^{J_C}X^C.$$</p>
 
       <example><h1>Specifying the kinematic tree in URDF</h1></example>
 
@@ -495,23 +498,24 @@ pose = plant.EvalBodyPoseInWorld(context, gripper)</pre></code>
       {}^A\text{v}^B_G = {}^GR^F {}^A\text{v}^B_F, \qquad {}^A\omega^B_G =
       {}^GR^F {}^A\omega^B_F, \qquad \text{when } {}^G\dot{R}^F=0.\end{equation}
       </li>
-      <li><details><summary>If the relative pose between two frames is not fixed, then we get
-        slightly more complicated formulas involving vector cross products; they
-        are derived from the derivative of the transform equation and the
-        chain rule.  (Click the triangle to expand those details, but consider skipping them for now!)</summary>
-        The angular velocity vector is related to the time-derivative of a
-        rotation matrix via the skew-symmetric (as verified by differentiating
-        $RR^T=I$) matrix: \begin{equation} \dot{R}R^T = \dot{R}R^{-1} =
-        \begin{bmatrix} 0 & -\omega_z & \omega_y \\ \omega_z & 0 & -\omega_x \\
-        -\omega_y & \omega_x & 0 \end{bmatrix}.\end{equation} Multiplying a
-        vector by this matrix can be written as a vector-cross product:
-        \begin{equation} \dot{R}R^T p = \dot{R}R^{-1} p = \omega \times
-        p.\end{equation}  Therefore, differentiating $${}^Gp^A = {}^GX^F {}^Fp^A
-        = {}^Gp^F + {}^GR^F] {}}^Fp^A,$$ yields \begin{align} {}^G\text{v}^A =&
-        {}^G\text{v}^F + {}^G\dot{R}^F {}^Fp^A + {}^GR^F {}^F\text{v}^A
-        \nonumber \\ =& {}^G\text{v}^F + {}^G\omega^F \times {}^GR^F {}^Fp^A +
-        {}^GR^F {}^F\text{v}^A.\end{align}  <!--Similarly, differentiating
-        ${}^AR^C = {}^AR^B {}^BR^C$ yields--></details></li>
+      <li><details><summary>If the relative pose between two frames is not
+      fixed, then we get slightly more complicated formulas involving vector
+      cross products; they are derived from the derivative of the transform
+      equation and the chain rule.  (Click the triangle to expand those details,
+      but consider skipping them for now!)</summary>  The angular velocity
+      vector is related to the time-derivative of a rotation matrix via the
+      skew-symmetric (as verified by differentiating $RR^T=I$) matrix:
+      \begin{equation} \dot{R}R^T = \dot{R}R^{-1} = \begin{bmatrix} 0 &
+      -\omega_z & \omega_y \\ \omega_z & 0 & -\omega_x \\ -\omega_y & \omega_x &
+      0 \end{bmatrix}.\end{equation} Multiplying a vector by this matrix can be
+      written as a vector-cross product: \begin{equation} \dot{R}R^T p =
+      \dot{R}R^{-1} p = \omega \times p.\end{equation}  Therefore,
+      differentiating $${}^Gp^A = {}^GX^F {}^Fp^A = {}^Gp^F + {}^GR^F
+      {}^Fp^A,$$ yields \begin{align} {}^G\text{v}^A =& {}^G\text{v}^F +
+      {}^G\dot{R}^F {}^Fp^A + {}^GR^F {}^F\text{v}^A \nonumber \\ =&
+      {}^G\text{v}^F + {}^G\omega^F \times {}^GR^F {}^Fp^A + {}^GR^F
+      {}^F\text{v}^A.\end{align}  <!--Similarly, differentiating ${}^AR^C =
+      {}^AR^B {}^BR^C$ yields--></details></li>
     </ul>
     </div>
 
@@ -576,7 +580,7 @@ plant.num_velocities() = 6</pre></code></p>
       are positions, $q$; we use unit quaternions in the position vector.  But
       we have just 6 velocities, $v$; we use angular velocities in the the
       velocity vector.  Clearly, if the length of the vectors don't even match,
-      we do *not* have $\dot{q} = v$.</p>
+      we do <i>not</i> have $\dot{q} = v$.</p>
 
       <p>It's not really any harder; Drake provides the
       <code>MultibodyPlant</code> methods <code>MapQDotToVelocity</code> and
@@ -597,7 +601,7 @@ plant.num_velocities() = 6</pre></code></p>
       <li><code>CalcJacobianTranslationalVelocity</code>, and</li>
       <li><code>CalcJacobianSpatialVelocity</code>,</li>
     </ul> with each taking an argument to specify whether you'd like the
-    Jacobian with respect to $\dot{q}$ or $v$. If you're really like the
+    Jacobian with respect to $\dot{q}$ or $v$. If you really like the
     analytical Jacobian, you could get it (much less efficiently) using our
     support for automatic differentiation.</p>
 
@@ -621,7 +625,8 @@ plant.num_velocities() = 6</pre></code></p>
     velocities is (configuration-dependent) linear: \begin{equation}V^G =
     J^G(q)v.\end{equation}  Maybe this gives us what we need to produce changes
     in gripper frame $G$?  If I have a desired gripper frame velocity $V^{G_d}$,
-    then how about commanding a joint velocity $v = [J^G(q)]^{-1} V^{G_d}$?</p>
+    then how about commanding a joint velocity $v = \left[J^G(q)\right]^{-1}
+    V^{G_d}$?</p>
 
     <subsection><h1>The Jacobian pseudo-inverse</h1>
 
@@ -1145,7 +1150,7 @@ plant.num_velocities() = 6</pre></code></p>
       
       <p>Denote $P(q)$ as an orthonormal basis for the kernel of a Jacobian $J$.
       Traditionally in robotics we implemented this using the pseudo-inverse: $P
-      = (I - JJ^+)$, but many linear algebra packages now provide methods to
+      = (I - J^+J)$, but many linear algebra packages now provide methods to
       obtain one more directly.  Adding $Pv \approx Pk(q_0 - q)$ as a secondary
       objective can be accomplished with \begin{align}\min_{v_n} \quad &
       \left|J^G(q)v_n - V^{G_d}\right|^2_2 + \epsilon \left|P(q)\left(v_n -
