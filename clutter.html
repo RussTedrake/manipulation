@@ -55,6 +55,10 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
 
 <!-- EVERYTHING ABOVE THIS LINE IS OVERWRITTEN BY THE INSTALL SCRIPT -->
 <chapter style="counter-reset: chapter 4"><h1>Bin Picking</h1>
+  <a style="float:right; margin-top:-80px;" target="clutter" href="https://colab.research.google.com/github/RussTedrake/manipulation/blob/master/clutter.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open Corresponding Notebook In Colab"/></a>
+  <div style="clear:right;"></div>
+
+  <todo>Consider moving / teaching this BEFORE geometric pose estimation.  It could actually be nice to introduce cameras / point clouds with this material instead of with pose estimation.</todo>
 
   <p>Our initial study of geometric perception gave us some powerful tools, but
   also revealed some major limitations.  In the next chapter, we will begin
@@ -65,13 +69,14 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
 
   <p>In this chapter we'll consider the simplest version of the bin picking
   problem: the robot has a bin full of random objects and simply needs to move
-  those objects from one bin to the other.  In the version we will consider
-  here, we'll be agnostic about what those objects are and about where they end
-  up in the other bin.  But we would like our solutions to achieve a reasonable
-  level of performance for a very wide variety of objects.  This turns out to be
-  a pretty convenient way to create a training ground for robot learning -- we
-  can set the robot up to move objects back and forth between bins all day and
-  night, and occasionally throw new objects into the bin to add diversity.</p>
+  those objects from one bin to the other.  We'll be agnostic about what those
+  objects are and about where they end up in the other bin, but we would like
+  our solution to achieve a reasonable level of performance for a very wide
+  variety of objects.  This turns out to be a pretty convenient way to create a
+  training ground for robot learning -- we can set the robot up to move objects
+  back and forth between bins all day and night, and intermittently add and
+  remove objects from the bin to improve diversity.  Of course, it is even
+  easier in simulation!</p>
 
   <p>Bin picking has potentially very important applications in industries such
   as logistics, and there are significantly more refined versions of this
@@ -79,9 +84,72 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
   place the objects in known position (e.g. for "packing").  But let's start
   with the basic case.</p>
 
-  <todo>Consider moving / teaching this BEFORE geometric pose estimation.  It could actually be nice to introduce cameras / point clouds with this material instead of with pose estimation.</todo>
+  <section><h1>Generating random cluttered scenes</h1>
+  
+    <subsection><h1>Falling things</h1>
 
-  <section><h1>Generating random cluttered scenes</h1></section>
+      <p>The simplest idea is to just use simulation to fill the bin.  We can
+      generate a random number of objects in random poses, staggered in their
+      vertical positions so that they trivially start out of penetration.
+      <todo>maybe cite the falling things paper, but make it clear that the idea
+      is not new?</todo></p>
+
+      <example><h1>Piles of foam bricks (in the plane)</h1>
+
+        <todo>Add foam brick version... prefer the pyplot visualizer for this one (shows the convex hulls a bit better)?</todo>  
+
+      </example>
+
+      <p>It's not really any different to do this with any random objects --
+      here is what it looks like when I run the same code, but replacing the
+      brick with a random draw from a few objects from the <a
+      href="https://www.ycbbenchmarks.com/">YCB dataset</a>.  It somehow amuses
+      me that we can see the <a
+      href="https://en.wikipedia.org/wiki/Central_limit_theorem">central limit
+      theorem</a> hard at work, even when our objects are slightly
+      ridiculous.</p>
+
+      <figure>
+      <img style="width:70%" src="data/ycb_planar_clutter.png"/>
+      </figure>
+
+      <example><h1>Filling bins with clutter</h1>
+      
+        <todo>YCB objects dropped into the bin in 3D.  Don't send them all to
+        meshcat (too slow, at least until I get object model caching working).
+        But I can add a camera and just return the rendered image of the view
+        from above (perhaps also to the side)?</todo>
+
+      </example>
+
+      <p>Please appreciate that bins are a particularly simple case for this. If
+      you wanted to generate random kitchen environments, for example, then you
+      won't be as happy with a solutions that drops refridgerators, toasters,
+      and stools from uniformly random i.i.d. poses.  In those cases, the
+      distributions get much more interesting; we will revisit the topic of
+      generative scene models later in the notes.</p>
+
+      <p>Even in the case of bins, though, we can understand some of the
+      machinery that we might build on later.  Given our discussion in the last
+      chapter about writing optimizations with non-penetration constraints, I
+      hope you are already asking yourself: why not use those constraints again
+      here?  Let's explore that idea a bit further.</p>
+
+    </subsection>
+
+    <subsection><h1>Static equilibrium with frictional contact</h1>
+    
+    </subsection>
+
+    <subsection><h1>A few of the nuances in simulating contact</h1>
+    
+    </subsection>
+
+    <subsection><h1>Static equilibrium as an optimization constraint</h1>
+
+    </subsection>
+
+  </section>
 
   <section><h1>Grasp selection</h1>
   
