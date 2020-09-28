@@ -27,7 +27,7 @@
       case a deviation of 0.0005 m from the visual surface).
      -->
       <collision name="box_collision">
-        <pose>0 0 0.025 0 0 0</pose>
+        <pose>0 0 0.0 0 0 0</pose>
         <geometry>
           <box>
             <size>0.074 0.049 0.049</size>
@@ -69,44 +69,12 @@
           </sphere>
         </geometry>
       </collision>
-      <collision name="point_collision5">
-        <pose>0.0375 0.025 0.05 0 0 0</pose>
-        <geometry>
-          <sphere>
-            <radius>1e-7</radius>
-          </sphere>
-        </geometry>
-      </collision>
-      <collision name="point_collision6">
-        <pose>0.0375 -0.025 0.05 0 0 0</pose>
-        <geometry>
-          <sphere>
-            <radius>1e-7</radius>
-          </sphere>
-        </geometry>
-      </collision>
-      <collision name="point_collision7">
-        <pose>-0.0375 0.025 0.05 0 0 0</pose>
-        <geometry>
-          <sphere>
-            <radius>1e-7</radius>
-          </sphere>
-        </geometry>
-      </collision>
-      <collision name="point_collision8">
-        <pose>-0.0375 -0.025 0.05 0 0 0</pose>
-        <geometry>
-          <sphere>
-            <radius>1e-7</radius>
-          </sphere>
-        </geometry>
-      </collision>
 
       <!--
       Use the collision elements (with sphere radius exaggerated) as visual elements, too.
       -->
       <visual name="box_collision">
-        <pose>0 0 0.025 0 0 0</pose>
+        <pose>0 0 -0.05 0 0 0</pose>
         <geometry>
           <box>
             <size>0.074 0.049 0.049</size>
@@ -160,50 +128,7 @@
           <diffuse>.9 .2 .2 1.0</diffuse>
         </material>
       </visual>
-      <visual name="point_collision5">
-        <pose>0.0375 0.025 0.05 0 0 0</pose>
-        <geometry>
-          <sphere>
-            <radius>1e-3</radius>
-          </sphere>
-        </geometry>
-        <material>
-          <diffuse>.9 .2 .2 1.0</diffuse>
-        </material>
-      </visual>
-      <visual name="point_collision6">
-        <pose>0.0375 -0.025 0.05 0 0 0</pose>
-        <geometry>
-          <sphere>
-            <radius>1e-3</radius>
-          </sphere>
-        </geometry>
-        <material>
-          <diffuse>.9 .2 .2 1.0</diffuse>
-        </material>
-      </visual>
-      <visual name="point_collision7">
-        <pose>-0.0375 0.025 0.05 0 0 0</pose>
-        <geometry>
-          <sphere>
-            <radius>1e-3</radius>
-          </sphere>
-        </geometry>
-        <material>
-          <diffuse>.9 .2 .2 1.0</diffuse>
-        </material>
-      </visual>
-      <visual name="point_collision8">
-        <pose>-0.0375 -0.025 0.05 0 0 0</pose>
-        <geometry>
-          <sphere>
-            <radius>1e-3</radius>
-          </sphere>
-        </geometry>
-        <material>
-          <diffuse>.9 .2 .2 1.0</diffuse>
-        </material>
-      </visual>
+
     </link>
   </model>
 </sdf>
