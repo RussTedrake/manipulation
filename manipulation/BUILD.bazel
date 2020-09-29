@@ -11,6 +11,7 @@ rt_py_library(
     name = "manipulation",
     srcs = [
         "__init__.py",
+        "jupyter_widgets.py",
         "meshcat_utils.py",
         "utils.py",
     ],
