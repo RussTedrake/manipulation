@@ -536,7 +536,7 @@ output_ports:
     href="https://en.wikipedia.org/wiki/Lagrange_multiplier">Lagrangian</a>
     with respect to $p$, and setting it equal to zero: $$\sum_{i=1}^{N_s} 2 (p +
     R \: {}^Op^{m_{c_i}} - p^{s_i}) = 0 \Rightarrow p^* = \frac{1}{N_s}
-    \sum_{i=1}^{N_s} {}^Op^{s_i} - R^*\left(\frac{1}{N_s} \sum_{i=1}^{N_s}
+    \sum_{i=1}^{N_s} p^{s_i} - R^*\left(\frac{1}{N_s} \sum_{i=1}^{N_s}
     {}^Op^{m_{c_i}}\right),$$ but don't forget the geometric interpretation
     above.  This is just another way to see that we can substitute the
     right-hand side in for $p$ in our objective and solve for $R$ by itself.</p>
@@ -545,7 +545,7 @@ output_ports:
     <p>To find $R$, compose the data matrix $$W = \sum_{i=1}^{N_s} (p^{s_i} -
     p^\bar{s}) ({}^Op^{m_{c_i}} - {}^Op^\bar{m})^T, $$ and use SVD to compute $W
     = U \Sigma V^T$.  The optimal solution is \begin{gather*} R^* = U D V^T,\\
-    p^* = {}^Op^\bar{s} - R^* p^\bar{m},\end{gather*} where $D$ is the diagonal
+    p^* = p^\bar{s} - R^* {}^Op^\bar{m},\end{gather*} where $D$ is the diagonal
     matrix with entries $[1, 1, \det(UV^T)]$ <elib>Myronenko09</elib>.  This may
     seem like magic, but replacing the singular values in SVD with ones gives
     the optimal projection back onto the orthonormal matrices, and the diagonal
