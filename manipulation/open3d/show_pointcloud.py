@@ -1,4 +1,5 @@
-"""An example of converting from the Drake point cloud representation to the
+"""
+An example of converting from the Drake point cloud representation to the
 Open3D point cloud representation.
 """
 

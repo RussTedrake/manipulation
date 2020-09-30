@@ -17,7 +17,8 @@ from pydrake.systems.framework import BasicVector, VectorSystem
 
 
 class JointSliders(VectorSystem):
-    """Provides a simple ipywidgets gui with one slider per joint of the
+    """
+    Provides a simple ipywidgets gui with one slider per joint of the
     MultibodyPlant.  Any positions that are not associated with joints (e.g.
     floating-base "mobilizers") are held constant at the default value
     obtained from robot.CreateDefaultContext().

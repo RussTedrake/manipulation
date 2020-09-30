@@ -11,7 +11,8 @@ def ransac_solution(point_cloud,
                     model_fit_func,
                     tolerance=1e-3,
                     max_iterations=500):
-    """Args:
+    """
+    Args:
       point_cloud is (N, 3) numpy array
       tolerance is a float
       max_iterations is a (small) integer

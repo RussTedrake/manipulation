@@ -25,8 +25,8 @@ class Grader:
                     Grader.locals_from_notebook(notebook_ipynb))
         except Exception as e:
             Grader.global_fail_with_error_message(
-                "Exception when running file: " + notebook_ipynb + ', ' +
-                str(e), results_json)
+                "Exception when running file: " + notebook_ipynb + ', '
+                + str(e), results_json)
             raise
 
         # Grade notebook_locals_list on test_cases_list

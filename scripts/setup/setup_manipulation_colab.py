@@ -7,13 +7,16 @@ from urllib.request import urlretrieve
 
 def setup_drake(*, version, build):
     if build == "continuous":  # This is a hack!
-        urlretrieve(f"https://drake-packages.csail.mit.edu/drake/nightly/drake-20200915/setup_drake_colab.py",
-                    "setup_drake_colab.py")
+        urlretrieve(
+            f"https://drake-packages.csail.mit.edu/drake/nightly/drake-20200915/setup_drake_colab.py",
+            "setup_drake_colab.py")
     else:
-        urlretrieve(f"https://drake-packages.csail.mit.edu/drake/{build}/drake-{version}/setup_drake_colab.py",
-                    "setup_drake_colab.py")
+        urlretrieve(
+            f"https://drake-packages.csail.mit.edu/drake/{build}/drake-{version}/setup_drake_colab.py",
+            "setup_drake_colab.py")
     from setup_drake_colab import setup_drake
     setup_drake(version=version, build=build)
+
 
 def setup_manipulation(*, manipulation_sha, drake_version, drake_build):
     setup_drake(version=drake_version, build=drake_build)
@@ -22,8 +25,10 @@ def setup_manipulation(*, manipulation_sha, drake_version, drake_build):
 
     # Clone the repo (if necessary).
     if not os.path.isdir(path):
-        subprocess.run(['git', 'clone', 
-            'https://github.com/RussTedrake/manipulation.git', path])
+        subprocess.run([
+            'git', 'clone', 'https://github.com/RussTedrake/manipulation.git',
+            path
+        ])
 
     # Checkout the sha.
     subprocess.run(['git', 'checkout', manipulation_sha], cwd=path)
@@ -32,12 +37,14 @@ def setup_manipulation(*, manipulation_sha, drake_version, drake_build):
     subprocess.run([f"{path}/scripts/setup/ubuntu/18.04/install_prereqs.sh"])
 
     # Run pip install
-    subprocess.run(["pip3", "install", "--requirement", "/opt/manipulation/requirements.txt"])
+    subprocess.run([
+        "pip3", "install", "--requirement", "/opt/manipulation/requirements.txt"
+    ])
 
     # Install colab specific requirements
     subprocess.run(["apt", "install", "xvfb"])
     subprocess.run(["pip3", "install", "pyngrok", "pyvirtualdisplay"])
- 
+
     # Set the path (if necessary).
     spec = importlib.util.find_spec('manipulation')
     if spec is None:

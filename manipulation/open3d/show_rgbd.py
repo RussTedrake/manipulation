@@ -1,4 +1,5 @@
-"""An example of converting from the Drake RGBD image representation to the
+"""
+An example of converting from the Drake RGBD image representation to the
 Open3D RGBD image representation.
 """
 
