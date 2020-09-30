@@ -62,10 +62,10 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
 
   <p>Our initial study of geometric perception gave us some powerful tools, but
   also revealed some major limitations.  In the next chapter, we will begin
-  applying techniques from deep learning to overcome some of these.  Spoiler
-  alert: those methods are insatiable in their hunger for data.  So before we
-  get there, I'd like to take a brief excursion into a nice subproblem that
-  might help us feed that need.</p>
+  applying techniques from deep learning to perception.  Spoiler alert: those
+  methods are going to be insatiable in their hunger for data. So before we get
+  there, I'd like to take a brief excursion into a nice subproblem that might
+  help us feed that need.</p>
 
   <p>In this chapter we'll consider the simplest version of the bin picking
   problem: the robot has a bin full of random objects and simply needs to move
@@ -80,23 +80,53 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
 
   <p>Bin picking has potentially very important applications in industries such
   as logistics, and there are significantly more refined versions of this
-  problem. For example, we might need to pick only specific objects, and/or
-  place the objects in known position (e.g. for "packing").  But let's start
-  with the basic case.</p>
+  problem. For example, we might need to pick only objects from a specific
+  class, and/or place the objects in known position (e.g. for "packing").  But
+  let's start with the basic case.</p>
 
   <section><h1>Generating random cluttered scenes</h1>
   
+    <p>If our goal is to test a diversity of bin picking situations, then the
+    first tasks is to figure out how to generate diverse simulations.  How
+    should we populate the bin full of objects?  So far we've set up each
+    simulation by carefully setting the initial positions (in the Context) for
+    each of the objects, but that approach won't scale.</p>
+
     <subsection><h1>Falling things</h1>
 
-      <p>The simplest idea is to just use simulation to fill the bin.  We can
-      generate a random number of objects in random poses, staggered in their
-      vertical positions so that they trivially start out of penetration.
+      <p>In the real world, we would probably just dump the random objects into
+      the bin.  That's a reasonable strategy for simulation, too.  We can
+      roughly expect our simulation to be reasonable as long as our initial
+      conditions are reasonable -- we can't have multiple objects occupying the
+      same physical space.  The simplest an most common way around this is to
+      generate a random number of objects in random poses, with their vertical
+      positions staggered so that they trivially start out of penetration.</p>
+
+      <p>If you look for them, you can find animations of large numbers of
+      falling objects in the demo reels for most advanced multibody
+      simulators.  But we're doing it for a purpose!</p>
+
       <todo>maybe cite the falling things paper, but make it clear that the idea
       is not new?</todo></p>
 
       <example><h1>Piles of foam bricks in 2D</h1>
 
-        <todo>Add foam brick version... prefer the pyplot visualizer for this one (shows the convex hulls a bit better)?</todo>
+        <p>Here is the 2D case.  I've added many instance of our favorite red
+        foam brick to the plant.  Note that it's possible to write highly
+        optimized 2D simulators; that's not what I've done here.  Rather, I've
+        added a planar joint connecting each of them to the world, and run our
+        full 3D simulator.  The planar joint has three degrees of freedom.  I've
+        oriented them here to be $x$, $z$, and $\theta$) to constrain the
+        objects to the 2D plane.</p>
+
+        <p>I've set the initial positions for each object in the Context to be
+        uniformly distributed over the horizontal position, uniformly rotated,
+        and staggered every 0.1m in their initial vertical position.</p>
+
+        <p><a target="clutter"
+          href="https://colab.research.google.com/github/RussTedrake/manipulation/blob/master/clutter.ipynb#scrollTo=fGbe-rJGJlF0"><img
+          src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
+          </p>
 
         <figure>
           <iframe style="border:0;height:300px;width:540px;" src="data/falling_bricks_2d.html?height=240px"></iframe>
@@ -118,11 +148,27 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       </figure>
 
       <example><h1>Filling bins with clutter</h1>
-      
-        <todo>YCB objects dropped into the bin in 3D.  Don't send them all to
-        meshcat (too slow, at least until I get object model caching working).
-        But I can add a camera and just return the rendered image of the view
-        from above (perhaps also to the side)?</todo>
+
+        <p>The same technique also works in 3D.  Setting uniformly random
+        orientations in 3D requires a little more thought, but Drake supplies
+        the method <code>UniformlyRandomRotationMatrix</code> (and also one for
+        quaternions and roll-pitch-yaw) to do that work for us.</p>
+
+        <p><a target="clutter"
+          href="https://colab.research.google.com/github/RussTedrake/manipulation/blob/master/clutter.ipynb#scrollTo=GoxjuO5PJlF4"><img
+          src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
+          </p>
+
+        <p>I had to decide how to visualize the results of this one for you. The
+        mesh and texture map files for the YCB objects are very large, so
+        downloading many of them to your browser from Colab felt a bit too
+        painful.  If you've decided to run the notebooks on your local machine,
+        then go ahead and run <code>drake_visualizer</code> before running this
+        test to see the live simulation (drake visualizer will load the mesh
+        files directly from your disk, so avoid the download).  For Colab, I've
+        decided to add a camera to the scene and take a picture after the
+        simulating for a few seconds.  After all, that's perhaps the data that
+        we're actually looking for.</p>
 
         <figure>
           <img style="width:70%" src="data/ycb_clutter.png"/>
@@ -130,23 +176,49 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
 
       </example>
 
-      <p>Please appreciate that bins are a particularly simple case for this. If
-      you wanted to generate random kitchen environments, for example, then you
-      won't be as happy with a solutions that drops refridgerators, toasters,
-      and stools from uniformly random i.i.d. poses.  In those cases, the
-      distributions get much more interesting; we will revisit the topic of
-      generative scene models later in the notes.</p>
-
-      <p>Even in the case of bins, though, we can understand some of the
-      machinery that we might build on later.  Given our discussion in the last
-      chapter about writing optimizations with non-penetration constraints, I
-      hope you are already asking yourself: why not use those constraints again
-      here?  Let's explore that idea a bit further.</p>
+      <p>Please appreciate that bins are a particularly simple case for
+      generating random scenarios. If you wanted to generate random kitchen
+      environments, for example, then you won't be as happy with a solution that
+      drops refrigerators, toasters, and stools from uniformly random i.i.d.
+      poses.  In those cases, authoring reasonable distributions gets much more
+      interesting; we will revisit the topic of generative scene models later in
+      the notes.</p>
 
     </subsection>
 
     <subsection><h1>Static equilibrium with frictional contact</h1>
-    
+
+      <p>Even in the case of bins, we should try think critically about whether
+      dropping objects from a height is really the best solution.  Given our
+      discussion in the last chapter about writing optimizations with
+      non-penetration constraints, I hope you are already asking yourself: why
+      not use those constraints again here?  Let's explore that idea a bit
+      further.</p>
+  
+      <p>I won't dive into a full discussion of multibody dynamics nor multibody
+      simulation, though I do have more notes <a
+      href="http://underactuated.mit.edu/multibody.html">available here</a>.
+      What is important to understand here is that the equations of motion of
+      our multibody system are described by differential equations of the form:
+      $$M(q)\dot{v} + C(q,v)v = \tau_g(q) + \sum_i J^T_i(q)F^{c_i}.$$  The left
+      side of the equation is just a generalization of "mass times
+      acceleration", with the mass matrix, $M$, and the Coriolis terms $C$.  The
+      right hand side is the sum of the (generalized) forces, with $\tau_g(q)$
+      capturing the terms due to gravity, $Bu$ the actuation inputs, and
+      $F^{c_i}$ is the <a
+      href="https://drake.mit.edu/doxygen_cxx/group__multibody__spatial__vectors.html">spatial
+      force</a> due to the $i$th contact.  $J_i(q)$ is the $i$th "contact
+      Jacobian" -- it is the Jacobian that maps from the generalized velocities
+      to the spatial velocity of the $i$th contact frame.</p>
+
+      <p>Our interest here is in finding (stable) steady-state solutions to
+      these differential equations that can serve as good initial conditions for
+      our simulation.  At steady-state we have $v=\dot{v}=0$, and conveniently
+      all of the terms on the left-hand side of the equations are zero.  This
+      leaves us with just the force-balance equations $$\tau_g(q) = - \sum_i
+      J^T_i(q) F^{c_i}.$$  But we still need to understand where the contact
+      forces come from.</p>
+      
     </subsection>
 
     <subsection><h1>A few of the nuances of simulating contact</h1>
