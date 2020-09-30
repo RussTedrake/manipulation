@@ -8,36 +8,36 @@ load("//htmlbook/tools/jupyter:defs.bzl", "rt_ipynb_test")
 
 rt_ipynb_test(
     name = "bunny_icp",
+    srcs = ["bunny_icp.ipynb"],
+    data = [
+        "//manipulation/models/bunny:bun_zipper_res2.ply",
+    ],
     deps = [
         "//manipulation",
         "//manipulation/exercises:grader",
         "//manipulation/exercises/pose:test_icp",
     ],
-    data = [
-	"//manipulation/models/bunny:bun_zipper_res2.ply",
-    ],
-    srcs = ["bunny_icp.ipynb"],
 )
 
 rt_ipynb_test(
     name = "ransac",
+    srcs = ["ransac.ipynb"],
+    data = [
+        "//manipulation/models/bunny:bun_zipper_res2.ply",
+    ],
     deps = [
-        "//manipulation",       
+        "//manipulation",
         "//manipulation/exercises:grader",
         "//manipulation/exercises/pose:test_ransac",
     ],
-    data = [
-	"//manipulation/models/bunny:bun_zipper_res2.ply",
-    ],
-    srcs = ["ransac.ipynb"],
 )
 
 rt_ipynb_test(
     name = "pose_estimation_icp",
+    srcs = ["pose_estimation_icp.ipynb"],
     deps = [
-        "//manipulation",       
+        "//manipulation",
         "//manipulation/exercises:grader",
         "//manipulation/exercises/pose:test_pose_estimation",
     ],
-    srcs = ["pose_estimation_icp.ipynb"],
 )
