@@ -92,8 +92,8 @@ class TestICP(unittest.TestCase):
                 X_BA.multiply(self.model.T).T)
             X_BA = least_squares_transform(self.scene, self.model[indices])
             mean_error = np.mean(distances)
-            if abs(mean_error -
-                   prev_error) < tolerance or num_iters >= max_iterations:
+            if abs(mean_error
+                   - prev_error) < tolerance or num_iters >= max_iterations:
                 break
             prev_error = mean_error
 
