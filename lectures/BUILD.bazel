@@ -8,9 +8,9 @@ load("//htmlbook/tools/jupyter:defs.bzl", "rt_ipynb_test")
 
 rt_ipynb_test(
     name = "highlights",
+    srcs = ["highlights.ipynb"],
     data = ["//manipulation/models:double_pendulum.urdf"],
     deps = ["//manipulation"],
-    srcs = ["highlights.ipynb"],
 )
 
 rt_ipynb_test(
@@ -25,7 +25,7 @@ rt_ipynb_test(
 
 rt_ipynb_test(
     name = "qp_diff_ik",
+    srcs = ["qp_diff_ik.ipynb"],
     data = ["//manipulation/models:double_pendulum.urdf"],
     deps = ["//manipulation"],
-    srcs = ["qp_diff_ik.ipynb"],
 )

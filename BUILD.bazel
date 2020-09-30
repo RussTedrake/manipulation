@@ -4,8 +4,8 @@
 # Copyright 2020 Massachusetts Institute of Technology.
 # Licensed under the BSD 3-Clause License. See LICENSE.TXT for details.
 
-load("//htmlbook/tools/tidy:def.bzl", "html_tidy_test")
 load("//htmlbook/tools/jupyter:defs.bzl", "rt_ipynb_test")
+load("//htmlbook/tools/tidy:def.bzl", "html_tidy_test")
 
 exports_files(
     ["LICENSE.TXT"],
@@ -50,18 +50,18 @@ rt_ipynb_test(
 rt_ipynb_test(
     name = "pose",
     srcs = ["pose.ipynb"],
-    tags = ["no-sandbox"], # from vtk-test-tags() in drake
+    tags = ["no-sandbox"],  # from vtk-test-tags() in drake
 )
 
 rt_ipynb_test(
     name = "clutter",
-    data = [
-        "//manipulation/models:planar_foam_brick_collision_as_visual.sdf",
-        "//manipulation/models:061_foam_brick.sdf",
-    ],
     srcs = ["clutter.ipynb"],
+    data = [
+        "//manipulation/models:061_foam_brick.sdf",
+        "//manipulation/models:planar_foam_brick_collision_as_visual.sdf",
+    ],
+    tags = ["no-sandbox"],  # from vtk-test-tags() in drake
     deps = ["//manipulation"],
-    tags = ["no-sandbox"], # from vtk-test-tags() in drake
 )
 
 filegroup(

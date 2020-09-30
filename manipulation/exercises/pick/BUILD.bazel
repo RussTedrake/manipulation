@@ -11,7 +11,7 @@ rt_py_library(
     srcs = [
         "test_differential_ik.py",
     ],
-    visibility = ["//visibility:public"],    
+    visibility = ["//visibility:public"],
 )
 
 rt_py_library(
@@ -19,7 +19,7 @@ rt_py_library(
     srcs = [
         "test_simple_qp.py",
     ],
-    visibility = ["//visibility:public"],    
+    visibility = ["//visibility:public"],
 )
 
 rt_py_library(
@@ -27,7 +27,7 @@ rt_py_library(
     srcs = [
         "test_planar_manipulator.py",
     ],
-    visibility = ["//visibility:public"],    
+    visibility = ["//visibility:public"],
 )
 
 rt_py_library(
@@ -35,7 +35,7 @@ rt_py_library(
     srcs = [
         "plot_planar_manipulator.py",
     ],
-    visibility = ["//visibility:public"],    
+    visibility = ["//visibility:public"],
 )
 
 rt_py_library(
@@ -43,7 +43,7 @@ rt_py_library(
     srcs = [
         "test_robot_painter.py",
     ],
-    visibility = ["//visibility:public"],    
+    visibility = ["//visibility:public"],
 )
 
 rt_py_library(
@@ -51,5 +51,5 @@ rt_py_library(
     srcs = [
         "test_rigid_transforms.py",
     ],
-    visibility = ["//visibility:public"],    
+    visibility = ["//visibility:public"],
 )
