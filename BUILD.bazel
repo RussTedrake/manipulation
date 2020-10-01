@@ -61,7 +61,10 @@ rt_ipynb_test(
         "//manipulation/models:planar_foam_brick_collision_as_visual.sdf",
     ],
     tags = ["no-sandbox"],  # from vtk-test-tags() in drake
-    deps = ["//manipulation"],
+    deps = [
+        "//manipulation",
+        "//manipulation/open3d:example",
+    ],
 )
 
 filegroup(
