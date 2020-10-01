@@ -92,3 +92,15 @@ def plot_mathematical_program(meshcat, prog, X, Y, result=None):
             tf.translation_matrix(
                 [x_solution[0], x_solution[1],
                  result.get_optimal_cost()]))
+
+
+def DrawOpen3dPointCloud(meshcat, pcd, normals_scale=0.0):
+    pts = np.asarray(pcd.points)
+    meshcat.set_object(g.PointCloud(pts.T, np.asarray(pcd.colors).T))
+    if pcd.has_normals() and normals_scale > 0.0:
+        normals = np.asarray(pcd.normals)
+        vertices = np.hstack(
+            (pts, pts + normals_scale * normals)).reshape(-1, 3).T
+        meshcat["normals"].set_object(
+            g.LineSegments(g.PointsGeometry(vertices),
+                           g.MeshBasicMaterial(color=0x000000)))

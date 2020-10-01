@@ -27,15 +27,18 @@ system = DepthCameraExampleSystem()
 
 # Evaluate the camera output ports to get the images.
 context = system.CreateDefaultContext()
-color_image = system.GetOutputPort("color_image").Eval(context)
-depth_image = system.GetOutputPort("depth_image").Eval(context)
-rgbd_image = create_open3d_rgbd_image(color_image, depth_image)
 
-# Plot the two images.
-plt.subplot(121)
-plt.imshow(rgbd_image.color)
-plt.title('Color image')
-plt.subplot(122)
-plt.imshow(rgbd_image.depth)
-plt.title('Depth image')
+for i in range(3):
+    color_image = system.GetOutputPort(f"color_image{i}").Eval(context)
+    depth_image = system.GetOutputPort(f"depth_image{i}").Eval(context)
+    rgbd_image = create_open3d_rgbd_image(color_image, depth_image)
+
+    # Plot the two images.
+    plt.subplot(3, 2, 2 * i + 1)
+    plt.imshow(rgbd_image.color)
+    plt.title('Color image')
+    plt.subplot(3, 2, 2 * i + 2)
+    plt.imshow(rgbd_image.depth)
+    plt.title('Depth image')
+
 plt.show()
