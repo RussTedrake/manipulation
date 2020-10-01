@@ -11,13 +11,13 @@ rt_py_library(
     srcs = [
         "test_pose_estimation.py",
     ],
-    deps = [
-        "//manipulation",
-    ],
     data = [
         "pcl_filtered.npy",
     ],
-    visibility = ["//visibility:public"],    
+    visibility = ["//visibility:public"],
+    deps = [
+        "//manipulation",
+    ],
 )
 
 rt_py_library(
@@ -25,7 +25,7 @@ rt_py_library(
     srcs = [
         "test_icp.py",
     ],
-    visibility = ["//visibility:public"],    
+    visibility = ["//visibility:public"],
 )
 
 rt_py_library(
@@ -33,5 +33,5 @@ rt_py_library(
     srcs = [
         "test_ransac.py",
     ],
-    visibility = ["//visibility:public"],    
+    visibility = ["//visibility:public"],
 )

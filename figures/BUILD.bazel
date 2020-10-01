@@ -29,8 +29,7 @@ rt_py_test(
 
 rt_py_test(
     name = "two_link_singularities",
-    data = ["//manipulation/models:double_pendulum.urdf"],
     srcs = ["two_link_singularities.py"],
-    deps = ["//manipulation:manipulation"]
+    data = ["//manipulation/models:double_pendulum.urdf"],
+    deps = ["//manipulation"],
 )
-

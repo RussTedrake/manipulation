@@ -4,8 +4,7 @@
 # Copyright 2020 Massachusetts Institute of Technology.
 # Licensed under the BSD 3-Clause License. See LICENSE.TXT for details.
 
-load("//htmlbook/tools/python:defs.bzl", "rt_py_library")
-load("//htmlbook/tools/python:defs.bzl", "rt_py_test")
+load("//htmlbook/tools/python:defs.bzl", "rt_py_library", "rt_py_test")
 
 rt_py_library(
     name = "example",
@@ -14,14 +13,13 @@ rt_py_library(
 )
 
 rt_py_test(
-  name = "show_rgbd",
-  srcs = ["show_rgbd.py"],
-  deps = ["example"],
+    name = "show_rgbd",
+    srcs = ["show_rgbd.py"],
+    deps = ["example"],
 )
 
 rt_py_test(
-  name = "show_pointcloud",
-  srcs = ["show_pointcloud.py"],
-  deps = ["example"],
+    name = "show_pointcloud",
+    srcs = ["show_pointcloud.py"],
+    deps = ["example"],
 )
-

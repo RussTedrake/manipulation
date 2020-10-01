@@ -3,7 +3,8 @@ import matplotlib.pyplot as plt
 
 
 def plot_planar_manipulator(q, p_ACplot):
-    """Plot manipulator with joint positions q and the end-effector location
+    """
+    Plot manipulator with joint positions q and the end-effector location
     p_ACplot.
 
     The intended use includes the following:
