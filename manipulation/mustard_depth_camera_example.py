@@ -1,6 +1,6 @@
 import numpy as np
 
-from pydrake.common import FindResourceOrThrow, set_log_level
+from pydrake.common import FindResourceOrThrow
 from pydrake.common.value import AbstractValue
 from pydrake.geometry import Box
 from pydrake.geometry.render import (DepthCameraProperties, MakeRenderEngineVtk,
@@ -17,10 +17,6 @@ from pydrake.systems.primitives import ConstantValueSource
 
 def MustardExampleSystem():
     builder = DiagramBuilder()
-
-    # If you have trouble finding resources, you can enable trace logging
-    # to see how `FindResource*` is searching.
-    set_log_level("trace")
 
     # Create the physics engine + scene graph.
     plant, scene_graph = AddMultibodyPlantSceneGraph(builder, time_step=0.0)
@@ -82,10 +78,10 @@ def MustardExampleSystem():
     rgbd = []
     to_point_cloud = []
     for i in range(camera_num):
+        parent_id = plant.GetBodyFrameIdOrThrow(camera[i].index())
         rgbd.append(
             builder.AddSystem(
-                RgbdSensor(parent_id=plant.GetBodyFrameIdOrThrow(
-                    camera[i].index()),
+                RgbdSensor(parent_id=parent_id,
                            X_PB=RigidTransform(),
                            properties=properties,
                            show_window=False)))
