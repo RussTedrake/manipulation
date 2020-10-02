@@ -242,7 +242,136 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
   </section>
 
   <section><h1>Grasp selection</h1>
+
+    <subsection><h1>Is geometry enough?</h1>
+    
+      <p>Thinking about bin picking puts us on the front lines of the discussion
+      (battle?) between geometric approaches and learning-based approaches.  Of
+      course, the right answer is probably somewhere in the middle.</p>
+
+    </subsection>
   
+    <subsection><h1>Point cloud pre-processing</h1>
+    
+      <example><h1>Mustard bottle point clouds</h1>
+
+        <figure><img style="width:60%"
+          src="data/mustard_normals.png"></figure>
+
+        <!-- todo: update hash -->
+        <p><a target="clutter"
+        href="https://colab.research.google.com/github/RussTedrake/manipulation/blob/master/clutter.ipynb#scrollTo=fGbe-rJGJlF0"><img
+        src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open
+        In Colab"/></a>
+          </p>
+  
+        <p>I've produced a scene with multiple cameras looking at our favorite
+        YCB mustard bottle.  I've taken the individual point clouds, converted
+        them into Open3d's point cloud format, estimated their normals, merged
+        the point clouds, cropped then point clouds (to get rid of the geometry
+        from the other cameras), then downsampled the point clouds.  (The order
+        is important!)</p>
+
+        <p>I've pushed all of the point clouds to meshcat, but with many of them
+        set to not be visible by default.  Use the drop-down menu to turn them
+        on and off, and make sure you understand basically what is happening on
+        each of the steps.</p>
+
+      </example>
+
+    </subsection>
+
+    <subsection><h1>Estimating normals and local curvature</h1>
+    
+      <p>It's worth going through the basic estimation of the local geometry in
+      a point cloud.  You'll see it has a lot in common with the point cloud
+      registration we studied in the last chapter.  Let's think about the
+      problem of fitting a plane, in a least-squares sense, to a set of
+      points<elib>Shakarji98</elib>. We can describe a plane in 3D with a
+      position $p$ and a unit length normal vector, $n$.  The distance between a
+      point $p^i$ and a plane is simply given by the magnitude of the inner
+      product, $\left| (p^i - p)^T n \right|.$  So our least-squares
+      optimization becomes $$\min_{p, n} \quad \sum_{i=1}^N \left| (p^i - p)^T n
+      \right|^2, \quad \subjto \quad |n| = 1. $$  Taking the gradient of the
+      Lagrangian with respect to $p$ and setting it equal to zero gives us that
+      $$p^* = \frac{1}{N} \sum_{i=1}^N p^i.$$ Inserting this back into the
+      objective, we can write the problem as $$\min_n n^T W n, \quad \subjto
+      \quad |n|=1, \quad \text{where } W = \left[ \sum_i  (p^i - p^*) (p^i -
+      p^*)^T \right].$$  Geometrically, this objective is a quadratic bowl
+      centered at the origin, with a unit circle constraint.  So the optimal
+      solution is given by the (unit-length) eigenvector corresponding to the
+      <i>smallest</i> eigenvalue of the data matrix, $W$. And for any optimal
+      $n$, the "flipped" normal $-n$ is also optimal.  We can pick arbitrarily
+      for now, and then flip the normals in a post-processing step (to make sure
+      that the normals all point towards the camera origin).</p>
+
+      <p>What is really interesting is that the second and third
+      eigenvalues/eigenvectors also tell us something about the local geometry.
+      Because $W$ is symmetric, it has orthogonal eigenvectors, and these
+      eigenvectors form a (local) basis for the point cloud.  The smallest
+      eigenvalue pointed along the normal, and the <i>largest</i> eigenvalue
+      corresponds to the direction of largest curvature (largest deviation from
+      the fit plane).  This information can be very useful for finding and
+      planning grasps.  <elib>tenPas17</elib> and others before them use is as a
+      primary heuristic in generating candidate grasps.</p>
+  
+      <p>In order to approximate the local curvature of a mesh represented by a
+      point cloud, we can use our fast nearest neighbor queries to find a
+      handful of local points, and using this plane fitting algorithm on just
+      those points.  Then we can repeat that entire procedure for every point in
+      the point cloud.  I remember when working with point clouds started to
+      become a bigger part of my life, I thought that surely doing anything
+      moderately computational like this on every point in some dense point
+      cloud would be incompatible with online perception.  But I was wrong! Even
+      years ago, operations like this one were often used inside real-time
+      perception loops.  (And they pale in comparison to the number of <a
+      href="https://en.wikipedia.org/wiki/FLOPS">FLOPs</a> we spend these days
+      evaluating large neural networks).</p>
+
+      <example><h1>Normals and local curvature of the mustard bottle.</h1>
+    
+        <figure><img style="width:60%"
+        src="data/mustard_surface_estimation.png"></figure>
+
+        <!-- todo: update hash -->
+        <p><a target="clutter"
+          href="https://colab.research.google.com/github/RussTedrake/manipulation/blob/master/clutter.ipynb#scrollTo=fGbe-rJGJlF0"><img
+          src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open
+          In Colab"/></a>
+            </p>
+
+        <p>I've coded up the basic least-squares surface estimation algorithm,
+        with the query point in green, the nearest neighbors in blue, and the
+        local least squares estimation drawn with our RGB$\Leftrightarrow$XYZ
+        frame graphic.  You should definitely slide it around and see if you can
+        understand how the axes line up with the normal and local curvature.</p>
+
+      </example>
+    
+      <p>You might wonder where you can read more about algorithms of this type.
+      I don't have a great reference for you.  But Radu Rusu was the main author
+      of the point cloud library<elib>Rusu11</elib>, and his thesis has a lot of
+      nice summaries of the point cloud algorithms of
+      2010<elib>Rusu10</elib>.</p>
+
+    </subsection>
+
+    <subsection><h1>Evaluating a candidate grasp</h1>
+    
+      <!-- Antipodal grasps -->
+
+      <!-- Approaches based on learning -->
+
+    </subsection>
+
+    <subsection><h1>Generating grasp candidates</h1>
+
+      <!-- method 1: pick a point at random.  align hand based on curvature.  Drive hand down until near collision.  Sample around a bit in traslation / rotation.  -->
+
+      <!-- method 2: find antipodal grasps with -->
+
+    </subsection>
+
     <!-- antipodal grasping -->
   
     <!-- do I need IK? -->

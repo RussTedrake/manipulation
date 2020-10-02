@@ -63,7 +63,7 @@ rt_ipynb_test(
     tags = ["no-sandbox"],  # from vtk-test-tags() in drake
     deps = [
         "//manipulation",
-        "//manipulation/open3d:example",
+        "//manipulation:mustard_depth_camera_example",
     ],
 )
 

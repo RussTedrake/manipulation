@@ -94,7 +94,7 @@ def plot_mathematical_program(meshcat, prog, X, Y, result=None):
                  result.get_optimal_cost()]))
 
 
-def DrawOpen3dPointCloud(meshcat, pcd, normals_scale=0.0):
+def draw_open3d_point_cloud(meshcat, pcd, normals_scale=0.0):
     pts = np.asarray(pcd.points)
     meshcat.set_object(g.PointCloud(pts.T, np.asarray(pcd.colors).T))
     if pcd.has_normals() and normals_scale > 0.0:
@@ -104,3 +104,13 @@ def DrawOpen3dPointCloud(meshcat, pcd, normals_scale=0.0):
         meshcat["normals"].set_object(
             g.LineSegments(g.PointsGeometry(vertices),
                            g.MeshBasicMaterial(color=0x000000)))
+
+
+def draw_points(meshcat, points, color, **kwargs):
+    """Helper for sending a 3xN points of a single color to MeshCat"""
+    points = np.asarray(points)
+    assert points.shape[0] == 3
+    if points.size == 3:
+        points.shape = (3, 1)
+    colors = np.tile(np.asarray(color).reshape(3, 1), (1, points.shape[1]))
+    meshcat.set_object(g.PointCloud(points, colors, **kwargs))

@@ -12,6 +12,7 @@ rt_py_library(
         "__init__.py",
         "jupyter_widgets.py",
         "meshcat_utils.py",
+        "open3d_utils.py",
         "utils.py",
     ],
     imports = [".."],
@@ -23,4 +24,21 @@ rt_py_test(
     srcs = ["test/test_meshcat_utils.py"],
     imports = [".."],
     deps = ["manipulation"],
+)
+
+rt_py_test(
+    name = "test_open3d_utils",
+    srcs = ["test/test_open3d_utils.py"],
+    imports = [".."],
+    deps = [
+        "manipulation",
+        "mustard_depth_camera_example",
+    ],
+)
+
+rt_py_library(
+    name = "mustard_depth_camera_example",
+    srcs = ["mustard_depth_camera_example.py"],
+    imports = [".."],
+    visibility = ["//visibility:public"],
 )

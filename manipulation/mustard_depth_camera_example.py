@@ -15,7 +15,7 @@ from pydrake.systems.sensors import RgbdSensor
 from pydrake.systems.primitives import ConstantValueSource
 
 
-def DepthCameraExampleSystem():
+def MustardExampleSystem():
     builder = DiagramBuilder()
 
     # If you have trouble finding resources, you can enable trace logging
@@ -82,11 +82,13 @@ def DepthCameraExampleSystem():
     rgbd = []
     to_point_cloud = []
     for i in range(camera_num):
-        rgbd.append(builder.AddSystem(RgbdSensor(
-            parent_id=plant.GetBodyFrameIdOrThrow(camera[i].index()),
-            X_PB=RigidTransform(),
-            properties=properties,
-            show_window=False)))
+        rgbd.append(
+            builder.AddSystem(
+                RgbdSensor(parent_id=plant.GetBodyFrameIdOrThrow(
+                    camera[i].index()),
+                           X_PB=RigidTransform(),
+                           properties=properties,
+                           show_window=False)))
         rgbd[i].set_name(f"rgbd_sensor{i}")
         builder.Connect(scene_graph.get_query_output_port(),
                         rgbd[i].query_object_input_port())
