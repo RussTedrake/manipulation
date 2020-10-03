@@ -1,0 +1,5 @@
+
+directives:
+- add_directives:
+    file: package://manipulation/two_bins.yaml
+

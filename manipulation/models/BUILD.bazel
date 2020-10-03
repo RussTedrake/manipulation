@@ -4,10 +4,21 @@
 # Copyright 2020 Massachusetts Institute of Technology.
 # Licensed under the BSD 3-Clause License. See LICENSE.TXT for details.
 
+filegroup(
+    name = "models",
+    srcs = glob([
+        "*.sdf",
+        "*.urdf",
+        "*.yaml",
+        "*.xml",
+    ]),
+    visibility = ["//visibility:public"],
+)
+
 exports_files(
     glob([
         "*.sdf",
         "*.urdf",
     ]),
-    visibility = ["//:__subpackages__"],
+    visibility = ["//visibility:public"],
 )

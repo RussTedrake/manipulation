@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<sdf version="1.7">
+  <model name="camera_box">
+    <link name="base">
+      <inertial>
+        <pose>0 0 0.025 0 0 0 </pose>
+        <mass>0.028</mass>
+        <inertia>
+          <ixx>1.17e-5</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>1.9e-5</iyy>
+          <iyz>0</iyz>
+          <izz>1.9e-5</izz>
+        </inertia>
+      </inertial>
+      <visual name="base">
+        <pose>0 0 -0.01 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>.1 .02 .02</size>
+          </box>
+        </geometry>
+        <material>
+          <diffuse>.4 .4 .4 1.</diffuse>
+        </material>
+      </visual>
+      <collision name="base">
+        <pose>0 0 -0.01 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>.1 .02 .02</size>
+          </box>
+        </geometry>
+      </collision>
+    </link>
+  </model>
+</sdf>
