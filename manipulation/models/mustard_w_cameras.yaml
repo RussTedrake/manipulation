@@ -1,0 +1,83 @@
+
+directives:
+- add_package_path:
+    name: ycb
+    path: drake/manipulation/models/ycb
+
+- add_frame:
+    name: mustard_origin
+    X_PF:
+        base_frame: world
+        rotation: !Rpy { deg: [-90.0, 0.0, -90.0 ]}
+        translation: [0, 0, 0.09515]
+
+- add_model:
+    name: mustard
+    file: package://ycb/sdf/006_mustard_bottle.sdf
+
+- add_weld:
+    parent: mustard_origin
+    child: mustard::base_link_mustard
+
+- add_frame:
+    name: camera0_staging
+    X_PF:
+        base_frame: world
+        rotation: !Rpy { deg: [0, 0, 15.0]}
+
+- add_frame:
+    name: camera1_staging
+    X_PF:
+        base_frame: world
+        rotation: !Rpy { deg: [0, 0, 130.0]}
+
+- add_frame:
+    name: camera2_staging
+    X_PF:
+        base_frame: world
+        rotation: !Rpy { deg: [0, 0, 245.0]}
+
+- add_frame:
+    name: camera0_origin
+    X_PF:
+        base_frame: camera0_staging
+        rotation: !Rpy { deg: [-100.0, 0, 90.0]}
+        translation: [.5, 0, .2]
+
+- add_model:
+    name: camera0
+    file: package://manipulation/camera_box.sdf
+
+- add_weld:
+    parent: camera0_origin
+    child: camera0::base
+
+- add_frame:
+    name: camera1_origin
+    X_PF:
+        base_frame: camera1_staging
+        rotation: !Rpy { deg: [-100.0, 0, 90.0]}
+        translation: [.5, 0, .2]
+
+- add_model:
+    name: camera1
+    file: package://manipulation/camera_box.sdf
+
+- add_weld:
+    parent: camera1_origin
+    child: camera1::base
+
+- add_frame:
+    name: camera2_origin
+    X_PF:
+        base_frame: camera2_staging
+        rotation: !Rpy { deg: [-100.0, 0, 90.0]}
+        translation: [.5, 0, .2]
+
+- add_model:
+    name: camera2
+    file: package://manipulation/camera_box.sdf
+
+- add_weld:
+    parent: camera2_origin
+    child: camera2::base

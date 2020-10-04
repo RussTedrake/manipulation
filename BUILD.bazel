@@ -49,17 +49,16 @@ rt_ipynb_test(
 
 rt_ipynb_test(
     name = "pose",
+    data = ["//manipulation/models:models"],
     srcs = ["pose.ipynb"],
+    deps = ["//manipulation"],
     tags = ["no-sandbox"],  # from vtk-test-tags() in drake
 )
 
 rt_ipynb_test(
     name = "clutter",
     srcs = ["clutter.ipynb"],
-    data = [
-        "//manipulation/models:061_foam_brick.sdf",
-        "//manipulation/models:planar_foam_brick_collision_as_visual.sdf",
-    ],
+    data = ["//manipulation/models:models"],
     tags = ["no-sandbox"],  # from vtk-test-tags() in drake
     deps = [
         "//manipulation",

@@ -12,6 +12,7 @@ from ipywidgets import FloatSlider, Layout
 from IPython.display import display
 
 from pydrake.common.jupyter import process_ipywidget_events
+from pydrake.math import RollPitchYaw, RigidTransform
 from pydrake.multibody.tree import JointIndex
 from pydrake.systems.framework import BasicVector, VectorSystem
 
@@ -199,7 +200,7 @@ def MakeJointSlidersThatPublishOnCallback(plant,
     """
 
     def _broadcast(x, num):
-        x = np.array(x)
+        x = np.asarray(x)
         assert len(x.shape) <= 1
         return np.array(x) * np.ones(num)
 
@@ -266,8 +267,8 @@ def MakeJointSlidersThatPublishOnCallback(plant,
                 (RollPitchYaw(pose.rotation()).vector(), pose.translation()))
             relative_index = 0
             for dof in ["roll", "pitch", "yaw", "x", "y", "z"]:
-                slider = FloatSlider(min=lower_limits[index],
-                                     max=upper_limits[index],
+                slider = FloatSlider(min=lower_limit[index],
+                                     max=upper_limit[index],
                                      value=vector_pose[relative_index],
                                      step=resolution[index],
                                      continuous_update=continuous_update,

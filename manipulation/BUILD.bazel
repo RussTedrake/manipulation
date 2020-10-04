@@ -13,6 +13,7 @@ rt_py_library(
         "jupyter_widgets.py",
         "meshcat_utils.py",
         "open3d_utils.py",
+        "scenarios.py",
         "utils.py",
     ],
     imports = [".."],
@@ -27,7 +28,16 @@ rt_py_test(
 )
 
 rt_py_test(
+    name = "test_model_directives",
+    data = ["//manipulation:models"],
+    srcs = ["test/test_model_directives.py"],
+    imports = [".."],
+    deps = ["manipulation"],
+)
+
+rt_py_test(
     name = "test_open3d_utils",
+    data = ["//manipulation:models"],
     srcs = ["test/test_open3d_utils.py"],
     imports = [".."],
     deps = [
