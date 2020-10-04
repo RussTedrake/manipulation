@@ -19,7 +19,7 @@ pydrake.multibody.parsing.ProcessModelDirectives(
 plant.Finalize()
 
 meshcat = pydrake.systems.meshcat_visualizer.ConnectMeshcatVisualizer(
-    builder, scene_graph, zmq_url="new")
+    builder, scene_graph, zmq_url="new", open_browser=False)
 diagram = builder.Build()
 context = diagram.CreateDefaultContext()
 

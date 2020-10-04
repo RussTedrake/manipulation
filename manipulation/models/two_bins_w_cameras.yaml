@@ -3,3 +3,92 @@ directives:
 - add_directives:
     file: package://manipulation/two_bins.yaml
 
+- add_frame:
+    name: camera0_origin
+    X_PF:
+        base_frame: world
+        rotation: !Rpy { deg: [-130.0, 0, 90.0]}
+        translation: [.25, -.5, .4]
+
+- add_model:
+    name: camera0
+    file: package://manipulation/camera_box.sdf
+
+- add_weld:
+    parent: camera0_origin
+    child: camera0::base
+
+- add_frame:
+    name: camera1_origin
+    X_PF:
+        base_frame: world
+        rotation: !Rpy { deg: [-150., 0, 0.0]}
+        translation: [-0.05, -.7, .5]
+
+- add_model:
+    name: camera1
+    file: package://manipulation/camera_box.sdf
+
+- add_weld:
+    parent: camera1_origin
+    child: camera1::base
+
+- add_frame:
+    name: camera2_origin
+    X_PF:
+        base_frame: world
+        rotation: !Rpy { deg: [-140., 0, -120.0]}
+        translation: [-.35, -.25, .45]
+
+- add_model:
+    name: camera2
+    file: package://manipulation/camera_box.sdf
+
+- add_weld:
+    parent: camera2_origin
+    child: camera2::base
+
+- add_frame:
+    name: camera3_origin
+    X_PF:
+        base_frame: world
+        rotation: !Rpy { deg: [-130.0, 0, 0.0]}
+        translation: [.5, -.3, .4]
+
+- add_model:
+    name: camera3
+    file: package://manipulation/camera_box.sdf
+
+- add_weld:
+    parent: camera3_origin
+    child: camera3::base
+
+- add_frame:
+    name: camera4_origin
+    X_PF:
+        base_frame: world
+        rotation: !Rpy { deg: [-150., 0, 90.0]}
+        translation: [.7, 0.05, .5]
+
+- add_model:
+    name: camera4
+    file: package://manipulation/camera_box.sdf
+
+- add_weld:
+    parent: camera4_origin
+    child: camera4::base
+
+- add_frame:
+    name: camera5_origin
+    X_PF:
+        base_frame: world
+        rotation: !Rpy { deg: [-140., 0, -150.0]}
+        translation: [.25, .35, .45]
+
+- add_model:
+    name: camera5
+    file: package://manipulation/camera_box.sdf
+
+- add_weld:
+    parent: camera5_origin
+    child: camera5::base

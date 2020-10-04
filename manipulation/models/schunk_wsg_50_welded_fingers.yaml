@@ -1,0 +1,9 @@
+
+directives:
+- add_package_path:
+    name: wsg_50_description
+    path: drake/manipulation/models/wsg_50_description
+
+- add_model:
+    name: gripper
+    file: package://manipulation/schunk_wsg_50_welded_fingers.sdf
