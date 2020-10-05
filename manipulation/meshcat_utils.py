@@ -94,9 +94,9 @@ def plot_mathematical_program(meshcat, prog, X, Y, result=None):
                  result.get_optimal_cost()]))
 
 
-def draw_open3d_point_cloud(meshcat, pcd, normals_scale=0.0):
+def draw_open3d_point_cloud(meshcat, pcd, normals_scale=0.0, size=0.001):
     pts = np.asarray(pcd.points)
-    meshcat.set_object(g.PointCloud(pts.T, np.asarray(pcd.colors).T))
+    meshcat.set_object(g.PointCloud(pts.T, np.asarray(pcd.colors).T, size=size))
     if pcd.has_normals() and normals_scale > 0.0:
         normals = np.asarray(pcd.normals)
         vertices = np.hstack(
