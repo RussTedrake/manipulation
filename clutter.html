@@ -276,7 +276,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       references to "hydroelastic" contact throughout the code.  We hope to turn
       it on by default soon.</p>
 
-      <todo>Add the hyroelastic skittles video here.</todo>
+      <todo>Add the hyroelastic skittles video here.  https://youtu.be/5-k2Pc6OmzE</todo>
 
       <p>In the mean time, we can make simulations robust by carefully curating the contact geometry...</p>
 
@@ -424,10 +424,10 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       Because $W$ is symmetric, it has orthogonal eigenvectors, and these
       eigenvectors form a (local) basis for the point cloud.  The smallest
       eigenvalue pointed along the normal, and the <i>largest</i> eigenvalue
-      corresponds to the direction of largest curvature (largest deviation from
-      the fit plane).  This information can be very useful for finding and
-      planning grasps.  <elib>tenPas17</elib> and others before them use is as a
-      primary heuristic in generating candidate grasps.</p>
+      corresponds to the direction of least curvature (the squared dot product
+      with this vector is the largest).  This information can be very useful for
+      finding and planning grasps.  <elib>tenPas17</elib> and others before them
+      use is as a primary heuristic in generating candidate grasps.</p>
   
       <p>In order to approximate the local curvature of a mesh represented by a
       point cloud, we can use our fast nearest neighbor queries to find a
