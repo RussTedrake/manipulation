@@ -92,15 +92,27 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
     simulation by carefully setting the initial positions (in the Context) for
     each of the objects, but that approach won't scale.</p>
 
+    <p>The first change that you'll see in this chapter is that I will start
+    using Drake's "<a
+    href="https://github.com/RobotLocomotion/drake/blob/master/multibody/parsing/README_model_directives.md">Model
+    Directives</a>" for <a
+    href="https://drake.mit.edu/doxygen_cxx/namespacedrake_1_1multibody_1_1parsing.html#a57aafdf49e089598a1e344d8e7a74249">parsing</a>
+    more complex environments from yaml files.  That will help us set up the
+    bins, cameras, and the robot which can be welded in fixed positions.  But
+    generating the distributions over objects and object initial conditions is
+    more bespoke, and we need an algorithm for that.</p>
+
     <subsection><h1>Falling things</h1>
 
       <p>In the real world, we would probably just dump the random objects into
-      the bin.  That's a reasonable strategy for simulation, too.  We can
-      roughly expect our simulation to be reasonable as long as our initial
-      conditions are reasonable -- we can't have multiple objects occupying the
-      same physical space.  The simplest an most common way around this is to
-      generate a random number of objects in random poses, with their vertical
-      positions staggered so that they trivially start out of penetration.</p>
+      the bin.  That's a decent strategy for simulation, too.  We can roughly
+      expect our simulation to faithfully implement multibody physics as long as
+      our initial conditions (and time step) are reasonable; the physics isn't
+      well defined if we initialize the Context with multiple objects occupying
+      the same physical space.  The simplest an most common way to avoid this is
+      to generate a random number of objects in random poses, with their
+      vertical positions staggered so that they trivially start out of
+      penetration.</p>
 
       <p>If you look for them, you can find animations of large numbers of
       falling objects in the demo reels for most advanced multibody
@@ -111,17 +123,19 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
 
       <example><h1>Piles of foam bricks in 2D</h1>
 
-        <p>Here is the 2D case.  I've added many instance of our favorite red
+        <p>Here is the 2D case.  I've added many instances of our favorite red
         foam brick to the plant.  Note that it's possible to write highly
         optimized 2D simulators; that's not what I've done here.  Rather, I've
-        added a planar joint connecting each of them to the world, and run our
+        added a planar joint connecting each brick to the world, and run our
         full 3D simulator.  The planar joint has three degrees of freedom.  I've
-        oriented them here to be $x$, $z$, and $\theta$) to constrain the
-        objects to the 2D plane.</p>
+        oriented them here to be $x$, $z$, and $\theta$ to constrain the
+        objects to the $xz$ plane.</p>
 
         <p>I've set the initial positions for each object in the Context to be
         uniformly distributed over the horizontal position, uniformly rotated,
-        and staggered every 0.1m in their initial vertical position.</p>
+        and staggered every 0.1m in their initial vertical position.  We only
+        have to simulate for a little more than a second for the bricks to come
+        to rest and give us our intended "initial conditions".</p>
 
         <p><a target="clutter"
           href="https://colab.research.google.com/github/RussTedrake/manipulation/blob/master/clutter.ipynb#scrollTo=fGbe-rJGJlF0"><img
@@ -223,6 +237,49 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
 
     <subsection><h1>A few of the nuances of simulating contact</h1>
     
+      <example><h1>Contact force inspector</h1>
+      
+        <p>I've created a simple GUI that allows you to pick any two primitive
+        geometry types and inspect the contact information that is computed when
+        those object are put into penetration.  There is a lot of information
+        displayed there!  Take a minute to make sure you understand the colors,
+        and the information provided in the textbox display.
+        </p>
+
+        <p><a target="clutter"
+          href="https://colab.research.google.com/github/RussTedrake/manipulation/blob/master/clutter.ipynb#scrollTo=7aGJ9e3lJlF8"><img
+          src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
+          </p>
+
+      </example>
+
+      <p>When I play with the GUI above, I feel almost overwhelmed.  First,
+      overwhelmed by the sheer number of cases that we have to get right in the
+      code; it's unfortunately extremely common for open-source tools to have
+      bugs in here.  But second, overwhelmed by the sense that we are asking the
+      wrong question.  Asking to summarize the forces between two bodies in deep
+      penetration with a single Cartesian force applied at a point is fraught
+      with peril.  As you move the objects, you will find many discontinuities;
+      this is a common reason why you sometimes see rigid body simulations
+      "explode".  It might seem natural to try to use multiple contact points
+      instead of a single contact point to summarize the forces, and some
+      simulators do, but it is very hard to write an algorithm that only depends
+      on the current configurations of the geometry which applies forces
+      consistently from one time step to the next with these approaches.</p>
+
+      <p>I currently feel that the only fundamental way to get around these
+      numerical issues is to start reasoning about the entire volume of
+      penetration.  The Drake developers have recently proposed a version of
+      this that we believe we can make computationally tractable enough to be
+      viable for real-time simulation <elib>Elandt19</elib>, and are working
+      hard to bring this into full service in Drake.  You will find many
+      references to "hydroelastic" contact throughout the code.  We hope to turn
+      it on by default soon.</p>
+
+      <todo>Add the hyroelastic skittles video here.</todo>
+
+      <p>In the mean time, we can make simulations robust by carefully curating the contact geometry...</p>
+
       <figure><img style="width:50%"
       src="data/foam_brick_contact_geometry.png"/><figcaption>The (exaggerated)
       contact geometry used for robust simulation of boxes.  We add contact
@@ -230,8 +287,6 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       inset box for the remaining contacts.  <a
       href="data/foam_brick_contact_geometry.html">Here</a> is the interactive
       version.</figcaption></figure>
-
-      <todo>drake visualizer render of collision geometry.  make meshcat to it, too... once we update to query object.</todo>
 
     </subsection>
 
@@ -243,34 +298,91 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
 
   <section><h1>Grasp selection</h1>
 
-    <subsection><h1>Is geometry enough?</h1>
-    
-      <p>Thinking about bin picking puts us on the front lines of the discussion
-      (battle?) between geometric approaches and learning-based approaches.  Of
-      course, the right answer is probably somewhere in the middle.</p>
+    <p>Now that we have that ability to populate our bins full of random
+    clutter, we need to determine where we will grasp.  The pipeline that one
+    might expect, and indeed the pipeline that robotics was somewhat stuck on
+    for decades, is that the first step should be to write some form of
+    perception system to look into the bin and segment the point cloud into
+    individual objects.  These days that's not impossible, but it's still
+    hard!</p>
 
-    </subsection>
-  
+    <p>The newer approach that has proven incredibly useful for bin picking is
+    to just look for graspable areas directly on the (unsegmented) point cloud.
+    Some of the most visible proponents of this approach are
+    <elib>tenPas17+Mahler17+Zeng18</elib>.  If you look at those references,
+    you'll see that they all use learning to somehow decide where in the point
+    cloud to grasp.  And I <b>do</b> think learning has a lot to offer in terms
+    of choosing good grasps -- it's a nice and natural learning formulation and
+    there is significant information besides just what appears in the
+    immediate sensor returns that can contribute to deciding where to grasp. But
+    often you will see that underlying those learning approaches is an approach
+    to selecting grasps based on geometry alone, if only to produce the original
+    training data.  I also think that the community doesn't regularly
+    acknowledge just how well the purely geometric approaches still work.  I'd
+    like to discuss those first.</p>
+
     <subsection><h1>Point cloud pre-processing</h1>
     
+      <p>To get a good view into the bin, we're going to set up multiple RGB-D
+      cameras.  I've used three per bin in all of my examples here.  And those
+      cameras don't only see the objects in the bin; they also see the bins, the
+      other cameras, and anything else in the viewable workspace.  So we have a
+      little work to do to merge the point clouds from multiple cameras into a
+      single point cloud that only includes the area of interest.</p>
+
+      <p>First, we can <i>crop</i> the point cloud to discard any points that
+      are from outside the area of interest (which we'll define as an
+      axis-aligned bounding box immediately above the known location of the
+      bin).</p>
+
+      <p>As we will discuss in some detail below, many of our grasp selection
+      strategies will benefit from <i>estimating the "normals"</i> of the point
+      cloud (a unit vector that estimates the normal direction relative to the
+      surface of the underlying geometry).  Is it actually better to estimate
+      the normals on the individual point clouds, making use of the camera
+      location that generated those points, than to estimate the normal after
+      the point cloud has been merged.</p>
+        
+      <p>For sensors mounted on the real world, <i>merging point clouds</i>
+      requires high-quality camera calibration and must deal with the messy
+      depth returns.  All of the tools from the last chapter are relevant, as
+      the tasks of merging the point clouds is another instance of the
+      point-cloud-registration problem. For the perfect depth measurements we
+      can get out of simulation, given known camera locations, we can skip this
+      step and simply concatenate the list of points in the point clouds
+      together.</p>
+
+      <p>Finally, the resulting raw point clouds likely include many more points
+      then we actually need for our grasp planning.  One of the standard
+      approaches for <i>down-sampling</i> the point clouds is using a <a
+      href="https://en.wikipedia.org/wiki/Voxel">voxel</a> grid -- regularly
+      sized cubes tiled in 3D.  We then summarize the original point cloud with
+      exactly one point per voxel (see, for instance <a
+      href="http://www.open3d.org/docs/latest/tutorial/Advanced/voxelization.html">Open3D's
+      note on voxelization</a>).  Since point clouds typically only small
+      percentage of the voxels in 3D space, we use sparse data structures to
+      store the voxel grid.  In noisy point clouds, this voxelization step is
+      also a useful form of filtering.</p>
+
       <example><h1>Mustard bottle point clouds</h1>
 
         <figure><img style="width:60%"
           src="data/mustard_normals.png"></figure>
 
-        <!-- todo: update hash -->
         <p><a target="clutter"
-        href="https://colab.research.google.com/github/RussTedrake/manipulation/blob/master/clutter.ipynb#scrollTo=fGbe-rJGJlF0"><img
+        href="https://colab.research.google.com/github/RussTedrake/manipulation/blob/master/clutter.ipynb#scrollTo=qxboQZ1IJlGM"><img
         src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open
         In Colab"/></a>
           </p>
   
-        <p>I've produced a scene with multiple cameras looking at our favorite
-        YCB mustard bottle.  I've taken the individual point clouds, converted
-        them into Open3d's point cloud format, estimated their normals, merged
-        the point clouds, cropped then point clouds (to get rid of the geometry
-        from the other cameras), then downsampled the point clouds.  (The order
-        is important!)</p>
+        <p>I've produced a scene with three cameras looking at our favorite YCB
+        mustard bottle.  I've taken the individual point clouds (already
+        converted to the world frame by the
+        <code>DepthImageToPointCloud</code> system), converted them into
+        Open3D's point cloud format, cropped the point clouds (to get rid of the
+        geometry from the other cameras), estimated their normals, merged the
+        point clouds, then down-sampled the point clouds.  The order is
+        important!</p>
 
         <p>I've pushed all of the point clouds to meshcat, but with many of them
         set to not be visible by default.  Use the drop-down menu to turn them
@@ -333,9 +445,8 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
         <figure><img style="width:60%"
         src="data/mustard_surface_estimation.png"></figure>
 
-        <!-- todo: update hash -->
         <p><a target="clutter"
-          href="https://colab.research.google.com/github/RussTedrake/manipulation/blob/master/clutter.ipynb#scrollTo=fGbe-rJGJlF0"><img
+          href="https://colab.research.google.com/github/RussTedrake/manipulation/blob/master/clutter.ipynb#scrollTo=xXjc8MBeAgMc"><img
           src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open
           In Colab"/></a>
             </p>
@@ -363,9 +474,8 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
         <figure><img style="width:80%"
           src="data/grasp_candidate_evaluation.png"></figure>
 
-        <!-- todo: update hash -->
         <p><a target="clutter"
-          href="https://colab.research.google.com/github/RussTedrake/manipulation/blob/master/clutter.ipynb#scrollTo=fGbe-rJGJlF0"><img
+          href="https://colab.research.google.com/github/RussTedrake/manipulation/blob/master/clutter.ipynb#scrollTo=DDUZgfc9AgMf"><img
           src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open
           In Colab"/></a>
             </p>
@@ -393,9 +503,8 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
             src="data/grasp_candidates.png"></figure>
   
 
-        <!-- todo: update hash -->
         <p><a target="clutter"
-        href="https://colab.research.google.com/github/RussTedrake/manipulation/blob/master/clutter.ipynb#scrollTo=fGbe-rJGJlF0"><img
+        href="https://colab.research.google.com/github/RussTedrake/manipulation/blob/master/clutter.ipynb#scrollTo=bWhiRMikAgMj"><img
         src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open
         In Colab"/></a>
           </p>
