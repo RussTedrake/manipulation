@@ -4,7 +4,6 @@ from gradescope_utils.autograder_utils.decorators import weight
 import numpy as np
 from pydrake.all import (RigidTransform, RotationMatrix, RandomGenerator,
                          UniformlyRandomRotationMatrix)
-from sklearn.neighbors import NearestNeighbors
 
 
 def least_squares_transform(scene, model):
