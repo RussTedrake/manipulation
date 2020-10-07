@@ -9,6 +9,11 @@ from pydrake.all import (AbstractValue, BaseField, ModelInstanceIndex,
                          LeafSystem, MakeRenderEngineVtk, RenderEngineVtkParams,
                          RigidTransform, RgbdSensor)
 
+ycb = [
+    "003_cracker_box.sdf", "004_sugar_box.sdf", "005_tomato_soup_can.sdf",
+    "006_mustard_bottle.sdf", "009_gelatin_box.sdf", "010_potted_meat_can.sdf"
+]
+
 
 def AddRgbdSensors(builder,
                    plant,
