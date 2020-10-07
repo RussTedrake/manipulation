@@ -79,7 +79,6 @@ python3-numpy
 python3-pandas
 python3-pip
 python3-retrying
-python3-sklearn
 python3-setuptools
 python3-six
 python3-snowballstemmer
