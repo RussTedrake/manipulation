@@ -51,5 +51,5 @@ class TestAnalyticGrasp(unittest.TestCase):
             "The optimal values are not returned correctly.")
 
         self.assertLessEqual(np.linalg.norm(H_eig_lst_target - H_eig_lst_eval),
-                             1e-6,
+                             1e-4,
                              "The Hessian values are not returned correctly.")
