@@ -83,6 +83,7 @@ python3-setuptools
 python3-six
 python3-snowballstemmer
 python3-toolz
+python3-tqdm
 python3-wheel
 python3-widgetsnbextension
 tidy

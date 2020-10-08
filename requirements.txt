@@ -68,6 +68,7 @@ timeout-decorator>=0.4.1
 toolz>=0.10.0; sys_platform == 'darwin'
 torch>=1.6.0; sys_platform == 'darwin'
 tornado>=6.0.4; sys_platform == 'darwin'
+tqdm>=4.50.1; sys_platform == 'darwin'
 traitlets>=5.0.4; sys_platform == 'darwin'
 u-msgpack-python>=2.7.0; sys_platform == 'darwin'
 wcwidth>=0.2.5; sys_platform == 'darwin'

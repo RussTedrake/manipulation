@@ -1,6 +1,11 @@
+# TODO: Change this to the three camera setup.  Make sure to pull images from both bins.
+
+# TODO: Compute mean and std for dataset and add the normalization transform.
+# https://github.com/pytorch/examples/blob/97304e232807082c2e7b54c597615dc0ad8f6173/imagenet/main.py#L197-L198
 
 import json
 import matplotlib.pyplot as plt
+import multiprocessing
 import numpy as np
 import os
 import shutil
@@ -16,17 +21,15 @@ debug = False
 path = '/tmp/clutter_maskrcnn_data'
 num_images = 1 if debug else 10000
 
-shutil.rmtree(path)
+if os.path.exists(path):
+    shutil.rmtree(path)
 os.makedirs(path)
 print(f'Creating dataset in {path} with {num_images} images')
 
 rng = np.random.default_rng()  # this is for python
 generator = pydrake.common.RandomGenerator(rng.integers(1000))  # for c++
 
-pbar = tqdm(total=num_images)
-
-# Note: Could (trivially) parallelize this.
-for image_num in range(num_images):
+def generate_image(image_num):
     filename_base = os.path.join(path, f"{image_num:05d}")
 
     builder = pydrake.systems.framework.DiagramBuilder()
@@ -109,8 +112,6 @@ for image_num in range(num_images):
     label_image = diagram.GetOutputPort("label_image").Eval(context)
     np.save(f"{filename_base}_mask", label_image.data)
 
-    pbar.update(1)
-
     if debug: 
         plt.figure()
         plt.subplot(211)
@@ -118,3 +119,15 @@ for image_num in range(num_images):
         plt.subplot(212)
         plt.imshow(colorize_labels(label_image.data))
         plt.axis('off')
+
+
+if True:
+    pool = multiprocessing.Pool(10)
+    list(tqdm(pool.imap(generate_image, range(num_images)), total=num_images))
+    pool.close()
+    pool.join()
+else:
+    pbar = tqdm(total=num_images)
+    for image_num in range(num_images):
+        generate_image(image_num)
+        pbar.update(1)
