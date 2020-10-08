@@ -47,7 +47,7 @@ class TestAnalyticGrasp(unittest.TestCase):
         # yapf: enable
 
         self.assertLessEqual(
-            np.linalg.norm(result_lst_target - result_lst_eval), 1e-6,
+            np.linalg.norm(result_lst_target - result_lst_eval), 1e-4,
             "The optimal values are not returned correctly.")
 
         self.assertLessEqual(np.linalg.norm(H_eig_lst_target - H_eig_lst_eval),
