@@ -521,11 +521,40 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
     <!-- do I need IK? -->
   </section>
 
+
   <section><h1>The corner cases</h1></section>
 
   <section><h1>Deciding between "macro" actions</h1></section>
 
   <section><h1>Putting it all together</h1></section>
+
+  <section id="exercises"><h1>Exercises</h1>
+
+    <exercise><h1>Normal Estimation from Depth</h1>
+      <p>For this exercise, you will investigate a slightly different approach to normal vector estimation. In particular, we can exploit the spatial structure that is already in a depth image to avoid computing nearest neighbors. You will work exclusively in <a href="https://colab.research.google.com/github/RussTedrake/manipulation/blob/master/exercises/clutter/normal_estimation_depth.ipynb" target="_blank">this notebook</a>. You will be asked to complete the following steps:</p>
+      <ol type="a">
+        <li> Implement a method to estimate normal vectors from a depth image, without computing nearest neighbors. </li>
+        <li> Reason about a scenario where the depth image-based solution will not be as performant as computing nearest-neighbors.</li>
+      </ol>    
+    </exercise>
+
+    <exercise><h1>Analytic Antipodal Grasping</h1>
+      <p>So far, we have used sampling-based methods to find antipodal grasps - but can we have find one analytically if we knew the equation of the object shape? For this exercise, you will analyze and implement a correct-by-construction method to find antipodal points using symbolic differentiation and MathematicalProgram. You will work exclusively in <a href="https://colab.research.google.com/github/RussTedrake/manipulation/blob/master/exercises/clutter/analytic_antipodal_grasps.ipynb" target="_blank">this notebook</a>. You will be asked to complete the following steps:</p>
+      <ol type="a">
+        <li> Prove that antipodal points are critical points of an energy function defined on the shape. </li>
+        <li> Prove the converse does not hold.</li>
+        <li> Implement a method to find these antipodal points using MathematicalProgram.</li>
+        <li> Analyze the Hessian of the energy function and its relation to the type of antipodal grasps.</li>
+      </ol>    
+    </exercise>
+
+    <exercise><h1>Grasp Candidate Generation</h1>
+      <p>In chapter Colab, we have generated grasp candidates using the antipodal heuristic. In this exercise, we will investigate an alternative method for generating grasp candidates based on local curvature. This exercise is implementation-heavy, and you will work exclusively in <a href="https://colab.research.google.com/github/RussTedrake/manipulation/blob/master/exercises/clutter/grasp_candidate.ipynb" target="_blank">this notebook</a>.</p>
+    </exercise>    
+
+  </section>
+
+
 </chapter>
 <!-- EVERYTHING BELOW THIS LINE IS OVERWRITTEN BY THE INSTALL SCRIPT -->
 
