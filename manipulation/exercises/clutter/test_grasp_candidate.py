@@ -1,0 +1,187 @@
+import unittest
+import timeout_decorator
+from gradescope_utils.autograder_utils.decorators import weight
+import numpy as np
+import os
+import open3d as o3d
+
+from pydrake.all import RigidTransform
+
+# Store X_lst_target as global for testing all the functions
+# yapf: disable
+X_lst_target = np.array([  # noqa
+    [[-0.209311, -0.977586, +0.022690, +0.022568],
+     [+0.966542, -0.210354, -0.146791, +0.023823],
+     [+0.148274, -0.008794, +0.988907, +0.082323],
+     [+0.000000, +0.000000, +0.000000, +1.000000]],
+    [[+0.930556, +0.359116, +0.071422, -0.007165],
+     [-0.364447, +0.889651, +0.275136, -0.018294],
+     [+0.035265, -0.282059, +0.958749, +0.170194],
+     [+0.000000, +0.000000, +0.000000, +1.000000]],
+    [[-0.731169, +0.159814, +0.663214, -0.007744],
+     [-0.580146, -0.657145, -0.481239, +0.032702],
+     [+0.358919, -0.736627, +0.573199, +0.144046],
+     [+0.000000, +0.000000, +0.000000, +1.000000]],
+    [[-0.350573, -0.936270, +0.022282, +0.018658],
+     [+0.931311, -0.351029, -0.097156, +0.034710],
+     [+0.098786, -0.013308, +0.995020, +0.106885],
+     [+0.000000, +0.000000, +0.000000, +1.000000]],
+    [[-0.843675, +0.525630, -0.109206, -0.015267],
+     [-0.468279, -0.820000, -0.329111, +0.043170],
+     [-0.262540, -0.226524, +0.937955, +0.045414],
+     [+0.000000, +0.000000, +0.000000, +1.000000]]])
+# yapf: enable
+
+test_indices = [10137, 36543, 21584, 7259, 32081]
+
+
+class TestGraspCandidate(unittest.TestCase):
+
+    def __init__(self, test_name, notebook_locals):
+        super().__init__(test_name)
+        self.notebook_locals = notebook_locals
+
+    @weight(4)
+    @timeout_decorator.timeout(10.)
+    def test_darboux_frame(self):
+        """Test compute_darboux_frame"""
+        pcd = self.notebook_locals["pcd"]
+        kdtree = o3d.geometry.KDTreeFlann(pcd)
+        f = self.notebook_locals["compute_darboux_frame"]
+
+        X_lst_eval = []
+
+        np.random.seed(11)
+        for i in range(5):
+            index = np.random.randint(np.asarray(pcd.points).shape[0])
+            RT = f(index, pcd, kdtree)
+            X_lst_eval.append(RT.GetAsMatrix4())
+
+        X_lst_eval = np.asarray(X_lst_eval)
+
+        self.assertLessEqual(np.linalg.norm(X_lst_target - X_lst_eval), 1e-4,
+                             "The Darboux frame is not correct")
+
+    @weight(4)
+    @timeout_decorator.timeout(10.)
+    def test_minimum_distance(self):
+        """Test find_minimum_distance"""
+        pcd = self.notebook_locals["pcd"]
+        f = self.notebook_locals["find_minimum_distance"]
+
+        # The following should return nan
+        for i in [0, 3]:
+            dist, X_new = f(pcd, RigidTransform(X_lst_target[i]))
+            self.assertTrue(
+                np.isnan(dist), "There is no value of y that results in "
+                "no collision in the grid, but dist is not nan")
+            self.assertTrue(
+                isinstance(X_new, type(None)),
+                "There is no value of y that results in "
+                "no collision in the grid, but X_WGnew is"
+                "not None.")
+
+        # yapf: disable
+        dist_new_target = np.array([  # noqa
+            0.0087354526,
+            0.0035799752,
+            0.0008069168])
+
+        X_new_target = np.array([  # noqa
+           [[+0.93056, +0.35912, +0.07142, -0.02512],
+            [-0.36445, +0.88965, +0.27514, -0.06278],
+            [+0.03527, -0.28206, +0.95875, +0.18430],
+            [+0.00000, +0.00000, +0.00000, +1.00000]],
+           [[-0.73117, +0.15981, +0.66321, -0.01573],
+            [-0.58015, -0.65715, -0.48124, +0.06556],
+            [+0.35892, -0.73663, +0.57320, +0.18088],
+            [+0.00000, +0.00000, +0.00000, +1.00000]],
+           [[-0.84368, +0.52563, -0.10921, -0.03571],
+            [-0.46828, -0.82000, -0.32911, +0.07506],
+            [-0.26254, -0.22652, +0.93796, +0.05422],
+            [+0.00000, +0.00000, +0.00000, +1.00000]]])
+        # yapf: enable
+
+        dist_new_eval = []
+        X_new_eval = []
+        # The following should return numbers.
+        for i in [1, 2, 4]:
+            dist, X_new = f(pcd, RigidTransform(X_lst_target[i]))
+            self.assertTrue(
+                not np.isnan(dist),
+                "There is a valid value of y that results in "
+                "no collision in the grid, but dist is nan")
+            self.assertTrue(
+                not isinstance(X_new, type(None)),
+                "There is a valid value of y that results in no "
+                "collision in the grid, but X_WGnew is None.")
+            dist_new_eval.append(dist)
+            X_new_eval.append(X_new.GetAsMatrix4())
+
+        dist_new_eval = np.array(dist_new_eval)
+        X_new_eval = np.array(X_new_eval)
+
+        self.assertLessEqual(np.linalg.norm(dist_new_target - dist_new_eval),
+                             1e-5, "The returned distance is not correct.")
+        self.assertLessEqual(np.linalg.norm(X_new_target - X_new_eval), 1e-4,
+                             "The returned transform is not correct.")
+
+    @weight(2)
+    @timeout_decorator.timeout(10.)
+    def test_nonempty(self):
+        """Test check_nonempty"""
+        pcd = self.notebook_locals["pcd"]
+        f = self.notebook_locals["check_nonempty"]
+
+        # Test some transforms that should evaluate to true
+        for i in range(5):
+            self.assertTrue(f(pcd, RigidTransform(X_lst_target[i])),
+                            "Should return true but returns false.")
+
+        X_fake = [
+            RigidTransform([1, 0, 0]),
+            RigidTransform([0, 1, 0]),
+            RigidTransform([0, 0, 1])
+        ]
+
+        # Test some transforms that should evaluate to false
+        for i in range(3):
+            self.assertTrue(not f(pcd, X_fake[i]),
+                            "Should return false but returns true")
+
+    @weight(4)
+    @timeout_decorator.timeout(60.)
+    def test_candidate_grasps(self):
+        """Test compute_candidate_grasps"""
+        pcd = self.notebook_locals["pcd"]
+        f = self.notebook_locals["compute_candidate_grasps"]
+
+        # yapf: disable
+        X_lst_target = np.array([  # noqa
+            [[-0.86670, +0.49867, -0.01296, -0.04684],
+             [-0.49881, -0.86662, +0.01232, +0.07370],
+             [-0.00508, +0.01714, +0.99984, +0.01943],
+             [+0.00000, +0.00000, +0.00000, +1.00000]],
+            [[-0.18753, +0.98111, +0.04745, -0.06946],
+             [-0.80412, -0.18108, +0.56621, +0.02289],
+             [+0.56411, +0.06802, +0.82289, +0.16031],
+             [+0.00000, +0.00000, +0.00000, +1.00000]],
+            [[-0.84403, -0.50298, +0.18606, +0.03698],
+             [-0.41280, +0.83080, +0.37331, -0.07931],
+             [-0.34235, +0.23828, -0.90886, +0.01522],
+             [+0.00000, +0.00000, +0.00000, +1.00000]]])
+        # yapf: enable
+
+        grasp_candidates = f(pcd, candidate_num=3, random_seed=5)
+
+        self.assertTrue(
+            len(grasp_candidates) == 3,
+            "Length of returned array is not correct.")
+
+        X_lst_eval = []
+        for i in range(len(grasp_candidates)):
+            X_lst_eval.append(grasp_candidates[i].GetAsMatrix4())
+        X_lst_eval = np.array(X_lst_eval)
+
+        self.assertLessEqual(np.linalg.norm(X_lst_target - X_lst_eval), 1e-4,
+                             "The returned grasp candidates are not correct.")
