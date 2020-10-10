@@ -641,17 +641,48 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
 
   <section><h1>The corner cases</h1>
   
-    <p>If you play around with the grasp scoring a little bit, you will find
-    deficiencies.  Some of them are addressed easily (albeit heuristically) by
-    adding a few more terms to the cost.  For instance, I didn't check
-    collisions of the pre-grasp configuration, but this could be added
-    easily.</p>
+    <p>If you play around with the grasp scoring I've implemented above a little
+    bit, you will find deficiencies.  Some of them are addressed easily (albeit
+    heuristically) by adding a few more terms to the cost.  For instance, I
+    didn't check collisions of the pre-grasp configuration, but this could be
+    added easily.</p>
 
+    <p>There are other cases where grasping alone is not sufficient as a
+    strategy.  Imagine that you place an object right in one of the corners of
+    the bin.  It might not be possible to get the hand around both sides of the
+    object without being in collision with either the object or the side.  The
+    strategy above will never choose to try to grab the very corner of a box
+    (because it always tried to align the sample point normal with the gripper
+    $x$), and it's not clear that it should.  This is probably especially true
+    for our relatively large gripper.  In the setup we used at TRI, we
+    implemented an additional simple "pushing" heuristic that would be used if
+    there were point clouds in the sink, but no viable grasp candidate could be
+    found.   Instead of grasping, we would drive the hand down and nudge that
+    part of the point cloud towards the middle of the bin.  This can actually
+    help a lot!
+    </p>
 
-    <p>There are other deficiencies that would be very hard to address
-    with a purely geometric approach.  For instance, you might see a system
-    using this scoring function ... </p>
+    <p>There are other deficiencies to our simple approach that would be very
+    hard to address with a purely geometric approach.  Most of them come down to
+    the fact that our system so far has no notion of "objects".  For instance,
+    it's not uncommon to see this strategy result in "double picks" if two
+    objects are close together in the bin.  For heavy objects, it might be
+    important to pick up the object close to the center of mass, to improve our
+    chances of resisting the gravitational wrench while staying in our friction
+    cones.  But our strategy here might pick up a heavy hammer by squeezing just
+    the very far end of the handle.</p>
+
+    <p>Interestingly, I don't think the problem is necessarily that the point
+    cloud information is insufficient, even without the color information.  I
+    could show you similar point clouds and you wouldn't make the same mistake.
+    These are the types of examples where learning a grasp metric could
+    potentially help.  We don't need to achieve artificial general intelligence
+    to solve this one; just experience knowing that when we tried to grasp in
+    someplace before we failed would be enough to improve our grasp heuristics
+    significantly.</p>
   
+    <todo>render some point clouds that a human can distinguish but out algorithm would not.</todo>
+
   </section>
 
   <section><h1>Putting it all together</h1>
