@@ -511,73 +511,120 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       to find perfect antipodal pairs, but finding areas with normals pointing
       in nearly opposite directions is a good strategy for grasping!</p>
 
-      <p>In practice, the contact between our fingers and the object(s) will be
-      better described by a <i>patch contact</i> than by a point contact (due to
-      the deflection of the rubber fingertips and any deflection of the objects
-      being picked).  So it makes sense to look for patches of points with
-      agreeable normals.  There are many ways one could write this, I've done it
-      here by transforming the processed point cloud of the scene into the
-      candidate frame of the gripper, and cropped away all of the points except
-      the ones that are inside a bounding box between the finger tips (I've
-      marked them in red in the example below).  The first term in my grasping
-      cost function is just reward for all of the points in the point cloud,
-      based on how aligned their normal is to the $x$-axis of the gripper:
-      $$\text{cost} = -\sum_i (n^i_{G_x})^2,$$ where $n^i_{G_x}$ is the $x$
-      component of the $i$th point in the cropped point cloud expressed in the
-      gripper frame.</p>
-
-      <p>But there are other considerations for what might make a good grasp,
-      too.  For our kinematically limited robot reaching into a bin, we might
-      favor grasps that put the hand in favorable orientation for the arm.  In
-      the grasp metric I've implemented in the code, I added a cost for the hand
-      deviating from vertical.  I can reward the dot product of the vector world
-      $-z$ vector, $[0, 0, -1]$ with the $y$-axis in gripper frame rotated into
-      world frame with : $$\text{cost} \mathrel{{+}{=}} -\alpha \begin{bmatrix}
-      0 & 0 &-1\end{bmatrix}R^G \begin{bmatrix}0 \\ 1 \\ 0\end{bmatrix} = \alpha
-      R^G_{3,2},$$ where $\alpha$ is relative cost weight, and $R^G_{3,2}$ is
-      the scalar element of the rotation matrix in the third row and second
-      column.</p>
-
-      <todo>Write my objective here.</todo>
-
-      <p>Collision checking.  Two worlds: robot + bins, and point cloud.</p>
-
-      </p>
 
       <example><h1>Scoring grasp candidates</h1>
 
+        <p>In practice, the contact between our fingers and the object(s) will
+        be better described by a <i>patch contact</i> than by a point contact
+        (due to the deflection of the rubber fingertips and any deflection of
+        the objects being picked).  So it makes sense to look for patches of
+        points with agreeable normals.  There are many ways one could write
+        this, I've done it here by transforming the processed point cloud of the
+        scene into the candidate frame of the gripper, and cropped away all of
+        the points except the ones that are inside a bounding box between the
+        finger tips (I've marked them in red in MeshCat).  The first term in my
+        grasping cost function is just reward for all of the points in the point
+        cloud, based on how aligned their normal is to the $x$-axis of the
+        gripper: $$\text{cost} = -\sum_i (n^i_{G_x})^2,$$ where $n^i_{G_x}$ is
+        the $x$ component of the $i$th point in the cropped point cloud
+        expressed in the gripper frame.</p>
+
         <figure><img style="width:80%"
           src="data/grasp_candidate_evaluation.png"></figure>
+    
+        <p>There are other considerations for what might make a good grasp, too.
+        For our kinematically limited robot reaching into a bin, we might favor
+        grasps that put the hand in favorable orientation for the arm.  In the
+        grasp metric I've implemented in the code, I added a cost for the hand
+        deviating from vertical.  I can reward the dot product of the vector
+        world $-z$ vector, $[0, 0, -1]$ with the $y$-axis in gripper frame
+        rotated into world frame with : $$\text{cost} \mathrel{{+}{=}} -\alpha
+        \begin{bmatrix} 0 & 0 &-1\end{bmatrix}R^G \begin{bmatrix}0 \\ 1 \\
+        0\end{bmatrix} = \alpha R^G_{3,2},$$ where $\alpha$ is relative cost
+        weight, and $R^G_{3,2}$ is the scalar element of the rotation matrix in
+        the third row and second column.</p>        
+
+        <p>Finally, we need to consider collisions between the candidate grasp
+        and both the bins and with the point cloud.  I simply return infinite
+        cost when the gripper is in collision.  I've implemented all of those
+        terms in the notebook, and given you a sliders to move the hand around
+        and see how the cost changes.</p>
 
         <p><a target="clutter"
-          href="https://colab.research.google.com/github/RussTedrake/manipulation/blob/master/clutter.ipynb#scrollTo=DDUZgfc9AgMf"><img
-          src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open
-          In Colab"/></a>
-            </p>
+        href="https://colab.research.google.com/github/RussTedrake/manipulation/blob/master/clutter.ipynb#scrollTo=DDUZgfc9AgMf"><img
+        src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open
+        In Colab"/></a></p>
   
       </example>
-
-      <!-- Antipodal grasps -->
-
-      <!-- Approaches based on learning -->
 
     </subsection>
 
     <subsection><h1>Generating grasp candidates</h1>
 
-      <!-- method 1: pick a point at random.  align hand based on curvature.  Drive hand down until near collision.  Sample around a bit in traslation / rotation.  -->
+      <p>We've defined a cost function that, given a point cloud from the scene
+      and a model of the environment (e.g. the location of the bins), can score
+      a candidate grasp pose, $X^G$.  So now we would like to solve the
+      optimization problem: find $X^G$ that minimizes the cost subject to the
+      collision constraints.</p>
 
-      <!-- method 2: find antipodal grasps with -->
+      <p>Unfortunately, this is an extremely difficult optimization problem,
+      with a highly nonconvex objective and constraints.  Moreover, the cost
+      terms corresponding the the antipodal points is zero for most $X^G$ --
+      since most random $X^G$ will not have any points between the fingers.  As
+      a result, instead of using the typical mathematical programming solvers,
+      the most approaches in the literature resort to a randomized
+      sampling-based algorithm.  And we do have strong heuristics for picking
+      reasonable samples.</p>
 
-      <example><h1>Candidate antipodal grasps</h1>
+      <p>One heuristic, used for instance in <elib>tenPas17</elib>, is to use
+      the local curvature of the point cloud to propose grasp candidates that
+      have the point cloud normals pointing into the palm, and orients the hand
+      so that the fingers are aligned with the direction of maximum curvature.
+      One can move the hand in the direction of the normal until the fingers are
+      out of collision, and even sample nearby points.  We have written <a
+      href="#gpg">an exercise</a> for you to explore this heuristic.  But for
+      our YCB objects, I'm not sure it's the best heuristic; we have a lot of
+      boxes, and boxes don't have a lot of information to give in their local
+      curvature.</p>
+
+      <p>Another heuristic is to find antipodal point pairs in the point cloud,
+      and then sample grasp candidates that would align the fingers with those
+      antipodal pairs.  Many 3D geometry libraries support "ray casting"
+      operations at least for a voxel representation of a point cloud; so a
+      reasonable approach to finding antipodal pairs is to simply choose a point
+      at random in the point cloud, then ray cast into the point cloud in the
+      opposite direction of the normal.  If the normal of the voxel found by ray
+      casting is sufficiently antipodal, and if the distance to that voxel is
+      smaller than the gripper width, then we've found a reasonable antipodal
+      point pair.</p>
+
+      <example><h1>Generating grasp candidates</h1>
+
+        <p>Open3D doesn't implement ray casting (yet), so I've implemented an
+        even simpler heuristic in my code example: I simply choose a point at
+        random, and start sampling grasps in orientation (starting from
+        vertical) that align the $x$-axis of the gripper with the normal of that
+        point.  Then I mostly just rely on the antipodal term in my scoring
+        function to allow me to find good grasps.</p>
 
         <figure><img style="width:60%"
           src="data/candidate_grasp_mustard.png"></figure>
 
+        <p>I do implement one more heuristic -- one I've found the points in the
+        point cloud that are between the finger tips, then I move the hand out
+        along the gripper $x$-axis so that those points are centered in the
+        gripper frame.  This helps prevent us knocking over objects as we close
+        our hands to grasp them.</p>
+
+        <p>But that's it!  It's a very simple strategy.  I sample a handful of
+        candidate grasps and just draw the top few with the lowest cost.  If you
+        run it a bunch of times, I think you will find it's actually quite
+        reasonable.  Every time it runs, it is simulating the objects falling
+        from the sky; the actual grasp evaluation is actually quite fast.</p>
+
         <figure><img style="width:80%"
             src="data/grasp_candidates.png"></figure>
   
-
         <p><a target="clutter"
         href="https://colab.research.google.com/github/RussTedrake/manipulation/blob/master/clutter.ipynb#scrollTo=bWhiRMikAgMj"><img
         src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open
@@ -589,17 +636,29 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
 
     </subsection>
 
-    <!-- antipodal grasping -->
-  
-    <!-- do I need IK? -->
+
   </section>
 
+  <section><h1>The corner cases</h1>
+  
+    <p>If you play around with the grasp scoring a little bit, you will find
+    deficiencies.  Some of them are addressed easily (albeit heuristically) by
+    adding a few more terms to the cost.  For instance, I didn't check
+    collisions of the pre-grasp configuration, but this could be added
+    easily.</p>
 
-  <section><h1>The corner cases</h1></section>
 
-  <section><h1>Deciding between "macro" actions</h1></section>
+    <p>There are other deficiencies that would be very hard to address
+    with a purely geometric approach.  For instance, you might see a system
+    using this scoring function ... </p>
+  
+  </section>
 
-  <section><h1>Putting it all together</h1></section>
+  <section><h1>Putting it all together</h1>
+  
+    <subsection><h1>A simple state machine</h1></subsection>
+  
+  </section>
 
   <section id="exercises"><h1>Exercises</h1>
 
@@ -621,8 +680,15 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       </ol>    
     </exercise>
 
-    <exercise><h1>Grasp Candidate Generation</h1>
-      <p>In chapter Colab, we have generated grasp candidates using the antipodal heuristic. In this exercise, we will investigate an alternative method for generating grasp candidates based on local curvature. This exercise is implementation-heavy, and you will work exclusively in <a href="https://colab.research.google.com/github/RussTedrake/manipulation/blob/master/exercises/clutter/grasp_candidate.ipynb" target="_blank">this notebook</a>.</p>
+    <exercise id="gpg"><h1>Grasp Candidate Generation</h1>
+
+      <p>In the chapter Colab notebook, we generated grasp candidates using the
+      antipodal heuristic.  In this exercise, we will investigate an alternative
+      method for generating grasp candidates based on local curvature, similar
+      to the one proposed in <elib>tenPas17</elib>. This exercise is
+      implementation-heavy, and you will work exclusively in <a
+      href="https://colab.research.google.com/github/RussTedrake/manipulation/blob/master/exercises/clutter/grasp_candidate.ipynb"
+      target="_blank">this notebook</a>.</p>
     </exercise>    
 
   </section>
