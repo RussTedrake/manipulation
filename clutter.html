@@ -506,10 +506,11 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       tilting our contact normals into the vertical direction), a reasonable
       strategy is to look for places on the point cloud where the normals will
       align with $x$-axis of the gripper.  That means finding a pair of points
-      on the point cloud with normals pointing directly in opposite directions,
-      these are <i>antipodal points</i>.  In a real point cloud, we are unlikely
-      to find perfect antipodal pairs, but finding areas with normals pointing
-      in nearly opposite directions is a good strategy for grasping!</p>
+      on the point cloud with normals that are collinear with the line
+      connecting the points and are pointing in opposite directions, these are
+      <i>antipodal points</i>.  In a real point cloud, we are unlikely to find
+      perfect antipodal pairs, but finding areas with normals pointing in nearly
+      opposite directions is a good strategy for grasping!</p>
 
 
       <example><h1>Scoring grasp candidates</h1>
