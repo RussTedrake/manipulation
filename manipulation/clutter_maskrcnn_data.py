@@ -3,6 +3,8 @@
 # TODO: Compute mean and std for dataset and add the normalization transform.
 # https://github.com/pytorch/examples/blob/97304e232807082c2e7b54c597615dc0ad8f6173/imagenet/main.py#L197-L198
 
+# TODO: Check if I'm running as a unit test and only do a single image.
+
 import json
 import matplotlib.pyplot as plt
 import multiprocessing
@@ -17,14 +19,15 @@ from pydrake.all import RigidTransform, RollPitchYaw
 from manipulation.scenarios import ycb
 from manipulation.utils import colorize_labels
 
-debug = False
+debug = True
 path = '/tmp/clutter_maskrcnn_data'
-num_images = 1 if debug else 10000
+num_images = 10000
 
-if os.path.exists(path):
-    shutil.rmtree(path)
-os.makedirs(path)
-print(f'Creating dataset in {path} with {num_images} images')
+if not debug:
+    if os.path.exists(path):
+        shutil.rmtree(path)
+    os.makedirs(path)
+    print(f'Creating dataset in {path} with {num_images} images')
 
 rng = np.random.default_rng()  # this is for python
 generator = pydrake.common.RandomGenerator(rng.integers(1000))  # for c++
@@ -57,8 +60,9 @@ def generate_image(image_num):
 
     plant.Finalize()
 
-    with open(filename_base + ".json", "w") as f:
-        json.dump(instance_id_to_class_name, f)
+    if not debug:
+        with open(filename_base + ".json", "w") as f:
+            json.dump(instance_id_to_class_name, f)
 
     renderer = "my_renderer"
     scene_graph.AddRenderer(
@@ -108,26 +112,26 @@ def generate_image(image_num):
             pass
 
     color_image = diagram.GetOutputPort("color_image").Eval(context)
-    Image.fromarray(color_image.data).save(f"{filename_base}.png")
     label_image = diagram.GetOutputPort("label_image").Eval(context)
-    np.save(f"{filename_base}_mask", label_image.data)
 
     if debug: 
         plt.figure()
-        plt.subplot(211)
+        plt.subplot(121)
         plt.imshow(color_image.data)
-        plt.subplot(212)
+        plt.axis('off')
+        plt.subplot(122)
         plt.imshow(colorize_labels(label_image.data))
         plt.axis('off')
+        plt.show()
+    else:
+        Image.fromarray(color_image.data).save(f"{filename_base}.png")
+        np.save(f"{filename_base}_mask", label_image.data)
 
-
-if True:
+if debug:
+    for image_num in range(num_images):
+        generate_image(image_num)
+else:
     pool = multiprocessing.Pool(10)
     list(tqdm(pool.imap(generate_image, range(num_images)), total=num_images))
     pool.close()
     pool.join()
-else:
-    pbar = tqdm(total=num_images)
-    for image_num in range(num_images):
-        generate_image(image_num)
-        pbar.update(1)

@@ -232,6 +232,8 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       leaves us with just the force-balance equations $$\tau_g(q) = - \sum_i
       J^T_i(q) F^{c_i}.$$  But we still need to understand where the contact
       forces come from.</p>
+
+      <p>Contact forces, static friction, friction cones...</p>
       
     </subsection>
 
@@ -470,7 +472,78 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
     </subsection>
 
     <subsection><h1>Evaluating a candidate grasp</h1>
-    
+
+      <p>Now that we have processed our point cloud, we have everything we need
+      to start planning grasps.  I'm going to break that discussion down into
+      two steps.  In this section we'll come up with a cost function that scores
+      grasp candidates.  In the following section, we'll discuss some very
+      simple ideas for trying to find grasps candidates that have a low
+      cost.</p>
+
+      <p>There is a massive literature in robotics on "grasp metrics" and "grasp
+      analysis".  The Handbook of Robotics<elib>Siciliano16</elib> has an entire
+      chapter on grasping devoted to it (which I
+      recommend)<elib>Prattichizzo08</elib>.  For a course on manipulation
+      (especially from someone who cares a lot about dynamics) to spend so
+      little time on this topic is perhaps surprising, but a great deal of that
+      literature is focused on analyzing point contacts between a dexterous hand
+      and an object with known geometry.  That's simply not the situation we
+      find ourselves in for a lot of manipulation work today.  We have ourselves
+      a simple two fingered grippers with relatively a lot of grasping force (>
+      80 N) and only local point clouds to represent our geometry.</p>
+
+      <p>But there is one key idea that I do want to extract from that
+      literature: the value of <b>antipodal grasps</b>.  Roughly speaking, once
+      we pick up an object -- or whatever happens to be between our fingers when
+      we squeeze -- then we will expect the contact forces between our fingers
+      to have to resist at least the <i>gravitational wrench</i> (the spatial
+      force due to gravity) of the object.  The clamping force provided by our
+      gripper is providing a force in the $x$-axis of the gripper, but if we
+      want to be able to pick up the object without it slipping from our hands,
+      then we need forces inside the friction cones of our contacts to be able
+      to resist the gravitational wrench.  Since we don't know what that wrench
+      will be (and are somewhat constrained by the geometry of our fingers from
+      tilting our contact normals into the vertical direction), a reasonable
+      strategy is to look for places on the point cloud where the normals will
+      align with $x$-axis of the gripper.  That means finding a pair of points
+      on the point cloud with normals pointing directly in opposite directions,
+      these are <i>antipodal points</i>.  In a real point cloud, we are unlikely
+      to find perfect antipodal pairs, but finding areas with normals pointing
+      in nearly opposite directions is a good strategy for grasping!</p>
+
+      <p>In practice, the contact between our fingers and the object(s) will be
+      better described by a <i>patch contact</i> than by a point contact (due to
+      the deflection of the rubber fingertips and any deflection of the objects
+      being picked).  So it makes sense to look for patches of points with
+      agreeable normals.  There are many ways one could write this, I've done it
+      here by transforming the processed point cloud of the scene into the
+      candidate frame of the gripper, and cropped away all of the points except
+      the ones that are inside a bounding box between the finger tips (I've
+      marked them in red in the example below).  The first term in my grasping
+      cost function is just reward for all of the points in the point cloud,
+      based on how aligned their normal is to the $x$-axis of the gripper:
+      $$\text{cost} = -\sum_i (n^i_{G_x})^2,$$ where $n^i_{G_x}$ is the $x$
+      component of the $i$th point in the cropped point cloud expressed in the
+      gripper frame.</p>
+
+      <p>But there are other considerations for what might make a good grasp,
+      too.  For our kinematically limited robot reaching into a bin, we might
+      favor grasps that put the hand in favorable orientation for the arm.  In
+      the grasp metric I've implemented in the code, I added a cost for the hand
+      deviating from vertical.  I can reward the dot product of the vector world
+      $-z$ vector, $[0, 0, -1]$ with the $y$-axis in gripper frame rotated into
+      world frame with : $$\text{cost} \mathrel{{+}{=}} -\alpha \begin{bmatrix}
+      0 & 0 &-1\end{bmatrix}R^G \begin{bmatrix}0 \\ 1 \\ 0\end{bmatrix} = \alpha
+      R^G_{3,2},$$ where $\alpha$ is relative cost weight, and $R^G_{3,2}$ is
+      the scalar element of the rotation matrix in the third row and second
+      column.</p>
+
+      <todo>Write my objective here.</todo>
+
+      <p>Collision checking.  Two worlds: robot + bins, and point cloud.</p>
+
+      </p>
+
       <example><h1>Scoring grasp candidates</h1>
 
         <figure><img style="width:80%"
