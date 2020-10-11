@@ -14,10 +14,6 @@ X_lst_target = np.array([  # noqa
      [+0.966542, -0.210354, -0.146791, +0.023823],
      [+0.148274, -0.008794, +0.988907, +0.082323],
      [+0.000000, +0.000000, +0.000000, +1.000000]],
-    [[+0.930556, +0.359116, +0.071422, -0.007165],
-     [-0.364447, +0.889651, +0.275136, -0.018294],
-     [+0.035265, -0.282059, +0.958749, +0.170194],
-     [+0.000000, +0.000000, +0.000000, +1.000000]],
     [[-0.731169, +0.159814, +0.663214, -0.007744],
      [-0.580146, -0.657145, -0.481239, +0.032702],
      [+0.358919, -0.736627, +0.573199, +0.144046],
@@ -32,7 +28,7 @@ X_lst_target = np.array([  # noqa
      [+0.000000, +0.000000, +0.000000, +1.000000]]])
 # yapf: enable
 
-test_indices = [10137, 36543, 21584, 7259, 32081]
+test_indices = [10137, 21584, 7259, 32081]
 
 
 class TestGraspCandidate(unittest.TestCase):
@@ -52,8 +48,8 @@ class TestGraspCandidate(unittest.TestCase):
         X_lst_eval = []
 
         np.random.seed(11)
-        for i in range(5):
-            index = np.random.randint(np.asarray(pcd.points).shape[0])
+        for i in range(4):
+            index = test_indices[i]
             RT = f(index, pcd, kdtree)
             X_lst_eval.append(RT.GetAsMatrix4())
 
@@ -61,6 +57,23 @@ class TestGraspCandidate(unittest.TestCase):
 
         self.assertLessEqual(np.linalg.norm(X_lst_target - X_lst_eval), 1e-4,
                              "The Darboux frame is not correct")
+
+        index = 5
+        RT = f(index, pcd, kdtree)
+
+        X_lst_order_eval = RT.GetAsMatrix4()
+
+        # yapf: disable
+        X_lst_order_target = np.array([  # noqa
+             [-0.03668, -0.88055, -0.47254, +0.00884],
+             [-0.93753, +0.19402, -0.28877, -0.00241],
+             [-0.34596, -0.43243, +0.83266, +0.19119],
+             [+0.00000, +0.00000, +0.00000, +1.00000]])
+        # yapf: enable
+
+        self.assertLessEqual(
+            np.linalg.norm(X_lst_order_eval - X_lst_order_target), 1e-4,
+            "Did you forget to sort the eigenvalues?")
 
     @weight(4)
     @timeout_decorator.timeout(10.)
@@ -70,7 +83,7 @@ class TestGraspCandidate(unittest.TestCase):
         f = self.notebook_locals["find_minimum_distance"]
 
         # The following should return nan
-        for i in [0, 3]:
+        for i in [0, 2]:
             dist, X_new = f(pcd, RigidTransform(X_lst_target[i]))
             self.assertTrue(
                 np.isnan(dist), "There is no value of y that results in "
@@ -83,15 +96,10 @@ class TestGraspCandidate(unittest.TestCase):
 
         # yapf: disable
         dist_new_target = np.array([  # noqa
-            0.0087354526,
             0.0035799752,
             0.0008069168])
 
         X_new_target = np.array([  # noqa
-           [[+0.93056, +0.35912, +0.07142, -0.02512],
-            [-0.36445, +0.88965, +0.27514, -0.06278],
-            [+0.03527, -0.28206, +0.95875, +0.18430],
-            [+0.00000, +0.00000, +0.00000, +1.00000]],
            [[-0.73117, +0.15981, +0.66321, -0.01573],
             [-0.58015, -0.65715, -0.48124, +0.06556],
             [+0.35892, -0.73663, +0.57320, +0.18088],
@@ -105,7 +113,7 @@ class TestGraspCandidate(unittest.TestCase):
         dist_new_eval = []
         X_new_eval = []
         # The following should return numbers.
-        for i in [1, 2, 4]:
+        for i in [1, 3]:
             dist, X_new = f(pcd, RigidTransform(X_lst_target[i]))
             self.assertTrue(
                 not np.isnan(dist),
@@ -134,7 +142,7 @@ class TestGraspCandidate(unittest.TestCase):
         f = self.notebook_locals["check_nonempty"]
 
         # Test some transforms that should evaluate to true
-        for i in range(5):
+        for i in range(4):
             self.assertTrue(f(pcd, RigidTransform(X_lst_target[i])),
                             "Should return true but returns false.")
 
@@ -162,13 +170,13 @@ class TestGraspCandidate(unittest.TestCase):
              [-0.49881, -0.86662, +0.01232, +0.07370],
              [-0.00508, +0.01714, +0.99984, +0.01943],
              [+0.00000, +0.00000, +0.00000, +1.00000]],
-            [[-0.18753, +0.98111, +0.04745, -0.06946],
-             [-0.80412, -0.18108, +0.56621, +0.02289],
-             [+0.56411, +0.06802, +0.82289, +0.16031],
+            [[-0.48845, +0.76646, +0.41709, -0.05009],
+             [+0.27538, +0.58896, -0.75979, -0.04657],
+             [+0.82800, +0.25626, +0.49875, +0.14333],
              [+0.00000, +0.00000, +0.00000, +1.00000]],
-            [[-0.84403, -0.50298, +0.18606, +0.03698],
-             [-0.41280, +0.83080, +0.37331, -0.07931],
-             [-0.34235, +0.23828, -0.90886, +0.01522],
+            [[+0.52811, -0.84916, +0.00468, +0.06930],
+             [+0.83829, +0.52222, +0.15671, -0.04796],
+             [-0.13552, -0.07884, +0.98763, +0.10482],
              [+0.00000, +0.00000, +0.00000, +1.00000]]])
         # yapf: enable
 
