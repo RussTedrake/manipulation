@@ -26,10 +26,19 @@ class TestNormal(unittest.TestCase):
         self.assertTrue(
             len(student_sol) == len(reference_sol),
             'the number of the normals is incorrent')
-        for X, v in zip(student_sol, reference_sol):
-            # check only the normal vector, not the entire frame
-            student_v = X.GetAsMatrix4()[0:3, 2]
-            # normalize the vector in case it is not normalized
-            student_v = student_v / np.linalg.norm(student_v)
-            test = np.dot(student_v, v)
-            self.assertTrue(test > 0.8, 'normal vector is incorrect')
+
+        for X, X_sol in zip(student_sol, reference_sol):
+            # check only points within the bounding box
+            pos_x, pos_y, pos_z = X_sol[0:3, 3]
+            if abs(pos_x) < 1.0 and abs(pos_y) < 1.0:
+                sol_v = X_sol[0:3, 2]
+                # check only the normal vector, not the entire frame
+                student_v = X.GetAsMatrix4()[0:3, 2]
+                # normalize the vector in case it is not normalized
+                student_v = student_v / np.linalg.norm(student_v)
+                test = np.dot(student_v, sol_v)
+                self.assertTrue(
+                    test > 0.7, 'error at the point: \n {} \
+                    \n normal is: {} \
+                    \n solution normal is: {}'.format([pos_x, pos_y, pos_z],
+                                                      student_v, sol_v))
