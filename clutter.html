@@ -87,7 +87,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
   <section><h1>Generating random cluttered scenes</h1>
   
     <p>If our goal is to test a diversity of bin picking situations, then the
-    first tasks is to figure out how to generate diverse simulations.  How
+    first task is to figure out how to generate diverse simulations.  How
     should we populate the bin full of objects?  So far we've set up each
     simulation by carefully setting the initial positions (in the Context) for
     each of the objects, but that approach won't scale.</p>
@@ -109,7 +109,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       expect our simulation to faithfully implement multibody physics as long as
       our initial conditions (and time step) are reasonable; the physics isn't
       well defined if we initialize the Context with multiple objects occupying
-      the same physical space.  The simplest an most common way to avoid this is
+      the same physical space.  The simplest and most common way to avoid this is
       to generate a random number of objects in random poses, with their
       vertical positions staggered so that they trivially start out of
       penetration.</p>
@@ -202,9 +202,9 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
 
     <subsection><h1>Static equilibrium with frictional contact</h1>
 
-      <p>Even in the case of bins, we should try think critically about whether
-      dropping objects from a height is really the best solution.  Given our
-      discussion in the last chapter about writing optimizations with
+      <p>Even in the case of bins, we should try to think critically about
+      whether dropping objects from a height is really the best solution.  Given
+      our discussion in the last chapter about writing optimizations with
       non-penetration constraints, I hope you are already asking yourself: why
       not use those constraints again here?  Let's explore that idea a bit
       further.</p>
@@ -218,8 +218,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       side of the equation is just a generalization of "mass times
       acceleration", with the mass matrix, $M$, and the Coriolis terms $C$.  The
       right hand side is the sum of the (generalized) forces, with $\tau_g(q)$
-      capturing the terms due to gravity, $Bu$ the actuation inputs, and
-      $F^{c_i}$ is the <a
+      capturing the terms due to gravity, and $F^{c_i}$ is the <a
       href="https://drake.mit.edu/doxygen_cxx/group__multibody__spatial__vectors.html">spatial
       force</a> due to the $i$th contact.  $J_i(q)$ is the $i$th "contact
       Jacobian" -- it is the Jacobian that maps from the generalized velocities
@@ -340,7 +339,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       <p>As we will discuss in some detail below, many of our grasp selection
       strategies will benefit from <i>estimating the "normals"</i> of the point
       cloud (a unit vector that estimates the normal direction relative to the
-      surface of the underlying geometry).  Is it actually better to estimate
+      surface of the underlying geometry).  It is actually better to estimate
       the normals on the individual point clouds, making use of the camera
       location that generated those points, than to estimate the normal after
       the point cloud has been merged.</p>
@@ -361,9 +360,9 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       sized cubes tiled in 3D.  We then summarize the original point cloud with
       exactly one point per voxel (see, for instance <a
       href="http://www.open3d.org/docs/latest/tutorial/Advanced/voxelization.html">Open3D's
-      note on voxelization</a>).  Since point clouds typically only small
-      percentage of the voxels in 3D space, we use sparse data structures to
-      store the voxel grid.  In noisy point clouds, this voxelization step is
+      note on voxelization</a>).  Since point clouds typically only occupy a
+      small percentage of the voxels in 3D space, we use sparse data structures
+      to store the voxel grid.  In noisy point clouds, this voxelization step is
       also a useful form of filtering.</p>
 
       <example><h1>Mustard bottle point clouds</h1>
@@ -433,7 +432,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
   
       <p>In order to approximate the local curvature of a mesh represented by a
       point cloud, we can use our fast nearest neighbor queries to find a
-      handful of local points, and using this plane fitting algorithm on just
+      handful of local points, and use this plane fitting algorithm on just
       those points.  Then we can repeat that entire procedure for every point in
       the point cloud.  I remember when working with point clouds started to
       become a bigger part of my life, I thought that surely doing anything
@@ -497,17 +496,17 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       we pick up an object -- or whatever happens to be between our fingers when
       we squeeze -- then we will expect the contact forces between our fingers
       to have to resist at least the <i>gravitational wrench</i> (the spatial
-      force due to gravity) of the object.  The clamping force provided by our
-      gripper is providing a force in the $x$-axis of the gripper, but if we
-      want to be able to pick up the object without it slipping from our hands,
-      then we need forces inside the friction cones of our contacts to be able
-      to resist the gravitational wrench.  Since we don't know what that wrench
-      will be (and are somewhat constrained by the geometry of our fingers from
-      tilting our contact normals into the vertical direction), a reasonable
-      strategy is to look for places on the point cloud where the normals will
-      align with $x$-axis of the gripper.  That means finding a pair of points
-      on the point cloud with normals that are collinear with the line
-      connecting the points and are pointing in opposite directions, these are
+      force due to gravity) of the object.  The closing force provided by our
+      gripper is in the gripper's $x$-axis, but if we want to be able to pick up
+      the object without it slipping from our hands, then we need forces inside
+      the friction cones of our contacts to be able to resist the gravitational
+      wrench.  Since we don't know what that wrench will be (and are somewhat
+      constrained by the geometry of our fingers from tilting our contact
+      normals into the vertical direction), a reasonable strategy is to look for
+      places on the point cloud where the normals will align with $x$-axis of
+      the gripper.  That means finding a pair of points on the point cloud with
+      normals that are collinear with the line connecting the points and are
+      pointing in opposite directions, these are
       <i>antipodal points</i>.  In a real point cloud, we are unlikely to find
       perfect antipodal pairs, but finding areas with normals pointing in nearly
       opposite directions is a good strategy for grasping!</p>
@@ -570,12 +569,12 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
 
       <p>Unfortunately, this is an extremely difficult optimization problem,
       with a highly nonconvex objective and constraints.  Moreover, the cost
-      terms corresponding the the antipodal points is zero for most $X^G$ --
+      terms corresponding to the antipodal points is zero for most $X^G$ --
       since most random $X^G$ will not have any points between the fingers.  As
       a result, instead of using the typical mathematical programming solvers,
-      the most approaches in the literature resort to a randomized
-      sampling-based algorithm.  And we do have strong heuristics for picking
-      reasonable samples.</p>
+      most approaches in the literature resort to a randomized sampling-based
+      algorithm.  And we do have strong heuristics for picking reasonable
+      samples.</p>
 
       <p>One heuristic, used for instance in <elib>tenPas17</elib>, is to use
       the local curvature of the point cloud to propose grasp candidates that
@@ -611,9 +610,9 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
         <figure><img style="width:60%"
           src="data/candidate_grasp_mustard.png"></figure>
 
-        <p>I do implement one more heuristic -- one I've found the points in the
-        point cloud that are between the finger tips, then I move the hand out
-        along the gripper $x$-axis so that those points are centered in the
+        <p>I do implement one more heuristic -- once I've found the points in
+        the point cloud that are between the finger tips, then I move the hand
+        out along the gripper $x$-axis so that those points are centered in the
         gripper frame.  This helps prevent us knocking over objects as we close
         our hands to grasp them.</p>
 
