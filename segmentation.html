@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+
+<html>
+
+  <head>
+    <title>Robotic Manipulation: Object detection and
+segmentation</title>
+    <meta name="Robotic Manipulation: Object detection and
+segmentation" content="text/html; charset=utf-8;" />
+    <link rel="canonical" href="http://manipulation.csail.mit.edu/segmentation.html" />
+
+    <script src="https://hypothes.is/embed.js" async></script>
+    <script type="text/javascript" src="htmlbook/book.js"></script>
+
+    <script src="htmlbook/mathjax-config.js" defer></script> 
+    <script type="text/javascript" id="MathJax-script" defer
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js">
+    </script>
+    <script>window.MathJax || document.write('<script type="text/javascript" src="htmlbook/MathJax/es5/tex-chtml.js" defer><\/script>')</script>
+
+    <link rel="stylesheet" href="htmlbook/highlight/styles/default.css">
+    <script src="htmlbook/highlight/highlight.pack.js"></script> <!-- http://highlightjs.readthedocs.io/en/latest/css-classes-reference.html#language-names-and-aliases -->
+    <script>hljs.initHighlightingOnLoad();</script>
+
+    <link rel="stylesheet" type="text/css" href="htmlbook/book.css" />
+  </head>
+
+<body onload="loadChapter('manipulation');">
+
+<div data-type="titlepage">
+  <header>
+    <h1><a href="index.html" style="text-decoration:none;">Robotic Manipulation</a></h1>
+    <p data-type="subtitle">Perception, Planning, and Control</p> 
+    <p style="font-size: 18px;"><a href="http://people.csail.mit.edu/russt/">Russ Tedrake</a></p>
+    <p style="font-size: 14px; text-align: right;"> 
+      &copy; Russ Tedrake, 2020<br/>
+      Last modified <span id="last_modified"></span>.</br>
+      <script>
+      var d = new Date(document.lastModified);
+      document.getElementById("last_modified").innerHTML = d.getFullYear() + "-" + (d.getMonth()+1) + "-" + d.getDate();</script>
+      <a href="misc.html">How to cite these notes, use annotations, and give feedback.</a><br/>
+    </p>
+  </header>
+</div>
+
+<p><b>Note:</b> These are working notes used for <a
+href="http://manipulation.csail.mit.edu/Fall2020/">a course being taught
+at MIT</a>. They will be updated throughout the Fall 2020 semester.  <!-- <a 
+href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos are available on YouTube</a>.--></p> 
+
+<table style="width:100%;"><tr style="width:100%">
+  <td style="width:33%;text-align:left;"><a class="previous_chapter" href=clutter.html>Previous Chapter</a></td>
+  <td style="width:33%;text-align:center;"><a href=index.html>Table of contents</a></td>
+  <td style="width:33%;text-align:right;"><a class="next_chapter" href=grasping.html>Next Chapter</a></td>
+</tr></table>
+
+
+<!-- EVERYTHING ABOVE THIS LINE IS OVERWRITTEN BY THE INSTALL SCRIPT -->
+<chapter style="counter-reset: chapter 5"><h1>Object detection and
+segmentation</h1>
+
+  <p>Our study of geometric perception gave us good tools for estimating the
+  pose of a known object.  These algorithms can produce highly accurate
+  estimates, but are still subject to local minima.  When the scenes get more
+  cluttered/complicated, or if we are dealing with many different object types,
+  they really don't offer an adequate solution by themselves.</p>
+
+  <p>Deep learning has given us data-driven solutions that complement our
+  geometric approaches beautifully.  Finding correlations in massive datasets
+  has proven to be a fantastic way to provide practical solutions to these more
+  "global" problems like detecting whether the mustard bottle is even in the
+  scene, segmenting out the portion of the image / point cloud that is relevant
+  to the object, and even in providing a rough estimate of the pose that could
+  be refined with a geometric method.</p>
+
+  <p>There are many sources of information about deep learning on the internet,
+  and I have no ambition of replicating nor replacing them here.  But this
+  chapter does being our exploration of deep perception in manipulation, and I
+  feel that I need to give just a little context.</p>
+
+  <section><h1>Getting to big data</h1>
+
+    <subsection><h1>Crowd-sourced annotation datasets</h1>
+    
+      <p>The modern revolution in computer vision was unquestionably fueled by
+      the availability of massive annotated datasets.  The most famous of all is
+      ImageNet, which eclipsed previous datasets with the number of images and
+      the accuracy and usefulness of the labels<elib>Russakovsky15</elib>.
+      Fei-fei Li, who led the creation of ImageNet has been giving talks that
+      give some nice historical perspective on how ImageNet came to be.  
+      <a href="https://youtu.be/0bb9EcaQupI">Here is one</a> (slightly) tailored
+      to robotics and even manipulation; you might start <a
+      href="https://youtu.be/0bb9EcaQupI?t=857">here</a>.  </p>
+
+      <p><elib>Russakovsky15</elib> describes the annotations available in
+      ImageNet: <blockquote>... annotations fall into one of two categories: (1)
+      image-level annotation of a binary label for the presence or absence of an
+      object class in the image, e.g., "there are cars in this image" but "there
+      are no tigers," and (2) object-level annotation of a tight bounding box
+      and class label around an object instance in the image, e.g., "there is a
+      screwdriver centered at position (20,25) with width of 50 pixels and
+      height of 30 pixels".</blockquote></p>
+
+      <figure><img width="80%"
+      src="data/coco_instance_segmentation.jpeg"/><figcaption>A sample annotated
+      image from the COCO dataset, illustrating the difference between
+      image-level annotations, object-level annotations, and segmentations at
+      the class/semantic- or instance- level..</figcaption></figure>
+
+      <p>The COCO dataset similarly enabled pixel-wise <i>instance-level</i>
+      segmentation <elib>Lin14a</elib>, where distinct instances of a class are
+      given a unique label (and also associated with the class label).  COCO has
+      fewer object categories than ImageNet, but more instances per category.
+      It's still shocking to me that they were able to get 2.5 million images
+      labeled at the pixel level.  I remember some of the early projects at MIT
+      when crowd-sourced image labeling was just beginning (projects like
+      LabelMe <elib>Russell08</elib>);  Antonio Torralba used to joke about how
+      surprised he was about the accuracy of the (nearly) pixel-wise annotations
+      that he was able to crowd-source (and that his mother was a particularly
+      prolific and accurate labeler)!</p>
+
+      <p>Instance segmentation turns out to be an very good match for the
+      perception needs we have in manipulation.  In the last chapter we found
+      ourselves with a bin full of YCB objects.  If we want to pick out only the
+      mustard bottles, and pick them out one at a time, then we can use a deep
+      network to perform an initial instance-level segmentation of the scene,
+      and then use our grasping strategies on only the segmented point cloud.
+      Or if we do need to estimate the pose of an object (e.g. in order to place
+      it in a desired pose), then segmenting the point cloud can also
+      dramatically improve the chances of success with our geometric pose
+      estimation algorithms.</p>
+
+    </subsection>
+
+    <subsection><h1>Segmenting new classes via fine tuning</h1>
+
+      <p>The ImageNet and COCO datasets contain labels for <a
+      href="https://tech.amikelive.com/node-718/what-object-categories-labels-are-in-coco-dataset/">a
+      variety of interesting classes</a>, including cows, elephants, bears,
+      zebras and giraffes.  They have a few classes that are more relevant to
+      manipulation (e.g., plates, forks, knives, and spoons), but they don't
+      have a mustard bottle nor a can of potted meat like we have in the YCB
+      dataset.  So what are we do to?  Must we produce the same image annotation
+      tools and pay for people to label thousands of images for us?</p>
+
+      <p>One of the most amazing and magical properties of the deep
+      architectures that have been working so well for instance-level
+      segmentation is that they appear to have some modularity in them.  An
+      image that was pre-trained on a large dataset like ImageNet or COCO can be
+      fine-tuned with a relatively much smaller amount of labeled data to a new
+      set of classes that are relevant to our particular application.  In fact,
+      the architectures are often referred to as having a "backbone" and a
+      "head" -- in order to train a new set of classes, it is often possible to
+      just pop off the existing head and replace it with a new head for the new
+      labels.  A relatively small amount of training with a relatively small
+      dataset can still achieve surprisingly robust performance.  Moreover, it
+      seems that training initially on the diverse dataset (ImageNet or COCO) is
+      actually important to learn the robust perceptual representations that
+      work for a broad class of perception tasks.  Incredible!</p>
+
+      <p>This is great news!  But we still need some amount of labeled data for
+      our objects of interest.  The last few years have seen a number of
+      start-ups based purely on the business model of helping you get your
+      dataset labeled.  But thankfully, this isn't our only option.
+      </p>
+    
+    </subsection>
+
+    <subsection><h1>Annotation tools for manipulation</h1>
+    
+      <p>Just as projects like LabelMe helped to streamline the process of
+      providing pixel-wise annotations for images downloaded from the web, there
+      are a number of tools that have been developed to streamline the
+      annotation process for robotics.  Our group introduced a tool called
+      <a href="http://labelfusion.csail.mit.edu/">LabelFusion</a>, which combines geometric perception of point clouds
+      with a simple user interface to very rapidly label a large number of
+      images<elib>Marion17</elib>.</p>
+
+      <figure><img id="labelfusion" style="width:75%" src="data/labelfusion_multi_object_scenes.png" onmouseenter="this.src = 'https://github.com/RobotLocomotion/LabelFusion/raw/master/docs/fusion_short.gif'" onmouseleave="this.src = 'data/labelfusion_multi_object_scenes.png'"/>
+        <figcaption>A multi-object scene from <a
+        href="http://labelfusion.csail.mit.edu/">LabelFusion</a>
+        <elib>Marion17</elib>.  (Mouse over for animation)</figcaption>
+      </figure>
+      
+      <p>In LabelFusion, we provide multiple RGB-D images of a static scene
+      containing some objects of interest, and the CAD models for those objects.
+      First we use a dense reconstruction algorithm, ElasticFusion, to merge the
+      point clouds from the individual images into a single dense
+      reconstruction; this is just another instance of the point cloud
+      registration problem.  The dense reconstruction algorithm also localizes
+      the camera relative to the point cloud.  Then we provide a simple gui that
+      asks the user to click on three points on the model and three points in
+      the scene to establish the "global" correspondence, and then we run ICP to
+      snap refine the pose estimate.  Finally, we render the pixels from the CAD
+      model on top of all of the images in the established pose giving beautiful
+      pixel-wise labels.</p>
+
+      <p>Tools like LabelFusion can be use to label large numbers of images very
+      quickly (three clicks from a user produces ground truth labels in many
+      images).</p>
+    
+    </subsection>
+
+    <subsection><h1>Synthetic datasets</h1>
+    
+      <p>All of this real world data is incredibly valuable.  But we have
+      another super powerful tool at our disposal: simulation!  Computer vision
+      researchers have traditionally been very skeptical of training perception
+      systems on synthetic images, but as game-engine quality physics-based
+      rendering has become a commodity technology, roboticists have been using
+      it aggressively to supplement or even replace their real-world datasets.
+      The annual robotics conferences now feature regular <a
+      href="https://sim2real.github.io/">workshops and/or debates</a> on the
+      topic of "sim2real".  It is still not clear whether we can generate
+      accurate enough art assets (with tune material properties) and environment
+      maps / lighting conditions to represent even specific scenes to the
+      fidelity we need.  An even bigger question is whether we can generate a
+      diverse enough set of data with distributions representative of the real
+      world to train robust feature detectors in the way that we've managed to
+      train with ImageNet.  But for many serious robotics groups, synthetic data
+      generation pipelines have significantly augmented or even replaced
+      real-world labeled data.</p>
+    
+      <p>For the purposes of this chapter, I aim to train an instance-level
+      segmentation system that will work well on our simulated images.  For this
+      use case, there is (almost) no debate!  Leveraging the pretrained backbone
+      from COCO, I will use only synthetic data for fine tuning.</p>
+
+      <p>You may have noticed it already, but the <code>RgbdSensor</code> that we've been using in Drake actually has a "label image" output port that we haven't used yet.</p>
+
+      <div>
+        <script type="text/javascript">
+        var rgdbsensor = { "name": "RgbdSensor", 
+          "input_ports" : ["geometry_query"],
+          "output_ports" : ["color_image", "depth_image_32f", "depth_image_16u", "<b>label_image</b>", "X_WB"]
+          };
+        document.write(system_html(rgdbsensor, "https://drake.mit.edu/doxygen_cxx/classdrake_1_1systems_1_1sensors_1_1_rgbd_sensor.html"));
+        </script>
+      </div>
+      
+      <p>This output port exists precisely to support the perception training
+      use case we have here.  It outputs an image that is identical to the RGB
+      image, except that every pixel is "colored" with a unique instance-level
+      identifier.</p>
+
+      <figure><img style="width:100%" src="data/clutter_maskrcnn_labels.png"/>
+      <figcaption>Pixelwise instance segmentation labels provided by the "label
+      image" output port from <code>RgbdSensor</code>.  I've remapped the colors
+      to be more visually distinct.</figcaption> </figure>
+
+      <example><h1>Generating training data for instance segmentation</h1>
+      
+        <p>I've provided a simple script that runs our "clutter generator" from
+        our bin picking example that drops random YCB objects into the bin.
+        After a short simulation, I render the RGB image and the label image,
+        and save them (along with some metadata with the instance and class
+        identifiers) to disk.</p>
+
+        <p>I've verified that this code <i>can</i> run on Colab, but to make a
+        dataset of 10k images using this un-optmized process takes about an hour
+        on my big development desktop. And curating the files is just easier if
+        you run it locally.  So I've provided this one as a python script
+        instead.</p>
+
+        <pysrc no_colab=True>manipulation/clutter_maskrcnn_data.py</pysrc>
+      
+        <todo>Provide a colab version?</todo>
+
+        <p>You can also feel free to skip this step!  I've uploaded the 10k
+        images that I generated <a
+        href="https://groups.csail.mit.edu/locomotion/clutter_maskrcnn_data.zip">here</a>.
+        We'll download that directly in our training notebook.</p>
+
+      </example>
+
+
+    </subsection>
+
+  </section>
+
+  <section><h1>Object detection and segmentation</h1>
+  
+    <!--Get to bounding boxes.  yolo, etc.-->
+
+    <!-- nice overview slides at http://cs231n.stanford.edu/slides/2020/lecture_12.pdf .  Videos at https://www.youtube.com/watch?v=vT1JzLTH4G4&list=PL3FW7Lu3i5JvHM8ljYj-zLfQRF3EO8sYv&index=1 -->
+  
+    <p>Fully Convolutional Networks (FCN) for semantic segmentation
+    <elib>Long15</elib>.  Girschink et al introduced "Regions with CNN Features"
+    (R-CNN), and then improvements to make it "Fast" and "Faster"
+    <elib>Girshick14+Girshick15+Ren15</elib>.  Mask R-CNN <elib>He17</elib>.  We will use the
+    latest implementation in <a
+    href="https://github.com/facebookresearch/detectron2">Detectron2</a> from
+    Facebook AI Research.</p>
+
+  </section>
+
+  <!--
+  <section><h1>Pose estimation</h1>
+  
+  </section>
+  -->
+  <!--
+  <section><h1>Keypoint detection</h1></section>
+
+  <section><h1>Dense Descriptors</h1></section>
+-->    
+</chapter>
+<!-- EVERYTHING BELOW THIS LINE IS OVERWRITTEN BY THE INSTALL SCRIPT -->
+
+<table style="width:100%;"><tr style="width:100%">
+  <td style="width:33%;text-align:left;"><a class="previous_chapter" href=clutter.html>Previous Chapter</a></td>
+  <td style="width:33%;text-align:center;"><a href=index.html>Table of contents</a></td>
+  <td style="width:33%;text-align:right;"><a class="next_chapter" href=grasping.html>Next Chapter</a></td>
+</tr></table>
+
+<div id="footer">
+  <hr>
+  <table style="width:100%;">
+    <tr><td><a href="https://accessibility.mit.edu/">Accessibility</a></td><td style="text-align:right">&copy; Russ
+      Tedrake, 2020</td></tr>
+  </table>
+</div>
+
+
+</body>
+</html>
