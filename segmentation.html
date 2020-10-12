@@ -280,18 +280,57 @@ segmentation</h1>
 
   <section><h1>Object detection and segmentation</h1>
   
-    <!--Get to bounding boxes.  yolo, etc.-->
+    <p>There is a lot to know about modern object detection and segmentation
+    pipelines.  I'll stick to the very basics.</p>
+    
+    <!-- nice overview slides at
+    http://cs231n.stanford.edu/slides/2020/lecture_12.pdf .  Videos at
+    https://www.youtube.com/watch?v=vT1JzLTH4G4&list=PL3FW7Lu3i5JvHM8ljYj-zLfQRF3EO8sYv&index=1
+    -->
 
-    <!-- nice overview slides at http://cs231n.stanford.edu/slides/2020/lecture_12.pdf .  Videos at https://www.youtube.com/watch?v=vT1JzLTH4G4&list=PL3FW7Lu3i5JvHM8ljYj-zLfQRF3EO8sYv&index=1 -->
+    <p>For image recognition (see Figure 1), one can imagine training a standard
+    convolutional network that takes the entire image as an input, and outputs a
+    probability of the image containing a sheep, a dog, etc.  In fact, these
+    architectures can even work well for semantic segmentation, where the input
+    is an image and the output is another image; a famous architecture for this
+    is the Fully Convolutional Network (FCN) <elib>Long15</elib>.  But for
+    object detection and instance segmentation, even the number of outputs of
+    the network can change.  How do we train a network to output a variable
+    number of detections?</p>
+
+    <p>The mainstream approach to this is to first break the input image up into
+    many (let's say on the order of 1000) overlapping regions that might
+    represent interesting sub-images.  Then we can run our favorite image
+    recognition and/or segmentation network on each subimage individually, and
+    output a detection for each region that that is scored as having a high
+    probability.  In order to output a tight bounding box, the detection
+    networks are also trained to output a "bounding box refinement" that selects
+    a subset of the final region for the bounding box.  Originally, these region
+    proposals were done with more traditional image preprocessing algorithms, as
+    in R-CNN (Regions with CNN Features)<elib>Girshick14</elib>.  But the "Fast"
+    and "Faster" versions of R-CNN replaced even these preprocessing with
+    learned "region proposal networks"<elib>Girshick15+Ren15</elib>.</p>
+
+    <p>For instance segmentation, we will use the very popular Mask R-CNN
+    network which puts all of these ideas, using region proposal networks and a
+    fully convolutional networks for the object detection and for the masks
+    <elib>He17</elib>.  In Mask R-CNN, the masks are evaluated in parallel from
+    the object detections, and only the masks corresponding to the most likely
+    detections are actually returned.  At the time of this writing, the latest
+    and most performant implementation of Mask R-CNN is available in the <a
+    href="https://github.com/facebookresearch/detectron2">Detectron2</a> project
+    from Facebook AI Research.  But that version is not quite as user-friendly
+    and clean as the original version that was released in the PyTorch <a
+    href="https://pytorch.org/docs/stable/torchvision/index.html"><code>torchvision</code></a>
+    package; we'll stick to the <code>torchvision</code> version for our
+    experiments here.</p>
+
+    <example><h1>Fine-tuning Mask R-CNN for bin picking</h1>
+
+      
+    
+    </example>
   
-    <p>Fully Convolutional Networks (FCN) for semantic segmentation
-    <elib>Long15</elib>.  Girschink et al introduced "Regions with CNN Features"
-    (R-CNN), and then improvements to make it "Fast" and "Faster"
-    <elib>Girshick14+Girshick15+Ren15</elib>.  Mask R-CNN <elib>He17</elib>.  We will use the
-    latest implementation in <a
-    href="https://github.com/facebookresearch/detectron2">Detectron2</a> from
-    Facebook AI Research.</p>
-
   </section>
 
   <!--
