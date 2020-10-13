@@ -327,22 +327,51 @@ segmentation</h1>
 
     <example><h1>Fine-tuning Mask R-CNN for bin picking</h1>
 
-      
+      <p>The following notebook loads our 10k image dataset and a Mask R-CNN
+      network pre-trained on the COCO dataset.  It then replaces the head of the
+      pretrained network with a new head with the right number of outputs for
+      our YCB recognition task, and then runs just a 10 epochs of training with
+      my new dataset.</p>
+
+      <p><a target="segmentation_train"
+      href="https://colab.research.google.com/github/RussTedrake/manipulation/blob/master/segmentation_train.ipynb"><img
+      src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open
+      In Colab"/></a> (Training Notebook)
+      </p>
     
+      <p>Training a network this big (it will take about 150MB on disk) is not
+      fast.  I strongly recommend hitting play on the cell immediately after the
+      training cell while you are watching it train so that the weights are
+      saved and downloaded even if your Colab session closes.  But when you're
+      done, you should have a shiny new network for instance segmentation of the
+      YCB objects in the bin!</p>
+
+      <p>I've provided a second notebook that you can use to load and evaluate
+      the trained model.  If you don't want to wait for your own to train, you
+      can examine the one that I've trained!</p>
+
+      <p><a target="segmentation_inference"
+      href="https://colab.research.google.com/github/RussTedrake/manipulation/blob/master/segmentation_inference.ipynb"><img
+      src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open
+      In Colab"/></a> (Inference Notebook)
+      </p>
+    
+      <figure><img style="width:50%" src="data/segmentation_detections.png"><img
+      style="width:50%" src="data/segmentation_mask.png"><figcaption>Outputs
+      from the Mask R-CNN inference.  (Left) Object detections.  (Right) One of
+      the instance masks.</figcaption></figure>
+
     </example>
-  
+
   </section>
 
-  <!--
-  <section><h1>Pose estimation</h1>
-  
-  </section>
-  -->
-  <!--
-  <section><h1>Keypoint detection</h1></section>
+  <section><h1>Putting it all together</h1>
 
-  <section><h1>Dense Descriptors</h1></section>
--->    
+    <p>We can use our Mask R-CNN inference in a manipulation to do selective
+    picking from the bin...</p>
+
+  </section>
+
 </chapter>
 <!-- EVERYTHING BELOW THIS LINE IS OVERWRITTEN BY THE INSTALL SCRIPT -->
 
