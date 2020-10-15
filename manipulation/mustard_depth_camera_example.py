@@ -9,7 +9,6 @@ from pydrake.math import RigidTransform, RollPitchYaw, RotationMatrix
 from pydrake.multibody.parsing import (Parser, ProcessModelDirectives,
                                        LoadModelDirectives)
 from pydrake.multibody.plant import AddMultibodyPlantSceneGraph
-from pydrake.multibody.tree import SpatialInertia
 from pydrake.perception import BaseField, DepthImageToPointCloud
 from pydrake.systems.framework import DiagramBuilder
 from pydrake.systems.sensors import RgbdSensor

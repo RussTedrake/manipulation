@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+
+<html>
+
+  <head>
+    <title>Robotic Manipulation: Force Control</title>
+    <meta name="Robotic Manipulation: Force Control" content="text/html; charset=utf-8;" />
+    <link rel="canonical" href="http://manipulation.csail.mit.edu/force_control.html" />
+
+    <script src="https://hypothes.is/embed.js" async></script>
+    <script type="text/javascript" src="htmlbook/book.js"></script>
+
+    <script src="htmlbook/mathjax-config.js" defer></script> 
+    <script type="text/javascript" id="MathJax-script" defer
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js">
+    </script>
+    <script>window.MathJax || document.write('<script type="text/javascript" src="htmlbook/MathJax/es5/tex-chtml.js" defer><\/script>')</script>
+
+    <link rel="stylesheet" href="htmlbook/highlight/styles/default.css">
+    <script src="htmlbook/highlight/highlight.pack.js"></script> <!-- http://highlightjs.readthedocs.io/en/latest/css-classes-reference.html#language-names-and-aliases -->
+    <script>hljs.initHighlightingOnLoad();</script>
+
+    <link rel="stylesheet" type="text/css" href="htmlbook/book.css" />
+  </head>
+
+<body onload="loadChapter('manipulation');">
+
+<div data-type="titlepage">
+  <header>
+    <h1><a href="index.html" style="text-decoration:none;">Robotic Manipulation</a></h1>
+    <p data-type="subtitle">Perception, Planning, and Control</p> 
+    <p style="font-size: 18px;"><a href="http://people.csail.mit.edu/russt/">Russ Tedrake</a></p>
+    <p style="font-size: 14px; text-align: right;"> 
+      &copy; Russ Tedrake, 2020<br/>
+      Last modified <span id="last_modified"></span>.</br>
+      <script>
+      var d = new Date(document.lastModified);
+      document.getElementById("last_modified").innerHTML = d.getFullYear() + "-" + (d.getMonth()+1) + "-" + d.getDate();</script>
+      <a href="misc.html">How to cite these notes, use annotations, and give feedback.</a><br/>
+    </p>
+  </header>
+</div>
+
+<p><b>Note:</b> These are working notes used for <a
+href="http://manipulation.csail.mit.edu/Fall2020/">a course being taught
+at MIT</a>. They will be updated throughout the Fall 2020 semester.  <!-- <a 
+href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos are available on YouTube</a>.--></p> 
+
+<table style="width:100%;"><tr style="width:100%">
+  <td style="width:33%;text-align:left;"><a class="previous_chapter" href=segmentation.html>Previous Chapter</a></td>
+  <td style="width:33%;text-align:center;"><a href=index.html>Table of contents</a></td>
+  <td style="width:33%;text-align:right;"><a class="next_chapter" href=drake.html>Next Chapter</a></td>
+</tr></table>
+
+
+<!-- EVERYTHING ABOVE THIS LINE IS OVERWRITTEN BY THE INSTALL SCRIPT -->
+<chapter style="counter-reset: chapter 6"><h1>Force Control</h1>
+
+  <p>Over the last few chapters, we've developed a great initial toolkit for
+  perceiving objects (or piles of objects) in a scene, planning grasps, and
+  moving the arm to grasp.  But there is a lot more to manipulation than
+  grasping!</p>
+
+  <p>In fact, the signs have already been there if you were paying close
+  attention.  I'm sure that you noticed image number 9954 in my clutter
+  segmentation dataset.  Good old <code>09954.png</code>. Just in case you
+  happened to miss it, here it is again.</p>
+
+  <figure><img style="width:60%" src="data/09954.png"/></figure>
+
+  <p>I don't know how many of the other 9999 random scenes that we generated are
+  going to have this problem, but 9954 makes it nice and clear.  How in the
+  world are we going to pick up that "Cheez-it" cracker box with our
+  two-fingered gripper?  (I know there are a few of you out there thinking about
+  how easy that scene is for your suction gripper, but suction along isn't going
+  to solve all of our problems either.)</p>
+
+  <p>Just for fun, I asked my daughter to try a similar task with the
+  "two-fingered gripper" I had in my kitchen.  Check out the video below.  The
+  manipulation problem just got a lot more interesting!</p>
+
+  <figure><figcaption>My daughter performing a quick approximation of the task.  (video coming soon)</figcaption></figure>
+
+  <p>The term <i>nonprehensile manipulation</i> means "manipulation without
+  grasping", and humans do it often.  It is easy to appreciate this fact when we
+  think about pushing an object that is too big to grasp (e.g. an office chair).
+  But if you pay close attention, you will see that humans make use of
+  strategies like sliding and environmental contact often, even when they are
+  grasping. These strategies just come to the forefront in non-grasping
+  manipulation.</p>
+
+  <p>As we build up our toolkit for prehensile and nonprehensile manipulation,
+  one of the things that is missing from our discussion so far, which has been
+  predominantly kinematic, has been thinking about forces.  This chapter aims to
+  begin that discussion.  By the end, I hope you'll agree that we have a pretty
+  satisfying way to flip up that box!</p>
+
+</chapter>
+<!-- EVERYTHING BELOW THIS LINE IS OVERWRITTEN BY THE INSTALL SCRIPT -->
+
+<table style="width:100%;"><tr style="width:100%">
+  <td style="width:33%;text-align:left;"><a class="previous_chapter" href=segmentation.html>Previous Chapter</a></td>
+  <td style="width:33%;text-align:center;"><a href=index.html>Table of contents</a></td>
+  <td style="width:33%;text-align:right;"><a class="next_chapter" href=drake.html>Next Chapter</a></td>
+</tr></table>
+
+<div id="footer">
+  <hr>
+  <table style="width:100%;">
+    <tr><td><a href="https://accessibility.mit.edu/">Accessibility</a></td><td style="text-align:right">&copy; Russ
+      Tedrake, 2020</td></tr>
+  </table>
+</div>
+
+
+</body>
+</html>

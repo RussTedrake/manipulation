@@ -66,6 +66,15 @@ rt_ipynb_test(
     ],
 )
 
+rt_ipynb_test(
+    name = "force_control",
+    srcs = ["force_control.ipynb"],
+    data = ["//manipulation/models:models"],
+    deps = [
+        "//manipulation",
+    ],
+)
+
 filegroup(
     name = "chapters",
     srcs = ["chapters.json"],

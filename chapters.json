@@ -6,6 +6,7 @@
     "pose",
     "clutter",
     "segmentation",
+    "force_control",
     "drake",
     "station",
     "misc"
