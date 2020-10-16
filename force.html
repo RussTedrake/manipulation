@@ -145,8 +145,8 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       <div>
         <script type="text/javascript">
         var force_control = { "name": "ForceControl", 
-          "input_ports" : ["desired_contact_force", "robot_state", '<div style="display:inline; vertical-align:middle">robot_accelerations OR&nbsp; &nbsp; &nbsp;<br/> measured_contact_force</div>'],
-          "output_ports" : ["robot_actuation_input"]
+          "input_ports" : ["desired_contact_force", "robot_state", "robot_accelerations OR &nbsp; &nbsp; &nbsp;<br/> measured_contact_force"],
+          "output_ports" : ["robot_actuation"]
           };
         document.write(system_html(force_control));
         </script>
@@ -179,6 +179,27 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       in contact.</p>
 
       <example><h1>Commanding a constant force</h1>
+
+        <p>Let's see what happens when we run a full simulation which includes
+        not only the non-contact case and the contact case, but also the
+        transition between the two (which involves collision dynamics).  I'll
+        start the point finger next to the box, and apply a constant force
+        command requesting to get a horizontal contact force from the box.  I've
+        drawn the $x$ trajectory of the finger for different (constant) contact
+        force commands.</p>
+
+        <figure><img style="margin-top:-20px; width:70%"
+        src="data/constant_force_box.svg"><figcaption>This is a plot of the
+        horizontal position of the finger as a function of time, given different
+        constant desired force commands.</figcaption></figure>
+        
+        <p>For all strictly positive desired force commands,
+        the finger will accelerate at a constant rate until it collides with the
+        box (at $x=0.089$).  For small $f^{c_d}$, the box barely moves.  For an
+        intermediate range of $f^{c_d}$, the collision with the box is enough to
+        start it moving, but friction eventually brings the box and therefore
+        also the finger to rest.  For large values, the finger will keep pushing
+        the box until it runs into the far wall.</p>
       
       </example>
 
