@@ -28,6 +28,9 @@
             <size>0.49 0.05 0.21</size>
           </box>
         </geometry>
+        <material>
+          <diffuse>0.4 0.4 0.4 1.0</diffuse>
+        </material>
       </visual>
       <collision name="left">
         <pose>0 0.29 0.105 0 0 0</pose>
@@ -44,6 +47,9 @@
             <size>0.49 0.05 0.21</size>
           </box>
         </geometry>
+        <material>
+          <diffuse>0.4 0.4 0.4 1.0</diffuse>
+        </material>
       </visual>
       <collision name="right">
         <pose>0 -0.29 0.105 0 0 0</pose>
@@ -60,6 +66,9 @@
             <size>0.49 0.63 0.015</size>
           </box>
         </geometry>
+        <material>
+          <diffuse>0.4 0.4 0.4 1.0</diffuse>
+        </material>
       </visual>
       <collision name="bottom">
         <pose>0.0 0.0 0.0075 0 0 0</pose>

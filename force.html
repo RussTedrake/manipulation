@@ -110,8 +110,10 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
     as a small sphere, and modeled two control inputs as providing force
     directly on the $x$ and $z$ coordinates of the point mass.</p>
 
-    <figure><figcaption>The simple model: a point finger, a cracker box, and the
-    bin all in 2D.</figcaption></figure>
+    <figure><img style="width:60%"
+    src="data/point_finger_cracker_box.png"/><figcaption>The simple model: a
+    point finger, a cracker box, and the bin all in 2D.  The green arrows are
+    the contact forces.</figcaption></figure>
 
     <p>Even in this simple model, and throughout the discussions in this
     chapter, we will have two dynamic models that we care about.  The first is
@@ -122,14 +124,76 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
     the finger, and experiences unmodelled contact forces.  By design, the
     equations of this second model are particularly simple: $$\begin{bmatrix}m &
     0 \\ 0 & m \end{bmatrix} \dot{v} = m \begin{bmatrix}\ddot{x} \\ \ddot{z}
-    \end{bmatrix} = -mg + \begin{bmatrix} u_x \\ u_z \end{bmatrix} + \sum_i
-    f^{c_i},$$ where $m$ is the mass, $g$ is the gravity vector, $u$ is the
-    control input vector, and $f^{c_i}$ are the contact forces.  Notably absent
-    is the contact Jacobian which normally pre-multiplies the contact forces
-    $\sum_i J_i^T f^{c_i};$ in the case of a point finger this Jacobian is
-    always the identity matrix, which justifies this nice simplification.</p>
+    \end{bmatrix} = -mg + \begin{bmatrix} u_x \\ u_z \end{bmatrix} + f^c,$$
+    where $m$ is the mass, $g$ is the gravity vector, $u$ is the control input
+    vector, and $f^c$ is the contact force.  Notably absent is the contact
+    Jacobian which normally pre-multiplies the contact forces $\sum_i J_i^T
+    f^{c_i};$ in the case of a point finger this Jacobian is always the identity
+    matrix, and there is only one point at which contact can be made, so there
+    is no meaningful reason to distinguish between multiple forces.</p>
 
     <subsection><h1>(Direct) force control</h1>
+
+      <p>Almost always, we implement a low-level controller that converts some
+      more intuitive command interface down into the generalized force inputs on
+      the robot.  In the case of direct force control, the abstraction that we
+      want is to be able to directly "control" the contact forces.  (In the
+      general case, we must specify the contact location to provide this
+      interface; again the point finger allows us to ignore that detail for the
+      moment).</p>
+      
+      <div>
+        <script type="text/javascript">
+        var force_control = { "name": "ForceControl", 
+          "input_ports" : ["desired_contact_force", "robot_state", '<div style="display:inline; vertical-align:middle">robot_accelerations OR&nbsp; &nbsp; &nbsp;<br/> measured_contact_force</div>'],
+          "output_ports" : ["robot_actuation_input"]
+          };
+        document.write(system_html(force_control));
+        </script>
+      </div>
+
+      <p>Let us assume that the robot is already in contact.  What information
+      do we need to regulate the contact forces?  Certainly we need the desired
+      contact force, $f^{c_d}$.  In general, we will need the robot's state
+      (though in the immediate example, the dynamics of our point mass are not
+      state dependent).  But we also need to either (1) measure the robot
+      accelerations (which we've tried to avoid), (2) assume the robot
+      accelerations are zero, or (3) provide a measurement of the contact force
+      so that we can regulate it with feedback.</p>
+      
+      <p>Assuming that the accelerations are (nearly) zero is not a horrible
+      assumption (if we are already in contact) for most manipulation tasks,
+      where the movements are relatively slow.  Let's assume it for now, and
+      revisit the assumption later.  In this case, our equations of motion
+      reduce to $$f^c = mg - u.$$  Our force controller implementation can be as
+      simple as $u = -mg - f^{c_d}.$  This assumes only that we know the mass of
+      the robot.</p>
+
+      <p>What happens when the robot is not in contact?  In this case, we cannot
+      reasonably ignore the accelerations, and applying the same control results
+      in $m\dot{v} = - f^{c_d}.$  That's not all bad.  In fact, it's one of the
+      defining features of force control that makes it very appealing.  When you
+      specify a desired force and don't get it, the result is accelerating the
+      contact point in the (opposite) direction of the desired force.  In
+      practice, this (locally) tends to bring you into contact when you are not
+      in contact.</p>
+
+      <example><h1>Commanding a constant force</h1>
+      
+      </example>
+
+      <p>Consider the consequences of this behavior.  By commanding force, we
+      can write a controller that will come into a nice contact with the box
+      with essentially no information about the geometry of the box (we just
+      need enough perception to start our finger in a location for which a
+      straight-line approach will reach the box).</p>
+
+      <p>This is one of the reasons that researchers working on legged robots
+      like force control.  On a force-capable walking robot, we might mimic
+      position control during the "swing phase", to get our foot approximately
+      where we are hoping to step.  But then we switch to a force control mode
+      to actually set the foot down on the ground.  This can significantly
+      reduce the requirements for accurate sensing of the terrain.</p>
 
     </subsection>
 
