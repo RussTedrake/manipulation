@@ -67,8 +67,8 @@ rt_ipynb_test(
 )
 
 rt_ipynb_test(
-    name = "force_control",
-    srcs = ["force_control.ipynb"],
+    name = "force",
+    srcs = ["force.ipynb"],
     data = ["//manipulation/models:models"],
     deps = [
         "//manipulation",

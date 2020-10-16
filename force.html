@@ -5,7 +5,7 @@
   <head>
     <title>Robotic Manipulation: Force Control</title>
     <meta name="Robotic Manipulation: Force Control" content="text/html; charset=utf-8;" />
-    <link rel="canonical" href="http://manipulation.csail.mit.edu/force_control.html" />
+    <link rel="canonical" href="http://manipulation.csail.mit.edu/force.html" />
 
     <script src="https://hypothes.is/embed.js" async></script>
     <script type="text/javascript" src="htmlbook/book.js"></script>
@@ -72,14 +72,16 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
   going to have this problem, but 9954 makes it nice and clear.  How in the
   world are we going to pick up that "Cheez-it" cracker box with our
   two-fingered gripper?  (I know there are a few of you out there thinking about
-  how easy that scene is for your suction gripper, but suction along isn't going
+  how easy that scene is for your suction gripper, but suction alone isn't going
   to solve all of our problems either.)</p>
 
-  <p>Just for fun, I asked my daughter to try a similar task with the
-  "two-fingered gripper" I had in my kitchen.  Check out the video below.  The
-  manipulation problem just got a lot more interesting!</p>
-
-  <figure><figcaption>My daughter performing a quick approximation of the task.  (video coming soon)</figcaption></figure>
+  <figure><<iframe width="560" height="315"
+  src="https://www.youtube.com/embed/XqRczI4Fepk?mute=1&rel=0" frameborder="0"
+  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope;
+  picture-in-picture" allowfullscreen></iframe><figcaption>Just for fun, I asked
+  my daughter to try a similar task with the "two-fingered gripper" I scrounged
+  from my kitchen. How are we to program something like
+  that!</figcaption></figure>
 
   <p>The term <i>nonprehensile manipulation</i> means "manipulation without
   grasping", and humans do it often.  It is easy to appreciate this fact when we
@@ -94,6 +96,80 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
   predominantly kinematic, has been thinking about forces.  This chapter aims to
   begin that discussion.  By the end, I hope you'll agree that we have a pretty
   satisfying way to flip up that box!</p>
+
+  <section><h1>A simple model</h1>
+  
+    <p>As always in our battle against complexity, I want to find a setup that
+    is as simple as possible (but no simpler)!  Here is my proposal for the
+    box-flipping example.  First, I will restrict all motion to a 2D plane; this
+    allows me to chop off two sides of the bin (for you to easily see inside),
+    but also drops the number of degrees of freedom we have to consider.  In
+    particular, we can avoid the quaternion floating base coordinates, by adding
+    a <code>PlanarJoint</code> to the box.  Instead of using a complete gripper,
+    let's start even simpler and just use a "point finger".  I've visualized it
+    as a small sphere, and modeled two control inputs as providing force
+    directly on the $x$ and $z$ coordinates of the point mass.</p>
+
+    <figure><figcaption>The simple model: a point finger, a cracker box, and the
+    bin all in 2D.</figcaption></figure>
+
+    <p>Even in this simple model, and throughout the discussions in this
+    chapter, we will have two dynamic models that we care about.  The first is
+    the full dynamic model used for simulation: it contains the finger, the box,
+    and the bin, and has a total of 5 degrees of freedom ($x, z, \theta$ for the
+    box and $x, z$ for the finger).  The second is the robot model used for
+    designing the controllers: this model has just the two degrees of freedom of
+    the finger, and experiences unmodelled contact forces.  By design, the
+    equations of this second model are particularly simple: $$\begin{bmatrix}m &
+    0 \\ 0 & m \end{bmatrix} \dot{v} = m \begin{bmatrix}\ddot{x} \\ \ddot{z}
+    \end{bmatrix} = -mg + \begin{bmatrix} u_x \\ u_z \end{bmatrix} + \sum_i
+    f^{c_i},$$ where $m$ is the mass, $g$ is the gravity vector, $u$ is the
+    control input vector, and $f^{c_i}$ are the contact forces.  Notably absent
+    is the contact Jacobian which normally pre-multiplies the contact forces
+    $\sum_i J_i^T f^{c_i};$ in the case of a point finger this Jacobian is
+    always the identity matrix, which justifies this nice simplification.</p>
+
+    <subsection><h1>(Direct) force control</h1>
+
+    </subsection>
+
+    <subsection><h1>A force-based "flip-up" strategy</h1>
+
+    </subsection>
+
+    <subsection><h1>Indirect force control (impedance and admittance)</h1>
+    
+    </subsection>
+
+    <subsection><h1>An impedance-based "flip-up" strategy</h1>
+    
+    </subsection>
+
+  </section>
+
+  <section><h1>Peg in hole</h1>
+
+    <p>Call-out to the classic great example for force control.  Remote-centered
+    compliance...</p>
+  
+    <p>Also for opening doors, tool use, ...</p>
+  </section>
+
+  <section><h1>Force control with the arm</h1>
+
+    <subsection><h1>Direct Force Control</h1>
+
+    </subsection>
+
+    <subsection><h1>Impedance and Admittance Control</h1>
+    
+    </subsection>
+  
+  </section>
+
+  <section><h1>Impedance control on the iiwa</h1>
+  
+  </section>
 
 </chapter>
 <!-- EVERYTHING BELOW THIS LINE IS OVERWRITTEN BY THE INSTALL SCRIPT -->
