@@ -250,8 +250,8 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
         Constrained least-squares is as natural a formulation for this as any!
         Here is one version: \begin{align*}\min_{f^C_W} \quad& \left|
         f^{C}_{C_x} - \text{PID}(\theta_d, \theta) \right|^2,\\ \subjto \quad &
-        \hat{m}g -
-        f^C_{W_z} \le -\hat{\mu}_A f^C_{W_x}, \\  & f^C_{C_z} \ge 0,
+        f^C_{W_x} \le -\hat\mu_A (\hat{m}g -
+        f^C_{W_z}), \\  & f^C_{C_z} \ge 0,
         \qquad |f^C_{C_x}| \le \hat\mu_C f^C_{C_z}, \\ \text{with} \quad &
         {}^WR^C(\theta) = \begin{bmatrix} -\sin\theta & -\cos\theta \\
         \cos\theta & -\sin\theta \end{bmatrix}.\end{align*} I've used
@@ -261,12 +261,11 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
         <ul style="margin-top:-10px; margin-bottom:5px"><li>We have some
         approximation, $\hat\theta$, for the orientation of the box.  We could
         obtain this from a point cloud normal estimation, or even from tracking
-        the location of the fingers relative to the wall of the bin.</li>
+        the path of the fingers.</li>
         <li>We have conservative estimates of the coefficients of static
         friction between the wall and the box, $\hat\mu^A$, and between the
         finger and the box, $\hat\mu^C$, as well as the box mass, $\hat{m}.$
-        (I'll try to convince you that these estimates can be loose; the only
-        disadvantage is you might eventually crush the box!)</li>
+        (I'll try to convince you that these estimates can be loose).</li>
         <li>We assume that $\theta_d(t)$ changes slowly (in particular, that the
         box accelerations are small), so that we can mostly ignore the unknown
         inertial terms from the box .</li>
@@ -281,16 +280,19 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
         task.</p>  
         
         <p>Once the box has rotated up off the bin bottom, the only forces on
-        the box are the gravitational force, the force that the wall applies on
-        the box, call it $f^A$, and the contact force, $f^C$, that the finger
-        applies on the box.  By convention, the contact frames $A$ and $C$ have
-        the $z$ axis aligned with the contact normal (pointing into the box),
-        and the $x$ axis aligned with the wall of the box.  The friction cone
-        constraints are: \begin{gather*}f^A_{A_z} = f^A_{W_x} \ge 0, \qquad
-        |f^A_{A_x}| = |f^A_{W_z}| \le \mu^A f^A_{W_x}, \\ f^C_{C_z} \ge 0,
-        \qquad |f^C_{C_x}| \le \mu^C f^C_{C_z}.\end{gather*}  The orientation of
-        frame $C$ is a function of the box orientation, ${}^WR^C(\theta)$, and
-        is written above.</p>
+        the box are the gravitational force, the force that the bin applies on
+        the box corner, call it $f^A$, and the contact force, $f^C$, that the
+        finger applies on the box.  By convention, the contact frames $A$ and
+        $C$ have the $z$ axis aligned with the contact normal (pointing into the
+        box).  Remember the contact geometry we use for the cracker box has
+        small spheres in the corners; so both of these contacts are "sphere on
+        box", with the box normals defining the contact normals (e.g. the $x$
+        axis is aligned with the wall of the box), and ${}^WR^A = I$.  The
+        friction cone constraints are: \begin{gather*}f^A_{W_z} \ge
+        0, \qquad |f^A_{W_x}| \le \mu^A f^A_{W_z}, \\ f^C_{C_z}
+        \ge 0, \qquad |f^C_{C_x}| \le \mu^C f^C_{C_z}.\end{gather*}  The
+        orientation of frame $C$ is a function of the box orientation,
+        ${}^WR^C(\theta)$, and is written above.</p>
 
         <todo>Add diagrams for the frames</todo>
 
@@ -303,38 +305,26 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
         these parameters, but it helps to understand them!  If we move slowly
         (the velocities and accelerations are nearly zero), then we can write
         $$f^A_{W_x} = -f^C_{W_x}, \qquad f^A_{W_z} = mg - f^C_{W_z}.$$ Taken
-        together, the friction cone constraints on the wall imply the following
-        constraints on our finger contact: $$mg - f^C_{W_z} \le -\mu_A
-        f^C_{W_x}.$$  Note that the <a
+        together, the friction cone constraints on the bin imply the following
+        constraints on our finger contact: $$ f^C_{W_x} \le -\mu_A (mg -
+        f^C_{W_z}).$$  Note that the <a
         href="http://underactuated.mit.edu/multibody.html#bilateral">full
         dynamic derivation</a> is not too much harder; I did it on paper by
-        writing ${}^{CM}p^A = [\frac{h}{2}, \frac{w}{2}]^T,$ the height and
-        width of the box. Then one can write the no-slip at the wall constraint
-        as $\phi(q) = {}^{CM}p^A_{W_z} = \text{constant}$ which implies that
-        $\ddot{\phi} = 0,$ which gives the full expression for $f^A_{W_z}$ (as
-        long as we're in the friction cone).</p>
+        writing ${}^{CM}p^A = [-\frac{h}{2}, -\frac{w}{2}]^T,$ with the height,
+        $h$, and width, $w$ of the box. Then one can write the no-slip at the
+        bin constraint as $\phi(q) = {}^{CM}p^A_{W_x} = \text{constant}$ which
+        implies that $\ddot{\phi} = 0,$ which gives the full expression for
+        $f^A_{W_x}$ (as long as we're in the friction cone).</p>
 
-        <p>Now here's a nice approximation.  If we've managed to make contact
-        relatively near the top of the box, then we can approximate
-        $${}^Ap^{C}_W \times f^C_W \approx -{}^Ap^C_{C_z} f^C_{C_x}.$$  In
-        words, the moment produce by the finger contact is approximately the
-        tangential force on the box (times the width of the box).  I therefore
-        claim that choosing $$f^{C_d}_{C_x} = \text{PID}(\theta_d, \theta),$$ is
-        a good strategy for regulating the orientation of the box.  It does not
-        assume we know the box geometry nor inertial properties.</p>
-
-        <p>I don't want to drag out the analysis too much, but you can apply a
-        similar thinking to the "end game" of this flip-up strategy.  At some
-        point the normals of the box will be pointed more down than horizontal,
-        and the friction cone constraints on $f^C$ will prevent us from further
-        increasing $\theta$.  And we actually want the box to fall, eventually.
-        If the center of mass of the box is on the wall side of the bottom
-        corner, then we can expect the box to fall passively into place.  But
-        even if that is not the case, we can push <i>down</i> on the top corner
-        to complete the rotation.  Again, the position trajectory of the finger
-        may be complicated, and quite dependent on the particular parameters of
-        the box, but a quite generic force command can accomplish the task
-        nicely.</p>
+        <p>Now here's a nice approximation.  By choosing to make contact near
+        the bottom of the box (since we know where the bin is), we can
+        approximate $${}^Ap^{C}_W \times f^C_W \approx -{}^Ap^C_{C_z}
+        f^C_{C_x}.$$  In words, the moment produce by the finger contact is
+        approximately the tangential force on the box (times the width of the
+        box).  I therefore claim that choosing $$f^{C_d}_{C_x} =
+        \text{PID}(\theta_d, \theta),$$ is a good strategy for regulating the
+        orientation of the box.  It does not assume we know the box geometry nor
+        inertial properties.</p>
 
         <p>That's a lot of details, but all to justify a very simple and robust
         controller.</p>
