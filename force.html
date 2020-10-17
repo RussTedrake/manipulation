@@ -232,7 +232,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       produce a moment about the top corner in order to generate a controlled
       rotation.</p>
 
-      <figure><img style="margin-top:-20px; width:60%" src="data/force_flip_up.png"></figcaption></figure>
+      <figure><img style="margin-top:-20px; width:60%" src="data/force_flip_up.png"><figcaption>Flipping the box.  <a href="data/force_flip_up.html">Click here</a> for an animation of the controller we'll write in the example below.  But it's worth running the code, where you can see the contact force visualization, too!</figcaption></figure>
 
       <p>These conditions are very natural to express in terms of forces.  And
       once again, we can implement this strategy with very little information
@@ -250,7 +250,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
         Constrained least-squares is as natural a formulation for this as any!
         Here is one version: \begin{align*}\min_{f^C_W} \quad& \left|
         f^{C}_{C_x} - \text{PID}(\theta_d, \theta) \right|^2,\\ \subjto \quad &
-        f^C_{W_x} \le -\hat\mu_A (\hat{m}g -
+        |f^C_{W_x}| \le \hat\mu_A (\hat{m}g -
         f^C_{W_z}), \\  & f^C_{C_z} \ge 0,
         \qquad |f^C_{C_x}| \le \hat\mu_C f^C_{C_z}, \\ \text{with} \quad &
         {}^WR^C(\theta) = \begin{bmatrix} -\sin\theta & -\cos\theta \\
@@ -265,7 +265,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
         <li>We have conservative estimates of the coefficients of static
         friction between the wall and the box, $\hat\mu^A$, and between the
         finger and the box, $\hat\mu^C$, as well as the box mass, $\hat{m}.$
-        (I'll try to convince you that these estimates can be loose).</li>
+        (You should experiment and decide for yourself whether these estimates can be loose).</li>
         <li>We assume that $\theta_d(t)$ changes slowly (in particular, that the
         box accelerations are small), so that we can mostly ignore the unknown
         inertial terms from the box .</li>
@@ -306,7 +306,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
         (the velocities and accelerations are nearly zero), then we can write
         $$f^A_{W_x} = -f^C_{W_x}, \qquad f^A_{W_z} = mg - f^C_{W_z}.$$ Taken
         together, the friction cone constraints on the bin imply the following
-        constraints on our finger contact: $$ f^C_{W_x} \le -\mu_A (mg -
+        constraints on our finger contact: $$|f^C_{W_x}| \le \mu_A (mg -
         f^C_{W_z}).$$  Note that the <a
         href="http://underactuated.mit.edu/multibody.html#bilateral">full
         dynamic derivation</a> is not too much harder; I did it on paper by
