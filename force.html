@@ -132,6 +132,9 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
     matrix, and there is only one point at which contact can be made, so there
     is no meaningful reason to distinguish between multiple forces.</p>
 
+    <todo>Add Jiaji's video?</todo>
+    <todo>Check yourself: can the finger move the box?  (only if the coefficient of friction is bigger).</todo>
+
     <subsection><h1>(Direct) force control</h1>
 
       <p>Almost always, we implement a low-level controller that converts some
@@ -200,6 +203,8 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
         start it moving, but friction eventually brings the box and therefore
         also the finger to rest.  For large values, the finger will keep pushing
         the box until it runs into the far wall.</p>
+
+        <todo>Add colab link</todo>
       
       </example>
 
@@ -210,7 +215,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       straight-line approach will reach the box).</p>
 
       <p>This is one of the reasons that researchers working on legged robots
-      like force control.  On a force-capable walking robot, we might mimic
+      also like force control.  On a force-capable walking robot, we might mimic
       position control during the "swing phase", to get our foot approximately
       where we are hoping to step.  But then we switch to a force control mode
       to actually set the foot down on the ground.  This can significantly
@@ -219,6 +224,125 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
     </subsection>
 
     <subsection><h1>A force-based "flip-up" strategy</h1>
+
+      <p>Here is my proposal for a simple strategy for flipping up the box. Once
+      in contact, we will use the contact force from the finger to apply a
+      sufficient horizontal force so that the top corner of the box does not
+      slip.  With the remaining degree of freedom in the contact force, we will
+      produce a moment about the top corner in order to generate a controlled
+      rotation.</p>
+
+      <figure><img style="margin-top:-20px; width:60%" src="data/force_flip_up.png"></figcaption></figure>
+
+      <p>These conditions are very natural to express in terms of forces.  And
+      once again, we can implement this strategy with very little information
+      about the box.  The position of the finger will evolve naturally as we
+      apply the contact forces.  It's harder for me to imagine a how to write an
+      equally robust strategy using a (high-gain) position-controller finger; it
+      would likely require many more assumptions about the geometry (and
+      possibly the mass) of the box.</p>
+
+      <example><h1>A force-based flip-up strategy</h1>
+      
+        <p>Let's encode the textual description above.  The friction cone
+        provides (linear inequality) constraints on the forces we want to apply.
+        Within those constraints, we would like to rotate up the box.
+        Constrained least-squares is as natural a formulation for this as any!
+        Here is one version: \begin{align*}\min_{f^C_W} \quad& \left|
+        f^{C}_{C_x} - \text{PID}(\theta_d, \theta) \right|^2,\\ \subjto \quad &
+        \hat{m}g -
+        f^C_{W_z} \le -\hat{\mu}_A f^C_{W_x}, \\  & f^C_{C_z} \ge 0,
+        \qquad |f^C_{C_x}| \le \hat\mu_C f^C_{C_z}, \\ \text{with} \quad &
+        {}^WR^C(\theta) = \begin{bmatrix} -\sin\theta & -\cos\theta \\
+        \cos\theta & -\sin\theta \end{bmatrix}.\end{align*} I've used
+        $\text{PID}$ here as shorthand for a simple
+        proportional-integral-derivative term. Implementing this strategy
+        assumes:
+        <ul style="margin-top:-10px; margin-bottom:5px"><li>We have some
+        approximation, $\hat\theta$, for the orientation of the box.  We could
+        obtain this from a point cloud normal estimation, or even from tracking
+        the location of the fingers relative to the wall of the bin.</li>
+        <li>We have conservative estimates of the coefficients of static
+        friction between the wall and the box, $\hat\mu^A$, and between the
+        finger and the box, $\hat\mu^C$, as well as the box mass, $\hat{m}.$
+        (I'll try to convince you that these estimates can be loose; the only
+        disadvantage is you might eventually crush the box!)</li>
+        <li>We assume that $\theta_d(t)$ changes slowly (in particular, that the
+        box accelerations are small), so that we can mostly ignore the unknown
+        inertial terms from the box .</li>
+<!---        
+        <li>We assume that the finger makes contact roughly near the top of the
+        box, but there is no other dependency on the size of the box.</li>
+        -->        
+        </ul> Apart from the finger making some contact, there are no other
+        assumptions about the shape of the box!</p>
+
+        <p>To understand this controller, let's break down the dynamics of the
+        task.</p>  
+        
+        <p>Once the box has rotated up off the bin bottom, the only forces on
+        the box are the gravitational force, the force that the wall applies on
+        the box, call it $f^A$, and the contact force, $f^C$, that the finger
+        applies on the box.  By convention, the contact frames $A$ and $C$ have
+        the $z$ axis aligned with the contact normal (pointing into the box),
+        and the $x$ axis aligned with the wall of the box.  The friction cone
+        constraints are: \begin{gather*}f^A_{A_z} = f^A_{W_x} \ge 0, \qquad
+        |f^A_{A_x}| = |f^A_{W_z}| \le \mu^A f^A_{W_x}, \\ f^C_{C_z} \ge 0,
+        \qquad |f^C_{C_x}| \le \mu^C f^C_{C_z}.\end{gather*}  The orientation of
+        frame $C$ is a function of the box orientation, ${}^WR^C(\theta)$, and
+        is written above.</p>
+
+        <todo>Add diagrams for the frames</todo>
+
+        <p>The dynamics of the box can be written as \begin{gather*} m\ddot{x} =
+        f^A_{W_x} + f^C_{W_x} \\ m \ddot{z} = f^A_{W_z} + f^C_{W_z} - mg \\
+        I\ddot\theta = ^Ap^{CM}_W \times \begin{bmatrix} 0 \\ -mg\end{bmatrix} +
+        {}^Ap^C_W \times f^C_W, \end{gather*} where $I$ is the moment of inertia
+        of the box taken around the top corner, and $p^{CM}$ is the position of
+        the center of mass.  We don't want our controller to depend on most of
+        these parameters, but it helps to understand them!  If we move slowly
+        (the velocities and accelerations are nearly zero), then we can write
+        $$f^A_{W_x} = -f^C_{W_x}, \qquad f^A_{W_z} = mg - f^C_{W_z}.$$ Taken
+        together, the friction cone constraints on the wall imply the following
+        constraints on our finger contact: $$mg - f^C_{W_z} \le -\mu_A
+        f^C_{W_x}.$$  Note that the <a
+        href="http://underactuated.mit.edu/multibody.html#bilateral">full
+        dynamic derivation</a> is not too much harder; I did it on paper by
+        writing ${}^{CM}p^A = [\frac{h}{2}, \frac{w}{2}]^T,$ the height and
+        width of the box. Then one can write the no-slip at the wall constraint
+        as $\phi(q) = {}^{CM}p^A_{W_z} = \text{constant}$ which implies that
+        $\ddot{\phi} = 0,$ which gives the full expression for $f^A_{W_z}$ (as
+        long as we're in the friction cone).</p>
+
+        <p>Now here's a nice approximation.  If we've managed to make contact
+        relatively near the top of the box, then we can approximate
+        $${}^Ap^{C}_W \times f^C_W \approx -{}^Ap^C_{C_z} f^C_{C_x}.$$  In
+        words, the moment produce by the finger contact is approximately the
+        tangential force on the box (times the width of the box).  I therefore
+        claim that choosing $$f^{C_d}_{C_x} = \text{PID}(\theta_d, \theta),$$ is
+        a good strategy for regulating the orientation of the box.  It does not
+        assume we know the box geometry nor inertial properties.</p>
+
+        <p>That's a lot of details, but all to justify a very simple and robust
+        controller.</p>
+
+        <todo>Clean up code.</todo>
+        <todo>Add colab link</todo>
+        <todo>Save html recording</todo>
+        <todo>Generate random boxes.</todo>
+
+      </example>
+
+      <p>We have multiple controllers in this example.  The first is the
+      low-level force controller that takes a desired contact force and sends
+      commands to the robot to attempt to regulate this force.  The second is
+      the higher-level controller that is looking at the orientation of the box
+      and deciding which forces to request from the low-level controller.</p>
+
+      <p>Please also understand that this is not some unique or optimal strategy
+      for box flipping.  I'm simply trying to demonstrate that sometimes
+      controllers which might be difficult to express otherwise can easily be
+      expressed in terms of forces!</p>
 
     </subsection>
 
