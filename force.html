@@ -75,7 +75,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
   how easy that scene is for your suction gripper, but suction alone isn't going
   to solve all of our problems either.)</p>
 
-  <figure><<iframe width="560" height="315"
+  <figure><iframe width="560" height="315"
   src="https://www.youtube.com/embed/XqRczI4Fepk?mute=1&rel=0" frameborder="0"
   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope;
   picture-in-picture" allowfullscreen></iframe><figcaption>Just for fun, I asked
@@ -322,6 +322,19 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
         claim that choosing $$f^{C_d}_{C_x} = \text{PID}(\theta_d, \theta),$$ is
         a good strategy for regulating the orientation of the box.  It does not
         assume we know the box geometry nor inertial properties.</p>
+
+        <p>I don't want to drag out the analysis too much, but you can apply a
+        similar thinking to the "end game" of this flip-up strategy.  At some
+        point the normals of the box will be pointed more down than horizontal,
+        and the friction cone constraints on $f^C$ will prevent us from further
+        increasing $\theta$.  And we actually want the box to fall, eventually.
+        If the center of mass of the box is on the wall side of the bottom
+        corner, then we can expect the box to fall passively into place.  But
+        even if that is not the case, we can push <i>down</i> on the top corner
+        to complete the rotation.  Again, the position trajectory of the finger
+        may be complicated, and quite dependent on the particular parameters of
+        the box, but a quite generic force command can accomplish the task
+        nicely.</p>
 
         <p>That's a lot of details, but all to justify a very simple and robust
         controller.</p>
