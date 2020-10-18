@@ -55,6 +55,8 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
 
 <!-- EVERYTHING ABOVE THIS LINE IS OVERWRITTEN BY THE INSTALL SCRIPT -->
 <chapter style="counter-reset: chapter 6"><h1>Force Control</h1>
+  <a style="float:right; margin-top:-80px;" target="force" href="https://colab.research.google.com/github/RussTedrake/manipulation/blob/master/force.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open Corresponding Notebook In Colab"/></a>
+  <div style="clear:right;"></div>
 
   <p>Over the last few chapters, we've developed a great initial toolkit for
   perceiving objects (or piles of objects) in a scene, planning grasps, and
@@ -204,7 +206,10 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
         also the finger to rest.  For large values, the finger will keep pushing
         the box until it runs into the far wall.</p>
 
-        <todo>Add colab link</todo>
+        <p><a target="force"
+          href="https://colab.research.google.com/github/RussTedrake/manipulation/blob/master/force.ipynb#scrollTo=1B0hQuLQZMD0"><img
+          src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
+          </p>
       
       </example>
 
@@ -227,10 +232,9 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
 
       <p>Here is my proposal for a simple strategy for flipping up the box. Once
       in contact, we will use the contact force from the finger to apply a
-      sufficient horizontal force so that the top corner of the box does not
-      slip.  With the remaining degree of freedom in the contact force, we will
-      produce a moment about the top corner in order to generate a controlled
-      rotation.</p>
+      moment around the bottom left corner of the box to generate the rotation.
+      But we'll add constraints to the forces that we apply so that the bottom
+      corner does not slip. </p>
 
       <figure><img style="margin-top:-20px; width:60%" src="data/force_flip_up.png"><figcaption>Flipping the box.  <a href="data/force_flip_up.html">Click here</a> for an animation of the controller we'll write in the example below.  But it's worth running the code, where you can see the contact force visualization, too!</figcaption></figure>
 
@@ -275,6 +279,11 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
         -->        
         </ul> Apart from the finger making some contact, there are no other
         assumptions about the shape of the box!</p>
+
+        <p><a target="force"
+          href="https://colab.research.google.com/github/RussTedrake/manipulation/blob/master/force.ipynb#scrollTo=VBc7zDKlElKu"><img
+          src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
+          </p>
 
         <p>To understand this controller, let's break down the dynamics of the
         task.</p>  
@@ -329,9 +338,6 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
         <p>That's a lot of details, but all to justify a very simple and robust
         controller.</p>
 
-        <todo>Clean up code.</todo>
-        <todo>Add colab link</todo>
-        <todo>Save html recording</todo>
         <todo>Generate random boxes.</todo>
 
       </example>
@@ -350,10 +356,22 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
     </subsection>
 
     <subsection><h1>Indirect force control (impedance and admittance)</h1>
+
+      <p>Expressing our goals in terms of force worked well for my simple example.  But expressing goals only in terms of force can be difficult.  Sometimes we would like to mix position-control objectives with force-control objectives.</p>
+
+      <p>Add a PD controller to the finger.  In joint control, we set the gains high and try to cancel out the unknown transmission dynamics.  Here, we think of setting the gains relatively low, and think of it as programming the mechanical response to disturbances.  Make our robot look like a spring-damper system at the point of contact.</p>
+
+      <p>Impedance control: apply torques to cancel... cite Neville.</p>
     
+      <p>We can still program the response if we have a position-controlled robot with a force-torque sensor.  We measure the force and command a new position.  This is called <i>admittance control</i>.</p>
+
     </subsection>
 
     <subsection><h1>An impedance-based "flip-up" strategy</h1>
+    
+    </subsection>
+
+    <subsection><h1>Hybrid control</h1>
     
     </subsection>
 
@@ -369,6 +387,11 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
 
   <section><h1>Force control with the arm</h1>
 
+    <p>I think that using the floating finger/gripper is a good way to
+    understand the main concepts of force control without the details.  But now
+    it's time to actually implement those strategies using joint commands that
+    we can send to the arm.</p>
+
     <subsection><h1>Direct Force Control</h1>
 
     </subsection>
@@ -380,6 +403,24 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
   </section>
 
   <section><h1>Impedance control on the iiwa</h1>
+
+    <p>As we discussed in the hardware chapter, the iiwa provides provides torque sensing and control via compliant elements at the joints.  The iiwa low-level controller (provided with the robot) actually provides an impedance control interface</p>
+
+    <subsection><h1>Dynamics of elastic-joint robots</h1>
+    
+    </subsection>
+
+    <subsection><h1>Joint impedance control</h1>
+  
+    </subsection>
+
+    <subsection><h1>End-effector impedance control</h1>
+    </subsection>
+
+  </section>
+
+  <section><h1>Putting it all together</h1>
+  
   
   </section>
 
