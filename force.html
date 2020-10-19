@@ -355,20 +355,106 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
 
     </subsection>
 
-    <subsection><h1>Indirect force control (impedance and admittance)</h1>
+    <subsection><h1>Indirect force control</h1>
 
-      <p>Expressing our goals in terms of force worked well for my simple example.  But expressing goals only in terms of force can be difficult.  Sometimes we would like to mix position-control objectives with force-control objectives.</p>
+      <p>There is a nice philosophical alternative to controlling the contact
+      interactions by specifying the forces directly.  Instead, we can program
+      our robot to act like a (simple) mechanical system that reacts to contact
+      forces in a desired way.  This philosophy was described nicely in an
+      important series of papers by Neville Hogan introducing <i>impedance
+      control</i> <elib>Hogan85a+Hogan85b+Hogan85c</elib>.</p>
 
-      <p>Add a PD controller to the finger.  In joint control, we set the gains high and try to cancel out the unknown transmission dynamics.  Here, we think of setting the gains relatively low, and think of it as programming the mechanical response to disturbances.  Make our robot look like a spring-damper system at the point of contact.</p>
+      <p>This approach is conceptually very nice.  With only knowledge of the
+      parameters of the robot itself (not the environment), we can write a
+      controller so that when we push on the end-effector, the end-effector
+      pushes back (using the entire robot) as if you were pushing on, for
+      instance, a simple spring-mass-damper system.  Rather than attempting to
+      achieve manipulation by moving the end-effector rigidly through a series
+      of position commands, we can move the set points (and perhaps stiffness)
+      of a soft virtual spring, and allow this virtual spring to generate our
+      desired contact forces.</p>
+      
+      <p>This approach can also have nice advantages for guaranteeing that your
+      robot won't go unstable even in the face of unmodeled contact
+      interactions.  If the robot acts like a dissipative system and the
+      environment is a dissipative system, then the entire system will be
+      stable.  Arguments of this form can ensure stability for even very complex
+      system, building on the rich literature on <i>passivity theory</i> or more
+      generally <i>Port-Hamiltonian</i>
+      systems<elib>Duindam09</elib>.</p>
 
-      <p>Impedance control: apply torques to cancel... cite Neville.</p>
-    
-      <p>We can still program the response if we have a position-controlled robot with a force-torque sensor.  We measure the force and command a new position.  This is called <i>admittance control</i>.</p>
+      <p>Our simple model with a point finger is ideal for understanding the
+      essence of indirect force control.  The original equations of motion of
+      our system are $$m\begin{bmatrix}\ddot{x} \\ \ddot{z} \end{bmatrix} = u +
+      f^c.$$  We can write a simple controller to make this system act, instead,
+      like (passive) mass-spring-damper system: $$m \begin{bmatrix}\ddot{x} \\
+      \ddot{z} \end{bmatrix} + b \begin{bmatrix} \dot{x} \\ \dot{z}
+      \end{bmatrix} + k \begin{bmatrix} x - x_d \\ z - z_d \end{bmatrix} =
+      f^c,$$ with the rest position of the spring at $(x_d, z_d).$  The
+      controller that implements this follows easily; in the point finger case
+      has exactly the familiar form of a proportional-derivative (PD)
+      controller!</p>
+
+      <p>The literature on indirect force control has a lot of terminology and
+      implementation details that are important to get right in practice.  Your
+      exact implementation will depend on, for instance, whether you have access
+      to a force sensor and whether you can command forces/torque directly.  The
+      performance can vary significantly based on the bandwidth of your
+      controller and the quality of your sensors.
+      <!--Technically, if we are just programming the stiffness and damping, as
+      I've written here, then a controller of this form would commonly be
+      referred to as "stiffness control", which is a subset of impedance
+      control.  We could also change the effective mass of the system; this
+      would be impedance control in its full glory. Importantly, changing the
+      effective mass can be done without estimating the accelerations, but it
+      does require measuring the contact force.  My impression is that it is
+      often consider not worth the complexity.-->  See e.g.
+      <elib>Villani08</elib> for a more thorough survey (and also some fun older
+      videos).</p>
+
+      <!--
+      <p>We can also program the response if we have a position-controlled robot with a force-torque sensor.  This is called <i>admittance control</i>.  In its simplest form, we can say that the original equations of motion already contain a PD controller, and our only command input is to modulate the setpoints of that controller.  For a single degree of freedom, we have $$m\ddot{q} + \text{unmodelled terms} = k_p(q_d - q) + k_d(\dot{q}_d - \dot{q}) + f^c.$$ </p>
+      -->
+
+      <example><h1>Teleop with impedance control</h1>
+        
+        <p>I didn't give you a teleop interface with direct force control; it
+        would have been very difficult to use!  Moving the robot by positioning
+        the set points on virtual springs, however, is quite natural. Take a
+        minute to try moving the box around, or even flipping it up.</p>
+
+        <p><a target="force"
+          href="https://colab.research.google.com/github/RussTedrake/manipulation/blob/master/force.ipynb#scrollTo=7q0A14bAilIX"><img
+          src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
+          </p>
+      
+      </example>
 
     </subsection>
 
-    <subsection><h1>An impedance-based "flip-up" strategy</h1>
+    <subsection><h1>An impedance-control-based "flip-up" strategy</h1>
+
+      <p>Let's embrace indirect force control to come up with another approach
+      to flipping up the box.  Flipping the box up in the middle of the bin
+      required very explicit reasoning about forces, in order to stay inside the
+      friction cone in the bottom left corner of the box.  But there is another
+      strategy that doesn't require the same precision in force space.  Let's
+      push the box into the corner, and <i>then</i> flip it up.</p>
+
+      <figure><img style="width:70%" src="data/impedance-based-flip-up.jpeg"></figure>
     
+      <p>To make this one happen, I'd like to imagine creating a virtual spring
+      -- you can think of it like a taught rubber band -- that we attach from
+      the finger to a point near the wall just a little above the top left
+      corner of the box.  The box will act like a pendulum, rotating around the
+      top corner, with the rubber band creating the moment.  At some point the
+      top corner will slip, but the very same rubber band will have the finger
+      pushing the box down from the top corner to complete the maneuver.</p>
+
+      <example><h1>An impedance-control-based flip-up strategy</h1>
+      
+      </example>
+
     </subsection>
 
     <subsection><h1>Hybrid control</h1>
@@ -418,6 +504,28 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
     </subsection>
 
   </section>
+
+    <!--
+
+    PD Control.  Inverse dynamics control.  (any material from slotine?  adaptive?  sliding mode?)  deluca "dynamic control of a single axis" http://www.diag.uniroma1.it/~deluca/rob1_en/16_DynamicControlSingleAxis.pdf
+      Spong model of elastic joints <elib>Spong87</elib> (deluca showed a video in his RSS talk)
+        exact gravity cancellation - https://www.youtube.com/watch?v=tKSCn2gN7Ks&t=9960s
+      Maybe -- planar IIWA sdf from andres? (how well does it render in matplotlib)
+    Tracking an end-effector trajectory
+      Operation-space control
+      Hybrid Control
+      Impedance control
+      Remote compliance (http://manipulation.csail.mit.edu/lecture_notes/Lec7.pdf)
+      Estimating contact location -- contact particle filter, etc.
+        haddadin videos (e.g. http://www.diag.uniroma1.it/~deluca/IIT_Seminar_Jan23_2019_ADL.pdf)
+      De Luca pHRI
+        https://www.youtube.com/playlist?list=PLvAUmIzqq6oaRtwX9l9sjDhcNMXNCGSN0
+
+        slotine wam ball throwing.  (have video, but here is maybe the most relevant paper? (by niemeyer) https://journals.sagepub.com/doi/pdf/10.1177/027836499101000206)
+
+        impedance control wikipedia article is great
+        https://en.wikipedia.org/wiki/Impedance_control#Joint_space
+  --> 
 
   <section><h1>Putting it all together</h1>
   
