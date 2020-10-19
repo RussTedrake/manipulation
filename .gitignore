@@ -1,7 +1,7 @@
 *.aux
 *.log
 
-venv
+/venv/
 solutions/
 
 \.DS_Store
