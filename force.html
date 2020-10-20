@@ -361,8 +361,9 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       interactions by specifying the forces directly.  Instead, we can program
       our robot to act like a (simple) mechanical system that reacts to contact
       forces in a desired way.  This philosophy was described nicely in an
-      important series of papers by Neville Hogan introducing <i>impedance
-      control</i> <elib>Hogan85a+Hogan85b+Hogan85c</elib>.</p>
+      important series of papers by Ken Salisbury <elib>Salisbury80</elib>
+      introducing <i>stiffness control</i> and then Neville Hogan introducing
+      <i>impedance control</i> <elib>Hogan85a+Hogan85b+Hogan85c</elib>.</p>
 
       <p>This approach is conceptually very nice.  With only knowledge of the
       parameters of the robot itself (not the environment), we can write a
@@ -395,22 +396,25 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       has exactly the familiar form of a proportional-derivative (PD)
       controller!</p>
 
+      <p>Technically, if we are just programming the stiffness and damping, as
+      I've written here, then a controller of this form would commonly be
+      referred to as "stiffness control", which is a subset of impedance
+      control.  We could also change the effective mass of the system; this
+      would be impedance control in its full glory. <!--Importantly, changing
+      the effective mass can be done without estimating the accelerations, but
+      it does require measuring the contact force.-->  My impression, though, is
+      that changing the effective mass is most often considered not worth the
+      complexity that comes from the extra sensing and bandwidth
+      requirements.</p>
+
       <p>The literature on indirect force control has a lot of terminology and
       implementation details that are important to get right in practice.  Your
       exact implementation will depend on, for instance, whether you have access
       to a force sensor and whether you can command forces/torque directly.  The
       performance can vary significantly based on the bandwidth of your
-      controller and the quality of your sensors.
-      <!--Technically, if we are just programming the stiffness and damping, as
-      I've written here, then a controller of this form would commonly be
-      referred to as "stiffness control", which is a subset of impedance
-      control.  We could also change the effective mass of the system; this
-      would be impedance control in its full glory. Importantly, changing the
-      effective mass can be done without estimating the accelerations, but it
-      does require measuring the contact force.  My impression is that it is
-      often consider not worth the complexity.-->  See e.g.
+      controller and the quality of your sensors.  See e.g.
       <elib>Villani08</elib> for a more thorough survey (and also some fun older
-      videos).</p>
+      videos), or <elib>Whitney87</elib> for a nice earlier perspective.</p>
 
       <!--
       <p>We can also program the response if we have a position-controlled robot with a force-torque sensor.  This is called <i>admittance control</i>.  In its simplest form, we can say that the original equations of motion already contain a PD controller, and our only command input is to modulate the setpoints of that controller.  For a single degree of freedom, we have $$m\ddot{q} + \text{unmodelled terms} = k_p(q_d - q) + k_d(\dot{q}_d - \dot{q}) + f^c.$$ </p>
@@ -469,10 +473,55 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
 
   <section><h1>Peg in hole</h1>
 
-    <p>Call-out to the classic great example for force control.  Remote-centered
-    compliance...</p>
-  
-    <p>Also for opening doors, tool use, ...</p>
+    <p>One of the classic problems for manipulator force control, inspired by
+    robotic assembly, is the problem of mating two parts together with under
+    tight kinematic tolerances.  Perhaps the cleanest and most famous version of
+    this is the problem of inserting a (round) peg into a (round) hole.  If your
+    <a href="https://en.wikipedia.org/wiki/Square_peg_in_a_round_hole">peg is
+    square and your hole is round</a>, I can't help.  Interestingly, much of the
+    literature on this topic in the late 1970's and early 1980's came out of MIT
+    and the Draper Laboratory.</p>
+
+    <figure><img height="150px" src="data/peg-in-hole.png"> <img style="margin-left:20px; margin-right:50px;" height="150px" src="data/peg-in-hole-force.png"> <img height="150px" src="data/peg-in-hole-moment.png"><figcaption>(Left) the
+    "peg in hole" insertion problem with kinematic tolerance $c$.  (Middle) the
+    desired response to a contact force.  (Right) the desired response to a
+    contact moment.  Figures reproduced (with some symbols removed) from
+    <elib>Drake78</elib>.
+    </figcaption></figure>
+
+    <p>For many peg insertion tasks, it's acceptable to add a small <a
+    href="https://en.wikipedia.org/wiki/Chamfer_(geometry)">chamfer</a> to the
+    part and/or the top of the hole.  This allows small errors in horizontal
+    alignment to be accounted for with a simple compliance in the horizontal
+    direction.  Misalignment in orientation is even more interesting.  Small
+    misalignments can cause the object to become "jammed", at which point the
+    frictional forces become large and ambiguous; we really want to avoid this.
+    Again, we can avoid jamming by allowing a rotational compliance at the
+    contact.  I think you can see why this is a great example for force
+    control!</p>
+
+    <p>The key insight here is that the rotational stiffness that we want should
+    result in rotations around the part/contact, not around the gripper.  We can
+    program this with stiffness control; but for very tight tolerances the
+    sensing and bandwidth requirements become a real limitation.  One of the
+    coolest results in force control is the realization that a clever physical
+    mechanism can be used to produce a remote-centered compliance completely
+    mechanically, with infinite bandwidth and no sensing required
+    <elib>Drake78</elib>!</p>
+
+    <figure><img height="180px" src="data/passive_remote_center_compliance.png">
+    <img style="margin-left:20px; margin-bottom:15px" height="150px"
+    src="data/Remote_Center_of_Compliance.svg"><figcaption>A passive
+    remote-center compliance device.  (Left) concept schematic from
+    <elib>Drake78</elib>.  (Right) schematic of a mechanical implementation;
+    image credit for <a
+    href="https://en.wikipedia.org/wiki/Remote_Center_Compliance#/media/File:Remote_Center_of_Compliance.svg">Arne
+    Nordmann, 2008</a>.  See <a href="https://www.ati-ia.com/products/compliance/Compensator_main.aspx">here</a> for some example products, and <a href="https://www.youtube.com/watch?v=qFTUFHGGZIg">here</a> for a nice (older) video.</figcaption></figure>
+
+    <p>Interestingly, the peg-in-hole problem inspired to incredibly important
+    and influential ideas in mechanics and control, but also in motion planning
+    <elib>Lozano-Perez84</elib>.  The general ideas are quite relevant and applicable for a wide variety of tasks for which compliant contact is a reasonable strategy, such as opening doors, tool use, etc.</p>
+
   </section>
 
   <section><h1>Manipulator control</h1>
