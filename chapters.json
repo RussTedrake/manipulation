@@ -12,13 +12,13 @@
     "misc"
   ],
   "other_potential_chapters": [ 
-    "trajectories",
-    "task",
+    "trajectories (time-optimal rescaling e.g. TOPPRA)",
+    "task (behavior trees, tamp)",
     "collision free motion planning (octtree?  rrt / prm).  or does this go with trajectories?",
     "belief-space planning",
     "tracking",
     "deep pose estimation, keypoints, and dense descriptors",
-    "fusion (or add this to the end of the pose estimation chapter?)",
+    "fusion (or add this to the end of the pose estimation chapter?).  kinect fusion, elastic fusion, surfelwarp",
     "underactuated (maybe dexterous?)",
     "rl",
     "Teleoperation and Imitation Learning; Interfaces.  Inputs (keyboard + mouse, HTC Vive, data gloves...).  Feedback (VR, haptic feedback).",

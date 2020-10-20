@@ -427,7 +427,11 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
           href="https://colab.research.google.com/github/RussTedrake/manipulation/blob/master/force.ipynb#scrollTo=7q0A14bAilIX"><img
           src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
           </p>
-      
+
+        <p>To help your intuition, I've made the bin and the box slightly
+        transparent, and added a visualization (in orange) of the virtual finger
+        or gripper that you are moving with the sliders.</p>
+
       </example>
 
     </subsection>
@@ -436,9 +440,9 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
 
       <p>Let's embrace indirect force control to come up with another approach
       to flipping up the box.  Flipping the box up in the middle of the bin
-      required very explicit reasoning about forces, in order to stay inside the
+      required very explicit reasoning about forces in order to stay inside the
       friction cone in the bottom left corner of the box.  But there is another
-      strategy that doesn't require the same precision in force space.  Let's
+      strategy that doesn't require as precise control of the forces.  Let's
       push the box into the corner, and <i>then</i> flip it up.</p>
 
       <figure><img style="width:70%" src="data/impedance-based-flip-up.jpeg"></figure>
@@ -471,39 +475,89 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
     <p>Also for opening doors, tool use, ...</p>
   </section>
 
-  <section><h1>Force control with the arm</h1>
+  <section><h1>Manipulator control</h1>
 
     <p>I think that using the floating finger/gripper is a good way to
     understand the main concepts of force control without the details.  But now
     it's time to actually implement those strategies using joint commands that
     we can send to the arm.</p>
 
-    <subsection><h1>Direct Force Control</h1>
+    <p>Our starting point is understanding that the equations of motion for a
+    fully-actuated robotic manipulator have a very structured form:
+    $$M(q)\ddot{q} + C(q,\dot{q})\dot{q} = \tau_g(q) + u + \sum_i
+    J^T_i(q)F^{c_i}.$$  The left side of the equation is just a generalization
+    of "mass times acceleration", with the mass matrix, $M$, and the Coriolis
+    terms $C$.  The right hand side is the sum of the (generalized) forces, with
+    $\tau_g(q)$ capturing the forces due to gravity, $u$ the joint torques
+    supplied by the motors, and $F^{c_i}$ is the spatial force due to the $i$th
+    contact, where $J_i(q)$ is the $i$th "contact Jacobian".  I introduced a
+    version of these briefly when we described multibody dynamics for dropping
+    random objects into the bin, and have more notes <a
+    href="http://underactuated.mit.edu/multibody.html">available here</a>.  For
+    the purposes of the remainder of this chapter, we can assume that the robot
+    is bolted to the table, so does not have any floating joints; I've therefore
+    used $\dot{q}$ and $\ddot{q}$ instead of $v$ and $\dot{v}$.</p>
 
-    </subsection>
+    <subsection><h1>Inverse dynamics control</h1>
 
-    <subsection><h1>Impedance and Admittance Control</h1>
+      <p>Let us ignore the contact terms for a moment: $$M(q)\ddot{q} +
+      C(q,\dot{q})\dot{q} = \tau_g(q) + u.$$  The <i>forward dynamics</i>
+      problem, which we use during simulation, is to compute the
+      accelerations, $\ddot{q}$, given the joint torques, $u$, (and $q,
+      \dot{q}$).  The <i>inverse dynamics</i>
+      problem, which we can use in control, is to compute $u$ given $\ddot{q}$
+      (and $q, \dot{q}$).  As a system, it looks like</p>
+
+      <div>
+        <script type="text/javascript">
+        var inverse_dynamics = { "name": "InverseDynamics", 
+          "input_ports" : ["estimated_state", "desired_acceleration"],
+          "output_ports" : ["actuation_input"]
+          };
+        document.write(system_html(inverse_dynamics, "https://drake.mit.edu/doxygen_cxx/classdrake_1_1systems_1_1controllers_1_1_inverse_dynamics.html"));
+        </script>
+      </div>
+
+      <p>This system implements the controller: $$u = M(q)\ddot{q}_d +
+      C(q,\dot{q})\dot{q} - \tau_g(q),$$ so that the resulting dynamics are
+      $M(q)\ddot{q} = M(q)\ddot{q}_d.$  Since we know that $M(q)$ is invertible,
+      this implies that $\ddot{q} = \ddot{q}_d$.</p>
+
+      <p>In practice, we only have estimates of the dynamics (mass matrix, etc) and even the states $q$ and $\dot{q}$.  We will need to account for these errors when we determine the acceleration commands to send.  For example, if we wanted to follow a desired joint trajectory, $q_0(t)$, we do not just differentiate the trajectory twice and command $\ddot{q}_0(t)$, but we could instead command e.g. $$\ddot{q}_d = \ddot{q}_0(t) + K_p(q_0(t) - q) + K_d(\dot{q}_0(t) - \dot{q}).$$</p>
     
     </subsection>
-  
-  </section>
 
-  <section><h1>Impedance control on the iiwa</h1>
+    <subsection><h1>Direct force control</h1>
 
-    <p>As we discussed in the hardware chapter, the iiwa provides provides torque sensing and control via compliant elements at the joints.  The iiwa low-level controller (provided with the robot) actually provides an impedance control interface</p>
+      <p>Let's bring back our contact forces, but assume that we are only making
+      contact at a single, known, point on the robot: $$M(q)\ddot{q} +
+      C(q,\dot{q})\dot{q} = \tau_g(q) + u + J^T(q)F^c.$$  <!--Very often in
+      manipulation we assume that our dynamics are <i>quasi-static</i>: that the
+      velocities and accelerations are small enough that the terms which depend
+      on them can be safely ignored.  In a quasi-static analysis, we have the force-balance equations $$\tau_g(q) + u = - J^T(q) F^c.$$  As a result, we can command the desired force by compensating for gravity and any other known forces</p>-->
 
-    <subsection><h1>Dynamics of elastic-joint robots</h1>
-    
     </subsection>
 
     <subsection><h1>Joint impedance control</h1>
-  
+    
     </subsection>
 
     <subsection><h1>End-effector impedance control</h1>
     </subsection>
 
+    <subsection><h1>Impedance control on the iiwa</h1>
+
+      <p>As we discussed in the hardware chapter, the iiwa provides provides torque sensing and control via compliant elements at the joints.  The iiwa low-level controller (provided with the robot) actually provides an impedance control interface</p>
+  
+      <subsubsection><h1>Dynamics of elastic-joint robots</h1>
+      
+      </subsubsection>
+    </subsection>
+
+
   </section>
+
+
 
     <!--
 
