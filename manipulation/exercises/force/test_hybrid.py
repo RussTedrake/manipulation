@@ -12,7 +12,7 @@ class TestHybrid(unittest.TestCase):
         self.notebook_locals = notebook_locals
 
     @weight(4)
-    @timeout_decorator.timeout(5.)
+    @timeout_decorator.timeout(30.)
     def test_antipodal_points(self):
         """Test compute_ctrl"""
         log = self.notebook_locals["log"]
