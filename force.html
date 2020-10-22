@@ -636,6 +636,56 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
   
   </section>
 
+  <section><h1>Exercises</h1>
+
+    <exercise><h1>Force and Position Control</h1>
+
+      <p> Suppose you are given a point-mass system with the following dynamics:</p>
+      $$m\ddot{x} = u + f^c$$
+
+      <p> where $x$ is the position, $u$ the input force applied on the point-mass, and $f^c$ the contact force from the environment. In order to control the position and force from the robot at the same time, the following controller is proposed:</p>
+
+      $$u = \underbrace{k_p(x_d-x) - k_d\dot{x}}_{\text{feedback force for position control}} - \underbrace{f^c_d}_{\text{feedforward force}}$$
+
+      <p>Define the error for this system to be:</p>
+
+      $$e = (x - x_d)^2 + (f^c - f^c_d)^2$$
+
+      <ol type="a">
+        <li> In free-space (i.e. $f^c=0$), can we achieve zero error for $x_d=0$ and a non-zero desired force $f^c_d$? Show your answer by writing down the staedy-state error as a function of the gains and the desired force. 
+        </li>
+        <li> Assume a rigid-body contact with a wall located at $x_d=0$, where a desired non-zero force of $f^c_d$ is commanded. By writing down the error at equilibrium, show that we are able to acheive zero-error.</li>
+      </ol>
+    </exercise>
+
+    <exercise><h1>Box Flip-up</h1>
+      
+      <p> Consider the initial phase of the box flip-up task from <a href="force.html#example2">Example 7.2</a> , when $\theta\approx 0$. We will assume that the forces can still be approximated as axis-aligned, but the ground contact is only being applied at the pivoting point $A$.</p>
+      <figure><img style="width:70%" src="figures/exercises/pivot.png"></figure>
+
+
+      <ol type="a">
+        <li> If we do not push hard enough (i.e. $f^C_{C_z}$ is too small), then we will not be able to create enough friction ($f^C_{C_x}$) to counteract gravity. By summing the torques around the pivot point $A$, derive a lower bound for the required normal force $f^C_{C_z}$, as a function of $m,g,$ and $\mu^C$. You may assume that the moment arm of gravity is half that of the moment arm on C, and that the box is square.
+        </li>
+        <li> If we push too hard (i.e. $f^C_{C_z}$ is too big), then the pivot point will end up sliding to the left. By writing the force balance along the axii, derive an upper bound for the required normal force $f^C_{C_z}$, as a function of $m,g,$ and $\mu^A$. (HINT: It will be necessary to use the otrque balance equation from before) </li>
+        <li> By combining the lower bounds and upper bounds from the previous problems, derive a relation for $\mu^A,\mu^C$ that must hold in order for this motion to be possible. If $\mu^A\approx 0.25$ (wood-metal), how high does $\mu^C$ have to be in order for the motion to be feasible? What if $\mu^A=1$ (concrete-rubber)?
+        </li>
+      </ol>
+    </exercise>
+
+
+    <exercise><h1>Hybrid Force-Position Control</h1>
+      <p> For this exercise, you will analyze and implement a hybrid force-position controller to drag a book, as we saw rom <a href="https://www.youtube.com/watch?v=PngdQGEUi7w&ab_channel=JiajiZhou">this video</a> during lecture. You will work exclusively in <a href="https://colab.research.google.com/github/RussTedrake/manipulation/blob/master/exercises/force/hybrid_force_position.ipynb" target="_blank">this notebook</a>. You will be asked to complete the following steps: </p>
+
+      <ol type="a">
+        <li> Analyze the conditions for this motion to be feasible. 
+        </li>
+        <li> Implement a control law to implement the motion </li>
+      </ol>
+
+    </exercise>
+
+  </section>
 </chapter>
 <!-- EVERYTHING BELOW THIS LINE IS OVERWRITTEN BY THE INSTALL SCRIPT -->
 
