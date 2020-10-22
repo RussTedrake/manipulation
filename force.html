@@ -126,13 +126,14 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
     the finger, and experiences unmodelled contact forces.  By design, the
     equations of this second model are particularly simple: $$\begin{bmatrix}m &
     0 \\ 0 & m \end{bmatrix} \dot{v} = m \begin{bmatrix}\ddot{x} \\ \ddot{z}
-    \end{bmatrix} = -mg + \begin{bmatrix} u_x \\ u_z \end{bmatrix} + f^c,$$
-    where $m$ is the mass, $g$ is the gravity vector, $u$ is the control input
-    vector, and $f^c$ is the contact force.  Notably absent is the contact
-    Jacobian which normally pre-multiplies the contact forces $\sum_i J_i^T
-    f^{c_i};$ in the case of a point finger this Jacobian is always the identity
-    matrix, and there is only one point at which contact can be made, so there
-    is no meaningful reason to distinguish between multiple forces.</p>
+    \end{bmatrix} = mg + \begin{bmatrix} u_x \\ u_z \end{bmatrix} + f^c,$$ where
+    $m$ is the mass, $g = [0, -9.81]^T$ is the gravity vector, $u$ is the
+    control input vector, and $f^c$ is the contact force (from the world to the
+    finger).  Notably absent is the contact Jacobian which normally
+    pre-multiplies the contact forces $\sum_i J_i^T f^{c_i};$ in the case of a
+    point finger this Jacobian is always the identity matrix, and there is only
+    one point at which contact can be made, so there is no meaningful reason to
+    distinguish between multiple forces.</p>
 
     <todo>Add Jiaji's video?</todo>
     <todo>Check yourself: can the finger move the box?  (only if the coefficient of friction is bigger).</todo>
@@ -170,9 +171,9 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       assumption (if we are already in contact) for most manipulation tasks,
       where the movements are relatively slow.  Let's assume it for now, and
       revisit the assumption later.  In this case, our equations of motion
-      reduce to $$f^c = mg - u.$$  Our force controller implementation can be as
-      simple as $u = -mg - f^{c_d}.$  This assumes only that we know the mass of
-      the robot.</p>
+      reduce to $$f^c = - mg - u.$$  Our force controller implementation can be
+      as simple as $u = -mg - f^{c_d}.$  This assumes only that we know the mass
+      of the robot.</p>
 
       <p>What happens when the robot is not in contact?  In this case, we cannot
       reasonably ignore the accelerations, and applying the same control results
@@ -267,8 +268,8 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
         obtain this from a point cloud normal estimation, or even from tracking
         the path of the fingers.</li>
         <li>We have conservative estimates of the coefficients of static
-        friction between the wall and the box, $\hat\mu^A$, and between the
-        finger and the box, $\hat\mu^C$, as well as the box mass, $\hat{m}.$
+        friction between the wall and the box, $\hat\mu_A$, and between the
+        finger and the box, $\hat\mu_C$, as well as the box mass, $\hat{m}.$
         (You should experiment and decide for yourself whether these estimates can be loose).</li>
         <li>We assume that $\theta_d(t)$ changes slowly (in particular, that the
         box accelerations are small), so that we can mostly ignore the unknown
@@ -298,8 +299,8 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
         box", with the box normals defining the contact normals (e.g. the $x$
         axis is aligned with the wall of the box), and ${}^WR^A = I$.  The
         friction cone constraints are: \begin{gather*}f^A_{W_z} \ge
-        0, \qquad |f^A_{W_x}| \le \mu^A f^A_{W_z}, \\ f^C_{C_z}
-        \ge 0, \qquad |f^C_{C_x}| \le \mu^C f^C_{C_z}.\end{gather*}  The
+        0, \qquad |f^A_{W_x}| \le \mu_A f^A_{W_z}, \\ f^C_{C_z}
+        \ge 0, \qquad |f^C_{C_x}| \le \mu_C f^C_{C_z}.\end{gather*}  The
         orientation of frame $C$ is a function of the box orientation,
         ${}^WR^C(\theta)$, and is written above.</p>
 
