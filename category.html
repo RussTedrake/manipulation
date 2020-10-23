@@ -56,6 +56,79 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
 <!-- EVERYTHING ABOVE THIS LINE IS OVERWRITTEN BY THE INSTALL SCRIPT -->
 <chapter style="counter-reset: chapter 7"><h1>Category-Level Manipulation</h1>
 
+<!--
+  big question: perception -> control.  what do we pass across that arrow? for a
+  uav darting through forests, local geometry is enough. for driving, positions
+  of the stop signs, trajectories of the other cars gets you very far
+  (predicting the future trajectories of other cars is very hard, though!  and
+  there are more layers here, too... is the other driver making eye contact with
+  me to signal that it's ok for me to go?). for manipulation?  so far we've
+  given two answers.  urdf + pose.  and processed point cloud.
+
+  what is the state of my shirt?  peanut butter on toast?  salad?  chopping
+  onions?
+
+  it's a big problem.  I would say it's the biggest reason I'm working on
+  manipulation right now.  gets to the very heart of perception + control...
+  sweet spot -- try to manipulate the same types of objects we've manipulated so
+  far, but generalize to a class / category.  all mugs, all shoes.
+
+  -keypoints as a representation for manipulation 
+    kPAM, KETO, S3K
+    - self-supervised keypoints
+      dense object nets 
+      keto (sort of)
+    - keypoint networks
+      - CPM (lots build on this, including integral pose etc)
+      - stacked hourglass
+  - NOCS
+  - shape completion
+    - kpam-sc
+    - hermans with pointnet
+  - analysis by synthesis (including shape parameters)
+    - category-level object pose estimation via neural analysis by synthesis
+  - differentiable renderer from Sven Benke, using dense descriptors
+
+    just pose estimation:
+    - DeepIM seems best according to ben et al.
+
+  - including control
+    - keto
+    - visuomotor
+    - kpam2.0
+    - form2fit
+
+  Ben's summary of my breakdown
+  I'd say:
+- Detection-based (keypoints)
+- Regression-based
+- Analysis-by-synthesis for known models (includes things like shape-fitting and rendering-based methods)
+- Analysis-by-synthesis while solving for shape jointly (generative) including both NOCS-style stuff as well as differentiable rendering approaches
+
+-->
+
+
+  <p>What is the right representation for an object?</p>
+
+<p>So far our answer to this question has been pretty narrow.  We've basically asked for a sdf file..</p>
+
+<p>The manipulation tasks that we've considered so far fall into one of two
+cases.  In the first case, if we have a small number of objects that we wish to
+manipulate, and we have models for those objects, then we have tools to find
+them (e.g. via instance segmentation) in a scene, estimate their pose, plan a
+grasp, etc.  We could use this pipeline to perform a variety of manipulation
+tasks, but the assumption that we have model is quite limiting.  And it's
+nontrivial to get models that are sufficient for both simulation and rendering.
+The second case we have considered was in the bin picking / clutter clearing
+example, where we can pick up almost any object, with no model required, but the
+tasks we can accomplish without any object model are quite limited.  So far
+we've only dropped things into the other bin.</p>
+
+
+
+</section>
+
+
 </chapter>
 <!-- EVERYTHING BELOW THIS LINE IS OVERWRITTEN BY THE INSTALL SCRIPT -->
 

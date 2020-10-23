@@ -69,6 +69,7 @@ jupyter-nbconvert
 jupyter-notebook
 locales
 python3
+python3-bs4
 python3-entrypoints
 python3-future
 python3-ipywidgets
