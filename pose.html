@@ -292,13 +292,10 @@ output_ports:
     libraries of tools for performing basic geometric operations on point
     clouds, and that can be used to transform back and forth between
     representations.  We can implement many of of the basic operations directly
-    in Drake, but I would recommend the <a
-    href="http://www.open3d.org/">Open3D</a> library if you need more (I have an
-    example of transferring data from the Drake image and point cloud
-    representations into Open3D <a href="manipulation/open3d/">here</a>).  Many
-    older projects used the <a href="http://pointclouds.org/">Point Cloud
-    Library (PCL)</a>, which is now defunct but still has some very useful
-    documentation.</p>
+    in Drake, but we will use the <a href="http://www.open3d.org/">Open3D</a>
+    library if we need more.  Many older projects used the <a
+    href="http://pointclouds.org/">Point Cloud Library (PCL)</a>, which is now
+    defunct but still has some very useful documentation.</p>
 
     <p>It's important to realize that the conversion of a depth image into a
     point cloud does lose some information -- specifically the information
@@ -715,7 +712,7 @@ output_ports:
       can be labeled as outliers and removed from the point cloud, allowing us
       to refine the pose estimate without these distractors.  You will find that
       many ICP implementations, such as <a
-      href="http://www.open3d.org/docs/release/python_api/open3d.registration.registration_icp.html">this
+      href="http://www.open3d.org/docs/release/python_api/open3d.pipelines.registration.registration_icp.html">this
       one from Open3d</a> include a "maximum correspondence distance" parameter
       for this purpose.</p>
 
@@ -761,7 +758,7 @@ output_ports:
       case, our object of interest will be resting on a table or in a bin.  If
       we know the geometry of the table/bin a priori, then we can subtract away
       points from that region.  Alternatively, we can <a
-      href="http://www.open3d.org/docs/release/tutorial/Basic/pointcloud.html#Crop-point-cloud">crop</a>
+      href="http://www.open3d.org/docs/release/tutorial/geometry/pointcloud.html#Crop-point-cloud">crop</a>
       the point cloud to a region of interest.  This can be sufficient for very
       simple or uncluttered scenes, and will be just enough for us to accomplish
       our goal for this chapter.</p>
