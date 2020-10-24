@@ -78,6 +78,7 @@ python3-matplotlib
 python3-numpy
 python3-pandas
 python3-pip
+python3-requests
 python3-retrying
 python3-setuptools
 python3-six
