@@ -508,6 +508,13 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       direction to become whatever is necessary to apply the force, and it will
       follow the wall.</p>
 
+      <p>The choice of position control or force control need not be a binary
+      decision.  We can simply apply both the position command and a
+      "feed-forward" force command: $$u = -mg + {}^WR^C \left[K_p (p^{C_d}_C -
+      p^{C}_C) + K_d (v^{C_d}_C - v^{C}_C) + f^{ff}_C \right].$$ As we'll see,
+      this is quite similar to the interface provided by the iiwa (and many
+      other torque-controlled robots).</p>      
+
     </subsection>
 
   </section>
@@ -567,21 +574,21 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
 
   <section><h1>Manipulator control</h1>
 
-    <p>I think that using the floating finger/gripper is a good way to
-    understand the main concepts of force control without the details.  But now
-    it's time to actually implement those strategies using joint commands that
-    we can send to the arm.</p>
+    <p>Using the floating finger/gripper is a good way to understand the main
+    concepts of force control without the details.  But now it's time to
+    actually implement those strategies using joint commands that we can send to
+    the arm.</p>
 
     <p>Our starting point is understanding that the equations of motion for a
     fully-actuated robotic manipulator have a very structured form:
     $$M(q)\ddot{q} + C(q,\dot{q})\dot{q} = \tau_g(q) + u + \sum_i
-    J^T_i(q)F^{c_i}.$$  The left side of the equation is just a generalization
+    J^T_i(q)f^{c_i}.$$  The left side of the equation is just a generalization
     of "mass times acceleration", with the mass matrix, $M$, and the Coriolis
     terms $C$.  The right hand side is the sum of the (generalized) forces, with
     $\tau_g(q)$ capturing the forces due to gravity, $u$ the joint torques
-    supplied by the motors, and $F^{c_i}$ is the spatial force due to the $i$th
-    contact, where $J_i(q)$ is the $i$th "contact Jacobian".  I introduced a
-    version of these briefly when we described multibody dynamics for dropping
+    supplied by the motors, and $f^{c_i}$ is the Cartesian force due to the
+    $i$th contact, where $J_i(q)$ is the $i$th "contact Jacobian".  I introduced
+    a version of these briefly when we described multibody dynamics for dropping
     random objects into the bin, and have more notes <a
     href="http://underactuated.mit.edu/multibody.html">available here</a>.  For
     the purposes of the remainder of this chapter, we can assume that the robot
@@ -617,57 +624,71 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       <p>In practice, we only have estimates of the dynamics (mass matrix, etc) and even the states $q$ and $\dot{q}$.  We will need to account for these errors when we determine the acceleration commands to send.  For example, if we wanted to follow a desired joint trajectory, $q_0(t)$, we do not just differentiate the trajectory twice and command $\ddot{q}_0(t)$, but we could instead command e.g. $$\ddot{q}_d = \ddot{q}_0(t) + K_p(q_0(t) - q) + K_d(\dot{q}_0(t) - \dot{q}).$$</p>
     
     </subsection>
--->
 
     <subsection><h1>Direct force control</h1>
 
       <p>Let's bring back our contact forces, but assume that we are only making
       contact at a single, known, point on the robot: $$M(q)\ddot{q} +
-      C(q,\dot{q})\dot{q} = \tau_g(q) + u + J^T(q)F^c.$$  <!--Very often in
+      C(q,\dot{q})\dot{q} = \tau_g(q) + u + J^T(q)f^c.$$  <!--Very often in
       manipulation we assume that our dynamics are <i>quasi-static</i>: that the
       velocities and accelerations are small enough that the terms which depend
-      on them can be safely ignored.  In a quasi-static analysis, we have the force-balance equations $$\tau_g(q) + u = - J^T(q) F^c.$$  As a result, we can command the desired force by compensating for gravity and any other known forces</p>-->
+      on them can be safely ignored.  In a quasi-static analysis, we have the force-balance equations $$\tau_g(q) + u = - J^T(q) F^c.$$  As a result, we can command the desired force by compensating for gravity and any other known forces</p> --> <!--
 
     </subsection>
+  -->
 
-    <subsection><h1>Joint stiffness control</h1>
+    <subsection><h1>Joint-stiffness control</h1>
+
+      <p>In practice, the way that we most often interface with the iiwa is
+      through the its "joint-impedance control" mode, which is written up nicely
+      in <elib>Albu-Schaffer07</elib>.  For our purposes, we can view this as a
+      stiffness control in joint space: $$u = -\tau_g(q) - K_p(q_d - q) -
+      K_d(\dot{q}_d - \dot{q}) + \tau_{ff},$$ where $K_p, K_d$ are positive
+      diagonal matrices, and $\tau_{ff}$ is a "feed-forward" torque.  In
+      practice the controller also includes some joint friction
+      compensation<elib>Albu-Schaffer01</elib>, but I've left those friction
+      terms out here for the sake of brevity.  The controller does also do some
+      shaping of the inertias, but only the rotor inertias, and the user does
+      not set these effective inertias.</p>
 
       <details><summary><b>Check yourself:</b> What is the difference between
-        traditional position control with a PD controller and joint stiffness
-        control?</summary> The difference in the algebra is quite small.  A PD
-        control would typically have the form $u=K_p(q_d-q) + K_d(\dot{q}_d -
-        \dot{q}),$ whereas stiffness control is $u = -\tau_g(q) + K_p(q_d-q) +
-        K_d(\dot{q}_d - \dot{q}).$  In
-        other words, stiffness control tries to cancel out the gravity and any
-        other estimated terms in the model, like friction.  As written, this
-        obviously requires an estimated model (which we don't believe we have for
-        large gear-ratio transmissions) and torque control.  But this small
-        difference in the algebra can make a profound difference in practice. The
-        controller is no longer depending on error to achieve the joint position
-        in steady state. As such we can turn the gains way down, and in practice
-        have a much more compliant response while still achieving good tracking
-        when there are no external torques.</details>
+      traditional position control with a PD controller and joint-stiffness
+      control?</summary> The difference in the algebra is quite small.  A PD
+      control would typically have the form $u=K_p(q_d-q) + K_d(\dot{q}_d -
+      \dot{q}),$ whereas stiffness control is $u = -\tau_g(q) + K_p(q_d-q) +
+      K_d(\dot{q}_d - \dot{q}).$  In other words, stiffness control tries to
+      cancel out the gravity and any other estimated terms in the model, like
+      friction.  As written, this obviously requires an estimated model (which
+      we don't believe we have for large gear-ratio transmissions) and torque
+      control.  But this small difference in the algebra can make a profound
+      difference in practice. The controller is no longer depending on error to
+      achieve the joint position in steady state. As such we can turn the gains
+      way down, and in practice have a much more compliant response while still
+      achieving good tracking when there are no external torques.</details>
       
-        <p>The choice of position or force control need not be a binary
-        decision. The controller for the iiwa accepts both a position command
-        and a feed-forward force command: $$u = -\tau_g(q) + K_p(q_d - q) +
-        K_d(\dot{q}_d - \dot{q}) + \tau_{ff}.$$  The iiwa interface does not
-        actually allow you to change $K_p$ and $K_d$ at runtime; they must be
-        set in hardware, so we end up playing games to achieve pure force/torque
-        control, like commanding $q_d = \hat{q}$.</p>      
 
     </subsection>
 
-    <subsection><h1>End-effector stiffness control</h1>
+    <subsection><h1>End-effector-stiffness control</h1>
     </subsection>
 
-    <subsection><h1>Impedance control on the iiwa</h1>
+    <subsection><h1>Some implementation details on the iiwa</h1>
 
-      <p>As we discussed in the hardware chapter, the iiwa provides provides torque sensing and control via compliant elements at the joints.  The iiwa low-level controller (provided with the robot) actually provides an impedance control interface</p>
+      <p>As we discussed in the hardware chapter, the iiwa provides provides
+      torque sensing and control via compliant elements at the joints.  The iiwa
+      low-level controller (provided with the robot) actually provides an
+      impedance control interface</p>
   
+      <!--
       <subsubsection><h1>Dynamics of elastic-joint robots</h1>
       
       </subsubsection>
+      -->
+      <!-- The iiwa interface does not
+      actually allow you to change $K_p$ and $K_d$ at runtime; they must be set
+      in hardware, so we end up playing games to achieve pure force/torque
+      control, like commanding $q_d = \hat{q}$.</p>  -->
+
     </subsection>
 
 
