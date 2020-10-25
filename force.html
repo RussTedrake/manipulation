@@ -487,8 +487,27 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
 
     <subsection><h1>Hybrid position/force control</h1>
 
-      <p></p>
-    
+      <p>There are a number of applications where we would like to explicitly
+      command force in one direction, but command positions in another.  One
+      classic examples if you are trying to wipe or polish a surface -- you
+      might care about the amount of force you are applying normal to the
+      surface, but use position feedback to follow a trajectory in the
+      directions tangent to the surface.  In the simplest case, imagine
+      controlling force in $z$ and position in $x$ for our point finger: $$u =
+      -mg + \begin{bmatrix} k_p (x_d - x) + k_d (\dot{x}_d - \dot{x}) \\
+      -f^{C_d}_{W_z} \end{bmatrix}.$$  If want the forces/positions in a
+      different frame, $C$, then we can use $$u = -mg + {}^WR^{C}
+      \begin{bmatrix} k_p (p^{C_d}_{C_x} - p^{C}_{C_x}) + k_d (v^{C_d}_{C_x} -
+      v^{C}_{C_x}) \\ -f^{C_d}_{C_z}  \end{bmatrix}.$$  By commanding the normal
+      force, you not only have the benefit of controlling how hard the robot is
+      pushing on the surface, but also gain some robustness to errors in
+      estimating the surface normal.  If a position-controlled robot estimated
+      the normal of a wall badly, then it might leave the wall entirely in one
+      direction, and push extremely hard in the other.  Having a commanded force
+      in the normal direction would allow the position of the robot in that
+      direction to become whatever is necessary to apply the force, and it will
+      follow the wall.</p>
+
     </subsection>
 
   </section>
@@ -569,6 +588,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
     is bolted to the table, so does not have any floating joints; I've therefore
     used $\dot{q}$ and $\ddot{q}$ instead of $v$ and $\dot{v}$.</p>
 
+<!--
     <subsection><h1>Inverse dynamics control</h1>
 
       <p>Let us ignore the contact terms for a moment: $$M(q)\ddot{q} +
@@ -597,6 +617,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       <p>In practice, we only have estimates of the dynamics (mass matrix, etc) and even the states $q$ and $\dot{q}$.  We will need to account for these errors when we determine the acceleration commands to send.  For example, if we wanted to follow a desired joint trajectory, $q_0(t)$, we do not just differentiate the trajectory twice and command $\ddot{q}_0(t)$, but we could instead command e.g. $$\ddot{q}_d = \ddot{q}_0(t) + K_p(q_0(t) - q) + K_d(\dot{q}_0(t) - \dot{q}).$$</p>
     
     </subsection>
+-->
 
     <subsection><h1>Direct force control</h1>
 
@@ -609,11 +630,35 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
 
     </subsection>
 
-    <subsection><h1>Joint impedance control</h1>
-    
+    <subsection><h1>Joint stiffness control</h1>
+
+      <details><summary><b>Check yourself:</b> What is the difference between
+        traditional position control with a PD controller and joint stiffness
+        control?</summary> The difference in the algebra is quite small.  A PD
+        control would typically have the form $u=K_p(q_d-q) + K_d(\dot{q}_d -
+        \dot{q}),$ whereas stiffness control is $u = -\tau_g(q) + K_p(q_d-q) +
+        K_d(\dot{q}_d - \dot{q}).$  In
+        other words, stiffness control tries to cancel out the gravity and any
+        other estimated terms in the model, like friction.  As written, this
+        obviously requires an estimated model (which we don't believe we have for
+        large gear-ratio transmissions) and torque control.  But this small
+        difference in the algebra can make a profound difference in practice. The
+        controller is no longer depending on error to achieve the joint position
+        in steady state. As such we can turn the gains way down, and in practice
+        have a much more compliant response while still achieving good tracking
+        when there are no external torques.</details>
+      
+        <p>The choice of position or force control need not be a binary
+        decision. The controller for the iiwa accepts both a position command
+        and a feed-forward force command: $$u = -\tau_g(q) + K_p(q_d - q) +
+        K_d(\dot{q}_d - \dot{q}) + \tau_{ff}.$$  The iiwa interface does not
+        actually allow you to change $K_p$ and $K_d$ at runtime; they must be
+        set in hardware, so we end up playing games to achieve pure force/torque
+        control, like commanding $q_d = \hat{q}$.</p>      
+
     </subsection>
 
-    <subsection><h1>End-effector impedance control</h1>
+    <subsection><h1>End-effector stiffness control</h1>
     </subsection>
 
     <subsection><h1>Impedance control on the iiwa</h1>
