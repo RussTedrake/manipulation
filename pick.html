@@ -302,7 +302,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
 
   </section>
 
-  <section><h1>Forward kinematics</h1>
+  <section id="kinematics"><h1>Forward kinematics</h1>
   
     <p>The spatial algebra gets us pretty close to what we need for our pick and
     place algorithm.  But remember that the interface we have with the robot
@@ -459,7 +459,7 @@ pose = plant.EvalBodyPoseInWorld(context, gripper)</pre></code>
 
   </section>
 
-  <section><h1>Differential kinematics (Jacobians)</h1>
+  <section id="jacobian"><h1>Differential kinematics (Jacobians)</h1>
 
     <p>The forward kinematics machinery gives us the ability to compute the pose
     of the gripper and the pose of the object, both in the world frame.  But
@@ -1135,10 +1135,10 @@ plant.num_velocities() = 6</pre></code></p>
     <subsection id="joint_centering"><h1>Joint centering</h1>
   
       <p><i>(Need to finish/clean up the writing here)</i>.  Our Jacobian is $6
-      times 7$.  We have extra degrees of freedom.  Not only an opportunity, but
-      a responsibility.  If we don't tell them what we want them to do, then you
-      might not like what you get.  Discuss analytic centering.  Add a term to
-      the objective in the nullspace of our current objective.</p>
+      \times 7$.  We have extra degrees of freedom.  Not only an opportunity,
+      but a responsibility.  If we don't tell them what we want them to do, then
+      you might not like what you get.  Discuss analytic centering.  Add a term
+      to the objective in the nullspace of our current objective.</p>
 
       <p>Here is one way to formulate it.  If we had no end-effector goals, then
       we might write the controller $v = K(q_0 - q)$, a proportional control
