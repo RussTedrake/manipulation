@@ -69,7 +69,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
   such a simple solution, and we might have to worry about collisions between
   the arm and the environment as well as the gripper and the environment.</li>
   <li>If we are doing "mobile manipulation" -- our robotic arms are attached to
-  a mobile base -- then even if the workspace is not geometrically complicated,
+  a mobile base -- then the robot might have to operate in many different environments.  Even if the workspace is not geometrically complicated,
   it might still be different enough each time we reach that it requires
   automated (but possibly still simple) planning.</li><li>If the robot is
   operating in a simple known environment all day long, then it probably makes
@@ -82,22 +82,94 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
   cover this now for another reason, too: it will also soon help us think about
   programming a more dexterous hand.</p>
 
-  <p>I do need to make one caveat.  Despite having spent time on it myself, I
-  actually really dislike the problem formulation of collision-free motion
-  planning.  I think that as a whole, robots are too afraid of bumping into the
-  world (because things still go wrong when they do).  I don't think humans are
-  solving these complex geometric problems every time we reach... even when we
-  are reaching in dense clutter (I actually suspect that we are very bad at it).
-  I would much rather see robots that perform well even with very coarse /
-  approximate plans for moving through a cluttered environment, that are not
-  afraid to make incidental contacts, and that can still accomplish the task
-  when they do!</p>
+  <p>I do need to make one important caveat.  Despite having done some work in
+  this field myself, I actually really dislike the problem formulation of
+  collision-free motion planning.  I think that on the whole, robots are too
+  afraid of bumping into the world (because things still go wrong when they do).
+  I don't think humans are solving these complex geometric problems every time
+  we reach... even when we are reaching in dense clutter (I actually suspect
+  that we are very bad at it). I would much rather see robots that perform well
+  even with very coarse / approximate plans for moving through a cluttered
+  environment, that are not afraid to make incidental contacts, and that can
+  still accomplish the task when they do!</p>
 
   <section><h1>Inverse Kinematics</h1>
 
-    <p></p>
+    <p>We know that that the <a href="pick.html#kinematics">forward
+    kinematics</a> give us a (nonlinear) mapping from joint angles to e.g. the
+    pose of the gripper: $X^G = f_{kin}(q)$.  So, naturally, the problem of
+    inverse kinematics (IK) is about solving for the inverse map, $q =
+    f^{-1}_{kin}(X^G).$  Indeed, that is perhaps the most common and classical
+    question studied in inverse kinematics.  But I want you to think of inverse
+    kinematics as a much richer topic than that.</p>
 
-    <p>Closed-form solutions.  Wampler <elib>Wampler11</elib>.  IKFast Section 4.1 of <elib>Diankov10</elib>.</p>
+    <p>For example, when we were <a
+    href="clutter.html#grasp_candidates">evaluating grasp candidates for bin
+    picking</a>, we had only a soft preference on the orientation of the hand
+    relative to some antipodal grasp.  In that case, a full 6 DOF pose would
+    have been an overly constrained specification.  And often we have many
+    constraints on the kinematics: some in joint space (like joint limits) and
+    others in Cartesian space (like non-penetration constraints).  So really,
+    inverse kinematics is about solving for joint angles in a very rich
+    landscape of objectives and constraints.</p>
+
+    <subsection><h1>Closed-form solutions</h1>
+
+      <p>With its obvious importance in robotics, you probably won't be
+      surprised to hear that there is an extensive literature on inverse
+      kinematics.  But you may be surprised at how extensive and complete the
+      solutions can get. The forward kinematics, $f_{kin}$, is a nonlinear
+      function in general, but it is a very structured one.  In fact, with rare
+      exceptions (like if your robot has a <a
+      href="https://www.hindawi.com/journals/mpe/2016/1761968/fig4/">helical
+      joint</a>, aka screw joint), the equations governing the valid Cartesian
+      positions of our robots are actually <i>polynomial</i>.  "But wait!  What
+      about all of those sines and cosines in my kinematic equations?" you say.
+      The trigonometric terms come when we want to relate joint angles with
+      Cartesian coordinates.  In $\Re^3$, the constraints for two points on a
+      rigid body are just that the (squared) distance between them, $\|p^A -
+      p^B\|^2,$ is a constant.  And a joint is just a polynomial constraint
+      between positions on adjoining bodies, e.g. that they occupy the same
+      point in Cartesian space.  See <elib>Wampler11</elib> for an excellent
+      overview.</p>
+
+      <p>Understanding the solutions to polynomial equations is the subject of
+      algebraic geometry.  There is a deep literature on the theory, on symbolic
+      algorithms, and on numerical algorithms.  For even very complex kinematic
+      topologies, such as <a
+      href="https://en.wikipedia.org/wiki/Four-bar_linkage">four-bar
+      linkages</a> and <a
+      href="https://en.wikipedia.org/wiki/Stewart_platform">Stewart-Gough
+      platforms</a>, we can count the number of solutions, and/or understand the
+      continuous manifold of solutions.  For instance,
+      <elib>Wampler11</elib>describes a substantial toolbox for numerical
+      algebraic geometry (based on homotopy methods) with impressive results on
+      extremely difficult configurations.</p>
+
+      <p>While the algebraic geometry methods are targeted for offline global
+      analysis, they are not designed for fast real-time inverse kinematics
+      solutions needed in a control loop.  The most popular tool these days for
+      real-time inverse kinematics for six- or seven-DOF manipulators is a tool
+      called "IKFast", which was described in Section 4.1 of
+      <elib>Diankov10</elib> that gained popularity because of its effective
+      open-source implementation.  Rather than focus on completeness, IKFast
+      uses a number of approximations to provide fast and numerically robust
+      solutions to the "easy" kinematics problems.  It leverages the fact that a
+      six-DOF pose constraint on a six-DOF manipulator has a closed-form
+      solutions, and for seven-DOF manipulators it adds a layer of sampling in
+      the last degree of freedom on top of the six-DOF solver.</p>
+
+      <todo>add an example of ik-fast and/or bertini</todo>
+
+      <p>These closed-form solutions are important to understand because they
+      provide deep insight into the equations, and because they can be fast
+      enough to use inside a more sophisticated solution approach.  But the
+      closed-form solutions don't provide the rich specification I promoted
+      above; in particular, they break down once we have inequality constraints
+      instead of equality constraints.  For those richer specifications, we will
+      turn to optimization.</p>
+
+    </subsection>
 
     <subsection><h1>IK as constrained optimization</h1>
     
