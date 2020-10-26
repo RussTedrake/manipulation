@@ -82,6 +82,8 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
   cover this now for another reason, too: it will also soon help us think about
   programming a more dexterous hand.</p>
 
+  <todo>Add atlas "big robot little car"</todo>
+
   <p>I do need to make one important caveat.  Despite having done some work in
   this field myself, I actually really dislike the problem formulation of
   collision-free motion planning.  I think that on the whole, robots are too
@@ -113,6 +115,18 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
     inverse kinematics is about solving for joint angles in a very rich
     landscape of objectives and constraints.</p>
 
+    <figure>
+      <iframe width="560" height="315" src="https://www.youtube.com/embed/m1rv4d_zUCY" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+      <figcaption>We made extensive use of rich inverse kinematics
+      specifications in our work on humanoid robots.  The video above is an
+      example of the interactive inverse kinematics interface (here to help us
+      figure out how to fit the our big humanoid robot into the little Polaris).
+      <a href="https://www.youtube.com/watch?v=E_CVq0lWfSc">Here is another video</a> of the Valkyrie humanoid, where we do specify and
+      end-effector pose, but we also add a joint-centering objective and static
+      stability constraints <elib>Fallon14+Marion16</elib>. </figcaption>
+    </figure>
+  
     <subsection><h1>Closed-form solutions</h1>
 
       <p>With its obvious importance in robotics, you probably won't be
@@ -126,11 +140,11 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       positions of our robots are actually <i>polynomial</i>.  "But wait!  What
       about all of those sines and cosines in my kinematic equations?" you say.
       The trigonometric terms come when we want to relate joint angles with
-      Cartesian coordinates.  In $\Re^3$, the constraints for two points on a
-      rigid body are just that the (squared) distance between them, $\|p^A -
-      p^B\|^2,$ is a constant.  And a joint is just a polynomial constraint
-      between positions on adjoining bodies, e.g. that they occupy the same
-      point in Cartesian space.  See <elib>Wampler11</elib> for an excellent
+      Cartesian coordinates.  In $\Re^3$, for two points, $A$ and $B$, on the
+      same rigid body, the (squared) distance between them, $\|p^A - p^B\|^2,$
+      is a constant.  And a joint is just a polynomial constraint between
+      positions on adjoining bodies, e.g. that they occupy the same point in
+      Cartesian space.  See <elib>Wampler11</elib> for an excellent
       overview.</p>
 
       <p>Understanding the solutions to polynomial equations is the subject of
@@ -141,10 +155,10 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       linkages</a> and <a
       href="https://en.wikipedia.org/wiki/Stewart_platform">Stewart-Gough
       platforms</a>, we can count the number of solutions, and/or understand the
-      continuous manifold of solutions.  For instance,
-      <elib>Wampler11</elib>describes a substantial toolbox for numerical
-      algebraic geometry (based on homotopy methods) with impressive results on
-      extremely difficult configurations.</p>
+      continuous manifold of solutions.  For instance, <elib>Wampler11</elib>
+      describes a substantial toolbox for numerical algebraic geometry (based on
+      homotopy methods) with impressive results on extremely difficult
+      configurations.</p>
 
       <p>While the algebraic geometry methods are targeted for offline global
       analysis, they are not designed for fast real-time inverse kinematics
