@@ -7,13 +7,14 @@
     "clutter",
     "segmentation",
     "force",
-    "category",
+    "trajectories",
     "drake",
     "station",
     "misc"
   ],
   "other_potential_chapters": [ 
     "trajectories (time-optimal rescaling e.g. TOPPRA)",
+    "category",
     "task (behavior trees, tamp)",
     "collision free motion planning (octtree?  rrt / prm).  or does this go with trajectories?",
     "belief-space planning",

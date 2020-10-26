@@ -49,7 +49,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
 <table style="width:100%;"><tr style="width:100%">
   <td style="width:33%;text-align:left;"><a class="previous_chapter" href=segmentation.html>Previous Chapter</a></td>
   <td style="width:33%;text-align:center;"><a href=index.html>Table of contents</a></td>
-  <td style="width:33%;text-align:right;"><a class="next_chapter" href=category.html>Next Chapter</a></td>
+  <td style="width:33%;text-align:right;"><a class="next_chapter" href=trajectories.html>Next Chapter</a></td>
 </tr></table>
 
 
@@ -669,6 +669,10 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       and in practice have a much more compliant response while still achieving
       good tracking when there are no external torques.</p></details>
       
+      <todo>Gravity comp is a classic demo of how well you model/control your robot.  Show kuka videos.</todo>
+
+      <todo>C++ implementation.  Add code example(s) here.</todo>
+
     </subsection>
 
     <subsection><h1>Cartesian stiffness control</h1>
@@ -742,34 +746,19 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       behavior</a>).  I don't really know why we aren't allowed to send our own
       joint velocity commands.</p>
 
+      <todo>Think through and propose a specific velocity filtering/estimation system that could account for this behavior.</todo>
+
+      <todo>Can also tell the firmware about the lumped inertia of the gripper.  But if you pick something up (or even move the fingers), that will not be included.</todo>
+
     </subsection>
 
+    <todo>Adaptive control.  Slotine WAM throwing.</todo>
+    <todo>Estimating contact location.  contact particle filter.  
+      haddadin videos (e.g. http://www.diag.uniroma1.it/~deluca/IIT_Seminar_Jan23_2019_ADL.pdf)
+      De Luca pHRI
+        https://www.youtube.com/playlist?list=PLvAUmIzqq6oaRtwX9l9sjDhcNMXNCGSN0</todo>
 
   </section>
-
-
-
-    <!--
-
-    PD Control.  Inverse dynamics control.  (any material from slotine?  adaptive?  sliding mode?)  deluca "dynamic control of a single axis" http://www.diag.uniroma1.it/~deluca/rob1_en/16_DynamicControlSingleAxis.pdf
-      Spong model of elastic joints <elib>Spong87</elib> (deluca showed a video in his RSS talk)
-        exact gravity cancellation - https://www.youtube.com/watch?v=tKSCn2gN7Ks&t=9960s
-      Maybe -- planar IIWA sdf from andres? (how well does it render in matplotlib)
-    Tracking an end-effector trajectory
-      Operation-space control
-      Hybrid Control
-      Impedance control
-      Remote compliance (http://manipulation.csail.mit.edu/lecture_notes/Lec7.pdf)
-      Estimating contact location -- contact particle filter, etc.
-        haddadin videos (e.g. http://www.diag.uniroma1.it/~deluca/IIT_Seminar_Jan23_2019_ADL.pdf)
-      De Luca pHRI
-        https://www.youtube.com/playlist?list=PLvAUmIzqq6oaRtwX9l9sjDhcNMXNCGSN0
-
-        slotine wam ball throwing.  (have video, but here is maybe the most relevant paper? (by niemeyer) https://journals.sagepub.com/doi/pdf/10.1177/027836499101000206)
-
-        impedance control wikipedia article is great
-        https://en.wikipedia.org/wiki/Impedance_control#Joint_space
-  --> 
 
   <section><h1>Putting it all together</h1>
   
@@ -832,7 +821,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
 <table style="width:100%;"><tr style="width:100%">
   <td style="width:33%;text-align:left;"><a class="previous_chapter" href=segmentation.html>Previous Chapter</a></td>
   <td style="width:33%;text-align:center;"><a href=index.html>Table of contents</a></td>
-  <td style="width:33%;text-align:right;"><a class="next_chapter" href=category.html>Next Chapter</a></td>
+  <td style="width:33%;text-align:right;"><a class="next_chapter" href=trajectories.html>Next Chapter</a></td>
 </tr></table>
 
 <div id="footer">
