@@ -122,9 +122,11 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       specifications in our work on humanoid robots.  The video above is an
       example of the interactive inverse kinematics interface (here to help us
       figure out how to fit the our big humanoid robot into the little Polaris).
-      <a href="https://www.youtube.com/watch?v=E_CVq0lWfSc">Here is another video</a> of the Valkyrie humanoid, where we do specify and
-      end-effector pose, but we also add a joint-centering objective and static
-      stability constraints <elib>Fallon14+Marion16</elib>. </figcaption>
+      <a href="https://www.youtube.com/watch?v=E_CVq0lWfSc">Here is another
+      video</a> of the same tool being used for the Valkyrie humanoid, where we
+      do specify and end-effector pose, but we also add a joint-centering
+      objective and static stability constraints <elib>Fallon14+Marion16</elib>.
+      </figcaption>
     </figure>
   
     <subsection><h1>Closed-form solutions</h1>
@@ -147,6 +149,8 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       Cartesian space.  See <elib>Wampler11</elib> for an excellent
       overview.</p>
 
+      <todo>example: trig and polynomial kinematics of a two-link arm.</todo>
+
       <p>Understanding the solutions to polynomial equations is the subject of
       algebraic geometry.  There is a deep literature on the theory, on symbolic
       algorithms, and on numerical algorithms.  For even very complex kinematic
@@ -157,28 +161,30 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       platforms</a>, we can count the number of solutions, and/or understand the
       continuous manifold of solutions.  For instance, <elib>Wampler11</elib>
       describes a substantial toolbox for numerical algebraic geometry (based on
-      homotopy methods) with impressive results on extremely difficult
-      configurations.</p>
+      homotopy methods) with impressive results on difficult kinematics
+      problems.</p>
 
-      <p>While the algebraic geometry methods are targeted for offline global
-      analysis, they are not designed for fast real-time inverse kinematics
-      solutions needed in a control loop.  The most popular tool these days for
-      real-time inverse kinematics for six- or seven-DOF manipulators is a tool
-      called "IKFast", which was described in Section 4.1 of
-      <elib>Diankov10</elib> that gained popularity because of its effective
+      <p>While the algebraic-geometry methods are mostly targeted for offline
+      global analysis, they are not designed for fast real-time inverse
+      kinematics solutions needed in a control loop.  The most popular tool
+      these days for real-time inverse kinematics for six- or seven-DOF
+      manipulators is a tool called "IKFast", which was described in Section 4.1
+      of <elib>Diankov10</elib> that gained popularity because of its effective
       open-source implementation.  Rather than focus on completeness, IKFast
       uses a number of approximations to provide fast and numerically robust
       solutions to the "easy" kinematics problems.  It leverages the fact that a
       six-DOF pose constraint on a six-DOF manipulator has a closed-form
-      solutions, and for seven-DOF manipulators it adds a layer of sampling in
-      the last degree of freedom on top of the six-DOF solver.</p>
+      solutions with a finite number of joint space configurations that produce
+      the same end-effector pose, and for seven-DOF manipulators it adds a layer
+      of sampling in the last degree of freedom on top of the six-DOF
+      solver.</p>
 
-      <todo>add an example of ik-fast and/or bertini</todo>
+      <todo>add an example of calling (or implementing something equivalent to) ikfast and/or bertini.  looks like bertini 2 has python bindings (but not pip) and is GPL3.</todo>
 
       <p>These closed-form solutions are important to understand because they
       provide deep insight into the equations, and because they can be fast
       enough to use inside a more sophisticated solution approach.  But the
-      closed-form solutions don't provide the rich specification I promoted
+      closed-form solutions don't provide the rich specification I advocated for
       above; in particular, they break down once we have inequality constraints
       instead of equality constraints.  For those richer specifications, we will
       turn to optimization.</p>
@@ -187,9 +193,43 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
 
     <subsection><h1>IK as constrained optimization</h1>
     
+      <!-- the differential IK controller that we discussed before is just doing gradient descent on the objective ... -->
+
+      <!-- a rich library of constraints -->
+
+    </subsection>
+
+    <subsection><h1>Grasp planning as IK</h1>
+    
+      <!-- key idea to get across: solve for "pick up" and "put down" simultaneously.  -->
+    
     </subsection>
 
   </section>
+
+  <!-- maybe section on collision detection / constraints? GJK? octrees? -->
+
+  <section><h1>Kinematic trajectory optimization</h1>
+  
+    <!-- trajectories in joint space versus EE space -->
+
+    <!-- pp trajectories -->
+
+    <!-- b-spline trajectories -->
+
+    <!-- anytime b-spline smoother? -->
+
+    <!-- chomp? (and friends?) -->
+
+    <!-- snopt vs augmented lagrangian? -->
+
+  </section>
+
+  <section><h1>Sample-based motion planning</h1>
+  
+  </section>
+
+  <!-- time-scaling trajectories (TOPPRA?) -->
 
 </chapter>
 <!-- EVERYTHING BELOW THIS LINE IS OVERWRITTEN BY THE INSTALL SCRIPT -->
