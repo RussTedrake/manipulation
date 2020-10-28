@@ -3,16 +3,59 @@ This file contains a number of helper utilities to set up our various
 experiments with less code.
 """
 import numpy as np
+import os
 
+import pydrake.all
 from pydrake.all import (AbstractValue, BaseField, ModelInstanceIndex,
                          DepthCameraProperties, DepthImageToPointCloud,
                          LeafSystem, MakeRenderEngineVtk, RenderEngineVtkParams,
-                         RigidTransform, RgbdSensor)
+                         RgbdSensor)
+from pydrake.all import RigidTransform, RollPitchYaw
+from manipulation.utils import FindResource
 
 ycb = [
     "003_cracker_box.sdf", "004_sugar_box.sdf", "005_tomato_soup_can.sdf",
     "006_mustard_bottle.sdf", "009_gelatin_box.sdf", "010_potted_meat_can.sdf"
 ]
+
+
+def AddIiwa(plant, collision_model="no_collision"):
+    sdf_path = pydrake.common.FindResourceOrThrow(
+        "drake/manipulation/models/iiwa_description/iiwa7/"
+        f"iiwa7_{collision_model}.sdf")
+
+    parser = pydrake.multibody.parsing.Parser(plant)
+    iiwa = parser.AddModelFromFile(sdf_path)
+    plant.WeldFrames(plant.world_frame(), plant.GetFrameByName("iiwa_link_0"))
+
+    # Set default positions:
+    q0 = [0.0, 0.1, 0, -1.2, 0, 1.6, 0]
+    index = 0
+    for joint_index in plant.GetJointIndices(iiwa):
+        joint = plant.get_mutable_joint(joint_index)
+        if isinstance(joint, pydrake.multibody.tree.RevoluteJoint):
+            joint.set_default_angle(q0[index])
+            index += 1
+
+    return iiwa
+
+
+# TODO: take argument for whether we want the welded fingers version or not
+def AddWsg(plant, iiwa_model_instance):
+    parser = pydrake.multibody.parsing.Parser(plant)
+    parser.package_map().Add(
+        "wsg_50_description",
+        os.path.dirname(
+            pydrake.common.FindResourceOrThrow(
+                "drake/manipulation/models/wsg_50_description/package.xml")))
+    gripper = parser.AddModelFromFile(
+        FindResource("models/schunk_wsg_50_welded_fingers.sdf"), "gripper")
+
+    X_7G = RigidTransform(RollPitchYaw(np.pi / 2.0, 0, np.pi / 2.0),
+                          [0, 0, 0.114])
+    plant.WeldFrames(plant.GetFrameByName("iiwa_link_7", iiwa_model_instance),
+                     plant.GetFrameByName("body", gripper), X_7G)
+    return gripper
 
 
 def AddRgbdSensors(builder,
