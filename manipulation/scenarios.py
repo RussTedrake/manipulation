@@ -149,3 +149,37 @@ def AddRgbdSensors(builder,
                 # Export the point cloud output.
                 builder.ExportOutput(to_point_cloud.point_cloud_output_port(),
                                      f"{model_name}_point_cloud")
+
+
+def SetTransparency(scene_graph, alpha, source_id, geometry_ids=None):
+    inspector = scene_graph.model_inspector()
+    if not geometry_ids:
+        geometry_ids = inspector.GetAllGeometryIds()
+
+    for gid in geometry_ids:
+        # just waiting on drake #14259
+        #        if not inspector.BelongsToSource(gid, source_id):
+        #            continue
+        props = inspector.GetIllustrationProperties(gid)
+        if props is None or not props.HasProperty("phong", "diffuse"):
+            continue
+        c = props.GetProperty("phong", "diffuse")
+        new_color = pydrake.geometry.Rgba(c.r(), c.g(), c.b(), alpha)
+        props.UpdateProperty("phong", "diffuse", new_color)
+
+
+def SetColor(scene_graph, color, source_id, geometry_ids=None):
+    inspector = scene_graph.model_inspector()
+    if not geometry_ids:
+        geometry_ids = inspector.GetAllGeometryIds()
+
+    for gid in geometry_ids:
+        # just waiting on drake #14259
+        #        if not inspector.BelongsToSource(gid, source_id):
+        #            continue
+        props = inspector.GetIllustrationProperties(gid)
+        if props is None or not props.HasProperty("phong", "diffuse"):
+            continue
+        new_color = pydrake.geometry.Rgba(color[0], color[1], color[2],
+                                          color[3])
+        props.UpdateProperty("phong", "diffuse", new_color)
