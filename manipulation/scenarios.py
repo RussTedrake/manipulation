@@ -40,8 +40,29 @@ def AddIiwa(plant, collision_model="no_collision"):
     return iiwa
 
 
+def AddPlanarIiwa(plant):
+    urdf = pydrake.common.FindResourceOrThrow(
+        "drake/manipulation/models/iiwa_description/urdf/"
+        "planar_iiwa14_spheres_dense_elbow_collision.urdf")
+
+    parser = pydrake.multibody.parsing.Parser(plant)
+    iiwa = parser.AddModelFromFile(urdf)
+    plant.WeldFrames(plant.world_frame(), plant.GetFrameByName("iiwa_link_0"))
+
+    # Set default positions:
+    q0 = [0.1, -1.2, 1.6]
+    index = 0
+    for joint_index in plant.GetJointIndices(iiwa):
+        joint = plant.get_mutable_joint(joint_index)
+        if isinstance(joint, pydrake.multibody.tree.RevoluteJoint):
+            joint.set_default_angle(q0[index])
+            index += 1
+
+    return iiwa
+
+
 # TODO: take argument for whether we want the welded fingers version or not
-def AddWsg(plant, iiwa_model_instance):
+def AddWsg(plant, iiwa_model_instance, roll=np.pi / 2.0):
     parser = pydrake.multibody.parsing.Parser(plant)
     parser.package_map().Add(
         "wsg_50_description",
@@ -51,11 +72,58 @@ def AddWsg(plant, iiwa_model_instance):
     gripper = parser.AddModelFromFile(
         FindResource("models/schunk_wsg_50_welded_fingers.sdf"), "gripper")
 
-    X_7G = RigidTransform(RollPitchYaw(np.pi / 2.0, 0, np.pi / 2.0),
-                          [0, 0, 0.114])
+    X_7G = RigidTransform(RollPitchYaw(np.pi / 2.0, 0, roll), [0, 0, 0.114])
     plant.WeldFrames(plant.GetFrameByName("iiwa_link_7", iiwa_model_instance),
                      plant.GetFrameByName("body", gripper), X_7G)
     return gripper
+
+
+def AddShape(plant, shape, name, mass=1, mu=1, color=[.5, .5, .9, 1.0]):
+    instance = plant.AddModelInstance(name)
+    # TODO: Add a method to UnitInertia that accepts a geometry shape (unless
+    # that dependency is somehow gross) and does this.
+    if isinstance(shape, pydrake.geometry.Box):
+        inertia = pydrake.multibody.tree.UnitInertia.SolidBox(
+            shape.width(), shape.depth(), shape.height())
+    elif isinstance(shape, pydrake.geometry.Cylinder):
+        inertia = pydrake.multibody.tree.UnitInertia.SolidCylinder(
+            shape.radius(), shape.length())
+    elif isinstance(shape, pydrake.geometry.Sphere):
+        inertia = pydrake.multibody.tree.UnitInertia.SolidSphere(shape.radius())
+    else:
+        raise RunTimeError(
+            f"need to write the unit inertia for shapes of type {shape}")
+    body = plant.AddRigidBody(
+        name, instance,
+        pydrake.multibody.tree.SpatialInertia(mass=mass,
+                                              p_PScm_E=np.array([0., 0., 0.]),
+                                              G_SP_E=inertia))
+    if plant.geometry_source_is_registered():
+        if isinstance(shape, pydrake.geometry.Box):
+            plant.RegisterCollisionGeometry(
+                body, RigidTransform(),
+                pydrake.geometry.Box(shape.width() - 0.001,
+                                     shape.depth() - 0.001,
+                                     shape.height() - 0.001), name,
+                pydrake.multibody.plant.CoulombFriction(mu, mu))
+            i = 0
+            for x in [-shape.width() / 2.0, shape.width() / 2.0]:
+                for y in [-shape.depth() / 2.0, shape.depth() / 2.0]:
+                    for z in [-shape.height() / 2.0, shape.height() / 2.0]:
+                        plant.RegisterCollisionGeometry(
+                            body, RigidTransform([x, y, z]),
+                            pydrake.geometry.Sphere(radius=1e-7),
+                            f"contact_sphere{i}",
+                            pydrake.multibody.plant.CoulombFriction(mu, mu))
+                        i += 1
+        else:
+            plant.RegisterCollisionGeometry(
+                body, RigidTransform(), shape, name,
+                pydrake.multibody.plant.CoulombFriction(mu, mu))
+
+        plant.RegisterVisualGeometry(body, RigidTransform(), shape, name, color)
+
+    return instance
 
 
 def AddRgbdSensors(builder,
