@@ -77,6 +77,13 @@ jobs:
       - name: submodule checkout
         run:  ./scripts/submodule_checkout
         shell: zsh -efuo pipefail {0}
+      - name: actions/virtual-environments#1811
+        run: |
+          brew uninstall openssl@1.0.2t
+          brew uninstall python@2.7.17
+          brew untap local/openssl
+          brew untap local/python2
+        shell: zsh -efuo pipefail {0}
       - name: setup
         run: ./htmlbook/workflows/ci/catalina/setup
         shell: zsh -efuo pipefail {0}
