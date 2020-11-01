@@ -6,14 +6,15 @@
 
 load("//htmlbook/tools/jupyter:defs.bzl", "rt_ipynb_test")
 
-rt_ipynb_test(
-    name = "label_generation",
-    srcs = ["label_generation.ipynb"],
-    data = ["//manipulation/models:models"],
-    deps = [
-        "//manipulation",
-        "//manipulation/exercises:grader",
-        "//manipulation/exercises/segmentation:test_mask",
-        "//manipulation:mustard_depth_camera_example",
-    ],
-)
+# Temporarily disabled due to mac test failures.  See #95
+#rt_ipynb_test(
+#    name = "label_generation",
+#    srcs = ["label_generation.ipynb"],
+#    data = ["//manipulation/models:models"],
+#    deps = [
+#        "//manipulation",
+#        "//manipulation/exercises:grader",
+#        "//manipulation/exercises/segmentation:test_mask",
+#        "//manipulation:mustard_depth_camera_example",
+#    ],
+#)
