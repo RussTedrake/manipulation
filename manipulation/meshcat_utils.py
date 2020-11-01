@@ -1,7 +1,59 @@
 import numpy as np
+import pydrake.all
 
 import meshcat.geometry as g
 import meshcat.transformations as tf
+
+
+# TODO: push this back to meshcat-python
+class TriangularMeshGeometry(g.Geometry):
+    """
+    A mesh consisting of an arbitrary collection of triangular faces. To
+    construct one, you need to pass in a collection of vertices as an Nx3 array
+    and a collection of faces as an Mx3 array. Each element of `faces` should
+    be a collection of 3 indices into the `vertices` array.
+
+    For example, to create a square made out of two adjacent triangles, we
+    could do:
+
+    vertices = np.array([
+        [0, 0, 0],  # the first vertex is at [0, 0, 0]
+        [1, 0, 0],
+        [1, 0, 1],
+        [0, 0, 1]
+    ])
+    faces = np.array([
+        [0, 1, 2],  # The first face consists of vertices 0, 1, and 2
+        [3, 0, 2]
+    ])
+
+    mesh = TriangularMeshGeometry(vertices, faces)
+    """
+    __slots__ = ["vertices", "faces"]
+
+    def __init__(self, vertices, faces, color=None):
+        super(TriangularMeshGeometry, self).__init__()
+
+        vertices = np.asarray(vertices, dtype=np.float32)
+        faces = np.asarray(faces, dtype=np.uint32)
+        assert vertices.shape[1] == 3, "`vertices` must be an Nx3 array"
+        assert faces.shape[1] == 3, "`faces` must be an Mx3 array"
+        self.vertices = vertices
+        self.faces = faces
+        self.color = color
+
+    def lower(self, object_data):
+        attrs = {u"position": g.pack_numpy_array(self.vertices.T)}
+        if self.color is not None:
+            attrs[u"color"] = g.pack_numpy_array(self.color)
+        return {
+            u"uuid": self.uuid,
+            u"type": u"BufferGeometry",
+            u"data": {
+                u"attributes": attrs,
+                u"index": g.pack_numpy_array(self.faces.T)
+            }
+        }
 
 
 def plot_surface(meshcat, X, Y, Z, color=0xdd9999, wireframe=False):
@@ -21,8 +73,15 @@ def plot_surface(meshcat, X, Y, Z, color=0xdd9999, wireframe=False):
     faces[:, :, 1, 1] = r[1:, 1:]
     faces[:, :, :, 2] = r[1:, :-1, None]
     faces.shape = (-1, 3)
-    meshcat.set_object(g.TriangularMeshGeometry(vertices, faces),
-                       g.MeshLambertMaterial(color=color, wireframe=wireframe))
+
+    if isinstance(color, int):
+        meshcat.set_object(
+            g.TriangularMeshGeometry(vertices, faces),
+            g.MeshLambertMaterial(color=color, wireframe=wireframe))
+    else:
+        meshcat.set_object(
+            TriangularMeshGeometry(vertices, faces, color),
+            g.MeshLambertMaterial(vertexColors=True, wireframe=wireframe))
 
 
 def plot_mathematical_program(meshcat, prog, X, Y, result=None):
@@ -41,52 +100,61 @@ def plot_mathematical_program(meshcat, prog, X, Y, result=None):
         for b in costs[1:]:
             Z = Z + prog.EvalBindingVectorized(b, values)
 
-    cv = meshcat["constraint"]
+    cv = meshcat["constraints"]
     for binding in prog.GetAllConstraints():
-        c = binding.evaluator()
-        var_indices = [
-            int(prog.decision_variable_index()[v.get_id()])
-            for v in binding.variables()
-        ]
-        satisfied = np.array(
-            c.CheckSatisfiedVectorized(values[var_indices, :],
-                                       0.001)).reshape(1, -1)
-        if costs:
-            Z[~satisfied] = np.nan
+        if isinstance(
+                binding.evaluator(),
+                pydrake.solvers.mathematicalprogram.BoundingBoxConstraint):
+            c = binding.evaluator()
+            var_indices = [
+                int(prog.decision_variable_index()[v.get_id()])
+                for v in binding.variables()
+            ]
+            satisfied = np.array(
+                c.CheckSatisfiedVectorized(values[var_indices, :],
+                                           0.001)).reshape(1, -1)
+            if costs:
+                Z[~satisfied] = np.nan
 
-        # Special case linear constraints
-        if False:  # isinstance(c, LinearConstraint):
-            # TODO: take these as (optional) arguments to avoid computing them
-            # inefficiently.
-            xmin = np.min(X.reshape(-1))
-            xmax = np.max(X.reshape(-1))
-            ymin = np.min(Y.reshape(-1))
-            ymax = np.max(Y.reshape(-1))
-            A = c.A()
-            lower = c.lower_bound()
-            upper = c.upper_bound()
-            # find line / box intersections
-            # https://gist.github.com/ChickenProp/3194723
-        else:
-            v = cv[str(binding)]
+            v = cv[type(c).__name__]
             Zc = np.zeros(Z.shape)
             Zc[satisfied] = np.nan
             plot_surface(v,
                          X,
                          Y,
                          Zc.reshape((X.shape[1], X.shape[0])),
-                         color=0x9999dd)
+                         color=0xff3333,
+                         wireframe=True)
+        else:
+            Zc = prog.EvalBindingVectorized(binding, values)
+            evaluator = binding.evaluator()
+            low = evaluator.lower_bound()
+            up = evaluator.upper_bound()
+            cvb = cv[type(evaluator).__name__]
+            for index in range(Zc.shape[0]):
+                color = np.repeat([[0.3], [0.3], [1.0]], N, axis=1)
+                infeasible = np.logical_or(Zc[index, :] < low[index],
+                                           Zc[index, :] > up[index])
+                color[0, infeasible] = 1.0
+                color[2, infeasible] = 0.3
+                plot_surface(cvb[str(index)],
+                             X,
+                             Y,
+                             Zc[index, :].reshape(X.shape[1], X.shape[0]),
+                             color=color,
+                             wireframe=True)
 
     if costs:
         plot_surface(meshcat["objective"],
                      X,
                      Y,
                      Z.reshape(X.shape[1], X.shape[0]),
+                     color=0x77cc77,
                      wireframe=True)
 
     if result:
         v = meshcat["solution"]
-        v.set_object(g.Sphere(0.1), g.MeshLambertMaterial(color=0x99ff99))
+        v.set_object(g.Sphere(0.1), g.MeshLambertMaterial(color=0x55ff55))
         x_solution = result.get_x_val()
         v.set_transform(
             tf.translation_matrix(

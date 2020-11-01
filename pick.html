@@ -785,6 +785,8 @@ plant.num_velocities() = 6</pre></code></p>
         Jacobian is singular, the robot is <i>accelerating</i> in $-x$,
         $\ddot{p}^G_{W_x}(t) = -2\cos(1-t).$</p>
 
+        <todo>Update this to use the two-link iiwa (like i've done in the qp_diff_ik notebook).  The link lengths aren't *quite* one to one, but it's close.  could have a point on the second link that is the right distance away, or just add the ratio logic here.</todo>
+
       </example>
 
     </subsection>

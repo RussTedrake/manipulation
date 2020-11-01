@@ -61,6 +61,29 @@ def AddPlanarIiwa(plant):
     return iiwa
 
 
+def AddTwoLinkIiwa(plant, q0=[0.1, -1.2]):
+    urdf = FindResource("models/two_link_iiwa14.urdf")
+
+    parser = pydrake.multibody.parsing.Parser(plant)
+    parser.package_map().Add(
+        "iiwa_description",
+        os.path.dirname(
+            pydrake.common.FindResourceOrThrow(
+                "drake/manipulation/models/iiwa_description/package.xml")))
+    iiwa = parser.AddModelFromFile(urdf)
+    plant.WeldFrames(plant.world_frame(), plant.GetFrameByName("iiwa_link_0"))
+
+    # Set default positions:
+    index = 0
+    for joint_index in plant.GetJointIndices(iiwa):
+        joint = plant.get_mutable_joint(joint_index)
+        if isinstance(joint, pydrake.multibody.tree.RevoluteJoint):
+            joint.set_default_angle(q0[index])
+            index += 1
+
+    return iiwa
+
+
 # TODO: take argument for whether we want the welded fingers version or not
 def AddWsg(plant, iiwa_model_instance, roll=np.pi / 2.0):
     parser = pydrake.multibody.parsing.Parser(plant)
