@@ -684,11 +684,11 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       origin of this frame is the expected point of contact.  Following our
       treatment of <a href="pick.html#kinematics">kinematics</a> and <a
       href="pick.html#jacobian">differential kinematics</a>, we'll define the
-      forward kinematics of this frame as: \begin{equation}X^C = f_{kin}(q),
-      \qquad V^C = \dot{X}^C = J(q) \dot{q}, \qquad A^C = \ddot{X}^C =
+      forward kinematics of this frame as: \begin{equation}p^C = f_{kin}(q),
+      \qquad v^C = \dot{p}^C = J(q) \dot{q}, \qquad a^C = \ddot{p}^C =
       J(q)\ddot{q} + \dot{J}(q) \dot{q}.\label{eq:kinematics}\end{equation} We
       haven't actually written the second derivative before, but it follows
-      naturally from the chain rule. </p>
+      naturally from the chain rule. Also, I've restricted this to the Cartesian positions; one can think about the orientation of the end-effector, but this requires some care in defining the 3D stiffness in orientation.</p>
 
       <p>One of the big ideas from manipulator control is that we can actually
       write the dynamics of the robot in the frame $C$, by writing the joint
@@ -696,12 +696,13 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       substituting this and the manipulator equations (\ref{eq:manipulator})
       into (\ref{eq:kinematics}) and assuming that the only external contacts
       happen at $C$, we can write the dynamics: \begin{equation} M_C(q)
-      \ddot{X}^C + C_C(q,\dot{q}) = {}^C F^{g}(q) + F^u + F^{ext}
+      \ddot{p}^C + C_C(q,\dot{q})\dot{q} = {}^C F^{g}(q) + F^u + F^{ext}
       \label{eq:cartesian_dynamics},\end{equation} where $$M_C = (J M^{-1}
-      J^T)^{-1}, \qquad C_C = M_C J M^{-1} C\dot{q} + M_C \dot{J}\dot{q}, \qquad
-      {}^CF^g = M_C J M^{-1} \tau_g.$$  Now we can simply apply the controller
-      we used in joint space, e.g.: $$F^u = -{}^C F^{g}(q) + K_p(p^{C_d} - p^C)
-      + K_d(v^{C_d} - v^C) + F^{ff}.$$  Please don't forget to add some terms to
+      J^T)^{-1}, \qquad C_C = M_C \left(J M^{-1} C+ \dot{J} \right),
+      \qquad {}^CF^g = M_C J M^{-1} \tau_g.$$  Now we can simply apply the
+      controller we used in joint space, e.g.: $$F^u = -{}^C F^{g}(q) +
+      K_p(p^{C_d} - p^C) + K_d(\dot{p}^{C_d} - \dot{p}^C) + F^{ff}.$$  Please
+      don't forget to add some terms to
       <a href="pick.html#joint_centering">stabilize the null space of your
       Jacobian</a> if necessary.</p>
 
