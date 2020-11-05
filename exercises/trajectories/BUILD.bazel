@@ -20,7 +20,7 @@ rt_ipynb_test(
     deps = [
         "//manipulation/exercises:grader",
         "//manipulation/exercises/trajectories:test_rrt_planning",
-	"//exercises/trajectories/rrt_planner",
+	"//manipulation/exercises/trajectories/rrt_planner",
     ],
     srcs = ["rrt_planning.ipynb"],
 )
