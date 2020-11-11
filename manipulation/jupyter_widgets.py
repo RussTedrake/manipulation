@@ -242,7 +242,7 @@ def MakeJointSlidersThatPublishOnCallback(plant,
         low = joint.position_lower_limits()
         upp = joint.position_upper_limits()
         for j in range(joint.num_positions()):
-            index = joint.position_start() + j
+            index = joint.velocity_start() + j
             description = joint.name()
             if joint.num_positions() > 1:
                 description += f"[{j}]"
