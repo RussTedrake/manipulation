@@ -99,6 +99,8 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
 
   <section><h1>Inverse Kinematics</h1>
 
+    <p>The goal of this chapter is to solve for motion trajectories.  But I would argue that if you really understand how to solve inverse kinematics, then you've got most of what you need to plan trajectories.</p>
+
     <p>We know that that the <a href="pick.html#kinematics">forward
     kinematics</a> give us a (nonlinear) mapping from joint angles to e.g. the
     pose of the gripper: $X^G = f_{kin}(q)$.  So, naturally, the problem of
@@ -170,8 +172,8 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       global analysis, they are not designed for fast real-time inverse
       kinematics solutions needed in a control loop.  The most popular tool
       these days for real-time inverse kinematics for six- or seven-DOF
-      manipulators is a tool called "IKFast", which was described in Section 4.1
-      of <elib>Diankov10</elib> that gained popularity because of its effective
+      manipulators is a tool called "IKFast", described in Section 4.1
+      of <elib>Diankov10</elib>, that gained popularity because of its effective
       open-source implementation.  Rather than focus on completeness, IKFast
       uses a number of approximations to provide fast and numerically robust
       solutions to the "easy" kinematics problems.  It leverages the fact that a
@@ -194,10 +196,39 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
     </subsection>
 
     <subsection><h1>IK as constrained optimization</h1>
-    
+
+      <figure><img style="width:60%" src="data/shelf_ik.png"><figcaption>A richer inverse kinematics problem: solve for the joint angles, $q$, that allow the robot to reach into the shelf and grab the object, while avoiding collisions.</figcaption></figure>
+
+      <p>We have <a href="pick.html#diff_ik_w_constraints">already discussed</a> the idea of solving <i>differential</i> inverse kinematics as an optimization problem.  This was a very nice use case, where the </p>
+
       <!-- the differential IK controller that we discussed before is just doing gradient descent on the objective ... -->
 
+      <example><h1>Interactive IK</h1>
+
+        <p>Colab.</p>
+
+      </example>
+
       <!-- a rich library of constraints -->
+      <p>Write minimal constraints.</p>
+
+      <example><h1>Grasp the cylinder.</h1>
+      
+      </example>
+
+      <p>Collision avoidance constraints.</p>
+
+      <example><h1>Visualizing the configuration stace</h1>
+      
+      </example>
+
+      <example><h1>Visualizing the IK optimization problem</h1>
+      
+        <p><a href="data/shelf_ik_prog_zoom.html">Zoomed in</a>.  <a href="data/shelf_ik_prog.html">The global optimization problem.</a></p>
+      
+      </example>
+
+      <p>Global IK.</p>      
 
     </subsection>
 

@@ -84,7 +84,12 @@ def plot_surface(meshcat, X, Y, Z, color=0xdd9999, wireframe=False):
             g.MeshLambertMaterial(vertexColors=True, wireframe=wireframe))
 
 
-def plot_mathematical_program(meshcat, prog, X, Y, result=None):
+def plot_mathematical_program(meshcat,
+                              prog,
+                              X,
+                              Y,
+                              result=None,
+                              point_size=0.05):
     assert prog.num_vars() == 2
     assert X.size == Y.size
 
@@ -154,7 +159,8 @@ def plot_mathematical_program(meshcat, prog, X, Y, result=None):
 
     if result:
         v = meshcat["solution"]
-        v.set_object(g.Sphere(0.1), g.MeshLambertMaterial(color=0x55ff55))
+        v.set_object(g.Sphere(point_size),
+                     g.MeshLambertMaterial(color=0x55ff55))
         x_solution = result.get_x_val()
         v.set_transform(
             tf.translation_matrix(
