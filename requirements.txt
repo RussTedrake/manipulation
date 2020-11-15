@@ -31,7 +31,7 @@ lxml>=4.5.2; sys_platform == 'darwin'
 MarkupSafe>=1.1.1; sys_platform == 'darwin'
 matplotlib>=3.3.1; sys_platform == 'darwin'
 mistune>=0.8.4; sys_platform == 'darwin'
-mpld3>=0.5.1
+mpld3==0.5.1
 nbclient>=0.5.0; sys_platform == 'darwin'
 nbconvert>=6.0.2; sys_platform == 'darwin'
 nbformat>=5.0.7; sys_platform == 'darwin'
