@@ -46,5 +46,5 @@ try-import %workspace%/user.bazelrc
 # Disable python imports from ~/.local (pip -U) during build and test.
 # https://github.com/bazelbuild/bazel/issues/4939
 # https://github.com/RobotLocomotion/drake/issues/8475
-#build --action_env=PYTHONNOUSERSITE=1
-#build --test_env=PYTHONNOUSERSITE=1
+build --action_env=PYTHONNOUSERSITE=1
+build --test_env=PYTHONNOUSERSITE=1

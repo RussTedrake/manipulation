@@ -155,12 +155,17 @@ python3 -c 'import pydrake; print(pydrake.__file__)</code></pre></div>
       <p>and install the prerequisites using the platform-specific installation script provided:</p>
 
       <div class="bionic"><pre class="highlight"><code>sudo manipulation/scripts/setup/ubuntu/18.04/install_prereqs.sh
-pip3 install --requirement ./requirements.txt
+pip3 install --requirement manipulation/requirements.txt
 export PYTHONPATH=`pwd`/manipulation:${PYTHONPATH}</code></pre></div>
 
       <div class="mac"><pre class="highlight"><code>manipulation/scripts/setup/mac/install_prereqs.sh
-pip3 install --requirement ./requirements.txt
+pip3 install --requirement manipulation/requirements.txt /opt/drake/share/drake/setup/requirements.txt
 export PYTHONPATH=`pwd`/manipulation:${PYTHONPATH}</code></pre></div>
+
+      <p>Note that, as always, I would strongly recommend running
+      <code>pip</code>
+      commands in a <a
+      href="https://python-guide-cn.readthedocs.io/en/latest/dev/virtualenvs.html">virtualenv</a>.</p>
 
     </subsection>
 
