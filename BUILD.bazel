@@ -84,6 +84,15 @@ rt_ipynb_test(
     ],
 )
 
+rt_ipynb_test(
+    name = "manipulation_station",
+    srcs = ["manipulation_station.ipynb"],
+    data = ["//manipulation/models:models"],
+    deps = [
+        "//manipulation",
+    ],
+)
+
 filegroup(
     name = "chapters",
     srcs = ["chapters.json"],

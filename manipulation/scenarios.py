@@ -85,15 +85,22 @@ def AddTwoLinkIiwa(plant, q0=[0.1, -1.2]):
 
 
 # TODO: take argument for whether we want the welded fingers version or not
-def AddWsg(plant, iiwa_model_instance, roll=np.pi / 2.0):
+def AddWsg(plant, iiwa_model_instance, roll=np.pi / 2.0, welded=False):
     parser = pydrake.multibody.parsing.Parser(plant)
-    parser.package_map().Add(
-        "wsg_50_description",
-        os.path.dirname(
+    if welded:
+        parser.package_map().Add(
+            "wsg_50_description",
+            os.path.dirname(
+                pydrake.common.FindResourceOrThrow(
+                    "drake/manipulation/models/wsg_50_description/package.xml"))
+        )
+        gripper = parser.AddModelFromFile(
+            FindResource("models/schunk_wsg_50_welded_fingers.sdf"), "gripper")
+    else:
+        gripper = parser.AddModelFromFile(
             pydrake.common.FindResourceOrThrow(
-                "drake/manipulation/models/wsg_50_description/package.xml")))
-    gripper = parser.AddModelFromFile(
-        FindResource("models/schunk_wsg_50_welded_fingers.sdf"), "gripper")
+                "drake/manipulation/models/"
+                "wsg_50_description/sdf/schunk_wsg_50.sdf"))
 
     X_7G = RigidTransform(RollPitchYaw(np.pi / 2.0, 0, roll), [0, 0, 0.114])
     plant.WeldFrames(plant.GetFrameByName("iiwa_link_7", iiwa_model_instance),
