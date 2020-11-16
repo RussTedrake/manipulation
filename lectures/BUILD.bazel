@@ -9,7 +9,7 @@ load("//htmlbook/tools/jupyter:defs.bzl", "rt_ipynb_test")
 rt_ipynb_test(
     name = "highlights",
     srcs = ["highlights.ipynb"],
-    data = ["//manipulation/models:double_pendulum.urdf"],
+    data = ["//manipulation/models"],
     deps = ["//manipulation"],
 )
 
