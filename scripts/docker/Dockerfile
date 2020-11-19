@@ -26,7 +26,7 @@ LABEL org.opencontainers.image.source="https://github.com/RussTedrake/manipulati
 LABEL org.opencontainers.image.title="Robot Manipulation"
 LABEL org.opencontainers.image.url="http://manipulation.csail.mit.edu/"
 LABEL org.opencontainers.image.vendor="Massachusetts Institute of Technology"
-COPY requirements.txt /tmp/
+COPY requirements.txt /tmp/requirements.txt
 COPY scripts/docker/pip.conf /root/.config/pip/pip.conf
 COPY scripts/setup/ubuntu/18.04/install_prereqs.sh /tmp/
 RUN /tmp/install_prereqs.sh \
