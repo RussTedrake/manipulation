@@ -76,7 +76,6 @@ python3-future
 python3-ipywidgets
 python3-jinja2
 python3-jsonschema
-python3-matplotlib
 python3-numpy
 python3-pandas
 python3-pip
