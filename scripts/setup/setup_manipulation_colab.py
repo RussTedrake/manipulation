@@ -33,7 +33,8 @@ def setup_manipulation(*, manipulation_sha, drake_version, drake_build):
 
     # Run pip install
     subprocess.run([
-        "pip3", "install", "--requirement", "/opt/manipulation/requirements.txt"
+        "pip3", "install", "--requirement",
+        "/opt/manipulation/requirements.txt"
     ])
 
     # Install colab specific requirements
