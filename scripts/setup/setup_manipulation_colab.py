@@ -32,16 +32,22 @@ def setup_manipulation(*, manipulation_sha, drake_version, drake_build):
     subprocess.run([f"{path}/scripts/setup/ubuntu/18.04/install_prereqs.sh"])
 
     # Run pip install
-    subprocess.run([
-        "pip3", "install", "--requirement",
-        "/opt/manipulation/requirements.txt"
-    ])
+    if os.path.isfile("/opt/manipulation/colab-requirements.txt"):
+        subprocess.run([
+            "pip3", "install", "--requirement",
+            "/opt/manipulation/colab-requirements.txt"
+        ])
+    else:
+        subprocess.run([
+            "pip3", "install", "--requirement",
+            "/opt/manipulation/requirements.txt"
+        ])
+        subprocess.run(["pip3", "install",
+                        "pyngrok==4.2.2",
+                        "pyvirtualdisplay==1.3.2"])
 
     # Install colab specific requirements
     subprocess.run(["apt", "install", "xvfb"])
-    subprocess.run(["pip3", "install",
-                    "pyngrok==4.2.2",
-                    "pyvirtualdisplay==1.3.2"])
 
     # Set the path (if necessary).
     spec = importlib.util.find_spec('manipulation')
