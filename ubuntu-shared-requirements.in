@@ -5,3 +5,7 @@ open3d==0.10.0.0 # new dependencies added from 0.11
 plotly>=4.10.0
 PyMCubes>=0.0.9
 timeout-decorator>=0.4.1
+
+# //exercises/rl:policy_gradient hit a scipy/numpy mismatch bug.
+# hard-code scipy version for now:
+scipy==1.5.3

@@ -25,13 +25,13 @@ jupyter-client==5.3.5     # via -c colab-constraints.txt, ipykernel, notebook
 jupyter-core==4.6.3       # via -c colab-constraints.txt, jupyter-client, nbconvert, nbformat, notebook
 kiwisolver==1.3.1         # via matplotlib
 markupsafe==1.1.1         # via jinja2
-matplotlib==3.2.2         # via -c colab-constraints.txt, mpld3, open3d
+matplotlib==3.2.2         # via -r colab-requirements.in, mpld3, open3d
 mistune==0.8.4            # via nbconvert
 mpld3==0.5.1              # via -r ubuntu-shared-requirements.in
 nbconvert==5.6.1          # via notebook
 nbformat==5.0.8           # via ipywidgets, nbconvert, notebook
 notebook==5.3.1           # via open3d, widgetsnbextension
-numpy==1.18.5             # via altair, matplotlib, open3d, pandas
+numpy==1.18.5             # via -c colab-constraints.txt, altair, matplotlib, open3d, pandas, scipy
 open3d==0.10.0.0          # via -r ubuntu-shared-requirements.in
 packaging==20.4           # via bleach
 pandas==1.1.4             # via altair
@@ -52,6 +52,7 @@ pyvirtualdisplay==1.3.2   # via -r colab-requirements.in
 pyyaml==5.3.1             # via pyngrok
 pyzmq==19.0.2             # via -c colab-constraints.txt, jupyter-client
 retrying==1.3.3           # via plotly
+scipy==1.5.3              # via -r ubuntu-shared-requirements.in
 send2trash==1.5.0         # via notebook
 simplegeneric==0.8.1      # via ipython
 six==1.15.0               # via bleach, cycler, jsonschema, packaging, plotly, prompt-toolkit, python-dateutil, retrying, traitlets
