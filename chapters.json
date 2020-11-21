@@ -8,6 +8,7 @@
     "segmentation",
     "force",
     "trajectories",
+    "rl",
     "drake",
     "station",
     "misc"
