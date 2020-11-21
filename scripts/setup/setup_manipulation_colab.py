@@ -18,36 +18,47 @@ def setup_manipulation(*, manipulation_sha, drake_version, drake_build):
 
     path = "/opt/manipulation"
 
+    def run(cmd, **kwargs):
+        cp = subprocess.run(cmd,
+                            stdout=subprocess.PIPE,
+                            stderr=subprocess.PIPE,
+                            universal_newlines=True, **kwargs)
+        if cp.stderr:
+            print(cp.stderr)
+        assert cp.returncode == 0, cp
+
     # Clone the repo (if necessary).
     if not os.path.isdir(path):
-        subprocess.run([
+        run([
             'git', 'clone', 'https://github.com/RussTedrake/manipulation.git',
             path
         ])
 
     # Checkout the sha.
-    subprocess.run(['git', 'checkout', manipulation_sha], cwd=path)
+    run(['git', 'checkout', manipulation_sha], cwd=path)
 
     # Run install_prereqs.sh
-    subprocess.run([f"{path}/scripts/setup/ubuntu/18.04/install_prereqs.sh"])
+    run([f"{path}/scripts/setup/ubuntu/18.04/install_prereqs.sh"])
 
     # Run pip install
     if os.path.isfile("/opt/manipulation/colab-requirements.txt"):
-        subprocess.run([
+        run([
             "pip3", "install", "--requirement",
             "/opt/manipulation/colab-requirements.txt"
         ])
     else:
-        subprocess.run([
+        run([
             "pip3", "install", "--requirement",
             "/opt/manipulation/requirements.txt"
         ])
-        subprocess.run(["pip3", "install",
-                        "pyngrok==4.2.2",
-                        "pyvirtualdisplay==1.3.2"])
+        run([
+            "pip3", "install",
+            "pyngrok==4.2.2",
+            "pyvirtualdisplay==1.3.2"
+        ])
 
     # Install colab specific requirements
-    subprocess.run(["apt", "install", "xvfb"])
+    run(["apt", "install", "xvfb"])
 
     # Set the path (if necessary).
     spec = importlib.util.find_spec('manipulation')

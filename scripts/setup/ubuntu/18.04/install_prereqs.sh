@@ -29,7 +29,7 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-set -euxo pipefail
+set -euo pipefail
 
 if [[ "${EUID}" -ne 0 ]]; then
   echo 'ERROR: This script must be run as root' >&2
