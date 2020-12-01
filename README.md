@@ -47,10 +47,13 @@ will clean them up.
 
 My current (proposed) solution:
 - OBS on Ubuntu
-  - Connect ipad via this Airplay recevier on Ubuntu: https://github.com/antimof/UxPlay
+  - Connect ipad via this Airplay recevier on Ubuntu: https://github.com/RussTedrake/UxPlay
   - Share with Zoom via "Windowed Projector (Source)".  Drag the window to make it big (full resolution) and to fit the content nicely.  Then I can minimize it. 
   - Google Hangouts meet speaker
   - Brio for video (through OBS?  or directly?)
+
+Or when I can get away with just slides / goodnotes:
+- Zoom on mac, connect ipad with cable, show slides.com and goodnotes both directly from ipad.
 
 I've tried a number of solutions.
 - OBS
