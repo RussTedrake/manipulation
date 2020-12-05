@@ -100,7 +100,7 @@ def AddWsg(plant, iiwa_model_instance, roll=np.pi / 2.0, welded=False):
         gripper = parser.AddModelFromFile(
             pydrake.common.FindResourceOrThrow(
                 "drake/manipulation/models/"
-                "wsg_50_description/sdf/schunk_wsg_50.sdf"))
+                "wsg_50_description/sdf/schunk_wsg_50_no_tip.sdf"))
 
     X_7G = RigidTransform(RollPitchYaw(np.pi / 2.0, 0, roll), [0, 0, 0.114])
     plant.WeldFrames(plant.GetFrameByName("iiwa_link_7", iiwa_model_instance),
