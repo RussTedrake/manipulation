@@ -15,6 +15,7 @@ from pydrake.common.jupyter import process_ipywidget_events
 from pydrake.math import RollPitchYaw, RigidTransform
 from pydrake.multibody.tree import JointIndex
 from pydrake.systems.framework import BasicVector, VectorSystem
+from pydrake.systems.jupyter_widgets import PoseSliders
 
 
 class JointSliders(VectorSystem):
@@ -215,9 +216,9 @@ def MakeJointSlidersThatPublishOnCallback(plant,
     positions = plant.GetPositions(plant_context)
 
     # Publish once immediately.
-    publishing_system.Publish(publishing_context)
     if my_callback:
         my_callback(plant_context)
+    publishing_system.Publish(publishing_context)
 
     def _slider_callback(change, index, body=None):
         if body:  # Then it's a floating base
@@ -231,9 +232,9 @@ def MakeJointSlidersThatPublishOnCallback(plant,
         else:
             positions[index] = change.new
             plant.SetPositions(plant_context, positions)
-        publishing_system.Publish(publishing_context)
         if my_callback:
             my_callback(plant_context)
+        publishing_system.Publish(publishing_context)
 
     slider_widgets = []
     for i in range(plant.num_joints()):
@@ -241,7 +242,7 @@ def MakeJointSlidersThatPublishOnCallback(plant,
         low = joint.position_lower_limits()
         upp = joint.position_upper_limits()
         for j in range(joint.num_positions()):
-            index = joint.position_start() + j
+            index = joint.velocity_start() + j
             description = joint.name()
             if joint.num_positions() > 1:
                 description += f"[{j}]"
@@ -282,5 +283,59 @@ def MakeJointSlidersThatPublishOnCallback(plant,
                 slider_widgets.append(slider)
                 index += 1
                 relative_index += 1
+
+    return slider_widgets
+
+
+def MakePoseSlidersThatPublishOnCallback(publishing_system,
+                                         root_context,
+                                         my_callback,
+                                         min_range=PoseSliders.MinRange(),
+                                         max_range=PoseSliders.MaxRange(),
+                                         value=PoseSliders.Value(),
+                                         resolution=0.01,
+                                         length=200,
+                                         continuous_update=True):
+
+    def value_to_pose(val):
+        return RigidTransform(RollPitchYaw(val.roll, val.pitch, val.yaw),
+                              [val.x, val.y, val.z])
+
+    def pose_to_value(pose):
+        rpy = RollPitchYaw(pose.rotation())
+        xyz = pose.translation()
+        return PoseSliders.Value(rpy.roll_angle(), rpy.pitch_angle(),
+                                 rpy.yaw_angle(), xyz[0], xyz[1], xyz[2])
+
+    if isinstance(value, RigidTransform):
+        value = pose_to_value(value)
+
+    publishing_context = publishing_system.GetMyContextFromRoot(root_context)
+
+    # Publish once immediately.
+    my_callback(root_context, value_to_pose(value))
+    publishing_system.Publish(publishing_context)
+
+    global v
+    v = value
+
+    def _slider_callback(change, var):
+        global v
+        v = v._replace(**{var: change.new})
+        my_callback(root_context, value_to_pose(v))
+        publishing_system.Publish(publishing_context)
+
+    slider_widgets = []
+    for var in ["roll", "pitch", "yaw", "x", "y", "z"]:
+        slider = FloatSlider(min=getattr(min_range, var),
+                             max=getattr(max_range, var),
+                             value=getattr(value, var),
+                             step=resolution,
+                             continuous_update=continuous_update,
+                             description=var,
+                             layout=Layout(width='90%'))
+        slider.observe(partial(_slider_callback, var=var), names='value')
+        display(slider)
+        slider_widgets.append(slider)
 
     return slider_widgets

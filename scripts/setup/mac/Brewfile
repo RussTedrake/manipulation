@@ -2,6 +2,6 @@
 # vi: set ft=ruby :
 
 brew "bazel"
+brew "python@3.8", link: :force
 brew "numpy"
-brew "python@3.8"
 brew "tidy-html5"

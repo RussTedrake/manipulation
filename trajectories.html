@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+
+<html>
+
+  <head>
+    <title>Robotic Manipulation: Motion Planning</title>
+    <meta name="Robotic Manipulation: Motion Planning" content="text/html; charset=utf-8;" />
+    <link rel="canonical" href="http://manipulation.csail.mit.edu/trajectories.html" />
+
+    <script src="https://hypothes.is/embed.js" async></script>
+    <script type="text/javascript" src="htmlbook/book.js"></script>
+
+    <script src="htmlbook/mathjax-config.js" defer></script> 
+    <script type="text/javascript" id="MathJax-script" defer
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js">
+    </script>
+    <script>window.MathJax || document.write('<script type="text/javascript" src="htmlbook/MathJax/es5/tex-chtml.js" defer><\/script>')</script>
+
+    <link rel="stylesheet" href="htmlbook/highlight/styles/default.css">
+    <script src="htmlbook/highlight/highlight.pack.js"></script> <!-- http://highlightjs.readthedocs.io/en/latest/css-classes-reference.html#language-names-and-aliases -->
+    <script>hljs.initHighlightingOnLoad();</script>
+
+    <link rel="stylesheet" type="text/css" href="htmlbook/book.css" />
+  </head>
+
+<body onload="loadChapter('manipulation');">
+
+<div data-type="titlepage">
+  <header>
+    <h1><a href="index.html" style="text-decoration:none;">Robotic Manipulation</a></h1>
+    <p data-type="subtitle">Perception, Planning, and Control</p> 
+    <p style="font-size: 18px;"><a href="http://people.csail.mit.edu/russt/">Russ Tedrake</a></p>
+    <p style="font-size: 14px; text-align: right;"> 
+      &copy; Russ Tedrake, 2020<br/>
+      Last modified <span id="last_modified"></span>.</br>
+      <script>
+      var d = new Date(document.lastModified);
+      document.getElementById("last_modified").innerHTML = d.getFullYear() + "-" + (d.getMonth()+1) + "-" + d.getDate();</script>
+      <a href="misc.html">How to cite these notes, use annotations, and give feedback.</a><br/>
+    </p>
+  </header>
+</div>
+
+<p><b>Note:</b> These are working notes used for <a
+href="http://manipulation.csail.mit.edu/Fall2020/">a course being taught
+at MIT</a>. They will be updated throughout the Fall 2020 semester.  <!-- <a 
+href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos are available on YouTube</a>.--></p> 
+
+<table style="width:100%;"><tr style="width:100%">
+  <td style="width:33%;text-align:left;"><a class="previous_chapter" href=force.html>Previous Chapter</a></td>
+  <td style="width:33%;text-align:center;"><a href=index.html>Table of contents</a></td>
+  <td style="width:33%;text-align:right;"><a class="next_chapter" href=rl.html>Next Chapter</a></td>
+</tr></table>
+
+
+<!-- EVERYTHING ABOVE THIS LINE IS OVERWRITTEN BY THE INSTALL SCRIPT -->
+<chapter style="counter-reset: chapter 7"><h1>Motion Planning</h1>
+  <a style="float:right; margin-top:-80px;" target="trajectories" href="https://colab.research.google.com/github/RussTedrake/manipulation/blob/master/trajectories.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open Corresponding Notebook In Colab"/></a>
+  <div style="clear:right;"></div>
+
+  <p>There are a few more essential skills that we need in our toolbox.  In this
+  chapter, we will explore some of the powerful methods of kinematic trajectory
+  motion planning.</p>
+
+  <div>I'm actually almost proud of making it this far into the notes without
+  covering this topic yet.  Writing a relatively simple script for the pose of
+  the gripper, like we did in the bin picking chapter, really can solve a lot of
+  interesting problems.  But there are a number of reasons that we might want a
+  more automated solution:
+  <ol><li>When the environment becomes more cluttered, it is harder to write
+  such a simple solution, and we might have to worry about collisions between
+  the arm and the environment as well as the gripper and the environment.</li>
+  <li>If we are doing "mobile manipulation" -- our robotic arms are attached to
+  a mobile base -- then the robot might have to operate in many different environments.  Even if the workspace is not geometrically complicated,
+  it might still be different enough each time we reach that it requires
+  automated (but possibly still simple) planning.</li><li>If the robot is
+  operating in a simple known environment all day long, then it probably makes
+  sense to optimize the trajectories that it is executing; we can often speed up
+  the manipulation process significantly.</li>
+  </div>
+
+  <p>We'll focus on the problem of moving an arm through space in this chapter,
+  because that is the classical and very important motivation.  But I need to
+  cover this now for another reason, too: it will also soon help us think about
+  programming a more dexterous hand.</p>
+
+  <todo>Add atlas "big robot little car"</todo>
+
+  <p>I do need to make one important caveat.  Despite having done some work in
+  this field myself, I actually really dislike the problem formulation of
+  collision-free motion planning.  I think that on the whole, robots are too
+  afraid of bumping into the world (because things still go wrong when they do).
+  I don't think humans are solving these complex geometric problems every time
+  we reach... even when we are reaching in dense clutter (I actually suspect
+  that we are very bad at it). I would much rather see robots that perform well
+  even with very coarse / approximate plans for moving through a cluttered
+  environment, that are not afraid to make incidental contacts, and that can
+  still accomplish the task when they do!</p>
+
+  <section><h1>Inverse Kinematics</h1>
+
+    <p>The goal of this chapter is to solve for motion trajectories.  But I would argue that if you really understand how to solve inverse kinematics, then you've got most of what you need to plan trajectories.</p>
+
+    <p>We know that that the <a href="pick.html#kinematics">forward
+    kinematics</a> give us a (nonlinear) mapping from joint angles to e.g. the
+    pose of the gripper: $X^G = f_{kin}(q)$.  So, naturally, the problem of
+    inverse kinematics (IK) is about solving for the inverse map, $q =
+    f^{-1}_{kin}(X^G).$  Indeed, that is perhaps the most common and classical
+    question studied in inverse kinematics.  But I want you to think of inverse
+    kinematics as a much richer topic than that.</p>
+
+    <p>For example, when we were <a
+    href="clutter.html#grasp_candidates">evaluating grasp candidates for bin
+    picking</a>, we had only a soft preference on the orientation of the hand
+    relative to some antipodal grasp.  In that case, a full 6 DOF pose would
+    have been an overly constrained specification.  And often we have many
+    constraints on the kinematics: some in joint space (like joint limits) and
+    others in Cartesian space (like non-penetration constraints).  So really,
+    inverse kinematics is about solving for joint angles in a very rich
+    landscape of objectives and constraints.</p>
+
+    <figure>
+      <iframe width="560" height="315" src="https://www.youtube.com/embed/m1rv4d_zUCY" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+      <figcaption>We made extensive use of rich inverse kinematics
+      specifications in our work on humanoid robots.  The video above is an
+      example of the interactive inverse kinematics interface (here to help us
+      figure out how to fit the our big humanoid robot into the little Polaris).
+      <a href="https://www.youtube.com/watch?v=E_CVq0lWfSc">Here is another
+      video</a> of the same tool being used for the Valkyrie humanoid, where we
+      do specify and end-effector pose, but we also add a joint-centering
+      objective and static stability constraints <elib>Fallon14+Marion16</elib>.
+      </figcaption>
+    </figure>
+  
+    <subsection><h1>Closed-form solutions</h1>
+
+      <p>With its obvious importance in robotics, you probably won't be
+      surprised to hear that there is an extensive literature on inverse
+      kinematics.  But you may be surprised at how extensive and complete the
+      solutions can get. The forward kinematics, $f_{kin}$, is a nonlinear
+      function in general, but it is a very structured one.  In fact, with rare
+      exceptions (like if your robot has a <a
+      href="https://www.hindawi.com/journals/mpe/2016/1761968/fig4/">helical
+      joint</a>, aka screw joint), the equations governing the valid Cartesian
+      positions of our robots are actually <i>polynomial</i>.  "But wait!  What
+      about all of those sines and cosines in my kinematic equations?" you say.
+      The trigonometric terms come when we want to relate joint angles with
+      Cartesian coordinates.  In $\Re^3$, for two points, $A$ and $B$, on the
+      same rigid body, the (squared) distance between them, $\|p^A - p^B\|^2,$
+      is a constant.  And a joint is just a polynomial constraint between
+      positions on adjoining bodies, e.g. that they occupy the same point in
+      Cartesian space.  See <elib>Wampler11</elib> for an excellent
+      overview.</p>
+
+      <todo>example: trig and polynomial kinematics of a two-link arm.</todo>
+
+      <p>Understanding the solutions to polynomial equations is the subject of
+      algebraic geometry.  There is a deep literature on the theory, on symbolic
+      algorithms, and on numerical algorithms.  For even very complex kinematic
+      topologies, such as <a
+      href="https://en.wikipedia.org/wiki/Four-bar_linkage">four-bar
+      linkages</a> and <a
+      href="https://en.wikipedia.org/wiki/Stewart_platform">Stewart-Gough
+      platforms</a>, we can count the number of solutions, and/or understand the
+      continuous manifold of solutions.  For instance, <elib>Wampler11</elib>
+      describes a substantial toolbox for numerical algebraic geometry (based on
+      homotopy methods) with impressive results on difficult kinematics
+      problems.</p>
+
+      <p>While the algebraic-geometry methods are mostly targeted for offline
+      global analysis, they are not designed for fast real-time inverse
+      kinematics solutions needed in a control loop.  The most popular tool
+      these days for real-time inverse kinematics for six- or seven-DOF
+      manipulators is a tool called "IKFast", described in Section 4.1
+      of <elib>Diankov10</elib>, that gained popularity because of its effective
+      open-source implementation.  Rather than focus on completeness, IKFast
+      uses a number of approximations to provide fast and numerically robust
+      solutions to the "easy" kinematics problems.  It leverages the fact that a
+      six-DOF pose constraint on a six-DOF manipulator has a closed-form
+      solutions with a finite number of joint space configurations that produce
+      the same end-effector pose, and for seven-DOF manipulators it adds a layer
+      of sampling in the last degree of freedom on top of the six-DOF
+      solver.</p>
+
+      <todo>add an example of calling (or implementing something equivalent to) ikfast and/or bertini.  looks like bertini 2 has python bindings (but not pip) and is GPL3.</todo>
+
+      <p>These closed-form solutions are important to understand because they
+      provide deep insight into the equations, and because they can be fast
+      enough to use inside a more sophisticated solution approach.  But the
+      closed-form solutions don't provide the rich specification I advocated for
+      above; in particular, they break down once we have inequality constraints
+      instead of equality constraints.  For those richer specifications, we will
+      turn to optimization.</p>
+
+    </subsection>
+
+    <subsection><h1>IK as constrained optimization</h1>
+
+      <figure><img style="width:60%" src="data/shelf_ik.png"><figcaption>A richer inverse kinematics problem: solve for the joint angles, $q$, that allow the robot to reach into the shelf and grab the object, while avoiding collisions.</figcaption></figure>
+
+      <p>We have <a href="pick.html#diff_ik_w_constraints">already discussed</a> the idea of solving <i>differential</i> inverse kinematics as an optimization problem.  This was a very nice use case, where the </p>
+
+      <!-- the differential IK controller that we discussed before is just doing gradient descent on the objective ... -->
+
+      <example><h1>Interactive IK</h1>
+
+        <p>Colab.</p>
+
+      </example>
+
+      <!-- a rich library of constraints -->
+      <p>Write minimal constraints.</p>
+
+      <example><h1>Grasp the cylinder.</h1>
+      
+      </example>
+
+      <p>Collision avoidance constraints.</p>
+
+      <example><h1>Visualizing the configuration stace</h1>
+      
+      </example>
+
+      <example><h1>Visualizing the IK optimization problem</h1>
+      
+        <p><a href="data/shelf_ik_prog_zoom.html">Zoomed in</a>.  <a href="data/shelf_ik_prog.html">The global optimization problem.</a></p>
+      
+      </example>
+
+      <p>Global IK.</p>      
+
+    </subsection>
+
+    <subsection><h1>Grasp planning as IK</h1>
+    
+      <!-- key idea to get across: solve for "pick up" and "put down" simultaneously.  -->
+    
+    </subsection>
+
+  </section>
+
+  <!-- maybe section on collision detection / constraints? GJK? octrees? -->
+
+  <section><h1>Kinematic trajectory optimization</h1>
+  
+    <!-- trajectories in joint space versus EE space -->
+
+    <!-- pp trajectories -->
+
+    <!-- b-spline trajectories -->
+
+    <!-- anytime b-spline smoother? -->
+
+    <!-- chomp? (and friends?) -->
+
+    <!-- snopt vs augmented lagrangian? -->
+
+  </section>
+
+  <section><h1>Sample-based motion planning</h1>
+  
+  </section>
+
+  <!-- time-scaling trajectories (TOPPRA?) -->
+
+  <section><h1>Exercises</h1>
+    <exercise><h1>Door Opening</h1>
+      <p> For this exercise, you will implement a optimization-based inverse kinematics solver to open a cupboard door. You will work exclusively in <a href="https://colab.research.google.com/github/RussTedrake/manipulation/blob/master/exercises/trajectories/door_opening.ipynb" target="_blank">this notebook</a>. You will be asked to complete the following steps: </p>
+      <ol type="a">
+        <li> Write down the constraints on the IK problem of grabbing a cupboard handle.
+        </li>
+        <li> Formalize the IK problem as an instance of optimization. </li>
+        <li> Implement the optimization problem using MathematicalProgram.</li>
+      </ol>
+    </exercise>    
+
+    <exercise><h1>RRT Motion Planning</h1>
+      <p> For this exercise, you will implement and analyze the RRT algorithm introduced in class. You will work exclusively in <a href="https://colab.research.google.com/github/RussTedrake/manipulation/blob/master/exercises/trajectories/rrt_planning.ipynb" target="_blank">this notebook</a>. You will be asked to complete the following steps: </p>
+      <ol type="a">
+        <li> Implement the RRT algorithm for the Kuka arm.
+        </li>
+        <li> Answer questions regarding its properties. </li>
+      </ol>
+    </exercise>    
+
+  </section>
+
+</chapter>
+<!-- EVERYTHING BELOW THIS LINE IS OVERWRITTEN BY THE INSTALL SCRIPT -->
+
+<table style="width:100%;"><tr style="width:100%">
+  <td style="width:33%;text-align:left;"><a class="previous_chapter" href=force.html>Previous Chapter</a></td>
+  <td style="width:33%;text-align:center;"><a href=index.html>Table of contents</a></td>
+  <td style="width:33%;text-align:right;"><a class="next_chapter" href=rl.html>Next Chapter</a></td>
+</tr></table>
+
+<div id="footer">
+  <hr>
+  <table style="width:100%;">
+    <tr><td><a href="https://accessibility.mit.edu/">Accessibility</a></td><td style="text-align:right">&copy; Russ
+      Tedrake, 2020</td></tr>
+  </table>
+</div>
+
+
+</body>
+</html>

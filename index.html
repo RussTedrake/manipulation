@@ -102,12 +102,12 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
     <li><a href=pick.html#section1>Monogram Notation</a></li>
     <li><a href=pick.html#section2>Pick and place via spatial transforms</a></li>
     <li><a href=pick.html#section3>Spatial Algebra</a></li>
-    <li><a href=pick.html#section4>Forward kinematics</a></li>
+    <li><a href=pick.html#kinematics>Forward kinematics</a></li>
     <ul>
       <li>The kinematic tree</li>
       <li>Forward kinematics for pick and place</li>
     </ul>
-    <li><a href=pick.html#section5>Differential kinematics (Jacobians)</a></li>
+    <li><a href=pick.html#jacobian>Differential kinematics (Jacobians)</a></li>
     <li><a href=pick.html#section6>Differential inverse kinematics</a></li>
     <ul>
       <li>The Jacobian pseudo-inverse</li>
@@ -116,7 +116,8 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
     <li><a href=pick.html#section7>Defining the grasp and pre-grasp poses</a></li>
     <li><a href=pick.html#section8>A pick and place trajectory</a></li>
     <li><a href=pick.html#section9>Putting it all together</a></li>
-    <li><a href=pick.html#section10>Differential inverse kinematics with constraints</a></li>
+    <li><a href=pick.html#diff_ik_w_constraints>Differential inverse kinematics with
+  constraints</a></li>
     <ul>
       <li>Pseudo-inverse as an optimization</li>
       <li>Adding velocity constraints</li>
@@ -188,6 +189,7 @@ segmentation</a></li>
     </ul>
     <li><a href=segmentation.html#section2>Object detection and segmentation</a></li>
     <li><a href=segmentation.html#section3>Putting it all together</a></li>
+    <li><a href=segmentation.html#section4>Exercises</a></li>
   </ul>
   <li><a href="force.html">Chapter 7: Force Control</a></li>
   <ul>
@@ -196,19 +198,34 @@ segmentation</a></li>
       <li>(Direct) force control</li>
       <li>A force-based "flip-up" strategy</li>
       <li>Indirect force control</li>
-      <li>An impedance-control-based "flip-up" strategy</li>
-      <li>Hybrid control</li>
+      <li>A stiffness-control-based "flip-up" strategy</li>
+      <li>Hybrid position/force control</li>
     </ul>
     <li><a href=force.html#section2>Peg in hole</a></li>
     <li><a href=force.html#section3>Manipulator control</a></li>
     <ul>
-      <li>Inverse dynamics control</li>
-      <li>Direct force control</li>
-      <li>Joint impedance control</li>
-      <li>End-effector impedance control</li>
-      <li>Impedance control on the iiwa</li>
+      <li>Joint stiffness control</li>
+      <li>Cartesian stiffness control</li>
+      <li>Some implementation details on the iiwa</li>
     </ul>
     <li><a href=force.html#section4>Putting it all together</a></li>
+    <li><a href=force.html#section5>Exercises</a></li>
+  </ul>
+  <li><a href="trajectories.html">Chapter 8: Motion Planning</a></li>
+  <ul>
+    <li><a href=trajectories.html#section1>Inverse Kinematics</a></li>
+    <ul>
+      <li>Closed-form solutions</li>
+      <li>IK as constrained optimization</li>
+      <li>Grasp planning as IK</li>
+    </ul>
+    <li><a href=trajectories.html#section2>Kinematic trajectory optimization</a></li>
+    <li><a href=trajectories.html#section3>Sample-based motion planning</a></li>
+    <li><a href=trajectories.html#section4>Exercises</a></li>
+  </ul>
+  <li><a href="rl.html">Chapter 9: Reinforcement Learning</a></li>
+  <ul>
+    <li><a href=rl.html#section1>Exercises</a></li>
   </ul>
 <p style="margin-bottom: 0; text-decoration: underline;font-variant: small-caps;"><b>Appendix</b></p>
   <li><a href="drake.html">Appendix A: Drake</a></li>

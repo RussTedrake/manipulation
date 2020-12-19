@@ -47,7 +47,7 @@ at MIT</a>. They will be updated throughout the Fall 2020 semester.  <!-- <a
 href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos are available on YouTube</a>.--></p> 
 
 <table style="width:100%;"><tr style="width:100%">
-  <td style="width:33%;text-align:left;"><a class="previous_chapter" href=force.html>Previous Chapter</a></td>
+  <td style="width:33%;text-align:left;"><a class="previous_chapter" href=rl.html>Previous Chapter</a></td>
   <td style="width:33%;text-align:center;"><a href=index.html>Table of contents</a></td>
   <td style="width:33%;text-align:right;"><a class="next_chapter" href=station.html>Next Chapter</a></td>
 </tr></table>
@@ -154,13 +154,20 @@ python3 -c 'import pydrake; print(pydrake.__file__)</code></pre></div>
 
       <p>and install the prerequisites using the platform-specific installation script provided:</p>
 
-      <div class="bionic"><pre class="highlight"><code>sudo manipulation/scripts/setup/ubuntu/18.04/install_prereqs.sh
-pip3 install --requirement ./requirements.txt
-export PYTHONPATH=`pwd`/manipulation:${PYTHONPATH}</code></pre></div>
+      <div class="bionic"><pre class="highlight"><code>cd manipulation
+sudo scripts/setup/ubuntu/18.04/install_prereqs.sh
+pip3 install --requirement requirements.txt
+export PYTHONPATH=`pwd`:${PYTHONPATH}</code></pre></div>
 
-      <div class="mac"><pre class="highlight"><code>manipulation/scripts/setup/mac/install_prereqs.sh
-pip3 install --requirement ./requirements.txt
-export PYTHONPATH=`pwd`/manipulation:${PYTHONPATH}</code></pre></div>
+      <div class="mac"><pre class="highlight"><code>cd manipulation
+scripts/setup/mac/install_prereqs.sh
+pip3 install --requirement requirements.txt /opt/drake/share/drake/setup/requirements.txt
+export PYTHONPATH=`pwd`:${PYTHONPATH}</code></pre></div>
+
+      <p>Note that, as always, I would strongly recommend running
+      <code>pip</code>
+      commands in a <a
+      href="https://python-guide-cn.readthedocs.io/en/latest/dev/virtualenvs.html">virtualenv</a>.</p>
 
     </subsection>
 
@@ -189,7 +196,7 @@ export PYTHONPATH=`pwd`/manipulation:${PYTHONPATH}</code></pre></div>
 <!-- EVERYTHING BELOW THIS LINE IS OVERWRITTEN BY THE INSTALL SCRIPT -->
 
 <table style="width:100%;"><tr style="width:100%">
-  <td style="width:33%;text-align:left;"><a class="previous_chapter" href=force.html>Previous Chapter</a></td>
+  <td style="width:33%;text-align:left;"><a class="previous_chapter" href=rl.html>Previous Chapter</a></td>
   <td style="width:33%;text-align:center;"><a href=index.html>Table of contents</a></td>
   <td style="width:33%;text-align:right;"><a class="next_chapter" href=station.html>Next Chapter</a></td>
 </tr></table>

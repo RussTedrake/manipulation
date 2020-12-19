@@ -29,7 +29,7 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-set -euxo pipefail
+set -euo pipefail
 
 if [[ "${EUID}" -ne 0 ]]; then
   echo 'ERROR: This script must be run as root' >&2
@@ -69,15 +69,17 @@ jupyter-nbconvert
 jupyter-notebook
 locales
 python3
+python3-bs4
+python3-dev
 python3-entrypoints
 python3-future
 python3-ipywidgets
 python3-jinja2
 python3-jsonschema
-python3-matplotlib
 python3-numpy
 python3-pandas
 python3-pip
+python3-requests
 python3-retrying
 python3-setuptools
 python3-six

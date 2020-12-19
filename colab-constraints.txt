@@ -1,0 +1,21 @@
+# Constraints from existing installation on colab
+tensorflow==2.3.0
+torch==1.7.0 #+cu101
+datascience==0.10.6
+albumentations==0.1.12
+#google-colab==1.0.0  # this appears out of date
+git+git://github.com/googlecolab/colabtools/#egg=google-colab
+
+# The following will avoid the "... packages were previously imported in this runtime... you must restart the runtime in order to use newly installed versions"
+google==2.0.3
+ipython==5.5.0
+ipykernel==4.10.1
+jupyter-client==5.3.5
+jupyter-core==4.6.3
+prompt-toolkit==1.0.18
+Pygments==2.6.1
+pytz==2018.9
+pyzmq==19.0.2
+Sphinx==1.8.5
+tornado==5.1.1
+numpy==1.18.5
