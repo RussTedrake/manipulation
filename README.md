@@ -45,10 +45,20 @@ will clean them up.
 
 ## For lecturing
 
-My current (proposed) solution:
+New proposed solution (attendees only have to look at slides.com + my video via zoom):
+- Zoom from either computer
+- ipad connects to http://wbo.ophir.dev; I add link to the private board in my slides.com
+  - alternatives i considered:
+    - goodnotes.  this will be the best if/when it's "realtime sharing" (released Dec 2020) becomes iframable.
+    - AWW app (probably needs $9/month edu license.  writing it borderline too ugly)
+    - ExplainEverything (user limit), Jamboard (can't embed), groupboard.com (writing wasn't great), ipevo whiteboard (can't share?), miro/mural look like overkill.
+- screen sharing via broadcast to youtube (until I find something better)
+
+My solution for much of Fall 2020:
 - OBS on Ubuntu
   - Connect ipad via this Airplay recevier on Ubuntu: https://github.com/RussTedrake/UxPlay
-  - Share with Zoom via "Windowed Projector (Source)".  Drag the window to make it big (full resolution) and to fit the content nicely.  Then I can minimize it. 
+  - Share with Zoom via "Windowed Projector (Source)".  Drag the window to make it big (full resolution) and to fit the content nicely.  Then I can minimize it.
+    - Update: this isn't working on my ubuntu again.  I suspect that the graphics card drivers are to blame.
   - Google Hangouts meet speaker
   - Brio for video (through OBS?  or directly?)
 
@@ -60,6 +70,8 @@ I've tried a number of solutions.
   - Never worked well for me on mac; at least not on the macbook air.  It might have been starved of resources.
   - I got things working beautifully on ubuntu, and could push to YouTube at a nice screen quality.
   - The sharing to Zoom, both with the virtual camera and the desktop sharing, resulted in a dramatic loss of resolution.  To the point where it was unusable.  Update: Seems to be resolved with version 26.0.2
+- OBS Streaming => youtube for sharing ipad, etc in slides.com as an iframe
+  - important: in streaming settings on youtube, click "stream latency: ultra-low latency".
 - Mmhmm
   - Again, resolution of the screen share with zoom was a bottleneck
 - Zoom (only) on mac
