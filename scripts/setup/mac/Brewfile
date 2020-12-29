@@ -3,5 +3,4 @@
 
 brew "bazel"
 brew "python@3.8", link: :force
-brew "numpy"
 brew "tidy-html5"
