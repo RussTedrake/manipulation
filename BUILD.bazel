@@ -4,6 +4,7 @@
 # Copyright 2020 Massachusetts Institute of Technology.
 # Licensed under the BSD 3-Clause License. See LICENSE.TXT for details.
 
+load("//htmlbook/tools/html:defs.bzl", "rt_html_test")
 load("//htmlbook/tools/jupyter:defs.bzl", "rt_ipynb_test")
 load("//htmlbook/tools/tidy:def.bzl", "html_tidy_test")
 
@@ -32,9 +33,17 @@ html_tidy_test(
     config = ".tidy.config",
 )
 
+rt_html_test(
+    srcs = ["intro.html"],
+)
+
 rt_ipynb_test(
     name = "intro",
     srcs = ["intro.ipynb"],
+)
+
+rt_html_test(
+    srcs = ["robot.html"],
 )
 
 rt_ipynb_test(
@@ -42,9 +51,17 @@ rt_ipynb_test(
     srcs = ["robot.ipynb"],
 )
 
+rt_html_test(
+    srcs = ["pick.html"],
+)
+
 rt_ipynb_test(
     name = "pick",
     srcs = ["pick.ipynb"],
+)
+
+rt_html_test(
+    srcs = ["pose.html"],
 )
 
 rt_ipynb_test(
@@ -53,6 +70,10 @@ rt_ipynb_test(
     srcs = ["pose.ipynb"],
     deps = ["//manipulation"],
     tags = ["no-sandbox"],  # from vtk-test-tags() in drake
+)
+
+rt_html_test(
+    srcs = ["clutter.html"],
 )
 
 rt_ipynb_test(
@@ -66,6 +87,10 @@ rt_ipynb_test(
     ],
 )
 
+rt_html_test(
+    srcs = ["force.html"],
+)
+
 rt_ipynb_test(
     name = "force",
     srcs = ["force.ipynb"],
@@ -75,6 +100,10 @@ rt_ipynb_test(
     ],
 )
 
+rt_html_test(
+    srcs = ["trajectories.html"],
+)
+
 rt_ipynb_test(
     name = "trajectories",
     srcs = ["trajectories.ipynb"],
@@ -82,6 +111,22 @@ rt_ipynb_test(
     deps = [
         "//manipulation",
     ],
+)
+
+rt_html_test(
+    srcs = ["rl.html"],
+)
+
+rt_html_test(
+    srcs = ["drake.html"],
+)
+
+rt_html_test(
+    srcs = ["misc.html"],
+)
+
+rt_html_test(
+    srcs = ["station.html"],
 )
 
 rt_ipynb_test(
