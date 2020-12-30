@@ -35,8 +35,8 @@ def MustardExampleSystem():
     use_meshcat = False
     if use_meshcat:
         meshcat = builder.AddSystem(MeshcatVisualizer(scene_graph))
-        builder.Connect(scene_graph.get_pose_bundle_output_port(),
-                        meshcat.get_input_port(0))
+        builder.Connect(scene_graph.get_query_output_port(),
+                        meshcat.get_geometry_query_input_port())
 
     AddRgbdSensors(builder, plant, scene_graph)
 
