@@ -1,0 +1,19 @@
+
+@page { 
+  margin-top: 2cm;
+  margin-bottom: 2cm;
+  margin-left: 4cm;
+  margin-right: 4cm;
+}
+
+body {
+  width: auto !important;
+  font-size: 12px !important;
+}
+
+[data-type="titlepage"] {
+  font-size: 16px !important;
+}
+[data-type="subtitle"] {
+  font-size: 14px !important;
+}
