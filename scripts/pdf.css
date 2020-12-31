@@ -17,3 +17,7 @@ body {
 [data-type="subtitle"] {
   font-size: 14px !important;
 }
+
+mjx-assistive-mml {
+  display: inline !important;
+}

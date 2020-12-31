@@ -1,3 +1,6 @@
+// Run with 
+// node render_html.js url output_file
+
 'use strict';
 
 const puppeteer = require('puppeteer');
@@ -7,11 +10,12 @@ const fs = require('fs');
   try {
     const browser = await puppeteer.launch();
     const page = await browser.newPage();
-
-    await page.goto('http://manipulation.csail.mit.edu/pick.html');
-//    await page.goto('file:///home/russt/manipulation/pick.html');
+    
+    const url = process.argv[2];
+    const output_file = process.argv[3];
+    await page.goto(url);
     const html = await page.content();
-    fs.writeFileSync('rendered_pick.html', html);
+    fs.writeFileSync(output_file, html);
     await browser.close();
   } catch (err) {
     console.error(err);
