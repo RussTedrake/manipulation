@@ -21,3 +21,10 @@ body {
 mjx-assistive-mml {
   display: inline !important;
 }
+
+[pdf="no"] {
+  display: none !important;
+}
+[pdf="only"] {
+  display: inherit !important;
+}
