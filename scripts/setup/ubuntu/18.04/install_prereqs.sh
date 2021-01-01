@@ -64,6 +64,7 @@ apt-get update -qq || (sleep 15; apt-get update -qq)
 apt-get install -o APT::Acquire::Retries=4 -o Dpkg::Use-Pty=0 -qy \
   --no-install-recommends $(cat <<EOF
 bazel
+bibtex2html
 jupyter
 jupyter-nbconvert
 jupyter-notebook

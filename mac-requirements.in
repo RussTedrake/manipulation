@@ -4,6 +4,7 @@ gradescope-utils>=0.4.0
 matplotlib==3.3.1
 meshcat>=0.0.19
 mpld3>=0.5.1
+mysql-connector-python
 open3d==0.10.0.0
 plotly>=4.10.0
 pycodestyle>=2.6.0
