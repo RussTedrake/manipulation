@@ -58,7 +58,7 @@ My solution for much of Fall 2020:
 - OBS on Ubuntu
   - Connect ipad via this Airplay recevier on Ubuntu: https://github.com/RussTedrake/UxPlay
   - Share with Zoom via "Windowed Projector (Source)".  Drag the window to make it big (full resolution) and to fit the content nicely.  Then I can minimize it.
-    - Update: this isn't working on my ubuntu again.  I suspect that the graphics card drivers are to blame.
+    - Note: windowed preview wasn't updating after a fresh reinstall; I had to install the proper nvidia drivers (from anzu/setup) to resolve the issue.
   - Google Hangouts meet speaker
   - Brio for video (through OBS?  or directly?)
 
