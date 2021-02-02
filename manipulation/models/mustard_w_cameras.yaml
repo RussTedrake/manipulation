@@ -1,8 +1,5 @@
 
 directives:
-- add_package_path:
-    name: ycb
-    path: drake/manipulation/models/ycb
 
 - add_frame:
     name: mustard_origin

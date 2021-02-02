@@ -1,9 +1,5 @@
 
 directives:
-- add_package_path:
-    name: manipulation_station
-    path: drake/examples/manipulation_station/models
-
 - add_frame:
     name: bin0_origin
     X_PF:

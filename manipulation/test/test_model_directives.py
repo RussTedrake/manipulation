@@ -1,3 +1,5 @@
+import os
+
 import pydrake.multibody.parsing
 import pydrake.multibody.plant
 import pydrake.systems.framework
@@ -11,8 +13,7 @@ builder = pydrake.systems.framework.DiagramBuilder()
 plant, scene_graph = pydrake.multibody.plant.AddMultibodyPlantSceneGraph(
     builder, time_step=0.001)
 parser = pydrake.multibody.parsing.Parser(plant)
-parser.package_map().Add("manipulation",
-                         manipulation.utils.FindResource("models"))
+manipulation.utils.AddPackagePaths(parser)
 pydrake.multibody.parsing.ProcessModelDirectives(
     pydrake.multibody.parsing.LoadModelDirectives(filename), plant, parser)
 

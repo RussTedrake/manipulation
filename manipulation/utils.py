@@ -10,6 +10,22 @@ def FindResource(filename):
     return os.path.join(os.path.dirname(__file__), filename)
 
 
+def AddPackagePaths(parser):
+    # Remove once https://github.com/RobotLocomotion/drake/issues/10531 lands.
+    parser.package_map().PopulateFromFolder(FindResource(""))
+    parser.package_map().Add(
+        "manipulation_station",
+        os.path.join(pydrake.common.GetDrakePath(),
+                     "examples/manipulation_station/models"))
+    parser.package_map().Add(
+        "ycb",
+        os.path.join(pydrake.common.GetDrakePath(), "manipulation/models/ycb"))
+    parser.package_map().Add(
+        "wsg_50_description",
+        os.path.join(pydrake.common.GetDrakePath(),
+                     "manipulation/models/wsg_50_description"))
+
+
 reserved_labels = [
     pydrake.geometry.render.RenderLabel.kDoNotRender,
     pydrake.geometry.render.RenderLabel.kDontCare,

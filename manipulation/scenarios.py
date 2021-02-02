@@ -7,9 +7,10 @@ import os
 
 import pydrake.all
 from pydrake.all import (AbstractValue, BaseField, ModelInstanceIndex,
-                         DepthCameraProperties, DepthImageToPointCloud,
-                         LeafSystem, MakeRenderEngineVtk, RenderEngineVtkParams,
-                         RgbdSensor)
+                         DepthRenderCamera, RenderCameraCore, RgbdSensor,
+                         CameraInfo, ClippingRange, DepthRange,
+                         DepthImageToPointCloud, LeafSystem,
+                         MakeRenderEngineVtk, RenderEngineVtkParams, RgbdSensor)
 from pydrake.all import RigidTransform, RollPitchYaw
 from manipulation.utils import FindResource
 
@@ -161,7 +162,7 @@ def AddRgbdSensors(builder,
                    scene_graph,
                    also_add_point_clouds=True,
                    model_instance_prefix="camera",
-                   properties=None,
+                   depth_camera=None,
                    renderer=None):
     """
     Adds a RgbdSensor to every body in the plant with a name starting with
@@ -176,13 +177,12 @@ def AddRgbdSensors(builder,
         scene_graph.AddRenderer(renderer,
                                 MakeRenderEngineVtk(RenderEngineVtkParams()))
 
-    if not properties:
-        properties = DepthCameraProperties(width=640,
-                                           height=480,
-                                           fov_y=np.pi / 4.0,
-                                           renderer_name=renderer,
-                                           z_near=0.1,
-                                           z_far=10.0)
+    if not depth_camera:
+        depth_camera = DepthRenderCamera(
+            RenderCameraCore(
+                renderer, CameraInfo(width=640, height=480, fov_y=np.pi / 4.0),
+                ClippingRange(near=0.1, far=10.0), RigidTransform()),
+            DepthRange(0.1, 10.0))
 
     for index in range(plant.num_model_instances()):
         model_instance_index = ModelInstanceIndex(index)
@@ -193,7 +193,7 @@ def AddRgbdSensors(builder,
             rgbd = builder.AddSystem(
                 RgbdSensor(parent_id=plant.GetBodyFrameIdOrThrow(body_index),
                            X_PB=RigidTransform(),
-                           properties=properties,
+                           depth_camera=depth_camera,
                            show_window=False))
             rgbd.set_name(model_name)
 

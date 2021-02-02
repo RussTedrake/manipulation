@@ -1,8 +1,5 @@
 
 directives:
-- add_package_path:
-    name: wsg_50_description
-    path: drake/manipulation/models/wsg_50_description
 
 - add_model:
     name: gripper

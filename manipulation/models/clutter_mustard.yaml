@@ -3,10 +3,6 @@ directives:
 - add_directives:
     file: package://manipulation/two_bins_w_cameras.yaml
 
-- add_package_path:
-    name: ycb
-    path: drake/manipulation/models/ycb
-
 - add_frame:
     name: mustard_origin
     X_PF:

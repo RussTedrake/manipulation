@@ -15,7 +15,7 @@ from pydrake.systems.sensors import RgbdSensor
 from pydrake.systems.primitives import ConstantValueSource
 
 from manipulation.scenarios import AddRgbdSensors
-from manipulation.utils import FindResource
+from manipulation.utils import FindResource, AddPackagePaths
 
 
 def MustardExampleSystem():
@@ -24,7 +24,7 @@ def MustardExampleSystem():
     # Create the physics engine + scene graph.
     plant, scene_graph = AddMultibodyPlantSceneGraph(builder, time_step=0.0)
     parser = Parser(plant)
-    parser.package_map().Add("manipulation", FindResource("models"))
+    AddPackagePaths(parser)
     ProcessModelDirectives(
         LoadModelDirectives(FindResource("models/mustard_w_cameras.yaml")),
         plant, parser)
