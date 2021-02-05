@@ -2,6 +2,5 @@
 # vi: set ft=ruby :
 
 brew "bazel"
-brew "bibtex2html"
 brew "python@3.8", link: :force
 brew "tidy-html5"
