@@ -12,8 +12,10 @@ attrs==20.3.0
     # via jsonschema
 bibtexparser==1.2.0
     # via -r ubuntu-requirements.in
-bleach==3.2.1
-    # via nbconvert
+bleach==3.3.0
+    # via
+    #   -r ubuntu-shared-requirements.in
+    #   nbconvert
 cffi==1.14.3
     # via argon2-cffi
 cycler==0.10.0
