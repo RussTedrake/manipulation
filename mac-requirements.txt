@@ -22,8 +22,10 @@ beautifulsoup4==4.9.3
     # via -r mac-requirements.in
 bibtexparser==1.2.0
     # via -r mac-requirements.in
-bleach==3.2.1
-    # via nbconvert
+bleach==3.3.0
+    # via
+    #   -r mac-requirements.in
+    #   nbconvert
 certifi==2020.11.8
     # via
     #   matplotlib

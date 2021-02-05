@@ -8,6 +8,7 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
     pip-compile mac-requirements.in
 else        
     pip-compile ubuntu-requirements.in
+    pip-compile colab-requirements.in
 fi
 
 grep == mac-requirements.txt | sed -e 's/$/ ; sys_platform == "darwin"/' > requirements.txt
