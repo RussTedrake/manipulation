@@ -3,13 +3,13 @@
 
 <div id="references"></div>
 
-<table style="width:100%;"><tr style="width:100%">
+<table style="width:100%;" pdf="no"><tr style="width:100%">
   <td style="width:33%;text-align:left;"><a class="previous_chapter"></a></td>
   <td style="width:33%;text-align:center;"><a href=index.html>Table of contents</a></td>
   <td style="width:33%;text-align:right;"><a class="next_chapter"></a></td>
 </tr></table>
 
-<div id="footer">
+<div id="footer" pdf="no">
   <hr>
   <table style="width:100%;">
     <tr><td><a href="https://accessibility.mit.edu/">Accessibility</a></td><td style="text-align:right">&copy; Russ
