@@ -1,6 +1,5 @@
 altair>=4.1.0
 beautifulsoup4>=4.9.3
-bibtexparser
 bleach>=3.3.0 # github issued a security concern.  this requirement comes from nbconvert (via open3d)
 gradescope-utils>=0.4.0
 matplotlib==3.3.1
