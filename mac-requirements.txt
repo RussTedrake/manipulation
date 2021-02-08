@@ -20,8 +20,6 @@ backcall==0.2.0
     # via ipython
 beautifulsoup4==4.9.3
     # via -r mac-requirements.in
-bibtexparser==1.2.0
-    # via -r mac-requirements.in
 bleach==3.3.0
     # via
     #   -r mac-requirements.in
@@ -47,9 +45,7 @@ entrypoints==0.3
     #   altair
     #   nbconvert
 future==0.18.2
-    # via
-    #   bibtexparser
-    #   torch
+    # via torch
 gradescope-utils==0.4.0
     # via -r mac-requirements.in
 idna==2.10
@@ -184,7 +180,6 @@ pyngrok==5.0.0
     # via meshcat
 pyparsing==2.4.7
     # via
-    #   bibtexparser
     #   matplotlib
     #   packaging
     #   pydot
