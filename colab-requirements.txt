@@ -34,7 +34,7 @@ importlib-metadata==2.0.0
     # via jsonschema
 ipykernel==4.10.1
     # via
-    #   -c colab-constraints.txt
+    #   -c htmlbook/colab-constraints.txt
     #   ipywidgets
     #   notebook
 ipython-genutils==0.2.0
@@ -44,7 +44,7 @@ ipython-genutils==0.2.0
     #   traitlets
 ipython==5.5.0
     # via
-    #   -c colab-constraints.txt
+    #   -c htmlbook/colab-constraints.txt
     #   ipykernel
     #   ipywidgets
 ipywidgets==7.5.1
@@ -61,12 +61,12 @@ jsonschema==3.2.0
     #   nbformat
 jupyter-client==5.3.5
     # via
-    #   -c colab-constraints.txt
+    #   -c htmlbook/colab-constraints.txt
     #   ipykernel
     #   notebook
 jupyter-core==4.6.3
     # via
-    #   -c colab-constraints.txt
+    #   -c htmlbook/colab-constraints.txt
     #   jupyter-client
     #   nbconvert
     #   nbformat
@@ -95,9 +95,9 @@ notebook==5.3.1
     # via
     #   open3d
     #   widgetsnbextension
-numpy==1.18.5
+numpy==1.19.5
     # via
-    #   -c colab-constraints.txt
+    #   -c htmlbook/colab-constraints.txt
     #   altair
     #   matplotlib
     #   open3d
@@ -119,7 +119,7 @@ plotly==4.12.0
     # via -r ubuntu-shared-requirements.in
 prompt-toolkit==1.0.18
     # via
-    #   -c colab-constraints.txt
+    #   -c htmlbook/colab-constraints.txt
     #   ipython
 ptyprocess==0.6.0
     # via
@@ -127,7 +127,7 @@ ptyprocess==0.6.0
     #   terminado
 pygments==2.6.1
     # via
-    #   -c colab-constraints.txt
+    #   -c htmlbook/colab-constraints.txt
     #   ipython
     #   nbconvert
 pymcubes==0.1.2
@@ -147,7 +147,7 @@ python-dateutil==2.8.1
     #   pandas
 pytz==2018.9
     # via
-    #   -c colab-constraints.txt
+    #   -c htmlbook/colab-constraints.txt
     #   pandas
 pyvirtualdisplay==1.3.2
     # via -r colab-requirements.in
@@ -155,7 +155,7 @@ pyyaml==5.3.1
     # via pyngrok
 pyzmq==19.0.2
     # via
-    #   -c colab-constraints.txt
+    #   -c htmlbook/colab-constraints.txt
     #   jupyter-client
 retrying==1.3.3
     # via plotly
@@ -186,7 +186,7 @@ toolz==0.11.1
     # via altair
 tornado==5.1.1
     # via
-    #   -c colab-constraints.txt
+    #   -c htmlbook/colab-constraints.txt
     #   ipykernel
     #   jupyter-client
     #   notebook

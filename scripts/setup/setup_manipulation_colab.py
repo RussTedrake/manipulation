@@ -35,7 +35,7 @@ def setup_manipulation(*, manipulation_sha, drake_version, drake_build):
         ])
 
     # Checkout the sha.
-    run(['git', 'checkout', manipulation_sha], cwd=path)
+    run(['git', 'checkout', '--detach', manipulation_sha], cwd=path)
 
     # Run install_prereqs.sh
     run([f"{path}/scripts/setup/ubuntu/18.04/install_prereqs.sh"])
