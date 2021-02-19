@@ -8,19 +8,19 @@ load("//htmlbook/tools/jupyter:defs.bzl", "rt_ipynb_test")
 
 rt_ipynb_test(
     name = "door_opening",
+    srcs = ["door_opening.ipynb"],
     deps = [
         "//manipulation/exercises:grader",
         "//manipulation/exercises/trajectories:test_door_opening",
     ],
-    srcs = ["door_opening.ipynb"],
 )
 
 rt_ipynb_test(
     name = "rrt_planning",
+    srcs = ["rrt_planning.ipynb"],
     deps = [
         "//manipulation/exercises:grader",
         "//manipulation/exercises/trajectories:test_rrt_planning",
-	"//manipulation/exercises/trajectories/rrt_planner",
+        "//manipulation/exercises/trajectories/rrt_planner",
     ],
-    srcs = ["rrt_planning.ipynb"],
 )

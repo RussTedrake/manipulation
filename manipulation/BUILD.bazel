@@ -29,16 +29,16 @@ rt_py_test(
 
 rt_py_test(
     name = "test_model_directives",
-    data = ["//manipulation:models"],
     srcs = ["test/test_model_directives.py"],
+    data = ["//manipulation:models"],
     imports = [".."],
     deps = ["manipulation"],
 )
 
 rt_py_test(
     name = "test_open3d_utils",
-    data = ["//manipulation:models"],
     srcs = ["test/test_open3d_utils.py"],
+    data = ["//manipulation:models"],
     imports = [".."],
     deps = [
         "manipulation",

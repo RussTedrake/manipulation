@@ -61,6 +61,6 @@ drake_repository(name = "drake")
 load("@rules_python//python:pip.bzl", "pip_install")
 
 pip_install(
-    requirements = "//:requirements.txt",
     name = "pip",
+    requirements = "//:requirements.txt",
 )

@@ -8,20 +8,20 @@ load("//htmlbook/tools/jupyter:defs.bzl", "rt_ipynb_test")
 
 rt_ipynb_test(
     name = "stochastic_optimization",
+    srcs = ["stochastic_optimization.ipynb"],
     deps = [
         "//manipulation/exercises:grader",
         "//manipulation/exercises/rl:test_stochastic_optimization",
     ],
-    srcs = ["stochastic_optimization.ipynb"],
 )
 
 rt_ipynb_test(
     name = "policy_gradient",
+    srcs = ["policy_gradient.ipynb"],
+    data = ["//manipulation/models"],
     deps = [
-	"//manipulation",
+        "//manipulation",
         "//manipulation/exercises:grader",
         "//manipulation/exercises/rl:test_vpg",
     ],
-    data = ["//manipulation/models:models"],
-    srcs = ["policy_gradient.ipynb"],
 )

@@ -11,9 +11,9 @@ rt_py_library(
     srcs = [
         "__init__.py",
         "geometry.py",
+        "iiwa_rrt_problem.py",
         "robot.py",
         "rrt_planning.py",
-        "iiwa_rrt_problem.py",
     ],
     imports = [".."],
     visibility = ["//visibility:public"],
