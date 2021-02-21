@@ -65,8 +65,8 @@ def plot_surface(meshcat, X, Y, Z, color=0xdd9999, wireframe=False):
     vertices[:, 2] = Z.reshape((-1))
 
     # Vectorized faces code from https://stackoverflow.com/questions/44934631/making-grid-triangular-mesh-quickly-with-numpy  # noqa
-    faces = np.empty((cols - 1, rows - 1, 2, 3), dtype=np.uint32)
-    r = np.arange(rows * cols).reshape(cols, rows)
+    faces = np.empty((rows - 1, cols - 1, 2, 3), dtype=np.uint32)
+    r = np.arange(rows * cols).reshape(rows, cols)
     faces[:, :, 0, 0] = r[:-1, :-1]
     faces[:, :, 1, 0] = r[:-1, 1:]
     faces[:, :, 0, 1] = r[:-1, 1:]
