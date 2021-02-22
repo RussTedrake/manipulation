@@ -10,6 +10,11 @@ rt_ipynb_test(
     name = "normal_estimation_depth",
     srcs = ["normal_estimation_depth.ipynb"],
     data = ["//manipulation/models"],
+    # Open3D 0.10.0 is not compatible with Python 3.9.
+    target_compatible_with = [
+        "@platforms//cpu:x86_64",
+        "@platforms//os:linux",
+    ],
     deps = [
         "//manipulation",
         "//manipulation:mustard_depth_camera_example",

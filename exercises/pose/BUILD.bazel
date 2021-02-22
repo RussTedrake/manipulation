@@ -12,6 +12,11 @@ rt_ipynb_test(
     data = [
         "//manipulation/models/bunny:bun_zipper_res2.ply",
     ],
+    # Open3D 0.10.0 is not compatible with Python 3.9.
+    target_compatible_with = [
+        "@platforms//cpu:x86_64",
+        "@platforms//os:linux",
+    ],
     deps = [
         "//manipulation",
         "//manipulation/exercises:grader",
@@ -25,6 +30,11 @@ rt_ipynb_test(
     data = [
         "//manipulation/models/bunny:bun_zipper_res2.ply",
     ],
+    # Open3D 0.10.0 is not compatible with Python 3.9.
+    target_compatible_with = [
+        "@platforms//cpu:x86_64",
+        "@platforms//os:linux",
+    ],
     deps = [
         "//manipulation",
         "//manipulation/exercises:grader",
@@ -35,6 +45,11 @@ rt_ipynb_test(
 rt_ipynb_test(
     name = "pose_estimation_icp",
     srcs = ["pose_estimation_icp.ipynb"],
+    # Open3D 0.10.0 is not compatible with Python 3.9.
+    target_compatible_with = [
+        "@platforms//cpu:x86_64",
+        "@platforms//os:linux",
+    ],
     deps = [
         "//manipulation",
         "//manipulation/exercises:grader",
