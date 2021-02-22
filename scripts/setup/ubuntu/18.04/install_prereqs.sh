@@ -62,41 +62,50 @@ echo 'deb [arch=amd64] https://storage.googleapis.com/bazel-apt stable jdk1.8' \
 apt-get update -qq || (sleep 15; apt-get update -qq)
 
 apt-get install -o APT::Acquire::Retries=4 -o Dpkg::Use-Pty=0 -qy \
-  --no-install-recommends $(cat <<EOF
-bazel
-jupyter
-jupyter-nbconvert
-jupyter-notebook
-locales
-python3
-python3-bs4
-python3-dev
-python3-entrypoints
-python3-future
-python3-ipywidgets
-python3-jinja2
-python3-jsonschema
-python3-numpy
-python3-pandas
-python3-pip
-python3-requests
-python3-retrying
-python3-setuptools
-python3-six
-python3-snowballstemmer
-python3-toolz
-python3-tqdm
-python3-wheel
-python3-widgetsnbextension
-tidy
-wget
+  --no-install-recommends $(cat <<- EOF
+  bazel
+  locales
+  python3
+  python3-bs4
+  python3-pip
+  python3-requests
+  python3-setuptools
+  python3-wheel
+  tidy
+  wget
 EOF
 )
 
 locale-gen en_US.UTF-8
 
-jupyter nbextension enable --system --py widgetsnbextension
-
 if [[ -z "${LANG:-}" && -z "${LC_ALL:-}" ]]; then
   echo 'WARNING: LANG and LC_ALL environment variables are NOT set. Please export LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8.' >&2
+fi
+
+# TODO(jamiesnape): Do we ever need to install these using apt?
+if [[ "${GITHUB_ACTIONS:-}" !=  "true" ]]; then
+  apt-get install -o APT::Acquire::Retries=4 -o Dpkg::Use-Pty=0 -qy \
+    --no-install-recommends $(cat <<- EOF
+    jupyter
+    jupyter-nbconvert
+    jupyter-notebook
+    python3-dev
+    python3-entrypoints
+    python3-future
+    python3-ipywidgets
+    python3-jinja2
+    python3-jsonschema
+    python3-numpy
+    python3-pandas
+    python3-pip
+    python3-retrying
+    python3-six
+    python3-snowballstemmer
+    python3-toolz
+    python3-tqdm
+    python3-widgetsnbextension
+EOF
+  )
+
+  jupyter nbextension enable --system --py widgetsnbextension
 fi
