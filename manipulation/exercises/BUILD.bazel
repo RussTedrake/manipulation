@@ -8,8 +8,6 @@ load("//htmlbook/tools/python:defs.bzl", "rt_py_library")
 
 rt_py_library(
     name = "grader",
-    srcs = [
-        "grader.py",
-    ],
+    srcs = ["grader.py"],
     visibility = ["//visibility:public"],
 )

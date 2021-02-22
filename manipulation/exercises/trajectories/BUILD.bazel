@@ -8,16 +8,12 @@ load("//htmlbook/tools/python:defs.bzl", "rt_py_library")
 
 rt_py_library(
     name = "test_door_opening",
-    srcs = [
-        "test_door_opening.py",
-    ],
+    srcs = ["test_door_opening.py"],
     visibility = ["//visibility:public"],
 )
 
 rt_py_library(
     name = "test_rrt_planning",
-    srcs = [
-        "test_rrt_planning.py",
-    ],
+    srcs = ["test_rrt_planning.py"],
     visibility = ["//visibility:public"],
 )

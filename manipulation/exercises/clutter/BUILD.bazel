@@ -8,24 +8,18 @@ load("//htmlbook/tools/python:defs.bzl", "rt_py_library")
 
 rt_py_library(
     name = "test_analytic_grasp",
-    srcs = [
-        "test_analytic_grasp.py",
-    ],
+    srcs = ["test_analytic_grasp.py"],
     visibility = ["//visibility:public"],
 )
 
 rt_py_library(
     name = "test_grasp_candidate",
-    srcs = [
-        "test_grasp_candidate.py",
-    ],
+    srcs = ["test_grasp_candidate.py"],
     visibility = ["//visibility:public"],
 )
 
 rt_py_library(
     name = "test_normal",
-    srcs = [
-        "test_normal.py",
-    ],
+    srcs = ["test_normal.py"],
     visibility = ["//visibility:public"],
 )
