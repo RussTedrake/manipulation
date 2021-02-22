@@ -8,8 +8,6 @@ load("//htmlbook/tools/python:defs.bzl", "rt_py_library")
 
 rt_py_library(
     name = "test_hybrid",
-    srcs = [
-        "test_hybrid.py",
-    ],
+    srcs = ["test_hybrid.py"],
     visibility = ["//visibility:public"],
 )

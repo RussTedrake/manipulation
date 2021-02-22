@@ -8,8 +8,6 @@ load("//htmlbook/tools/python:defs.bzl", "rt_py_library")
 
 rt_py_library(
     name = "test_mask",
-    srcs = [
-        "test_mask.py",
-    ],
+    srcs = ["test_mask.py"],
     visibility = ["//visibility:public"],
 )

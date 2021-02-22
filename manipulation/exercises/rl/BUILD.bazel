@@ -8,16 +8,12 @@ load("//htmlbook/tools/python:defs.bzl", "rt_py_library")
 
 rt_py_library(
     name = "test_stochastic_optimization",
-    srcs = [
-        "test_stochastic_optimization.py",
-    ],
+    srcs = ["test_stochastic_optimization.py"],
     visibility = ["//visibility:public"],
 )
 
 rt_py_library(
     name = "test_vpg",
-    srcs = [
-        "test_vpg.py",
-    ],
+    srcs = ["test_vpg.py"],
     visibility = ["//visibility:public"],
 )
