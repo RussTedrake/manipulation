@@ -1,20 +1,10 @@
 -r htmlbook/mac-requirements.in
-altair>=4.1.0
-bleach>=3.3.0 # github issued a security concern.  this requirement comes from nbconvert (via open3d)
-gradescope-utils>=0.4.0
-matplotlib==3.3.1
-meshcat>=0.0.19
-mpld3>=0.5.1
-open3d==0.10.0.0
-plotly>=4.10.0
-pydot>=1.4.1
-PyMCubes>=0.0.9
-PyYAML>=5.3.1
-requests>=2.14.2
-scipy>=1.5.2 # this should come only indirectly (e.g. from drake), but brew scipy moved to python 3.9 and is currently broken.
-timeout-decorator>=0.4.1
-torch>=1.7.0
-
-# //exercises/rl:policy_gradient hit a scipy/numpy mismatch bug.
-# hard-code scipy version for now:
-scipy==1.5.3
+altair>=4.1
+gradescope-utils>=0.4
+mpld3>=0.5
+plotly>=4.14
+pymcubes>=0.1
+requests>=2.25
+timeout-decorator>=0.5
+https://download.pytorch.org/whl/nightly/cpu/torch-1.9.0.dev20210218-cp39-none-macosx_10_9_x86_64.whl
+https://download.pytorch.org/whl/nightly/torchvision-0.9.0.dev20210218-cp39-cp39-macosx_10_9_x86_64.whl
