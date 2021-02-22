@@ -43,7 +43,7 @@ on:
 jobs:
   bionic:
     name: ubuntu 18.04 bionic beaver
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     container: ubuntu:18.04
     steps:
       - name: pre-checkout setup
