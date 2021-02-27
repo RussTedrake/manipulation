@@ -5,107 +5,124 @@
 #    pip-compile ubuntu-requirements.in
 #
 altair==4.1.0
-    # via -r ubuntu-shared-requirements.in
-argon2-cffi==20.1.0
-    # via notebook
-attrs==20.3.0
-    # via jsonschema
+    # via
+    #   -c htmlbook/colab-constraints-ubuntu.txt
+    #   -r ubuntu-shared-requirements.in
 bleach==3.3.0
     # via
+    #   -c htmlbook/colab-constraints-ubuntu.txt
     #   -r ubuntu-shared-requirements.in
     #   nbconvert
-cffi==1.14.3
-    # via argon2-cffi
 cycler==0.10.0
-    # via matplotlib
-dataclasses==0.8
+    # via
+    #   -c htmlbook/colab-constraints-ubuntu.txt
+    #   matplotlib
+dataclasses==0.6
     # via torch
 decorator==4.4.2
     # via
+    #   -c htmlbook/colab-constraints-ubuntu.txt
     #   ipython
     #   traitlets
 defusedxml==0.6.0
-    # via nbconvert
+    # via
+    #   -c htmlbook/colab-constraints-ubuntu.txt
+    #   nbconvert
 entrypoints==0.3
     # via
+    #   -c htmlbook/colab-constraints-ubuntu.txt
     #   altair
     #   nbconvert
-future==0.18.2
-    # via torch
 gradescope-utils==0.4.0
     # via -r ubuntu-shared-requirements.in
-importlib-metadata==2.0.0
-    # via jsonschema
 ipykernel==4.10.1
     # via
-    #   -c htmlbook/colab-constraints.txt
+    #   -c htmlbook/colab-constraints-ubuntu.txt
     #   ipywidgets
     #   notebook
 ipython-genutils==0.2.0
     # via
+    #   -c htmlbook/colab-constraints-ubuntu.txt
     #   nbformat
     #   notebook
     #   traitlets
 ipython==5.5.0
     # via
-    #   -c htmlbook/colab-constraints.txt
+    #   -c htmlbook/colab-constraints-ubuntu.txt
     #   ipykernel
     #   ipywidgets
-ipywidgets==7.5.1
-    # via open3d
-jinja2==2.11.2
+ipywidgets==7.6.3
     # via
+    #   -c htmlbook/colab-constraints-ubuntu.txt
+    #   open3d
+jinja2==2.11.3
+    # via
+    #   -c htmlbook/colab-constraints-ubuntu.txt
     #   altair
     #   mpld3
     #   nbconvert
     #   notebook
-jsonschema==3.2.0
+jsonschema==2.6.0
     # via
+    #   -c htmlbook/colab-constraints-ubuntu.txt
     #   altair
     #   nbformat
 jupyter-client==5.3.5
     # via
-    #   -c htmlbook/colab-constraints.txt
+    #   -c htmlbook/colab-constraints-ubuntu.txt
     #   ipykernel
     #   notebook
-jupyter-core==4.6.3
+jupyter-core==4.7.1
     # via
-    #   -c htmlbook/colab-constraints.txt
+    #   -c htmlbook/colab-constraints-ubuntu.txt
     #   jupyter-client
     #   nbconvert
     #   nbformat
     #   notebook
+jupyterlab-widgets==1.0.0
+    # via
+    #   -c htmlbook/colab-constraints-ubuntu.txt
+    #   ipywidgets
 kiwisolver==1.3.1
-    # via matplotlib
+    # via
+    #   -c htmlbook/colab-constraints-ubuntu.txt
+    #   matplotlib
 markupsafe==1.1.1
-    # via jinja2
+    # via
+    #   -c htmlbook/colab-constraints-ubuntu.txt
+    #   jinja2
 matplotlib==3.1.3
     # via
     #   -r ubuntu-requirements.in
     #   mpld3
     #   open3d
 mistune==0.8.4
-    # via nbconvert
+    # via
+    #   -c htmlbook/colab-constraints-ubuntu.txt
+    #   nbconvert
 mpld3==0.5.1
     # via -r ubuntu-shared-requirements.in
 mysql-connector-python==8.0.22
     # via -r htmlbook/ubuntu-requirements.in
 nbconvert==5.6.1
     # via
+    #   -c htmlbook/colab-constraints-ubuntu.txt
     #   -r ubuntu-requirements.in
     #   notebook
-nbformat==5.0.8
+nbformat==5.1.2
     # via
+    #   -c htmlbook/colab-constraints-ubuntu.txt
     #   ipywidgets
     #   nbconvert
     #   notebook
-notebook==6.1.5
+notebook==5.3.1
     # via
+    #   -c htmlbook/colab-constraints-ubuntu.txt
     #   open3d
     #   widgetsnbextension
 numpy==1.19.5
     # via
-    #   -c htmlbook/colab-constraints.txt
+    #   -c htmlbook/colab-constraints-ubuntu.txt
     #   altair
     #   matplotlib
     #   open3d
@@ -114,101 +131,125 @@ numpy==1.19.5
     #   torch
 open3d==0.10.0.0
     # via -r ubuntu-shared-requirements.in
-packaging==20.4
-    # via bleach
-pandas==1.1.4
-    # via altair
+packaging==20.9
+    # via
+    #   -c htmlbook/colab-constraints-ubuntu.txt
+    #   bleach
+pandas==1.1.5
+    # via
+    #   -c htmlbook/colab-constraints-ubuntu.txt
+    #   altair
 pandocfilters==1.4.3
-    # via nbconvert
+    # via
+    #   -c htmlbook/colab-constraints-ubuntu.txt
+    #   nbconvert
 pexpect==4.8.0
-    # via ipython
+    # via
+    #   -c htmlbook/colab-constraints-ubuntu.txt
+    #   ipython
 pickleshare==0.7.5
-    # via ipython
-plotly==4.12.0
-    # via -r ubuntu-shared-requirements.in
-prometheus-client==0.9.0
-    # via notebook
+    # via
+    #   -c htmlbook/colab-constraints-ubuntu.txt
+    #   ipython
+plotly==4.4.1
+    # via
+    #   -c htmlbook/colab-constraints-ubuntu.txt
+    #   -r ubuntu-shared-requirements.in
 prompt-toolkit==1.0.18
     # via
-    #   -c htmlbook/colab-constraints.txt
+    #   -c htmlbook/colab-constraints-ubuntu.txt
     #   ipython
-protobuf==3.14.0
-    # via mysql-connector-python
-ptyprocess==0.6.0
+protobuf==3.12.4
     # via
+    #   -c htmlbook/colab-constraints-ubuntu.txt
+    #   mysql-connector-python
+ptyprocess==0.7.0
+    # via
+    #   -c htmlbook/colab-constraints-ubuntu.txt
     #   pexpect
     #   terminado
 pycodestyle==2.6.0
     # via -r htmlbook/ubuntu-requirements.in
-pycparser==2.20
-    # via cffi
 pydocstyle==5.1.1
     # via -r htmlbook/ubuntu-requirements.in
 pygments==2.6.1
     # via
-    #   -c htmlbook/colab-constraints.txt
+    #   -c htmlbook/colab-constraints-ubuntu.txt
     #   ipython
     #   nbconvert
 pymcubes==0.1.2
     # via -r ubuntu-shared-requirements.in
 pyparsing==2.4.7
     # via
+    #   -c htmlbook/colab-constraints-ubuntu.txt
     #   matplotlib
     #   packaging
-pyrsistent==0.17.3
-    # via jsonschema
 python-dateutil==2.8.1
     # via
+    #   -c htmlbook/colab-constraints-ubuntu.txt
     #   jupyter-client
     #   matplotlib
     #   pandas
 pytz==2018.9
     # via
-    #   -c htmlbook/colab-constraints.txt
+    #   -c htmlbook/colab-constraints-ubuntu.txt
     #   pandas
-pyzmq==19.0.2
+pyzmq==22.0.3
     # via
-    #   -c htmlbook/colab-constraints.txt
+    #   -c htmlbook/colab-constraints-ubuntu.txt
     #   jupyter-client
-    #   notebook
 retrying==1.3.3
-    # via plotly
+    # via
+    #   -c htmlbook/colab-constraints-ubuntu.txt
+    #   plotly
 scipy==1.5.3
-    # via -r ubuntu-shared-requirements.in
+    # via
+    #   -c htmlbook/colab-constraints-ubuntu.txt
+    #   -r ubuntu-shared-requirements.in
 send2trash==1.5.0
-    # via notebook
+    # via
+    #   -c htmlbook/colab-constraints-ubuntu.txt
+    #   notebook
 simplegeneric==0.8.1
-    # via ipython
+    # via
+    #   -c htmlbook/colab-constraints-ubuntu.txt
+    #   ipython
 six==1.15.0
     # via
-    #   argon2-cffi
+    #   -c htmlbook/colab-constraints-ubuntu.txt
     #   bleach
     #   cycler
-    #   jsonschema
-    #   packaging
     #   plotly
     #   prompt-toolkit
     #   protobuf
     #   python-dateutil
     #   retrying
     #   traitlets
-snowballstemmer==2.0.0
-    # via pydocstyle
-terminado==0.9.1
-    # via notebook
+snowballstemmer==2.1.0
+    # via
+    #   -c htmlbook/colab-constraints-ubuntu.txt
+    #   pydocstyle
+terminado==0.9.2
+    # via
+    #   -c htmlbook/colab-constraints-ubuntu.txt
+    #   notebook
 testpath==0.4.4
-    # via nbconvert
+    # via
+    #   -c htmlbook/colab-constraints-ubuntu.txt
+    #   nbconvert
 timeout-decorator==0.5.0
     # via -r ubuntu-shared-requirements.in
 toolz==0.11.1
-    # via altair
-torch==1.7.0
     # via
-    #   -c htmlbook/colab-constraints.txt
+    #   -c htmlbook/colab-constraints-ubuntu.txt
+    #   altair
+torch==1.7.1
+    # via
+    #   -c htmlbook/colab-constraints-ubuntu.txt
     #   -r ubuntu-requirements.in
 tornado==5.1.1
     # via
-    #   -c htmlbook/colab-constraints.txt
+    #   -c htmlbook/colab-constraints-ubuntu.txt
     #   ipykernel
     #   jupyter-client
     #   notebook
@@ -224,19 +265,24 @@ traitlets==4.3.3
     #   nbformat
     #   notebook
 typing-extensions==3.7.4.3
-    # via torch
+    # via
+    #   -c htmlbook/colab-constraints-ubuntu.txt
+    #   torch
 wcwidth==0.2.5
-    # via prompt-toolkit
+    # via
+    #   -c htmlbook/colab-constraints-ubuntu.txt
+    #   prompt-toolkit
 webencodings==0.5.1
-    # via bleach
+    # via
+    #   -c htmlbook/colab-constraints-ubuntu.txt
+    #   bleach
 widgetsnbextension==3.5.1
     # via
+    #   -c htmlbook/colab-constraints-ubuntu.txt
     #   ipywidgets
     #   open3d
 yapf==0.30.0
     # via -r htmlbook/ubuntu-requirements.in
-zipp==3.4.0
-    # via importlib-metadata
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools
