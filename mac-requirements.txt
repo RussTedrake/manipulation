@@ -6,40 +6,89 @@
 #
 altair==4.1.0
     # via -r mac-requirements.in
+async-generator==1.10
+    # via nbclient
 attrs==20.3.0
     # via jsonschema
 beautifulsoup4==4.9.3
     # via -r htmlbook/mac-requirements.in
+bleach==3.3.0
+    # via nbconvert
 certifi==2020.12.5
     # via requests
 chardet==4.0.0
     # via requests
 cycler==0.10.0
     # via matplotlib
+defusedxml==0.7.1
+    # via nbconvert
 entrypoints==0.3
-    # via altair
+    # via
+    #   altair
+    #   nbconvert
 gradescope-utils==0.4.0
     # via -r mac-requirements.in
 idna==2.10
     # via requests
+ipython-genutils==0.2.0
+    # via
+    #   nbformat
+    #   traitlets
 jinja2==2.11.3
     # via
     #   altair
     #   mpld3
+    #   nbconvert
 jsonschema==3.2.0
-    # via altair
+    # via
+    #   altair
+    #   nbformat
+jupyter-client==6.1.12
+    # via nbclient
+jupyter-core==4.7.1
+    # via
+    #   jupyter-client
+    #   nbconvert
+    #   nbformat
+jupyterlab-pygments==0.1.2
+    # via nbconvert
 kiwisolver==1.3.1
     # via matplotlib
+lxml==4.6.3
+    # via -r htmlbook/mac-requirements.in
 markupsafe==1.1.1
     # via jinja2
 matplotlib==3.3.4
     # via mpld3
+mistune==0.8.4
+    # via nbconvert
 mpld3==0.5.2
     # via -r mac-requirements.in
 mysql-connector-python==8.0.23
     # via -r htmlbook/mac-requirements.in
+nbclient==0.5.3
+    # via nbconvert
+nbconvert==6.0.7
+    # via -r htmlbook/mac-requirements.in
+nbformat==5.1.3
+    # via
+    #   nbclient
+    #   nbconvert
+nest-asyncio==1.5.1
+    # via nbclient
+numpy==1.20.2
+    # via
+    #   altair
+    #   matplotlib
+    #   pandas
+    #   torch
+    #   torchvision
+packaging==20.9
+    # via bleach
 pandas==1.2.2
     # via altair
+pandocfilters==1.4.3
+    # via nbconvert
 pillow==8.1.0
     # via
     #   matplotlib
@@ -52,24 +101,36 @@ pycodestyle==2.6.0
     # via -r htmlbook/mac-requirements.in
 pydocstyle==5.1.1
     # via -r htmlbook/mac-requirements.in
+pygments==2.8.1
+    # via
+    #   jupyterlab-pygments
+    #   nbconvert
 pymcubes==0.1.2
     # via -r mac-requirements.in
 pyparsing==2.4.7
-    # via matplotlib
+    # via
+    #   matplotlib
+    #   packaging
 pyrsistent==0.17.3
     # via jsonschema
 python-dateutil==2.8.1
     # via
+    #   jupyter-client
     #   matplotlib
     #   pandas
 pytz==2021.1
     # via pandas
+pyzmq==22.0.3
+    # via jupyter-client
 requests==2.25.1
-    # via -r mac-requirements.in
+    # via
+    #   -r htmlbook/mac-requirements.in
+    #   -r mac-requirements.in
 retrying==1.3.3
     # via plotly
 six==1.15.0
     # via
+    #   bleach
     #   cycler
     #   jsonschema
     #   plotly
@@ -80,6 +141,8 @@ snowballstemmer==2.1.0
     # via pydocstyle
 soupsieve==2.2
     # via beautifulsoup4
+testpath==0.4.4
+    # via nbconvert
 timeout-decorator==0.5.0
     # via -r mac-requirements.in
 toolz==0.11.1
@@ -90,10 +153,21 @@ https://download.pytorch.org/whl/nightly/cpu/torch-1.9.0.dev20210218-cp39-none-m
     #   torchvision
 https://download.pytorch.org/whl/nightly/torchvision-0.9.0.dev20210218-cp39-cp39-macosx_10_9_x86_64.whl
     # via -r mac-requirements.in
+tornado==6.1
+    # via jupyter-client
+traitlets==5.0.5
+    # via
+    #   jupyter-client
+    #   jupyter-core
+    #   nbclient
+    #   nbconvert
+    #   nbformat
 typing-extensions==3.7.4.3
     # via torch
 urllib3==1.26.3
     # via requests
+webencodings==0.5.1
+    # via bleach
 yapf==0.30.0
     # via -r htmlbook/mac-requirements.in
 
