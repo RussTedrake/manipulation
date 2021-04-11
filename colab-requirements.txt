@@ -22,7 +22,7 @@ decorator==4.4.2
     #   -c htmlbook/colab-constraints-colab.txt
     #   ipython
     #   networkx
-defusedxml==0.6.0
+defusedxml==0.7.1
     # via
     #   -c htmlbook/colab-constraints-colab.txt
     #   nbconvert
@@ -161,7 +161,7 @@ pickleshare==0.7.5
     # via
     #   -c htmlbook/colab-constraints-colab.txt
     #   ipython
-pillow==7.0.0
+pillow==7.1.2
     # via
     #   -c htmlbook/colab-constraints-colab.txt
     #   imageio
@@ -249,7 +249,7 @@ six==1.15.0
     #   prompt-toolkit
     #   python-dateutil
     #   retrying
-terminado==0.9.2
+terminado==0.9.3
     # via
     #   -c htmlbook/colab-constraints-colab.txt
     #   notebook
