@@ -1,18 +1,9 @@
 import numpy as np
 
-from pydrake.common import FindResourceOrThrow
-from pydrake.common.value import AbstractValue
-from pydrake.geometry import Box
-from pydrake.geometry.render import (DepthCameraProperties, MakeRenderEngineVtk,
-                                     RenderEngineVtkParams)
-from pydrake.math import RigidTransform, RollPitchYaw, RotationMatrix
 from pydrake.multibody.parsing import (Parser, ProcessModelDirectives,
                                        LoadModelDirectives)
 from pydrake.multibody.plant import AddMultibodyPlantSceneGraph
-from pydrake.perception import BaseField, DepthImageToPointCloud
 from pydrake.systems.framework import DiagramBuilder
-from pydrake.systems.sensors import RgbdSensor
-from pydrake.systems.primitives import ConstantValueSource
 
 from manipulation.scenarios import AddRgbdSensors
 from manipulation.utils import FindResource, AddPackagePaths

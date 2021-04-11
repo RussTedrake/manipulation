@@ -67,18 +67,17 @@ def generate_image(image_num):
     renderer = "my_renderer"
     scene_graph.AddRenderer(
         renderer, pydrake.geometry.render.MakeRenderEngineVtk(pydrake.geometry.render.RenderEngineVtkParams()))
-    properties = pydrake.geometry.render.DepthCameraProperties(width=640,
-                                        height=480,
-                                        fov_y=np.pi / 4.0,
-                                        renderer_name=renderer,
-                                        z_near=0.1,
-                                        z_far=10.0)
+    depth_camera = DepthRenderCamera(RenderCameraCore(
+        renderer, CameraInfo(width=640, height=480, fov_y=np.pi / 4.0),
+        ClippingRange(near=0.1, far=10.0),
+        RigidTransform()),
+        DepthRange(0.1, 10.0))
     camera = builder.AddSystem(
         pydrake.systems.sensors.RgbdSensor(parent_id=scene_graph.world_frame_id(),
                     X_PB=RigidTransform(
                         RollPitchYaw(np.pi, 0, np.pi/2.0),
                         [0, 0, .8]),
-                    properties=properties,
+                    depth_camera=depth_camera,
                     show_window=False))
     camera.set_name("rgbd_sensor")
     builder.Connect(scene_graph.get_query_output_port(),
