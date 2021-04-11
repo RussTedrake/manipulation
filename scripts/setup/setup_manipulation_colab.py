@@ -92,15 +92,13 @@ def setup_drake(*, version, build='nightly'):
         #urlretrieve(f"{base_url}{build}/drake-{version}-bionic.tar.gz",
         #            'drake.tar.gz')
 
-        # THESE ARE NEW
-        urlretrieve("https://drake-packages.csail.mit.edu/tmp/drake-0.27.0-pip-bionic.tar.gz", 'drake.tar.gz')
-        subprocess.run(['mkdir', '/opt/drake'])
-        subprocess.run(['tar', '-xzf', 'drake.tar.gz', '-C', '/opt/drake'],
-                       check=True)
+        # THESE ARE A WORKAROUND FOR COLAB WITH PYTHON3.7
+        urlretrieve("https://drake-packages.csail.mit.edu/tmp/drake-20210409-pip-snopt-bionic.tar.gz", 'drake.tar.gz')
         subprocess.run(["pip3", "install", "meshcat"])
+        # END PYTHON3.7 WORKAROUND
 
-        #subprocess.run(['tar', '-xzf', 'drake.tar.gz', '-C', '/opt'],
-        #               check=True)
+        subprocess.run(['tar', '-xzf', 'drake.tar.gz', '-C', '/opt'],
+                       check=True)
         subprocess.run(['apt-get', 'update', '-o',
                         'APT::Acquire::Retries=4', '-qq'], check=True)
         with open("/opt/drake/share/drake/setup/packages-bionic.txt",
