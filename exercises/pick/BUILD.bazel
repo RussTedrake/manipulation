@@ -37,6 +37,7 @@ rt_ipynb_test(
 rt_ipynb_test(
     name = "intro_to_qp",
     srcs = ["intro_to_qp.ipynb"],
+    tags = ["requires-network"], # For gurobi
     deps = [
         "//manipulation/exercises:grader",
         "//manipulation/exercises/pick:test_simple_qp",

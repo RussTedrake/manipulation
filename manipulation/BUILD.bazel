@@ -23,6 +23,7 @@ rt_py_library(
 rt_py_test(
     name = "test_meshcat_utils",
     srcs = ["test/test_meshcat_utils.py"],
+    tags = ["requires-network"], # For gurobi
     imports = [".."],
     deps = ["manipulation"],
 )

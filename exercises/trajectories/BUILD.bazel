@@ -9,6 +9,7 @@ load("//htmlbook/tools/jupyter:defs.bzl", "rt_ipynb_test")
 rt_ipynb_test(
     name = "door_opening",
     srcs = ["door_opening.ipynb"],
+    tags = ["requires-network"], # For gurobi
     deps = [
         "//manipulation/exercises:grader",
         "//manipulation/exercises/trajectories:test_door_opening",
