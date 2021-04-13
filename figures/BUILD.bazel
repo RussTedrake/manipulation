@@ -20,6 +20,7 @@ rt_ipynb_test(
 rt_ipynb_test(
     name = "nonlinear_pose_estimation",
     srcs = ["nonlinear_pose_estimation.ipynb"],
+    deps = ["//manipulation"],
 )
 
 rt_py_test(

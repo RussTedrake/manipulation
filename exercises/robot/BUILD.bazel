@@ -10,6 +10,7 @@ rt_ipynb_test(
     name = "manipulation_station_io",
     srcs = ["manipulation_station_io.ipynb"],
     deps = [
+        "//manipulation",
         "//manipulation/exercises:grader",
         "//manipulation/exercises/robot:test_manipulation_io",
     ],
@@ -19,6 +20,7 @@ rt_ipynb_test(
     name = "reflected_inertia",
     srcs = ["reflected_inertia.ipynb"],
     deps = [
+        "//manipulation",
         "//manipulation/exercises:grader",
         "//manipulation/exercises/robot:test_reflected_inertia",
         "//manipulation/exercises/robot:test_survey",

@@ -10,6 +10,7 @@ rt_ipynb_test(
     name = "stochastic_optimization",
     srcs = ["stochastic_optimization.ipynb"],
     deps = [
+        "//manipulation",
         "//manipulation/exercises:grader",
         "//manipulation/exercises/rl:test_stochastic_optimization",
     ],

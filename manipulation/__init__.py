@@ -1,1 +1,1 @@
-from .utils import FindResource
+from .utils import FindResource, running_as_notebook
