@@ -58,8 +58,10 @@ lxml==4.6.3
     # via -r htmlbook/mac-requirements.in
 markupsafe==1.1.1
     # via jinja2
-matplotlib==3.3.4
-    # via mpld3
+matplotlib==3.4.1
+    # via
+    #   -r htmlbook/mac-requirements.in
+    #   mpld3
 mistune==0.8.4
     # via nbconvert
 mpld3==0.5.2
