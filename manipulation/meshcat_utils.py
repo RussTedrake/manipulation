@@ -1,11 +1,15 @@
 import numpy as np
 import pydrake.all
+from matplotlib.colors import Colormap
 
 import meshcat.geometry as g
 import meshcat.transformations as tf
 
+from pydrake.all import RigidTransform
 
-# TODO: push this back to meshcat-python
+
+# TODO: Remove this once https://github.com/rdeits/meshcat-python/pull/91 makes
+# its way through to drake.
 class TriangularMeshGeometry(g.Geometry):
     """
     A mesh consisting of an arbitrary collection of triangular faces. To
@@ -28,6 +32,10 @@ class TriangularMeshGeometry(g.Geometry):
     ])
 
     mesh = TriangularMeshGeometry(vertices, faces)
+
+    To set the color of the mesh by vertex, pass an Nx3 array containing the
+    RGB values (in range [0,1]) of the vertices to the optional `color`
+    argument, and set `vertexColors=True` in the Material.
     """
     __slots__ = ["vertices", "faces"]
 
@@ -40,12 +48,16 @@ class TriangularMeshGeometry(g.Geometry):
         assert faces.shape[1] == 3, "`faces` must be an Mx3 array"
         self.vertices = vertices
         self.faces = faces
+        if color is not None:
+            color = np.asarray(color, dtype=np.float32)
+            assert np.array_equal(vertices.shape, color.shape),\
+                "`color` must be the same shape as vertices"
         self.color = color
 
     def lower(self, object_data):
         attrs = {u"position": g.pack_numpy_array(self.vertices.T)}
         if self.color is not None:
-            attrs[u"color"] = g.pack_numpy_array(self.color)
+            attrs[u"color"] = g.pack_numpy_array(self.color.T)
         return {
             u"uuid": self.uuid,
             u"type": u"BufferGeometry",
@@ -73,6 +85,11 @@ def plot_surface(meshcat, X, Y, Z, color=0xdd9999, wireframe=False):
     faces[:, :, 1, 1] = r[1:, 1:]
     faces[:, :, :, 2] = r[1:, :-1, None]
     faces.shape = (-1, 3)
+
+    if isinstance(color, Colormap):
+        z = vertices[:, 2]
+        rgba = color((vertices[:, 2] - np.min(z)) / np.ptp(z))
+        color = rgba[:, :3]
 
     if isinstance(color, int):
         meshcat.set_object(
@@ -137,11 +154,11 @@ def plot_mathematical_program(meshcat,
             up = evaluator.upper_bound()
             cvb = cv[type(evaluator).__name__]
             for index in range(Zc.shape[0]):
-                color = np.repeat([[0.3], [0.3], [1.0]], N, axis=1)
+                color = np.repeat([[0.3, 0.3, 1.0]], N, axis=0)
                 infeasible = np.logical_or(Zc[index, :] < low[index],
                                            Zc[index, :] > up[index])
-                color[0, infeasible] = 1.0
-                color[2, infeasible] = 0.3
+                color[infeasible, 0] = 1.0
+                color[infeasible, 2] = 0.3
                 plot_surface(cvb[str(index)],
                              X,
                              Y,
@@ -168,16 +185,37 @@ def plot_mathematical_program(meshcat,
                  result.get_optimal_cost()]))
 
 
-def draw_open3d_point_cloud(meshcat, pcd, normals_scale=0.0, size=0.001):
-    pts = np.asarray(pcd.points)
-    meshcat.set_object(g.PointCloud(pts.T, np.asarray(pcd.colors).T, size=size))
-    if pcd.has_normals() and normals_scale > 0.0:
-        normals = np.asarray(pcd.normals)
-        vertices = np.hstack(
-            (pts, pts + normals_scale * normals)).reshape(-1, 3).T
-        meshcat["normals"].set_object(
-            g.LineSegments(g.PointsGeometry(vertices),
-                           g.MeshBasicMaterial(color=0x000000)))
+# pulled from inside MeshcatVisualizer.
+def set_planar_viewpoint(vis,
+                         camera_position=[0, -1, 0],
+                         camera_focus=[0, 0, 0],
+                         xmin=-1,
+                         xmax=1,
+                         ymin=-1,
+                         ymax=1):
+    # TODO(russt): Figure out the proper set of camera transformations to
+    # implement camera_focus.
+    if np.any(camera_focus):
+        warnings.warn("Non-zero camera_focus is not supported yet")
+
+    # Set up orthographic camera.
+    camera = g.OrthographicCamera(left=xmin,
+                                  right=xmax,
+                                  top=ymax,
+                                  bottom=ymin,
+                                  near=-1000,
+                                  far=1000)
+    vis['/Cameras/default/rotated'].set_object(camera)
+    vis['/Cameras/default'].set_transform(
+        RigidTransform(camera_position).GetAsMatrix4())
+
+    # Lock the orbit controls.
+    vis['/Cameras/default/rotated/<object>'].set_property("position", [0, 0, 0])
+
+    # Turn off background, axes, and grid.
+    vis['/Background'].set_property("visible", False)
+    vis['/Grid'].set_property("visible", False)
+    vis['/Axes'].set_property("visible", False)
 
 
 def draw_points(meshcat, points, color, **kwargs):
@@ -188,3 +226,15 @@ def draw_points(meshcat, points, color, **kwargs):
         points.shape = (3, 1)
     colors = np.tile(np.asarray(color).reshape(3, 1), (1, points.shape[1]))
     meshcat.set_object(g.PointCloud(points, colors, **kwargs))
+
+
+def draw_open3d_point_cloud(meshcat, pcd, normals_scale=0.0, size=0.001):
+    pts = np.asarray(pcd.points)
+    meshcat.set_object(g.PointCloud(pts.T, np.asarray(pcd.colors).T, size=size))
+    if pcd.has_normals() and normals_scale > 0.0:
+        normals = np.asarray(pcd.normals)
+        vertices = np.hstack(
+            (pts, pts + normals_scale * normals)).reshape(-1, 3).T
+        meshcat["normals"].set_object(
+            g.LineSegments(g.PointsGeometry(vertices),
+                           g.MeshBasicMaterial(color=0x000000)))
