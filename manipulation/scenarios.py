@@ -109,7 +109,7 @@ def AddWsg(plant, iiwa_model_instance, roll=np.pi / 2.0, welded=False):
     return gripper
 
 
-def AddShape(plant, shape, name, mass=1, mu=1, color=[.5, .5, .9, 1.0]):
+def AddShape(plant, shape, name, mass=1, mu=1, color=[.5, .5, .9, 1.0], collision=True):
     instance = plant.AddModelInstance(name)
     # TODO: Add a method to UnitInertia that accepts a geometry shape (unless
     # that dependency is somehow gross) and does this.
@@ -130,27 +130,28 @@ def AddShape(plant, shape, name, mass=1, mu=1, color=[.5, .5, .9, 1.0]):
                                               p_PScm_E=np.array([0., 0., 0.]),
                                               G_SP_E=inertia))
     if plant.geometry_source_is_registered():
-        if isinstance(shape, pydrake.geometry.Box):
-            plant.RegisterCollisionGeometry(
-                body, RigidTransform(),
-                pydrake.geometry.Box(shape.width() - 0.001,
-                                     shape.depth() - 0.001,
-                                     shape.height() - 0.001), name,
-                pydrake.multibody.plant.CoulombFriction(mu, mu))
-            i = 0
-            for x in [-shape.width() / 2.0, shape.width() / 2.0]:
-                for y in [-shape.depth() / 2.0, shape.depth() / 2.0]:
-                    for z in [-shape.height() / 2.0, shape.height() / 2.0]:
-                        plant.RegisterCollisionGeometry(
-                            body, RigidTransform([x, y, z]),
-                            pydrake.geometry.Sphere(radius=1e-7),
-                            f"contact_sphere{i}",
-                            pydrake.multibody.plant.CoulombFriction(mu, mu))
-                        i += 1
-        else:
-            plant.RegisterCollisionGeometry(
-                body, RigidTransform(), shape, name,
-                pydrake.multibody.plant.CoulombFriction(mu, mu))
+        if collision:
+            if isinstance(shape, pydrake.geometry.Box):
+                plant.RegisterCollisionGeometry(
+                    body, RigidTransform(),
+                    pydrake.geometry.Box(shape.width() - 0.001,
+                                         shape.depth() - 0.001,
+                                         shape.height() - 0.001), name,
+                    pydrake.multibody.plant.CoulombFriction(mu, mu))
+                i = 0
+                for x in [-shape.width() / 2.0, shape.width() / 2.0]:
+                    for y in [-shape.depth() / 2.0, shape.depth() / 2.0]:
+                        for z in [-shape.height() / 2.0, shape.height() / 2.0]:
+                            plant.RegisterCollisionGeometry(
+                                body, RigidTransform([x, y, z]),
+                                pydrake.geometry.Sphere(radius=1e-7),
+                                f"contact_sphere{i}",
+                                pydrake.multibody.plant.CoulombFriction(mu, mu))
+                            i += 1
+            else:
+                plant.RegisterCollisionGeometry(
+                    body, RigidTransform(), shape, name,
+                    pydrake.multibody.plant.CoulombFriction(mu, mu))
 
         plant.RegisterVisualGeometry(body, RigidTransform(), shape, name, color)
 
