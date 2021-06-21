@@ -12,7 +12,7 @@ from pydrake.all import (AbstractValue, BaseField, ModelInstanceIndex,
                          DepthImageToPointCloud, LeafSystem,
                          MakeRenderEngineVtk, RenderEngineVtkParams, RgbdSensor)
 from pydrake.all import RigidTransform, RollPitchYaw
-from manipulation.utils import FindResource
+from manipulation.utils import FindResource, AddPackagePaths
 
 ycb = [
     "003_cracker_box.sdf", "004_sugar_box.sdf", "005_tomato_soup_can.sdf",
@@ -41,12 +41,20 @@ def AddIiwa(plant, collision_model="no_collision"):
     return iiwa
 
 
-def AddPlanarIiwa(plant):
-    urdf = pydrake.common.FindResourceOrThrow(
-        "drake/manipulation/models/iiwa_description/urdf/"
-        "planar_iiwa14_spheres_dense_elbow_collision.urdf")
+def AddPlanarIiwa(plant, simple_collision=True):
+    urdf = FindResource('models/planar_iiwa14_one_sphere.urdf') \
+        if simple_collision else \
+        pydrake.common.FindResourceOrThrow(
+            "drake/manipulation/models/iiwa_description/urdf/"
+            "planar_iiwa14_spheres_dense_elbow_collision.urdf")
 
     parser = pydrake.multibody.parsing.Parser(plant)
+    parser.package_map().Add(
+        "iiwa_description",
+        os.path.dirname(
+            pydrake.common.FindResourceOrThrow(
+                "drake/manipulation/models/iiwa_description/package.xml"))
+    )
     iiwa = parser.AddModelFromFile(urdf)
     plant.WeldFrames(plant.world_frame(), plant.GetFrameByName("iiwa_link_0"))
 

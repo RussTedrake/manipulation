@@ -25,6 +25,10 @@ def AddPackagePaths(parser):
         os.path.join(pydrake.common.GetDrakePath(),
                      "examples/manipulation_station/models"))
     parser.package_map().Add(
+        "iiwa_description",
+        os.path.join(pydrake.common.GetDrakePath(),
+                     "manipulation/models/iiwa_description"))
+    parser.package_map().Add(
         "ycb",
         os.path.join(pydrake.common.GetDrakePath(), "manipulation/models/ycb"))
     parser.package_map().Add(
