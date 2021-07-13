@@ -255,10 +255,11 @@
       </geometry>
       <material name="Grey"/>
     </visual>
-    <collision>
+    <collision name="link7">
       <origin rpy="0 0 0" xyz="0 0 0.001"/>
       <geometry>
-        <sphere radius="0.06"/>
+        <!--<sphere radius="0.06"/>-->
+        <box size=".12 .12 .12"/>
       </geometry>
       <material name="Grey"/>
     </collision>
