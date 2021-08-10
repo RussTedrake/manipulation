@@ -5,40 +5,47 @@
 # Licensed under the BSD 3-Clause License. See LICENSE.TXT for details.
 
 # cd $(git rev-parse --show-toplevel)
-# docker build -f scripts/docker/Dockerfile \
-#   -t robotlocomotion/manipulation:latest .
+# docker build -f scripts/docker/Dockerfile -t russtedrake/manipulation:latest .
 #
-# docker run -i -p 7000:7000 -p 8888:8888 -t -v $(pwd):/root/manipulation \
-#   -w /root/manipulation robotlocomotion/manipulation:latest
+# docker run -i -p 7000:7000 -p 8888:8888 -t -w /root/manipulation russtedrake/manipulation:latest
 #
 # docker login
-# docker push robotlocomotion/manipulation:latest
+# docker push russtedrake/manipulation:latest
 
-FROM robotlocomotion/drake:latest
+FROM robotlocomotion/drake:bionic
 ARG DEBIAN_FRONTEND=noninteractive
 ENV SHELL /bin/bash
 EXPOSE 7000/tcp
 EXPOSE 8888/tcp
 LABEL org.opencontainers.image.authors="Russ Tedrake"
-LABEL org.opencontainers.image.description="A systems theory perspective on perception, planning, and control"
+LABEL org.opencontainers.image.description="Perception, Planning, and Control"
 LABEL org.opencontainers.image.licenses="BSD-3-Clause"
 LABEL org.opencontainers.image.source="https://github.com/RussTedrake/manipulation.git"
 LABEL org.opencontainers.image.title="Robot Manipulation"
-LABEL org.opencontainers.image.url="http://manipulation.csail.mit.edu/"
+LABEL org.opencontainers.image.url="https://manipulation.mit.edu/"
 LABEL org.opencontainers.image.vendor="Massachusetts Institute of Technology"
+COPY *.ipynb /root/manipulation/
+COPY manipulation/ /root/manipulation/manipulation/
+COPY exercises/ /root/manipulation/exercises/
 COPY requirements.txt /tmp/requirements.txt
+## Delete torch requirement until I figure out how to enable it.
+RUN sed -i '/torch/d' /tmp/requirements.txt
 COPY scripts/docker/pip.conf /root/.config/pip/pip.conf
 COPY scripts/setup/ubuntu/18.04/install_prereqs.sh /tmp/
-RUN /tmp/install_prereqs.sh \
- && LC_ALL=en_US.UTF-8 pip install -r /tmp/requirements.txt \
- && rm -rf /root/.cache \
- && rm -rf /root/.config \
- && rm -f /tmp/install_prereqs.sh \
- && rm -f /tmp/requirements.txt \
- && rm -f /var/cache/debconf/*-old \
- && rm -rf /var/lib/apt/lists/* \
- && rm -f /var/log/*.log \
- && rm -f /var/log/apt/*
+RUN /tmp/install_prereqs.sh
+RUN LC_ALL=en_US.UTF-8 pip3 install -r /tmp/requirements.txt
+RUN rm -rf /root/.cache /root/.config
+RUN rm -f /tmp/install_prereqs.sh
+RUN rm -f /tmp/requirements.txt
+RUN rm -f /var/cache/debconf/*-old
+RUN rm -rf /var/lib/apt/lists/*
+RUN rm -f /var/log/*.log
+RUN rm -f /var/log/apt/*
 ENV LANG en_US.UTF-8
 ENV LANGUAGE en_US.UTF-8
 ENV LC_ALL en_US.UTF-8
+# Make python and pip available to meet the requirements for deepnote.com:
+# https://docs.deepnote.com/environment/custom-environments#custom-image-requirements
+# TODO: Move these up to drake's Dockerfile (and remove them here)
+RUN update-alternatives --install /usr/bin/python python /usr/bin/python3 1
+RUN update-alternatives --install /usr/bin/pip pip /usr/bin/pip3 1
