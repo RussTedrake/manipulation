@@ -153,7 +153,7 @@ def setup_manipulation(*, manipulation_sha, drake_version, drake_build):
     run(['git', 'checkout', '--detach', manipulation_sha], cwd=path)
 
     # Run install_prereqs.sh
-    run([f"{path}/scripts/setup/ubuntu/18.04/install_prereqs.sh"])
+    run([f"{path}/setup/ubuntu/18.04/install_prereqs.sh"])
 
     # Run pip install
     if os.path.isfile("/opt/manipulation/colab-requirements.txt"):

@@ -12,7 +12,7 @@
 # docker login
 # docker push russtedrake/manipulation:latest
 
-FROM robotlocomotion/drake:bionic
+FROM robotlocomotion/drake:focal
 ARG DEBIAN_FRONTEND=noninteractive
 ENV SHELL /bin/bash
 EXPOSE 7000/tcp
@@ -31,7 +31,7 @@ COPY requirements.txt /tmp/requirements.txt
 ## Delete torch requirement until I figure out how to enable it.
 RUN sed -i '/torch/d' /tmp/requirements.txt
 COPY scripts/docker/pip.conf /root/.config/pip/pip.conf
-COPY scripts/setup/ubuntu/18.04/install_prereqs.sh /tmp/
+COPY setup/ubuntu/20.04/docker_distribution/install_prereqs.sh /tmp/
 RUN /tmp/install_prereqs.sh
 RUN LC_ALL=en_US.UTF-8 pip3 install -r /tmp/requirements.txt
 RUN rm -rf /root/.cache /root/.config
