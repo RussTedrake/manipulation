@@ -11,6 +11,9 @@
 #
 # docker login
 # docker push russtedrake/manipulation:latest
+#
+# To run w/ entire directory mounted (useful e.g. for running requirements.sh):
+# docker run -i -p 7000:7000 -p 8888:8888 -t -v $(pwd):/root/repo_mount -w /root/repo_mount russtedrake/manipulation:latest
 
 FROM robotlocomotion/drake:focal
 ARG DEBIAN_FRONTEND=noninteractive
@@ -25,7 +28,7 @@ LABEL org.opencontainers.image.title="Robot Manipulation"
 LABEL org.opencontainers.image.url="https://manipulation.mit.edu/"
 LABEL org.opencontainers.image.vendor="Massachusetts Institute of Technology"
 COPY *.ipynb /root/manipulation/
-COPY manipulation/ /root/manipulation/manipulation/
+COPY manipulation/ /opt/manipulation/
 COPY exercises/ /root/manipulation/exercises/
 COPY requirements.txt /tmp/requirements.txt
 ## Delete torch requirement until I figure out how to enable it.
@@ -41,11 +44,12 @@ RUN rm -f /var/cache/debconf/*-old
 RUN rm -rf /var/lib/apt/lists/*
 RUN rm -f /var/log/*.log
 RUN rm -f /var/log/apt/*
+RUN export PYTHONPATH=/opt/manipulation:${PYTHONPATH}
 ENV LANG en_US.UTF-8
 ENV LANGUAGE en_US.UTF-8
 ENV LC_ALL en_US.UTF-8
 # Make python and pip available to meet the requirements for deepnote.com:
 # https://docs.deepnote.com/environment/custom-environments#custom-image-requirements
-# TODO: Move these up to drake's Dockerfile (and remove them here)
-RUN update-alternatives --install /usr/bin/python python /usr/bin/python3 1
-RUN update-alternatives --install /usr/bin/pip pip /usr/bin/pip3 1
+# TODO: Remove these pending drake #15586.
+RUN ln -s /usr/bin/python3 /opt/drake/bin/python
+RUN ln -s /usr/bin/pip3 /opt/drake/bin/pip
