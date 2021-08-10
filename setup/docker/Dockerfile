@@ -5,7 +5,7 @@
 # Licensed under the BSD 3-Clause License. See LICENSE.TXT for details.
 
 # cd $(git rev-parse --show-toplevel)
-# docker build -f scripts/docker/Dockerfile -t russtedrake/manipulation:latest .
+# docker build -f setup/docker/Dockerfile -t russtedrake/manipulation:latest .
 #
 # docker run -i -p 7000:7000 -p 8888:8888 -t -w /root/manipulation russtedrake/manipulation:latest
 #
@@ -30,8 +30,8 @@ COPY exercises/ /root/manipulation/exercises/
 COPY requirements.txt /tmp/requirements.txt
 ## Delete torch requirement until I figure out how to enable it.
 RUN sed -i '/torch/d' /tmp/requirements.txt
-COPY scripts/docker/pip.conf /root/.config/pip/pip.conf
-COPY setup/ubuntu/20.04/docker_distribution/install_prereqs.sh /tmp/
+COPY setup/docker/pip.conf /root/.config/pip/pip.conf
+COPY setup/ubuntu/20.04/install_prereqs.sh /tmp/
 RUN /tmp/install_prereqs.sh
 RUN LC_ALL=en_US.UTF-8 pip3 install -r /tmp/requirements.txt
 RUN rm -rf /root/.cache /root/.config
