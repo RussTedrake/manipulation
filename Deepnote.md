@@ -13,7 +13,7 @@ Any changes to .ipynb in this repo must be "released" (manually, for now) on Dee
 This requires:
 - Pushing a new dockerfile to `russtedrake/manipulation:tagname`.
   - Instructions for (manually) updating the dockerhub instance are in [setup/docker/Dockerfile](setup/docker/Dockerfile).
-  - Push to tagname with the date (format `20210831`) and also to `latest`.
+  - Push to tagname with the short SHA (using `git rev-parse --short HEAD`) and also to `latest`.
   - I am working on adding github integration for the docker.  See [#147](https://github.com/RussTedrake/manipulation/issues/147).
 - Open the deepnote project, and
   - Update the environment dockerfile to point to the new tag.

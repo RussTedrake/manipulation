@@ -12,7 +12,8 @@
 # docker login
 # docker push russtedrake/manipulation:latest
 
-FROM robotlocomotion/drake:focal
+FROM russtedrake/drake:meshcat_rollup
+#FROM robotlocomotion/drake:focal
 ARG DEBIAN_FRONTEND=noninteractive
 ENV SHELL /bin/bash
 # Open ports for meshcat:
@@ -47,8 +48,3 @@ ENV PYTHONPATH="/opt/manipulation:${PYTHONPATH}"
 ENV LANG en_US.UTF-8
 ENV LANGUAGE en_US.UTF-8
 ENV LC_ALL en_US.UTF-8
-# Make python and pip available to meet the requirements for deepnote.com:
-# https://docs.deepnote.com/environment/custom-environments#custom-image-requirements
-# TODO: Remove these pending drake #15586.
-RUN ln -s /usr/bin/python3 /opt/drake/bin/python
-RUN ln -s /usr/bin/pip3 /opt/drake/bin/pip
