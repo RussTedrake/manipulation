@@ -83,3 +83,12 @@ I've tried a number of solutions.
   - Google Hangouts meet speaker
   - Connect ipad via this Airplay recevier on Ubuntu: https://github.com/antimof/UxPlay
   - Couldn't find the gstreamer window as an option for window sharing.
+
+## Dockerhub workflow
+
+Instructions for (manually) updating the dockerhub instance are in setup/docker/Dockerfile.
+TODO(russt): Add github integration for the docker.  See #147.
+
+If I need experimental drake binaries, then I'll need
+https://drake.mit.edu/jenkins.html#building-binary-packages-on-demand and https://github.com/RobotLocomotion/drake/tree/master/tools/install/dockerhub/focal . 
+
