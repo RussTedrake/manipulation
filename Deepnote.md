@@ -12,11 +12,17 @@ Any changes to .ipynb in this repo must be "released" (manually, for now) on Dee
 
 This requires:
 - Pushing a new dockerfile to `russtedrake/manipulation:tagname`.
-  - Instructions for (manually) updating the dockerhub instance are in [setup/docker/Dockerfile](setup/docker/Dockerfile).
-  - Push to tagname with the short SHA (using `git rev-parse --short HEAD`) and also to `latest`.
+```
+docker pull robotlocomotion/drake:focal
+docker build -f setup/docker/Dockerfile -t russtedrake/manipulation:latest .
+docker push russtedrake/manipulation:latest
+docker build -f setup/docker/Dockerfile -t russtedrake/manipulation:$(git rev-parse --short HEAD) .
+docker push russtedrake/manipulation:$(git rev-parse --short HEAD)
+echo russtedrake/manipulation:$(git rev-parse --short HEAD)
+```
   - I am working on adding github integration for the docker.  See [#147](https://github.com/RussTedrake/manipulation/issues/147).
 - Open the deepnote project, and
-  - Update the environment dockerfile to point to the new tag.
+  - Update the environment dockerfile to point to the new tag.  Note: Deepnote seems to cache docker instances.  If you've pushed something new to the same image tag, then you still need to "set up a new environment". 
   - Manually copy the files from `/root/manipulation` to `~/work`.
   - Make sure that the "Allow incoming connections" is enabled in the Environment settings.
 
