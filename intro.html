@@ -404,7 +404,60 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
     <p>One thing that we’ll leave out is humans.  It’s not that I don’t like humans, but we have enough to do here without trying to model them.  Let’s call it future work.  The one exception is when we talk about control of the arm — a few simple heuristics at this level can make the robots much safer if operating around humans.  The robot won’t understand them, but we want to make sure we still don’t hurt them.  Or other robots/agents in the scene.</p>
 -->    
   </section>
+
+  <section><h1>Exercises</h1>
   
+    <exercise id="drake_exercise"><h1>Familiarize yourself with Drake</h1>
+
+      <p><drake></drake> is a powerful and mature software library that can
+      support many advanced robotics applications.  The motivation behind it is
+      described <a
+      href="https://medium.com/toyotaresearch/drake-model-based-design-in-the-age-of-robotics-and-machine-learning-59938c985515">in
+      this blog post</a>.  It is extensively documented, but you have to know
+      where to look for it.  (As of this writing the discoverability of that
+      documentation is a known area for improvement!)</p>
+
+      <ol>
+        <li>Check out the growing list of <drake></drake> <a
+        href="https://mybinder.org/v2/gh/RobotLocomotion/drake/nightly-release-binder?filepath=tutorials"
+        target="_tutorials">tutorials</a> (linked from the main Drake page). In
+        the <code>dynamical_systems</code> tutorial, to what value is the
+        initial condition, $x(0)$, set when we simulate the
+        <code>SimpleContinuousTimeSystem</code>?</li>
+
+        <li>The class-/function-level documentation is the most extensive
+        documentation in Drake.  When I'm working on Drake (in either C++ or
+        Python), I most often have the <a
+        href="https://drake.mit.edu/doxygen_cxx/index.html">C++ doxygen</a>
+        open.  The <a href="https://drake.mit.edu/pydrake/index.html">Python
+        documentation</a> is (mostly) auto-generated from this and isn't
+        curated as carefully; I tend to look there only in the rare cases that
+        the Python interface differs from C++.  
+        
+        <div>In C++ doxygen, search for "Spatial Vectors".  What ascii
+        characters do we use to denote an angular acceleration in
+        code?</div></li>
+
+        <li>Drake is open-source.  There are no black-box algorithms here.  If
+        you ever want to see how a particular algorithm is implemented, or find
+        examples of how to use a function, you can always look at the source
+        code.  These days you can <a
+        href="https://github1s.com/RobotLocomotion/drake" target="_vscode">use
+        VS Code</a> to explore the code right in your browser.  What value of 
+        <code>convergence_tol</code> do I use in the <a
+        href="https://github1s.com/RobotLocomotion/drake/blob/HEAD/bindings/pydrake/systems/test/controllers_test.py"
+        target="_vscode">unit test for "fitted value iteration"?</a> </li>
+        </ol>
+
+      <p>As you use Drake, if you have any questions, please consider <a
+      href="https://stackoverflow.com/questions/tagged/drake">asking them on
+      stack<b>overflow</b></a> using the "drake" tag.  The broader Drake
+      developers community will often be able to answer faster (and/or better)
+      than the course staff!  And asking there helps to build a searchable
+      knowledge base that will make Drake more useful and accessible for
+      everyone.</p>
+    </exercise>
+  </section>
 </chapter>
 <!-- EVERYTHING BELOW THIS LINE IS OVERWRITTEN BY THE INSTALL SCRIPT -->
 
