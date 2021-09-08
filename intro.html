@@ -213,7 +213,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
     manipulation research.  Our software tools have (very recently) gotten much
     better!</p>
       
-    <p>It was only about three years ago that I remember talking to my students,
+    <p>It was only about four years ago that I remember talking to my students,
     who were all quite adept at using simulation for developing control systems
     for walking robots, about using simulation for manipulation.  "You can't
     work on manipulation in simulation" was their refrain, and for good reason.
@@ -234,12 +234,13 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
     perception system in simulation would allow it to exploit any quirks of the
     simulated images that could make the problem easier.</p>
       
-    <p>We have also seen dramatic improvements in the quality and performance of
-    contact simulation.  Making robust and performant simulations of multi-body
-    contact involves dealing with complex geometry queries and stiff (measure-)
-    differential equations.  There is still room for fundamental improvements in
-    the mathematical formulations of the governing equations, but today's
-    solvers are good enough to be extremely useful.</p>
+    <p>We have also seen dramatic improvements in the quality and performance
+    of contact simulation.  Making robust and performant simulations of
+    multi-body contact involves dealing with complex geometry queries and stiff
+    (measure-) differential equations.  There is still room for fundamental
+    improvements in the mathematical formulations of and numerical solutions
+    for the governing equations, but today's solvers are good enough to be
+    extremely useful.</p>
       
 </section>
     
@@ -248,12 +249,13 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
     <p>By leveraging the power of simulation, and the new availability of free
     online interactive compute, I am trying to make these notes more than what
     you would find in a traditional text.  Each chapter will have working code
-    examples, which you can run immediately (no installation required) on <a href="https://deepnote.com>Deepnote</a> and/or <a
+    examples, which you can run immediately (no installation required) on <a
+    href="https://deepnote.com">Deepnote</a> and/or <a
     href="https://colab.research.google.com/">Google's Colaboratory</a>, or
     download/install and run on your local machine (see the <a
     href="drake.html">appendix</a> for more details).  It uses an open-source
     library called <drake></drake> which has been a labor of love for me over
-    the last 7 years or so.  Because all of the code is open source, it is
+    the last 8 years or so.  Because all of the code is open source, it is
     entirely up to you how deep into the rabbit hole you choose to go.</p>
     
     <p>Mortimer Adler famously said "Reading a [great] book should be a
@@ -268,11 +270,11 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
     liked!</p>
       
     <p>I have organized the software examples into notebooks by chapter.  There
-    is an "Launch in Deepnote" button at the top of each chapter; I'd encourage you
-    to open it immediately when you are reading the chapter and run the
-    first cell, which takes up to two minutes to provision the cloud machine.
-    Then as you read the text, I will have examples that will have corresponding
-    sections in the notebook.</p>
+    is an "Launch in Deepnote" button at the top of each chapter; I'd encourage
+    you to open it immediately when you are reading the chapter.  Go ahead and
+    "duplicate" the chapter project and run the first cell to startup the cloud
+    machine. Then as you read the text, I will have examples that will have
+    corresponding sections in the notebook.</p>
       
     <example><h1>Teleoperation in 2D.</h1>
       
@@ -363,14 +365,14 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
         
     </example>
 
-    <p>Let me be transparent: not everybody likes this systems framework.  Some
-    people are just trying to move fast, and don't see the benefits of slowing
-    down to declare their state variables, etc.  It will likely feel like a
-    burden to you the first time you go to write a new system.  But it's
-    precisely <i>because</i> we're trying to build complex systems quickly that
-    I advocate this more rigorous approach.  I believe that getting to the next
-    level of maturity in our open-world manipulation system requires more
-    maturity from our building blocks.</p>
+    <p>Let me be transparent: not everybody likes this systems framework for
+    manipulation.  Some people are just trying to move fast, and don't see the
+    benefits of slowing down to declare their state variables, etc.  It will
+    likely feel like a burden to you the first time you go to write a new
+    system.  But it's precisely <i>because</i> we're trying to build complex
+    systems quickly that I advocate this more rigorous approach.  I believe
+    that getting to the next level of maturity in our open-world manipulation
+    system requires more maturity from our building blocks.</p>
         
   </section> 
   
