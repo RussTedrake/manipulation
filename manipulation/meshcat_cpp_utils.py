@@ -42,7 +42,7 @@ def StartMeshcat(open_window=True):
     meshcat = Meshcat()
     if use_ngrok:
         http_tunnel = ngrok.connect(meshcat.port(), bind_tls=False)
-        meshcat.set_web_url(http_tunnel.publich_url())
+        meshcat.set_web_url(http_tunnel.public_url())
 
     set_log_level(prev_log_level)
     display(
