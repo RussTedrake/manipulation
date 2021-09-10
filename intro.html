@@ -459,6 +459,48 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       knowledge base that will make Drake more useful and accessible for
       everyone.</p>
     </exercise>
+    <exercise id="state_space_practice">
+        <h1>State-space practice</h1>
+
+        <p>We are going to model manipulation components using state-space models; here is a simple practice problem to get you thinking. Consider the system:</p>
+
+        <p>$$y[n] = u[n-3]$$</p>
+
+        <p>Where $y$ is the output of the system that you're interested in and $u$ is the input which you control, both of which are scalars. In this problem, you'll consider how to choose a state vector $x$ which allows you to model the output trajectory $y$ as $u$ changes.</p>
+
+        <p>Specifically: you will choose a state vector $x$ such that $x[n+1]=Ax[n]+Bu[n]$ and $y[n]=Cx[n]$, where $A$, $B$, and $C$ are all matrices of appropriate size.</p>
+
+        <ol type="a">
+            <li>
+                <p>What size is (the smallest vector that can be used for) $x[n]$ to represent this system? Explain your answer. (Hint: what happens when you try to simulate the system, either by hand or computationally, with a state that's the wrong size?)</p>
+            </li>
+            <li>
+                <p>For the state size you chose for part (a), what are corresponding $A$, $B$, and $C$ matrices to represent the dynamics of the system?</p>
+            </li>
+            <li>
+                Say we increase the delay between the input and the output to 5: $$y[n] = u[n-5]$$
+                Does the size of the state change compared with (a)? Explain why or why not.
+            </li>
+            <li>
+                Consider a system with slightly different dynamics:
+                \begin{align*}
+                x[n] &= x[n-2] + u[n-1] \\
+                y[n] &= x[n] + 1
+                \end{align*}
+                Given the following library of blocks, draw a block diagram representing the difference equation above.
+                <figure>
+                    <img style="width:30%", src="figures/exercises/sum.png"/>
+                </figure>
+                <figure>
+                    <img style="width:45%", src="figures/exercises/delay.png"/>
+                </figure>
+                For example, the system $x[n] = u[n-1]$ would be represented as follows:
+                <figure>
+                    <img style="width:55%", src="figures/exercises/block_diagram_example.png"/>
+                </figure>
+            </li>
+        </ol>
+    </exercise>
   </section>
 </chapter>
 <!-- EVERYTHING BELOW THIS LINE IS OVERWRITTEN BY THE INSTALL SCRIPT -->
