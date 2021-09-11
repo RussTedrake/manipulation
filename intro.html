@@ -462,11 +462,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
     <exercise id="state_space_practice">
         <h1>State-space practice</h1>
 
-        <p>We are going to model manipulation components using state-space models; here is a simple practice problem to get you thinking. Consider the system:</p>
-
-        <p>$$y[n] = u[n-3]$$</p>
-
-        <p>Where $y$ is the output of the system that you're interested in and $u$ is the input which you control, both of which are scalars. In this problem, you'll consider how to choose a state vector $x$ which allows you to model the output trajectory $y$ as $u$ changes.</p>
+        <p>We are going to model manipulation components using state-space models; here is a simple practice problem to get you thinking. Consider the system: $$y[n] = u[n-3],$$ where $y$ is the output of the system that you're interested in and $u$ is the input which you control, both of which are scalars. In this problem, you'll consider how to choose a state vector $x$ which allows you to model the output trajectory $y$ as $u$ changes.</p>
 
         <p>Specifically: you will choose a state vector $x$ such that $x[n+1]=Ax[n]+Bu[n]$ and $y[n]=Cx[n]$, where $A$, $B$, and $C$ are all matrices of appropriate size.</p>
 
@@ -489,14 +485,12 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
                 \end{align*}
                 Given the following library of blocks, draw a block diagram representing the difference equation above.
                 <figure>
-                    <img style="width:30%", src="figures/exercises/sum.png"/>
-                </figure>
-                <figure>
-                    <img style="width:45%", src="figures/exercises/delay.png"/>
+                    <img style="width:25%", src="figures/exercises/sum.png"/>
+                    <img style="margin-left:10%; width:35%", src="figures/exercises/delay.png"/>
                 </figure>
                 For example, the system $x[n] = u[n-1]$ would be represented as follows:
                 <figure>
-                    <img style="width:55%", src="figures/exercises/block_diagram_example.png"/>
+                    <img style="width:45%", src="figures/exercises/block_diagram_example.png"/>
                 </figure>
             </li>
         </ol>
