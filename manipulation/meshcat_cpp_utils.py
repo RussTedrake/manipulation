@@ -3,7 +3,6 @@ import sys
 
 from IPython.display import display, HTML, Javascript
 import numpy as np
-from pyngrok import ngrok
 
 from pydrake.common import set_log_level
 from pydrake.geometry import Meshcat
@@ -41,6 +40,7 @@ def StartMeshcat(open_window=True):
 
     meshcat = Meshcat()
     if use_ngrok:
+        from pyngrok import ngrok
         http_tunnel = ngrok.connect(meshcat.port(), bind_tls=False)
         meshcat.set_web_url(http_tunnel.public_url())
 
