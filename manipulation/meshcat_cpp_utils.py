@@ -14,7 +14,7 @@ from pydrake.math import RollPitchYaw, RigidTransform
 from pydrake.systems.framework import LeafSystem, PublishEvent
 
 
-def StartMeshcat(open_window=True):
+def StartMeshcat(open_window=False):
     """
     A wrapper around the Meshcat constructor that supports Deepnote and Google
     Colab via ngrok when necessary.
