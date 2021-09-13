@@ -12,7 +12,7 @@
 # docker login
 # docker push russtedrake/manipulation:latest
 
-FROM russtedrake/drake:meshcat_rollup
+FROM russtedrake/drake:meshcat_sliders
 #FROM robotlocomotion/drake:focal
 ARG DEBIAN_FRONTEND=noninteractive
 ENV SHELL /bin/bash
