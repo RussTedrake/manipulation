@@ -51,7 +51,7 @@ def StartMeshcat(open_window=False):
     if use_ngrok:
         from pyngrok import ngrok
         http_tunnel = ngrok.connect(meshcat.port(), bind_tls=False)
-        web_url = http_tunnel.public_url()
+        web_url = http_tunnel.public_url
 
     set_log_level(prev_log_level)
     display(
