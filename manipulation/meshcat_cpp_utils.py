@@ -37,8 +37,7 @@ def StartMeshcat(open_window=False):
             use_ngrok = True
         else:
             set_log_level(prev_log_level)
-            web_url = "https://" + os.environ["DEEPNOTE_PROJECT_ID"]
-            + ".deepnoteproject.com"
+            web_url = f"https://{os.environ['DEEPNOTE_PROJECT_ID']}.deepnoteproject.com"  # noqa
             print(f"Meshcat is now available at {web_url}")
             if open_window:
                 display(Javascript(f'window.open("{web_url}");'))
