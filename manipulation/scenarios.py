@@ -11,7 +11,9 @@ from pydrake.all import (AbstractValue, BaseField, ModelInstanceIndex,
                          CameraInfo, ClippingRange, DepthRange,
                          DepthImageToPointCloud, LeafSystem,
                          MakeRenderEngineVtk, RenderEngineVtkParams, RgbdSensor)
-from pydrake.all import RigidTransform, RollPitchYaw
+from pydrake.geometry import (Cylinder, GeometryInstance,
+                              MakePhongIllustrationProperties)
+from pydrake.math import RigidTransform, RollPitchYaw, RotationMatrix
 from manipulation.utils import FindResource
 
 ycb = [
@@ -281,3 +283,58 @@ def SetColor(scene_graph, color, source_id, geometry_ids=None):
         new_color = pydrake.geometry.Rgba(color[0], color[1], color[2],
                                           color[3])
         props.UpdateProperty("phong", "diffuse", new_color)
+
+
+def AddTriad(source_id,
+             frame_id,
+             scene_graph,
+             length=.25,
+             radius=0.01,
+             opacity=1.,
+             X_FT=RigidTransform()):
+    """
+    Adds illustration geometry representing the coordinate frame, with the
+    x-axis drawn in red, the y-axis in green and the z-axis in blue. The axes
+    point in +x, +y and +z directions, respectively.
+
+    Args:
+      source_id: The source registered with SceneGraph.
+      frame_id: A geometry::frame_id registered with scene_graph.
+      scene_graph: The SceneGraph with which we will register the geometry.
+      length: the length of each axis in meters.
+      radius: the radius of each axis in meters.
+      opacity: the opacity of the coordinate axes, between 0 and 1.
+      X_FT: a RigidTransform from the triad frame T to the frame_id frame F
+    """
+    # x-axis
+    X_TG = RigidTransform(RotationMatrix.MakeYRotation(np.pi / 2),
+                          [length / 2., 0, 0])
+    geom = GeometryInstance(X_FT.multiply(X_TG), Cylinder(radius, length),
+                            "x-axis")
+    geom.set_illustration_properties(
+        MakePhongIllustrationProperties([1, 0, 0, opacity]))
+    scene_graph.RegisterGeometry(source_id, frame_id, geom)
+
+    # y-axis
+    X_TG = RigidTransform(RotationMatrix.MakeXRotation(np.pi / 2),
+                          [0, length / 2., 0])
+    geom = GeometryInstance(X_FT.multiply(X_TG), Cylinder(radius, length),
+                            "y-axis")
+    geom.set_illustration_properties(
+        MakePhongIllustrationProperties([0, 1, 0, opacity]))
+    scene_graph.RegisterGeometry(source_id, frame_id, geom)
+
+    # z-axis
+    X_TG = RigidTransform([0, 0, length / 2.])
+    geom = GeometryInstance(X_FT.multiply(X_TG), Cylinder(radius, length),
+                            "z-axis")
+    geom.set_illustration_properties(
+        MakePhongIllustrationProperties([0, 0, 1, opacity]))
+    scene_graph.RegisterGeometry(source_id, frame_id, geom)
+
+
+def AddMultibodyTriad(frame, scene_graph, length=.25, radius=0.01, opacity=1.):
+    plant = frame.GetParentPlant()
+    AddTriad(plant.get_source_id(),
+             plant.GetBodyFrameIdOrThrow(frame.body().index()), scene_graph,
+             length, radius, opacity, frame.GetFixedPoseInBodyFrame())

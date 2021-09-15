@@ -296,19 +296,24 @@ class MeshcatJointSlidersThatPublish():
                 slider_num += 1
 
     def Publish(self):
+        old_positions = self._plant.GetPositions(self._plant_context)
         positions = np.zeros((len(self._sliders), 1))
         for i, s in enumerate(self._sliders):
             positions[i] = self._meshcat.GetSliderValue(s)
-        self._plant.SetPositions(self._plant_context, positions)
-        self._publishing_system.Publish(self._publishing_context)
+        if not np.array_equal(positions, old_positions):
+            self._plant.SetPositions(self._plant_context, positions)
+            self._publishing_system.Publish(self._publishing_context)
+            return True
+        return False
 
-    def Run(self):
+    def Run(self, callback=None):
         if not running_as_notebook:
             return
         print("Press the 'Stop JointSliders' button in Meshcat to continue.")
         self._meshcat.AddButton("Stop JointSliders")
         while self._meshcat.GetButtonClicks("Stop JointSliders") < 1:
-            self.Publish()
+            if self.Publish() and callback:
+                callback(self._plant_context)
             time.sleep(.1)
 
         self._meshcat.DeleteButton("Stop JointSliders")
