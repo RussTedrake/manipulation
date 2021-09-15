@@ -30,3 +30,13 @@ The manipulation dockerfile builds on the drake dockerfile.  Ideally this would 
 - [Create experimental drake binaries](https://drake.mit.edu/jenkins.html#building-binary-packages-on-demand)
 - [Create a drake dockerfile](https://github.com/RobotLocomotion/drake/tree/master/tools/install/dockerhub/focal)
 - Push the experimental drake dockerfile with e.g. `docker push russtedrake/drake:tagname` .
+
+
+# Design notes
+
+The current design is to have one deepnote project per notebook.  (We originally started by having one project per chapter)  Here are some of the pros and cons:
+- when a student duplicates the project will reset the view back to the main notebook (I'm actually not sure how the "main" notebook is determined; probably the first one I created?).  so students have to figure out how to navigate back to an exercise notebook.
+- each user only fires up one cloud instance per project.  this is good and bad.  it's faster to load consecutive notebooks, but we only get to open one port on the machine directly to meshcat, so the second notebook uses ngrok... and the free ngrok tier only allows two connections per machine.  So currently if we try to open 4 meshcat instances on deepnote, that 4th one will fail to open a public port.
+- having a more granular set of projects allows us to version each notebook on a potentially different docker image.  again, good and bad.  it's more work to setup and to maintain.  but it's probably also more robust.  (e.g. I won't update a docker image, test on just the chapter, and find out later that I broke some exercise).
+- students need to duplicate projects again to get any updates.  it's probably better for them to do that in narrower slices.
+  
