@@ -1238,11 +1238,20 @@ plant.num_velocities() = 6</pre></code></p>
       </ol>
   </exercise>
 
-  <exercise id="manipulability_ellipsoid"><h1>Manipulability Ellipsoid</h1>
+  <exercise id="jacobian_exploration"><h1>Exploring the Jacobian</h1>
+      <p>Exercise 3.5 asked you to derived the Jacobian for the planar two-link manipulator. In this problem we will explore the Jacobian in more detail, both in the context of a planar two-link manipulator and in the context of a planar three-link manipulator. For the planar three-link manipulator, the joint angles are $(q_{0}, q_{1}, q_{2})$ and the end effector position is described by $(x, y)$. </p>
 
-      <todo>Rachel's problem goes here.
-        https://github.com/RobotLocomotion/6-800-website/issues/97
-      </todo>
+      <ol type="a">
+          <li>For the planar two-link manipulator, the size of the Jacobian is 2x2. What is the size of the Jacobian of the planar three-link manipulator?</li><br/>
+          <li>In considering the planar two-link and three-link manipulators, how does the size of the Jacobian impact the type of inverse that can be computed? (when can the inverse be computed exactly? when can it not?)</li><br/>
+          <li>Below, for the planar two-link manipulator, we draw the unit circle of joint velocities in the $\dot{\theta_{1}}-\dot{\theta_{2}}$ plane. This circle is then mapped through the Jacobian to an ellipse in the end effector velocity space. In other words, this visualizes that the Jacobian maps the space of joint velocities to the space of end effector velocities.<br/><br/>
+          The ellipse in the end effector velocity space is called the <i>manipulability ellipsoid</i>. The manipulability ellipsoid graphically captures the robot's ability to move its end effector in each direction. For example, the closer the ellipsoid is to a circle, the more easily the end effector can move in arbitrary directions. When the robot is at a singularity, it cannot generate end effector velocities in certain directions. Thinking back to the singularities you explored in Exercise 3.5, at one of these singularities, what shape would the manipulability ellipsoid collapse to?</li>
+      </ol>  
+
+      <figure>
+          <img style="width:80%", src="figures/exercises/manipulability.png"/>
+          <figcaption>Manipulability ellipoids for two different postures of the planar two-link manipulator. Source: Lynch, Kevin M., and Frank C. Park. Modern robotics. Cambridge University Press, 2017.</figcaption>
+      </figure>
   </exercise>
 
   <exercise id="spatial_transforms"><h1>Spatial Transforms and Grasp Pose</h1>
