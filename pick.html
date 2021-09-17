@@ -147,7 +147,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
     relative to a frame, and expressed in the same frame, then we can safely
     omit the subscript.  $^Fp^A \equiv {^Fp^A_F}$. Furthermore,
     if the "relative to" field is omitted, then we assume that the point is
-    relative to $W$, so $p^A \equiv ^Wp^A_W$.</p>
+    relative to $W$, so $p^A \equiv {}^Wp^A_W$.</p>
 
     <figure>
       <img style="width:60%" src="figures/notation.svg"></img>
@@ -371,11 +371,6 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       between a child body and a parent body removes all but one degree of
       freedom, etc.</p>
 
-      <p>Interestingly, <code>SceneGraph</code> (the geometry engine) does not
-      maintain any tree structure.  All that <code>SceneGraph</code> knows about
-      is a list of frames specified relative to the world frame, $W$, and a list
-      of geometries attached to each frame.</p> 
-    
     </subsection>
 
     <subsection><h1>Forward kinematics for pick and place</h1>
@@ -487,7 +482,10 @@ pose = plant.EvalBodyPoseInWorld(context, gripper)</pre></code>
       <li>Spatial velocities add (when the frames match): \begin{equation}
       {}^A\text{v}^B_F + {}^B\text{v}^C_F = {}^A\text{v}^C_F, \qquad
       {}^A\omega^B_F + {}^B\omega^C_F = {}^A\omega^C_F,\end{equation} and have
-      the additive inverse. For the translational velocity, the addition is perhaps known from high-school physics; for the angular velocity I consider it quite surprising, and <a href="#angular_velocity_addition"></a>deserves to be verified</a>.</li>
+      the additive inverse. For the translational velocity, the addition is
+      perhaps known from high-school physics; for the angular velocity I
+      consider it quite surprising, and <a
+      href="#angular_velocity_addition">deserves to be verified</a>.</li>
       <li>Rotation matrices can be used to change between the "expressed-in"
       frames <b>when those frames are fixed</b>: \begin{equation}
       {}^A\text{v}^B_G = {}^GR^F {}^A\text{v}^B_F, \qquad {}^A\omega^B_G =
