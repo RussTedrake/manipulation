@@ -290,7 +290,8 @@ def AddTriad(source_id,
              length=.25,
              radius=0.01,
              opacity=1.,
-             X_FT=RigidTransform()):
+             X_FT=RigidTransform(),
+             name="frame"):
     """
     Adds illustration geometry representing the coordinate frame, with the
     x-axis drawn in red, the y-axis in green and the z-axis in blue. The axes
@@ -304,12 +305,13 @@ def AddTriad(source_id,
       radius: the radius of each axis in meters.
       opacity: the opacity of the coordinate axes, between 0 and 1.
       X_FT: a RigidTransform from the triad frame T to the frame_id frame F
+      name: the added geometry will have names name + " x-axis", etc.
     """
     # x-axis
     X_TG = RigidTransform(RotationMatrix.MakeYRotation(np.pi / 2),
                           [length / 2., 0, 0])
     geom = GeometryInstance(X_FT.multiply(X_TG), Cylinder(radius, length),
-                            "x-axis")
+                            name + " x-axis")
     geom.set_illustration_properties(
         MakePhongIllustrationProperties([1, 0, 0, opacity]))
     scene_graph.RegisterGeometry(source_id, frame_id, geom)
@@ -318,7 +320,7 @@ def AddTriad(source_id,
     X_TG = RigidTransform(RotationMatrix.MakeXRotation(np.pi / 2),
                           [0, length / 2., 0])
     geom = GeometryInstance(X_FT.multiply(X_TG), Cylinder(radius, length),
-                            "y-axis")
+                            name + " y-axis")
     geom.set_illustration_properties(
         MakePhongIllustrationProperties([0, 1, 0, opacity]))
     scene_graph.RegisterGeometry(source_id, frame_id, geom)
@@ -326,7 +328,7 @@ def AddTriad(source_id,
     # z-axis
     X_TG = RigidTransform([0, 0, length / 2.])
     geom = GeometryInstance(X_FT.multiply(X_TG), Cylinder(radius, length),
-                            "z-axis")
+                            name + " z-axis")
     geom.set_illustration_properties(
         MakePhongIllustrationProperties([0, 0, 1, opacity]))
     scene_graph.RegisterGeometry(source_id, frame_id, geom)
