@@ -257,9 +257,8 @@ def SetTransparency(scene_graph, alpha, source_id, geometry_ids=None):
         geometry_ids = inspector.GetAllGeometryIds()
 
     for gid in geometry_ids:
-        # just waiting on drake #14259
-        #        if not inspector.BelongsToSource(gid, source_id):
-        #            continue
+        if not inspector.BelongsToSource(gid, source_id):
+            continue
         props = inspector.GetIllustrationProperties(gid)
         if props is None or not props.HasProperty("phong", "diffuse"):
             continue
@@ -268,15 +267,15 @@ def SetTransparency(scene_graph, alpha, source_id, geometry_ids=None):
         props.UpdateProperty("phong", "diffuse", new_color)
 
 
+# TODO(russt): Use Rgba instead of vector color.
 def SetColor(scene_graph, color, source_id, geometry_ids=None):
     inspector = scene_graph.model_inspector()
     if not geometry_ids:
         geometry_ids = inspector.GetAllGeometryIds()
 
     for gid in geometry_ids:
-        # just waiting on drake #14259
-        #        if not inspector.BelongsToSource(gid, source_id):
-        #            continue
+        if not inspector.BelongsToSource(gid, source_id):
+            continue
         props = inspector.GetIllustrationProperties(gid)
         if props is None or not props.HasProperty("phong", "diffuse"):
             continue
