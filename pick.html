@@ -1214,6 +1214,37 @@ plant.num_velocities() = 6</pre></code></p>
   </exercise>
 
   <exercise id="slerp"><h1>Spherical linear interpolation (slerp)</h1>
+     <p>For positions, we can linearly interpolate between points, i.e. a "first order hold" (this is also called LERP for linear interpolation). When dealing with rotations, we cannot simply linearly interpolate and must instead use spherical linear interpolation (SLERP). The goal of this problem is to dig into the details of SLERP.<br/><br/>
+
+     To do so we will consider the simpler case where our rotations are in $\Re^{2}$ and can be represented with complex numbers, $z = a + bi$. We'll constrain all complex numbers to have a magnitude of 1 (and thus lie on the unit circle, drawn in red). </p>
+
+     <figure>
+         <img style="width:50%", src="figures/exercises/slerp_complexNumbers.png"/>
+         <!--<figcaption>Complex number $z = a + bi$</figcaption>-->
+     </figure>
+
+
+     <ol type="a">
+        <li> Given two frames, $C$ and $D$, we can visualize SLERP's interpolate as moving along the edge of a 2D circle defined by our coordinate frame, i.e. that interpolating between C and D would correspond to moving a frame along the dotted green line. (The ideas of <a href="https://en.wikipedia.org/wiki/Great-circle_distance" target="_blank">great-circle distance</a> and <a href="https://en.wikipedia.org/wiki/Geodesic" target="_blank">geodesics</a> are very related concepts!) By contrast, we can visualize LERP as interpolating by moving a frame along the axes, i.e. moving along the dotted orange line.<br/>
+If we were to use LERP to interpolate rotations, where would our interpolation experience a discontinuous jump? (This behavior is why we cannot LERP, and must SLERP!)<br/>
+            <figure>
+                <img style="width:40%", src="figures/exercises/slerp_lerp.png"/>
+                <!--<figcaption>SLERP and LERP</figcaption>-->
+            </figure>
+
+        </li><br/>
+            
+
+
+        <li> Simplifying even further, let's consider how to linearly interpolate in the 1D case. We can LERP $t\%$ between two points $(p, q)$ via: $p + (q - p) * t$. Intuitively, this takes the difference between our two points $(q-p)$, scales it by $t$ and adds this to our starting point $p$. How can we apply this intuition to 2D SLERPing where we represent rotations with complex numbers?<br/>
+        Given two complex numbers $z_{1} = a_{1} + b_{1}i$ and $z_{2} = a_{2} + b_{2}i$, we can find their difference as $z_{diff} = (a_{2} - a_{1}) + (b_{2} - b_{1})i$. Following from our LERP example, we'd next want to scale the complex number by $t$. Why can we not directly scale by $t$?</li><br/><br/>
+
+        <li> Rather than directly scaling our complex numbers, we can instead convert to polar coordinates $(r, \theta)$, scale the angle $\theta$ by $t$ and convert back to our complex number representation. Following this series of operations and using the previously defined $z_{diff}$, what would the equation be for our new complex number $z_{new}$ that is scaled $t\%$ between $z_{1}$ and $z_{2}$ ?</li>
+     </ol>
+
+
+     <p>Throughout class we primarily consider 3D rotations and use the generalization of complex numbers: quaternions. (<elib>Stillwell08</elib> nicely introduces quaternions as a generalization of complex numbers!) The intuition built throughout our simplified example extends quite naturally, with the inclusion of quaternion notation and operations. </p>
+
   
   </exercise>
   
