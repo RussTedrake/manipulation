@@ -32,6 +32,10 @@ The manipulation dockerfile builds on the drake dockerfile.  Ideally this would 
 - Push the experimental drake dockerfile with e.g. `docker push russtedrake/drake:tagname` .
 
 
+# Latex
+
+- https://community.deepnote.com/c/ask-anything/aligning-latex-equations-in-markdown-cells
+
 # Design notes
 
 The current design is to have one deepnote project per notebook.  (We originally started by having one project per chapter)  Here are some of the pros and cons:
