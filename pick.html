@@ -909,15 +909,15 @@ plant.num_velocities() = 6</pre></code></p>
     classes available in Drake.  Many of them are implemented as <a
     href="https://en.wikipedia.org/wiki/Spline_(mathematics)">splines</a> --
     piecewise polynomial functions of time.  Interpolating between orientations
-    requires some care, but for positions we can do a simple cubic
-    interpolation between each of our keyframes, as implemented in Drake's <a
+    requires some care, but for positions we can do a simple linear
+    interpolation between each of our keyframes.  That would be called a "<a
+    href="https://en.wikipedia.org/wiki/First-order_hold">first-order hold</a>",
+    and it's implemented in Drake's <a
     href="https://drake.mit.edu/doxygen_cxx/classdrake_1_1trajectories_1_1_piecewise_polynomial.html">PiecewisePolynomial</a>
     class.  For rotations, we'll use something called "spherical linear
     interpolation" or <a href="https://en.wikipedia.org/wiki/Slerp">slerp</a>,
     which is implemented in Drake's <a
-    href="https://drake.mit.edu/doxygen_cxx/classdrake_1_1trajectories_1_1_piecewise_quaternion_slerp.html">PiecewiseQuaternionSlerp</a>.
-    The <code>PiecewisePose</code> class makes it convenient to construct these
-    two trajectories directly from a list of times and poses.</p>
+    href="https://drake.mit.edu/doxygen_cxx/classdrake_1_1trajectories_1_1_piecewise_quaternion_slerp.html">PiecewiseQuaternionSlerp</a>.  The <code>PiecewisePose</code> class makes it convenient to construct and work with the position and orientation trajectories together.</p>
 
     <example><h1>Grasping with trajectories</h1>
     
