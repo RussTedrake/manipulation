@@ -1167,6 +1167,11 @@ plant.num_velocities() = 6</pre></code></p>
       a scalar?  That's another great <a
       href="#scaling_spatial_velocity">exercise</a>. </p>
 
+      <p>What happens in this formulation when the Jacobian drops row rank?
+      Observe that $v_n = 0, \alpha = 0$ is always a feasible solution for this
+      problem.  So if it's not possible to move in the commanded direction,
+      then the robot will just stop.</p>
+
       <todo>Updated block diagram</todo>
 
       <example><h1>Drake's DifferentialInverseKinematics</h1>
