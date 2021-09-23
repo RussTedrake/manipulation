@@ -737,7 +737,7 @@ plant.num_velocities() = 6</pre></code></p>
         <p>Imagine a two-link arm, where each link has length one.  Then the
         kinematics reduce to $$p^G = \begin{bmatrix} c_0 + c_{0+1} \\ s_0 + s_{0
         + 1} \end{bmatrix},$$  where I've used the (very common) shorthard $s_0$
-        for $\sin(q_0)$ and $s_{0+1}$ for $\sin(q_0+q_1)$, etc.  The Jacobian is
+        for $\sin(q_0)$ and $s_{0+1}$ for $\sin(q_0+q_1)$, etc. The <i>translational</i> Jacobian is
         $$J^G(q) = \begin{bmatrix} -s_0 - s_{0+1} & -s_{0 + 1} \\ c_0 + c_{0 +
         1} & c_{0 + 1} \end{bmatrix},$$ and as expected, it loses rank when the
         arm is at full extension (e.g. when $q_0 = q_1 = 0$ which implies the
@@ -764,7 +764,7 @@ plant.num_velocities() = 6</pre></code></p>
         velocities.  However, just because you cannot achieve an instantaneous
         velocity in the backwards direction, it does not mean you cannot get
         there!  At $t=1$, even though the joint velocities are constant, and the
-        Jacobian is singular, the robot is <i>accelerating</i> in $-x$,
+        translational Jacobian is singular, the robot is <i>accelerating</i> in $-x$,
         $\ddot{p}^G_{W_x}(t) = -2\cos(1-t).$</p>
 
         <todo>Update this to use the two-link iiwa (like i've done in the qp_diff_ik notebook).  The link lengths aren't *quite* one to one, but it's close.  could have a point on the second link that is the right distance away, or just add the ratio logic here.</todo>
