@@ -1214,36 +1214,30 @@ plant.num_velocities() = 6</pre></code></p>
   </exercise>
 
   <exercise id="slerp"><h1>Spherical linear interpolation (slerp)</h1>
-     <p>For positions, we can linearly interpolate between points, i.e. a "first-order hold" (this is also called LERP for linear interpolation). When dealing with rotations, we cannot simply linearly interpolate and must instead use spherical linear interpolation (SLERP). The goal of this problem is to dig into the details of SLERP.<br/><br/>
+     <p>For positions, we can linearly interpolate between points, i.e. a "first-order hold". When dealing with rotations, we cannot simply linearly interpolate and must instead use spherical linear interpolation (slerp). The goal of this problem is to dig into the details of slerp.<br/><br/>
 
-     To do so we will consider the simpler case where our rotations are in $\Re^{2}$ and can be represented with complex numbers, $z = a + bi$. We'll constrain all complex numbers to have a magnitude of 1 (and thus lie on the unit circle, drawn in red). </p>
+       To do so we will consider the simpler case where our rotations are in $\Re^{2}$ and can be represented with complex numbers.  Here are the rules of the game:  a 2D vector (x,y) will be represented as a complex number $z = x + yi$.  To rotate this vector by $\theta$, we will multiply by $e^{i\theta} = \cos(\theta) + i\sin(\theta).$  </p>
 
      <figure>
-         <img style="width:50%", src="figures/exercises/slerp_complexNumbers.png"/>
-         <!--<figcaption>Complex number $z = a + bi$</figcaption>-->
+         <img style="width:50%", src="figures/exercises/slerp.png"/>
      </figure>
 
 
      <ol type="a">
-        <li> Given two frames, $C$ and $D$, we can visualize SLERP's interpolate as moving along the edge of a 2D circle defined by our coordinate frame, i.e. that interpolating between C and D would correspond to moving a frame along the dotted green line. (The ideas of <a href="https://en.wikipedia.org/wiki/Great-circle_distance" target="_blank">great-circle distance</a> and <a href="https://en.wikipedia.org/wiki/Geodesic" target="_blank">geodesics</a> are very related concepts!) By contrast, we can visualize LERP as interpolating by moving a frame along the axes, i.e. moving along the dotted orange line.<br/>
-If we were to use LERP to interpolate rotations, where would our interpolation experience a discontinuous jump? (This behavior is why we cannot LERP, and must SLERP!)<br/>
-            <figure>
-                <img style="width:40%", src="figures/exercises/slerp_lerp.png"/>
-                <!--<figcaption>SLERP and LERP</figcaption>-->
-            </figure>
+        <li> Let's verify that this works. Take the 2D vector $(x,y) = (1,1)$.  If you convert this vector into a complex number, multiply by $z = e^{i\pi/4}$ using complex multiplication, and convert the result back to a 2D vector, do you get the expected result?  Show your work and explain why this is the expected result. </li><br/>
 
-        </li><br/>
-            
+        A frame $F$ has an orientation.  We can represent that orientation using the rotation from the world frame, e.g. $^WR^F$.  We've just verified that you can represent that rotation using a complex number, $e^{i\theta}$.  Now assume we want to interpolate between two orientations, represented by frames $F$ and $G$.  How should we smoothly interpolate between the two frames, e.g. using $t\in [0,1]$? You'll explore this in parts (b) and (c). <br/><br/>
 
+       <li> Attempt 1: Consider $z(t) = (a_F*(1-t) + a_G*t) + i (b_F*(1-t) + b_G*t)$.  Take $t=.5$.  What happens if you multiply the 2D vector $(1,1)$ by $z(t = .5)$? Show your work and explain what goes wrong.  </li><br/>
 
-        <li> Simplifying even further, let's consider how to linearly interpolate in the 1D case. We can LERP $t\%$ between two points $(p, q)$ via: $p + (q - p) * t$. Intuitively, this takes the difference between our two points $(q-p)$, scales it by $t$ and adds this to our starting point $p$. How can we apply this intuition to 2D SLERPing where we represent rotations with complex numbers?<br/>
-        Given two complex numbers $z_{1} = a_{1} + b_{1}i$ and $z_{2} = a_{2} + b_{2}i$, we can find their difference as $z_{diff} = (a_{2} - a_{1}) + (b_{2} - b_{1})i$. Following from our LERP example, we'd next want to scale the complex number by $t$. Why can we not directly scale by $t$?</li><br/><br/>
-
-        <li> Rather than directly scaling our complex numbers, we can instead convert to polar coordinates $(r, \theta)$, scale the angle $\theta$ by $t$ and convert back to our complex number representation. Following this series of operations and using the previously defined $z_{diff}$, what would the equation be for our new complex number $z_{new}$ that is scaled $t\%$ between $z_{1}$ and $z_{2}$ ?</li>
+        <li> Attempt 2: Instead we can leverage the other representation: $z(t) = e^{i \theta_{F}*(1-t) + \theta_{G}*t}$.  What happens if we multiply by the 2D vector $(1,1)$ by $z(t = .5)$? Again, show your work.</li>
      </ol>
 
 
-     <p>Throughout class we primarily consider 3D rotations and use the generalization of complex numbers: quaternions. (<elib>Stillwell08</elib> nicely introduces quaternions as a generalization of complex numbers!) The intuition built throughout our simplified example extends quite naturally, with the inclusion of quaternion notation and operations. </p>
+     <p>Quaternions simply are a generalization of this idea to 3D. In 2D, it might seem inefficient to use two numbers and a constraint that $a^2 + b^2 = 1$ to represent a single rotation (why not just $\theta$!?), but we've seen that it works.  In 3D we can use 4 numbers $x,y,z,w$ plus the constraint that $x^2+y^2+z^2+w^2 = 1$ to represent a 3D rotation.  In 2D,  using just $\theta$ can work fine, but in 3D using only three numbers leads to problems like the famous <a href=”https://en.wikipedia.org/wiki/Gimbal_lock” target=”_blank”>gimbal lock</a>.  The 4 numbers forming a unit quaternion provides a non-degenerate mapping of all 3D rotations. <br/><br/>
+
+Just like we saw in 2D, one cannot simply linearly interpolate the 4 numbers of the quaternion to interpolate orientations.  Instead, we linearly interpolate the angle between two orientations, using the quaternion slerp.  The details involve some quaternion notation, but the concept is the same as in 2D.
+</p>
 
   
   </exercise>
