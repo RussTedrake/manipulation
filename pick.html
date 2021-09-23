@@ -167,15 +167,19 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
     <i>spatial pose</i></a>, or just <i>pose</i>.  A <i>spatial transform</i>,
     or just <i>transform</i>, is the "verb form" of pose.  In Drake we use <a
     href="https://drake.mit.edu/doxygen_cxx/classdrake_1_1math_1_1_rigid_transform.html"><code>RigidTransform</code></a>
-    to represent a pose/transform, and denote it with the letter $X$. $^BX^A$ is
-    the pose of frame $A$ relative to frame $B$.  When we talk about the pose of
-    an object $O$, without mentioning a reference frame explicitly, we mean
-    $^WX^O$ where $O$ is the body frame of the object.</p>
+    to represent a pose/transform, and denote it with the letter $X$. $^BX^A$
+    is the pose of frame $A$ relative to frame $B$.  When we talk about the
+    pose of an object $O$, without mentioning a reference frame explicitly, we
+    mean $^WX^O$ where $O$ is the body frame of the object.  We do not use the
+    "expressed in" frame subscript for pose; we always want the pose expressed
+    in the reference frame.</p>
     
     <p>The Drake <a
     href="https://drake.mit.edu/doxygen_cxx/group__multibody__notation.html">
-    documentation</a> also discusses how to use this notation in code. In short,
-    $^Bp^A_C$ is written <code>p_BA_C</code>. It works, I promise.</p>
+    documentation</a> also discusses how to use this notation in code. In
+    short, $^Bp^A_C$ is written <code>p_BA_C</code>, ${}^BR^A$ as
+    <code>R_BA</code>, and ${}^BX^A$ as <code>X_BA</code>. It works, I
+    promise.</p>
 
     <!--
     <subsection><h1>Rotation representations</h1>
@@ -484,7 +488,7 @@ pose = plant.EvalBodyPoseInWorld(context, gripper)</pre></code>
       {}^A\omega^B_F + {}^B\omega^C_F = {}^A\omega^C_F,\end{equation} and have
       the additive inverse. For the translational velocity, the addition is
       perhaps known from high-school physics; for the angular velocity I
-      consider it quite surprising, and <a
+      consider it quite surprising, and it <a
       href="#angular_velocity_addition">deserves to be verified</a>.</li>
       <li>Rotation matrices can be used to change between the "expressed-in"
       frames <b>when those frames are fixed</b>: \begin{equation}
@@ -690,8 +694,8 @@ plant.num_velocities() = 6</pre></code></p>
       case, we need $\rank(J) = 6$. But assigning an integer rank to a matrix
       doesn't tell the entire story; for a real robot with (noisy)
       floating-point joint positions, as the matrix gets <i>close</i> to losing
-      rank, (pseudo-)inverse starts to "blow-up".  A better metric, then, is to
-      watch the smallest <a
+      rank, the (pseudo-)inverse starts to "blow-up".  A better metric, then,
+      is to watch the smallest <a
       href="https://en.wikipedia.org/wiki/Singular_value_decomposition">singular
       value</a>; as this approaches zero, the norm of the pseudo-inverse will
       approach infinity.</p>
@@ -917,7 +921,7 @@ plant.num_velocities() = 6</pre></code></p>
     class.  For rotations, we'll use something called "spherical linear
     interpolation" or <a href="https://en.wikipedia.org/wiki/Slerp">slerp</a>,
     which is implemented in Drake's <a
-    href="https://drake.mit.edu/doxygen_cxx/classdrake_1_1trajectories_1_1_piecewise_quaternion_slerp.html">PiecewiseQuaternionSlerp</a>.  The <code>PiecewisePose</code> class makes it convenient to construct and work with the position and orientation trajectories together.</p>
+    href="https://drake.mit.edu/doxygen_cxx/classdrake_1_1trajectories_1_1_piecewise_quaternion_slerp.html">PiecewiseQuaternionSlerp</a>.  The <a href="https://drake.mit.edu/doxygen_cxx/classdrake_1_1trajectories_1_1_piecewise_pose.html">PiecewisePose</a> class makes it convenient to construct and work with the position and orientation trajectories together.</p>
 
     <example><h1>Grasping with trajectories</h1>
     

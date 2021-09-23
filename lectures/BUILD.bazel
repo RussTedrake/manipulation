@@ -20,12 +20,6 @@ rt_ipynb_test(
 )
 
 rt_ipynb_test(
-    name = "jacobian",
-    srcs = ["jacobian.ipynb"],
-    deps = ["//manipulation"],
-)
-
-rt_ipynb_test(
     name = "messy_icp",
     srcs = ["messy_icp.ipynb"],
     # Open3D 0.10 is not compatible with Python 3.9.
