@@ -70,6 +70,8 @@ class TriangularMeshGeometry(g.Geometry):
 
 def plot_surface(meshcat, X, Y, Z, color=0xdd9999, wireframe=False):
     (rows, cols) = Z.shape
+    assert (np.array_equal(X.shape, Y.shape))
+    assert (np.array_equal(X.shape, Z.shape))
 
     vertices = np.empty((rows * cols, 3), dtype=np.float32)
     vertices[:, 0] = X.reshape((-1))
@@ -144,7 +146,7 @@ def plot_mathematical_program(meshcat,
             plot_surface(v,
                          X,
                          Y,
-                         Zc.reshape((X.shape[1], X.shape[0])),
+                         Zc.reshape(X.shape),
                          color=0xff3333,
                          wireframe=True)
         else:
@@ -162,7 +164,7 @@ def plot_mathematical_program(meshcat,
                 plot_surface(cvb[str(index)],
                              X,
                              Y,
-                             Zc[index, :].reshape(X.shape[1], X.shape[0]),
+                             Zc[index, :].reshape(X.shape),
                              color=color,
                              wireframe=True)
 
@@ -170,7 +172,7 @@ def plot_mathematical_program(meshcat,
         plot_surface(meshcat["objective"],
                      X,
                      Y,
-                     Z.reshape(X.shape[1], X.shape[0]),
+                     Z.reshape(X.shape),
                      color=0x77cc77,
                      wireframe=True)
 
