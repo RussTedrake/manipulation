@@ -1214,6 +1214,31 @@ plant.num_velocities() = 6</pre></code></p>
   </exercise>
 
   <exercise id="slerp"><h1>Spherical linear interpolation (slerp)</h1>
+     <p>For positions, we can linearly interpolate between points, i.e. a "first-order hold". When dealing with rotations, we cannot simply linearly interpolate and must instead use spherical linear interpolation (slerp). The goal of this problem is to dig into the details of slerp.<br/><br/>
+
+       To do so we will consider the simpler case where our rotations are in $\Re^{2}$ and can be represented with complex numbers.  Here are the rules of the game:  a 2D vector (x,y) will be represented as a complex number $z = x + yi$.  To rotate this vector by $\theta$, we will multiply by $e^{i\theta} = \cos(\theta) + i\sin(\theta).$  </p>
+
+     <figure>
+         <img style="width:50%", src="figures/exercises/slerp.png"/>
+     </figure>
+
+
+     <ol type="a">
+        <li> Let's verify that this works. Take the 2D vector $(x,y) = (1,1)$.  If you convert this vector into a complex number, multiply by $z = e^{i\pi/4}$ using complex multiplication, and convert the result back to a 2D vector, do you get the expected result?  Show your work and explain why this is the expected result. </li><br/>
+
+        A frame $F$ has an orientation.  We can represent that orientation using the rotation from the world frame, e.g. $^WR^F$.  We've just verified that you can represent that rotation using a complex number, $e^{i\theta}$.  Now assume we want to interpolate between two orientations, represented by frames $F$ and $G$.  How should we smoothly interpolate between the two frames, e.g. using $t\in [0,1]$? You'll explore this in parts (b) and (c). <br/><br/>
+
+       <li> Attempt 1: Consider $z(t) = (a_F*(1-t) + a_G*t) + i (b_F*(1-t) + b_G*t)$.  Take $t=.5$.  What happens if you multiply the 2D vector $(1,1)$ by $z(t = .5)$? Show your work and explain what goes wrong.  </li><br/>
+
+        <li> Attempt 2: Instead we can leverage the other representation: $z(t) = e^{i \theta_{F}*(1-t) + \theta_{G}*t}$.  What happens if we multiply by the 2D vector $(1,1)$ by $z(t = .5)$? Again, show your work.</li>
+     </ol>
+
+
+     <p>Quaternions simply are a generalization of this idea to 3D. In 2D, it might seem inefficient to use two numbers and a constraint that $a^2 + b^2 = 1$ to represent a single rotation (why not just $\theta$!?), but we've seen that it works.  In 3D we can use 4 numbers $x,y,z,w$ plus the constraint that $x^2+y^2+z^2+w^2 = 1$ to represent a 3D rotation.  In 2D,  using just $\theta$ can work fine, but in 3D using only three numbers leads to problems like the famous <a href=”https://en.wikipedia.org/wiki/Gimbal_lock” target=”_blank”>gimbal lock</a>.  The 4 numbers forming a unit quaternion provides a non-degenerate mapping of all 3D rotations. <br/><br/>
+
+Just like we saw in 2D, one cannot simply linearly interpolate the 4 numbers of the quaternion to interpolate orientations.  Instead, we linearly interpolate the angle between two orientations, using the quaternion slerp.  The details involve some quaternion notation, but the concept is the same as in 2D.
+</p>
+
   
   </exercise>
   
