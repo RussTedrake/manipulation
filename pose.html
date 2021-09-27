@@ -55,8 +55,10 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
 
 <!-- EVERYTHING ABOVE THIS LINE IS OVERWRITTEN BY THE INSTALL SCRIPT -->
 <chapter style="counter-reset: chapter 3"><h1>Geometric Pose Estimation</h1>
-  <a style="float:right; margin-top:-80px;" target="pose" href="https://colab.research.google.com/github/RussTedrake/manipulation/blob/master/pose.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open Corresponding Notebook In Colab"/></a>
-  <div style="clear:right;"></div>
+  <a href="https://deepnote.com/project/Ch-4-Geometric-Pose-Estimation-zGNA9TdORJqhlYOaPO3sSg/%2Fpose.ipynb" style="float:right; margin-top:-70px;background:white;border:0;" class="deepnote" target="pose">
+    <img src="https://deepnote.com/buttons/launch-in-deepnote-white.svg"></a>
+    <div style="clear:right;"></div>
+
 
   <p>In the last chapter, we developed an initial solution to moving objects
   around, but we made one major assumption that would prevent us from using it
@@ -166,10 +168,11 @@ output_ports:
 
       <example class="drake"><h1>Simulating an RGB-D camera</h1>
 
-        <p><a target="pose"
-          href="https://colab.research.google.com/github/RussTedrake/manipulation/blob/master/pose.ipynb#scrollTo=7q0A14bAilIX"><img
-          src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
-          </p>
+        <p><a
+        href="https://deepnote.com/project/Ch-4-Geometric-Pose-Estimation-zGNA9TdORJqhlYOaPO3sSg/%2Fpose.ipynb"
+        style="background:none; border:none;" class="deepnote" target="pose">
+        <img
+        src="https://deepnote.com/buttons/launch-in-deepnote-white.svg"></a></p>
 
         <p>As a simple example of depth cameras in drake, I've constructed a
         scene with a single object (the mustard bottle from the <a
@@ -566,11 +569,11 @@ output_ports:
       world frame.  As expected, the algorithm perfectly recovers the ground
       truth transformation.</p>
 
-      <p><a target="pose"
-      href="https://colab.research.google.com/github/RussTedrake/manipulation/blob/master/pose.ipynb#scrollTo=9QDyRMCyb_gL"><img
-      src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open
-      In Colab"/></a>
-          </p>
+      <p><a
+        href="https://deepnote.com/project/Ch-4-Geometric-Pose-Estimation-zGNA9TdORJqhlYOaPO3sSg/%2Fpose.ipynb"
+        style="background:none; border:none;" class="deepnote" target="pose">
+        <img
+        src="https://deepnote.com/buttons/launch-in-deepnote-white.svg"></a></p>
 
     </example>
 
@@ -636,10 +639,11 @@ output_ports:
       will recover the exact solution.  So every one of those steps before
       convergence has at least a few bad correspondences.  Look closely!</p>
   
-      <p><a target="pose"
-      href="https://colab.research.google.com/github/RussTedrake/manipulation/blob/master/pose.ipynb#scrollTo=AHfxMwrvb1mz"><img
-      src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open
-      In Colab"/></a></p>
+      <p><a
+        href="https://deepnote.com/project/Ch-4-Geometric-Pose-Estimation-zGNA9TdORJqhlYOaPO3sSg/%2Fpose.ipynb"
+        style="background:none; border:none;" class="deepnote" target="pose">
+        <img
+        src="https://deepnote.com/buttons/launch-in-deepnote-white.svg"></a></p>
   
     </example>      
       
@@ -679,11 +683,11 @@ output_ports:
       point), to add noise, and/or to restrict the points to a partial view.
       Please try them by themselves and in combination.</p>
 
-      <!-- todo: update the hash -->
-      <p><a target="pose"
-        href="https://colab.research.google.com/github/RussTedrake/manipulation/blob/master/pose.ipynb#scrollTo=AHfxMwrvb1mz"><img
-        src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open
-        In Colab"/></a></p>
+      <p><a
+        href="https://deepnote.com/project/Ch-4-Geometric-Pose-Estimation-zGNA9TdORJqhlYOaPO3sSg/%2Fpose.ipynb"
+        style="background:none; border:none;" class="deepnote" target="pose">
+        <img
+        src="https://deepnote.com/buttons/launch-in-deepnote-white.svg"></a></p>
   
       <figure style="margin-top:-40px;">
         <iframe style="border:0;height:300px;width:400px;" src="data/icp_outliers.html?height=240px" pdf="no"></iframe>
@@ -1091,14 +1095,15 @@ output_ports:
       (SOCP), though we need to use a slack variable to put it into the standard
       form with a linear objective.</p>
 
-      <p><a target="pose"
-        href="https://colab.research.google.com/github/RussTedrake/manipulation/blob/master/pose.ipynb#scrollTo=pO8WTJjEWJ0k"><img
-        src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open
-        In Colab"/></a></p>
+      <p><a
+        href="https://deepnote.com/project/Ch-4-Geometric-Pose-Estimation-zGNA9TdORJqhlYOaPO3sSg/%2Fpose.ipynb"
+        style="background:none; border:none;" class="deepnote" target="pose">
+        <img
+        src="https://deepnote.com/buttons/launch-in-deepnote-white.svg"></a></p>
       
       <p>Please be careful.  Now that we have a constraint that depends on $p$,
       our original approach to solving for $R$ independently is no longer valid
-      (at least not without modification).  I've provided a simple implementation in colab.</p>
+      (at least not without modification).  I've provided a simple implementation in the notebook.</p>
       
       <!--To add the objective efficiently in
       code, we'll use properties of the matrix trace and $R^TR=I$ to observe
