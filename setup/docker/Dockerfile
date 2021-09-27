@@ -12,8 +12,8 @@
 # docker login
 # docker push russtedrake/manipulation:latest
 
-FROM russtedrake/drake:make_linear_pose
-#FROM robotlocomotion/drake:focal
+#FROM russtedrake/drake:make_linear_pose
+FROM robotlocomotion/drake:focal
 ARG DEBIAN_FRONTEND=noninteractive
 ENV SHELL /bin/bash
 # Open ports for meshcat:
