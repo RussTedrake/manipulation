@@ -26,6 +26,9 @@ LABEL org.opencontainers.image.source="https://github.com/RussTedrake/manipulati
 LABEL org.opencontainers.image.title="Robot Manipulation"
 LABEL org.opencontainers.image.url="https://manipulation.mit.edu/"
 LABEL org.opencontainers.image.vendor="Massachusetts Institute of Technology"
+ENV LANG en_US.UTF-8
+ENV LANGUAGE en_US.UTF-8
+ENV LC_ALL en_US.UTF-8
 COPY *.ipynb /root/manipulation/
 COPY manipulation/ /opt/manipulation/manipulation/
 COPY exercises/ /root/manipulation/exercises/
@@ -35,8 +38,8 @@ RUN sed -i '/torch/d' /tmp/requirements.txt
 COPY setup/docker/pip.conf /root/.config/pip/pip.conf
 COPY setup/ubuntu/20.04/install_prereqs.sh /tmp/
 RUN /tmp/install_prereqs.sh
-RUN LC_ALL=en_US.UTF-8 pip3 install -r /tmp/requirements.txt \
-    pyngrok pyvirtualdisplay
+RUN apt -y install xvfb
+RUN pip3 install -r /tmp/requirements.txt pyngrok pyvirtualdisplay
 RUN rm -rf /root/.cache /root/.config
 RUN rm -f /tmp/install_prereqs.sh
 RUN rm -f /tmp/requirements.txt
@@ -45,6 +48,3 @@ RUN rm -rf /var/lib/apt/lists/*
 RUN rm -f /var/log/*.log
 RUN rm -f /var/log/apt/*
 ENV PYTHONPATH="/opt/manipulation:${PYTHONPATH}"
-ENV LANG en_US.UTF-8
-ENV LANGUAGE en_US.UTF-8
-ENV LC_ALL en_US.UTF-8

@@ -6,61 +6,179 @@
 #
 altair==4.1.0
     # via -r focal-requirements.in
+argon2-cffi==21.1.0
+    # via notebook
 attrs==21.2.0
     # via jsonschema
+backcall==0.2.0
+    # via ipython
+bleach==4.1.0
+    # via nbconvert
+cffi==1.14.6
+    # via argon2-cffi
 cycler==0.10.0
     # via matplotlib
+debugpy==1.4.3
+    # via ipykernel
+decorator==5.1.0
+    # via ipython
+defusedxml==0.7.1
+    # via nbconvert
 entrypoints==0.3
-    # via altair
+    # via
+    #   altair
+    #   jupyter-client
+    #   nbconvert
 gradescope-utils==0.4.0
     # via -r focal-requirements.in
+ipykernel==6.4.1
+    # via
+    #   ipywidgets
+    #   notebook
+ipython==7.28.0
+    # via
+    #   ipykernel
+    #   ipywidgets
+ipython-genutils==0.2.0
+    # via
+    #   ipykernel
+    #   ipywidgets
+    #   nbformat
+    #   notebook
+ipywidgets==7.6.5
+    # via open3d
+jedi==0.18.0
+    # via ipython
 jinja2==3.0.1
     # via
     #   altair
     #   mpld3
+    #   nbconvert
+    #   notebook
 jsonschema==3.2.0
-    # via altair
+    # via
+    #   altair
+    #   nbformat
+jupyter-client==7.0.3
+    # via
+    #   ipykernel
+    #   nbclient
+    #   notebook
+jupyter-core==4.8.1
+    # via
+    #   jupyter-client
+    #   nbconvert
+    #   nbformat
+    #   notebook
+jupyterlab-pygments==0.1.2
+    # via nbconvert
+jupyterlab-widgets==1.0.2
+    # via ipywidgets
 kiwisolver==1.3.1
     # via matplotlib
 markupsafe==2.0.1
     # via jinja2
 matplotlib==3.4.2
-    # via mpld3
+    # via
+    #   mpld3
+    #   open3d
+matplotlib-inline==0.1.3
+    # via
+    #   ipykernel
+    #   ipython
+mistune==0.8.4
+    # via nbconvert
 mpld3==0.5.5
     # via -r focal-requirements.in
 mysql-connector-python==8.0.26
     # via -r htmlbook/focal-requirements.in
+nbclient==0.5.4
+    # via nbconvert
+nbconvert==6.2.0
+    # via notebook
+nbformat==5.1.3
+    # via
+    #   ipywidgets
+    #   nbclient
+    #   nbconvert
+    #   notebook
+nest-asyncio==1.5.1
+    # via
+    #   jupyter-client
+    #   nbclient
+notebook==6.4.4
+    # via
+    #   open3d
+    #   widgetsnbextension
 numpy==1.21.1
     # via
     #   altair
     #   matplotlib
+    #   open3d
     #   pandas
+open3d==0.10.0.0
+    # via -r focal-requirements.in
+packaging==21.0
+    # via bleach
 pandas==1.3.1
     # via altair
+pandocfilters==1.5.0
+    # via nbconvert
+parso==0.8.2
+    # via jedi
+pexpect==4.8.0
+    # via ipython
+pickleshare==0.7.5
+    # via ipython
 pillow==8.3.1
     # via matplotlib
 plotly==5.1.0
     # via -r focal-requirements.in
+prometheus-client==0.11.0
+    # via notebook
+prompt-toolkit==3.0.20
+    # via ipython
 protobuf==3.17.3
     # via mysql-connector-python
+ptyprocess==0.7.0
+    # via
+    #   pexpect
+    #   terminado
 pycodestyle==2.7.0
     # via -r htmlbook/focal-requirements.in
+pycparser==2.20
+    # via cffi
 pydocstyle==6.1.1
     # via -r htmlbook/focal-requirements.in
+pygments==2.10.0
+    # via
+    #   ipython
+    #   jupyterlab-pygments
+    #   nbconvert
 pymcubes==0.1.2
     # via -r focal-requirements.in
 pyparsing==2.4.7
-    # via matplotlib
+    # via
+    #   matplotlib
+    #   packaging
 pyrsistent==0.18.0
     # via jsonschema
 python-dateutil==2.8.2
     # via
+    #   jupyter-client
     #   matplotlib
     #   pandas
 pytz==2021.1
     # via pandas
+pyzmq==22.3.0
+    # via
+    #   jupyter-client
+    #   notebook
+send2trash==1.8.0
+    # via notebook
 six==1.16.0
     # via
+    #   bleach
     #   cycler
     #   jsonschema
     #   plotly
@@ -70,10 +188,40 @@ snowballstemmer==2.1.0
     # via pydocstyle
 tenacity==8.0.1
     # via plotly
+terminado==0.12.1
+    # via notebook
+testpath==0.5.0
+    # via nbconvert
 timeout-decorator==0.5.0
     # via -r focal-requirements.in
 toolz==0.11.1
     # via altair
+tornado==6.1
+    # via
+    #   ipykernel
+    #   jupyter-client
+    #   notebook
+    #   terminado
+traitlets==5.1.0
+    # via
+    #   ipykernel
+    #   ipython
+    #   ipywidgets
+    #   jupyter-client
+    #   jupyter-core
+    #   matplotlib-inline
+    #   nbclient
+    #   nbconvert
+    #   nbformat
+    #   notebook
+wcwidth==0.2.5
+    # via prompt-toolkit
+webencodings==0.5.1
+    # via bleach
+widgetsnbextension==3.5.1
+    # via
+    #   ipywidgets
+    #   open3d
 yapf==0.31.0
     # via -r htmlbook/focal-requirements.in
 

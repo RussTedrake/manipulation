@@ -1,7 +1,7 @@
 #
 # Assembles requirements for running the manipulation source on colab.
 
--r ubuntu-shared-requirements.in
+-r bionic-shared-requirements.in
 -c htmlbook/colab-constraints-colab.txt
 pyngrok>=4.2.2
 pyvirtualdisplay>=1.3.2

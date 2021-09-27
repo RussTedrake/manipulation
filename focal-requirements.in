@@ -4,6 +4,7 @@
 altair>=4.1.0
 gradescope-utils>=0.4.0
 mpld3>=0.5.1
+open3d==0.10.0.0 # new dependencies added from 0.11
 plotly>=4.4.1
 PyMCubes>=0.0.9
 timeout-decorator>=0.4.1
