@@ -29,3 +29,11 @@ If you would like to `bazel` to use a local installation of drake, you can set
 the `DRAKE_INSTALL_DIR` environment variable. Otherwise it will look in
 `/opt/drake`.
 
+## Tips for developers
+
+If you find yourself making modifications to the supporting .py files in addition to the notebook, then adding 
+```
+%load_ext autoreload
+%autoreload 2
+```
+to the top of the notebook will force those changes to get reloaded automatically.
