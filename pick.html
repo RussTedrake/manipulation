@@ -897,15 +897,6 @@ plant.num_velocities() = 6</pre></code></p>
   
     </example>
 
-    <div>To fill in the details -- defining a gripper pose for all $t$ -- we'll
-    convert these keyframes into a proper <i>trajectory</i>, $X^G(t), \forall t
-    \in [t_{initial}, t_{postpick}].$ Actually, we will produce two 
-    trajectories:
-      <ul>
-        <li>desired gripper poses,</li>
-        <li>desired gripper finger positions (open and close).</li>
-      </div>
-  
     <p>There are a number of ways one might represent a trajectory
     computationally. We have a pretty good collection of
     <a
@@ -921,7 +912,7 @@ plant.num_velocities() = 6</pre></code></p>
     class.  For rotations, we'll use something called "spherical linear
     interpolation" or <a href="https://en.wikipedia.org/wiki/Slerp">slerp</a>,
     which is implemented in Drake's <a
-    href="https://drake.mit.edu/doxygen_cxx/classdrake_1_1trajectories_1_1_piecewise_quaternion_slerp.html">PiecewiseQuaternionSlerp</a>.  The <a href="https://drake.mit.edu/doxygen_cxx/classdrake_1_1trajectories_1_1_piecewise_pose.html">PiecewisePose</a> class makes it convenient to construct and work with the position and orientation trajectories together.</p>
+    href="https://drake.mit.edu/doxygen_cxx/classdrake_1_1trajectories_1_1_piecewise_quaternion_slerp.html">PiecewiseQuaternionSlerp</a>, and which you can explore in <a href="#slerp">this exercise</a>.  The <a href="https://drake.mit.edu/doxygen_cxx/classdrake_1_1trajectories_1_1_piecewise_pose.html">PiecewisePose</a> class makes it convenient to construct and work with the position and orientation trajectories together.</p>
 
     <example><h1>Grasping with trajectories</h1>
     
@@ -950,14 +941,17 @@ plant.num_velocities() = 6</pre></code></p>
       videos</a>.</p>
     </example>
 
+    <p>One final detail -- we also need a trajectory of gripper commands (to
+    open and close the gripper).  We'll use a first-order hold for that, as
+    well.</p>
+
   </section>
 
   <section><h1>Putting it all together</h1>
   
-    <p>We can slightly generalize our PseudoInverseController to have additional
-    input ports for the gripper position and gripper orientation (in our first
-    version, the spatial velocity command was just hard-coded in the
-    controller).</p>
+    <p>We can slightly generalize our PseudoInverseController to have
+    additional input ports for the desired gripper spatial velocity, ${}^WV^G$
+    (in our first version, this was just hard-coded in the controller).</p>
 
     <div>
       <script type="text/javascript">
@@ -969,13 +963,14 @@ plant.num_velocities() = 6</pre></code></p>
       </script>
     </div>
 
-    <p>So far, our trajectories are position and orientation trajectories.  Our
-    controller needs translational velocity and angular velocity commands.
-    Fortunately, the trajectory classes we have used support differentiating the
-    trajectories.  In fact, the <code>PiecewiseQuaternionSlerp</code> is clever
-    enough to return the derivative of the 4-component quaternion trajectory as
-    a 3-component angular velocity trajectory.  The rest is just a matter of
-    wiring up the system diagram.</p>
+    <p>The trajectory we have constructed is a <i>pose</i> trajectory, but our
+    controller needs spatial velocity commands. Fortunately, the trajectory
+    classes we have used support differentiating the trajectories.  In fact,
+    the <code>PiecewiseQuaternionSlerp</code> is clever enough to return the
+    derivative of the 4-component quaternion trajectory as a 3-component
+    angular velocity trajectory, and taking the derivative of a
+    <code>PiecewisePose</code> trajectory returns a spatial velocity
+    trajectory.  The rest is just a matter of wiring up the system diagram.</p>
 
     <example><h1>The full pick and place demo</h1>
     
@@ -1110,19 +1105,26 @@ plant.num_velocities() = 6</pre></code></p>
 
     <subsection id="joint_centering"><h1>Joint centering</h1>
   
-      <p><i>(Need to finish/clean up the writing here)</i>.  Our Jacobian is $6
-      \times 7$.  We have extra degrees of freedom.  Not only an opportunity,
-      but a responsibility.  If we don't tell them what we want them to do, then
-      you might not like what you get.  Discuss analytic centering.  Add a term
-      to the objective in the nullspace of our current objective.</p>
+      <p>Our Jacobian is $6 \times 7$, so we actually have more degrees of
+      freedom than end-effector goals. This is not only an opportunity, but a
+      responsibility. When the column rank of $J^G$ exceeds the row rank, then
+      we have specified an optimization problem that has an infinite number of
+      solutions; and we've left it up to the solver to choose one. Typically a
+      convex optimization solver does choose something reasonable, like taking
+      the "analytic center" of the constraints, or a minimum-norm solution for
+      an unconstrained problem. But why leave this to chance? It's much better
+      for us to completely specify the problem so that there is a unique global
+      optima.</p>
 
-      <p>Here is one way to formulate it.  If we had no end-effector goals, then
-      we might write the controller $v = K(q_0 - q)$, a proportional control
-      that would drive the robot to its nominal configuration.  In the
-      unconstrained control case, there is a very elegant way of implementing
-      this controller as a "secondary" control, guaranteed not to interfere with
-      our primary end-effector spatial velocity controller, by projecting it
-      into the nullspace of $J^G$.  We can use almost the same trick here.</p>
+      <p>In the rich history of Jacobian-based control for robotics, there is a
+      very elegant idea of implementing a "secondary" control, guaranteed (in
+      some cases) not to interfere with our primary end-effector spatial
+      velocity controller, by projecting it into the <i>nullspace</i> of $J^G$.
+      So in order to fully specify the problem, we will provide a secondary
+      controller that attempts to control <i>all</i> of the joints.  We'll do
+      that here with a simple joint-space controller $v = K(q_0 - q)$; this is
+      a proportional controller that drives the robot to its nominal
+      configuration.</p>
       
       <p>Denote $P(q)$ as an orthonormal basis for the kernel of a Jacobian $J$.
       Traditionally in robotics we implemented this using the pseudo-inverse: $P
