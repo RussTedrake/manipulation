@@ -1298,6 +1298,36 @@ output_ports:
       </ol>    
     </exercise>
 
+    <exercise><h1>Outliers in ICP</h1>
+      <p>In this question you'll explore a technique for handling outliers in ICP and think through how the distance metric impacts the robustness of ICP to outliers. There are two parts to this question and each part has three subquestions. </p> 
+
+
+      <ol type="a">
+          <li>Consider the setting visualized below. Here the model points are given in black and labeled as $b_{i}$ and the scene points are given in red and labeled as $r_{j}$. 
+          <figure><img style="width:60%", src="figures/exercises/icp_trimmed.png"/></figure>
+
+          Let's consider a possible algorithm for handling the outliers in the scene. 
+          <ol>
+            <li>First, write down each of the correspondence, i.e the ($b_{i}, r_{j}$) pairs. Next, compute the ICP error, the sum of the pairwise distances between each of these correspondences. </li>
+            <li>Suppose that you are told that $\frac{1}{3}$ of the scene points are outliers. Using the pairwise distances between each $b_{i}$ and $r_{j}$, which two scene points $r_{j}$ could you detect as the most likely outliers?</li>
+            <li>Discard the two proposed outlier scene points, compute the new ICP error.</li>
+          </ol><br/>
+          This is the basic intution behind the Trimmed ICP algorithm! 
+          </li><br/><br/>
+
+          <li>The optimization in ICP captures the distance between two sets of points as the sum of pairwise Euclidean distances. As a thought experiment: another possible distance metric (which isn't as optimization friendly) is the one-way Hausdorff distance. SStated simply, given that an adversary picks a point on one shape, the <a href="https://en.wikipedia.org/wiki/Hausdorff_distance" target="_blank">one-way Hausdorff distance</a> is the distance you are  forced to travel to get to the closest point on the other shape. We could consider two schemes:<br/>
+<u>Scheme 1)</u> The adversary picks the scene point and thus you pick the model point that is closest to this scene point.<br/>
+<u>Scheme 2)</u> The adversary picks the model point and thus you pick the scene point that is closest to this model point.<br/><br/>
+Which is more robust to outliers? Let's explore through a 2D example. Again, the model points are given in black and labeled as $b_{i}$ and the scene points are given in red and labeled as $r_{j}$.
+
+          <figure><img style="width:50%", src="figures/exercises/icp_hausdorff.png"/></figure>
+          <ol>
+            <li>Lets consider scheme 1. I, as the adversary, pick the scene point $r_{5}$. Whats the nearest model point $b_{i}$ you can pick? Whats the distance to this model point? </li>
+            <li>Now in scheme 2, I pick the model point $b_{1}$. What's the nearest scene point $r_{j}$ that you can pick? What's the distance to this scene point? </li>
+          </li>
+      </ol>
+    </exercise>
+
     <exercise><h1>Pose Estimation</h1>
       <p>Let's go back to the example from Chapter 3, but relax the assumption that we have the pose of the red foam brick. You will be given a simulated raw pointcloud from our previous setup from a depth camera. Your task is to perform segmentation on this raw pointcloud data, and perform ICP to estimate the pose of the brick. You will work exclusively in <a href="https://colab.research.google.com/github/RussTedrake/manipulation/blob/master/exercises/pose/pose_estimation_icp.ipynb" target="_blank">this notebook</a>. You will be asked to complete the following steps:</p>
       <ol type="a">
