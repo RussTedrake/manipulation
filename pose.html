@@ -437,19 +437,19 @@ output_ports:
     always this problem is dramatically over-constrained.  Treating each point
     as hard constraints on the relative pose would also be very susceptible to
     measurement noise.  As a result, it will serve us better to try to find a
-    pose that describes the data, e.g., in a least-squares sense: $$\min_{X^O
-    \in \mathrm{SE}(3)} \sum_{i=1}^{N_s} \| X^O \: {}^Op^{m_{c_i}} - X^C \:
+    pose that describes the data, e.g., in a least-squares sense: $$\min_{X
+    \in \mathrm{SE}(3)} \sum_{i=1}^{N_s} \| X \: {}^Op^{m_{c_i}} - X^C \:
     {}^Cp^{s_i}\|^2.$$  Here I have used the notation $\mathrm{SE}(3)$ for the
     "<a href="http://planning.cs.uiuc.edu/node147.html">special Euclidean
-    group</a>," which is the standard notation saying the $X^O$ must be a valid
+    group</a>," which is the standard notation saying the $X$ must be a valid
     rigid transform.</p>
 
     <p>To proceed, let's pick a particular representation for the pose to work
     with.  I will use 3x3 rotation matrices here; the approach I'll describe
     below also has an equivalent in quaternion form<elib>Horn87</elib>.  To
     write the optimization above using the coefficients of the rotation matrix
-    and the translation as decision variables, I have: \begin{align} \min_{p^O,
-    R^O} \quad& \sum_{i=1}^{N_s} \| p^O + R^O \: {}^Op^{m_{c_i}} - X^C
+    and the translation as decision variables, I have: \begin{align} \min_{p,
+    R} \quad& \sum_{i=1}^{N_s} \| p + R \: {}^Op^{m_{c_i}} - X^C
     \: {}^Cp^{s_i} \|^2, \\ \subjto \quad& R^T = R^{-1}, \quad \det(R) = +1.
     \nonumber \end{align}  The constraints are needed because not every 3x3
     matrix is a valid rotation matrix; satisfying these constraints ensures that
@@ -461,8 +461,8 @@ output_ports:
     rotation.</p>
 
     <p>Let's think about the type of optimization problem we've formulated so
-    far.  Given our decision to use rotation matrices, the term $p^O +
-    R^O{^Op^{m_{c_i}}} - X^C {^Cp^{s_i}}$ is linear in the decision variables
+    far.  Given our decision to use rotation matrices, the term $p +
+    R{}^Op^{m_{c_i}} - X^C {^Cp^{s_i}}$ is linear in the decision variables
     (think $Ax \approx b$), making the objective a convex quadratic.  How about
     the constraints?  The first constraint is a quadratic equality constraint
     (to see it, rewrite it as $RR^T=I$ which gives 9 constraints, each quadratic
@@ -821,8 +821,8 @@ output_ports:
       general.  Let's denote the correspondence matrix $C\in \{0,1\}^{N_s \times
       N_m}$, with $C_{ij} = 1$ iff scene point $i$ corresponds with model point
       $j$.  Using this notation, we can write our estimation step (given known
-      correspondences) as: $$\min_{X^O\in \mathrm{SE}(3)} \sum_{i=1}^{N_s}
-      \sum_{j=1}^{N_m} C_{ij} \|X^O \: {}^Op^{m_j} - p^{s_i}\|^2.$$ This
+      correspondences) as: $$\min_{X\in \mathrm{SE}(3)} \sum_{i=1}^{N_s}
+      \sum_{j=1}^{N_m} C_{ij} \|X \: {}^Op^{m_j} - p^{s_i}\|^2.$$ This
       subsumes our previous approach: if $c_i = j$ then set $C_{ij} = 1$ and the
       rest of the row equal to zero.  If the scene point $i$ is an outlier, then
       set the entire row to zero.  The previous notation was a more compact
