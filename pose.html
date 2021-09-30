@@ -1264,6 +1264,47 @@ output_ports:
 
     </exercise>
 
+    <exercise><h1>Point Registration with Fixed Rotation</h1>
+      <p>Consider the case of point registration where the rotation component of $X^O$ is known, but not the translation. (In other words, the opposite of Example 4.2.)
+      </p>
+      <p>Specifically, say your scene points ${}^WX^C{}^Cp^{s_i}={}^Wp^{s_i}$ are defined as follows:</p>
+        $$
+        \begin{aligned}
+        {}^Wp^{s_0}&=(1,5) \\
+        {}^Wp^{s_1}&=(3,10) \\
+        {}^Wp^{s_2}&=(5,10)
+        \end{aligned}
+        $$
+      Which can be plotted as follows:
+      <figure>
+          <img style="width:50%", src="figures/exercises/scene_triangle.png"/>
+      </figure>
+      <p>And your model points are defined as follows:</p>
+        $$
+        \begin{aligned}
+        {}^Op^{m_0}&=(-2,-5) \\
+        {}^Op^{m_1}&=(0,0) \\
+        {}^Op^{m_2}&=(2,0)
+        \end{aligned}
+        $$
+        Which can be plotted as follows:
+        <figure>
+            <img style="width:50%", src="figures/exercises/model_triangle.png"/>
+        </figure>
+
+        <p>As you can see, both triangles are in the same orientation, so $R^O= \begin{bmatrix} 1 & 0 \\ 0 & 1 \end{bmatrix}$. However, we still need to solve for the translation component of $X^O$.</p>
+
+        <p>(In this example, we can easily separate translation and rotation because the orientation of the model already matches the scene, but this decoupling actually works in the general case as well. See the explanation following Example 4.2 in the textbook.)</p>
+
+      <ol type="a">
+        <li> What are the decision variables in this optimization problem? Be specific. </li>
+        <li> How do the decision variables show up in the constraints?</li>
+        <li>What is the value of the objective function for $p^O = (0,0)$? What about (3,10)? And (6,12)?</li>
+        <li>If you plotted the objective function and constraints as a function of your decision variables, what shape would it be? Explain the significance of this.</li>
+      </ol>
+    </exercise>
+
+
     <exercise><h1>Planar Two-Point ICP</h1>
       <p>We saw that ICP has many local minimas. But what are these local minimas, and can we say something about how wrong our initial guess has to be until we arrive at one of these local minima? Although the analysis can get complicated for general geometry, let's start by analyzing a simple example of a planar two-point ICP.</p> 
 
