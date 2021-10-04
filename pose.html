@@ -606,7 +606,7 @@ output_ports:
     <p>To be precise, let's use $\hat{X}^O$ to denote our estimate of the object
     pose, and $\hat{c}$ to denote our estimated correspondences.  The
     "closest-point" step is given by $$\forall i, \hat{c}_i = \argmin_{j \in
-    N_m}\| \hat{X}^O \: {}^Op^{m_{c_i}} - p^{s_i} \|^2.$$  In words, we want to
+    N_m}\| \hat{X}^O \: {}^Op^{m_j} - p^{s_i} \|^2.$$  In words, we want to
     find the point in the model that is the closest in Euclidean distance to the
     transformed scene points.  This is the famous "nearest neighbor" problem,
     and we have good numerical solutions (using optimized data structures) for
@@ -1335,8 +1335,8 @@ output_ports:
       write down the resulting optimization as:</p>
       $$\begin{aligned} \min_{p_x,p_y,a,b} \quad & \sum_i \bigg\|
       \begin{pmatrix} p_x \\ p_y \end{pmatrix} + \begin{pmatrix} a & -b \\ b &
-      a \end{pmatrix} p^{m_i} - p^{s_i} \bigg\|^2 \\ \text{s.t.} \quad & a^2 +
-      b^2 = 1. \end{aligned}$$
+      a \end{pmatrix} p^{m_{c_i}} - p^{s_i} \bigg\|^2 \\ \text{s.t.} \quad &
+      a^2 + b^2 = 1. \end{aligned}$$
 
       <ol type="a">
         <li> When the initial guess for the pose results in the correct
@@ -1417,19 +1417,19 @@ output_ports:
           <li>The optimization in ICP captures the distance between two sets of
           points as the sum of pairwise Euclidean distances. As a thought
           experiment: another possible distance metric (which isn't as
-          optimization friendly) is the one-way Hausdorff distance. SStated
+          optimization friendly) is the one-way Hausdorff distance. Stated
           simply, given that an adversary picks a point on one shape, the <a
           href="https://en.wikipedia.org/wiki/Hausdorff_distance"
           target="_blank">one-way Hausdorff distance</a> is the distance you
           are  forced to travel to get to the closest point on the other shape.
           We could consider two schemes:<br/>
-<u>Scheme 1)</u> The adversary picks the scene point and thus you pick the
-model point that is closest to this scene point.<br/>
-<u>Scheme 2)</u> The adversary picks the model point and thus you pick the
-scene point that is closest to this model point.<br/><br/> Which is more robust
-to outliers? Let's explore through a 2D example. Again, the model points are
-given in black and labeled as $b_{i}$ and the scene points are given in red and
-labeled as $r_{j}$.
+          <u>Scheme 1)</u> The adversary picks the scene point and thus you
+          pick the model point that is closest to this scene point.<br />
+          <u>Scheme 2)</u> The adversary picks the model point and thus you
+          pick the scene point that is closest to this model point.<br /><br />
+          Which is more robust to outliers? Let's explore through a 2D example.
+          Again, the model points are given in black and labeled as $b_{i}$ and
+          the scene points are given in red and labeled as $r_{j}$.
 
           <figure><img style="width:50%",
           src="figures/exercises/icp_hausdorff.png"/></figure>
