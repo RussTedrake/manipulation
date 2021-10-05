@@ -749,13 +749,15 @@ output_ports:
       decided to ignore scaling throughout this chapter, since it doesn't make
       immediate sense for our proposed problem).  In <elib>Yang20a</elib> they
       proposed that this can also be used to prune outliers even before we have
-      an initial pose estimate.  If the distance between a <i>pair</i> of points
-      in the scene is unlike any distance between any pair of points in the
-      model, then one of those two points is an outlier.  Finding the maximum
-      set of inliers by this metric would correspond to finding the maximum
-      clique in a graph.  Unfortunately, finding optimal cliques is probably too
-      expensive for large point clouds, so in <elib>Yang20a</elib> conservative
-      approximations are used instead.</p>
+      an initial pose estimate.  If the distance between a <i>pair</i> of
+      points in the scene is unlike any distance between any pair of points in
+      the model, then one of those two points is an outlier.  Finding the
+      maximum set of inliers by this metric would correspond to finding the
+      maximum clique in a graph; one can make strong assumptions to guarantee
+      that the maximum clique is the best match, or simply admit that this
+      could be a useful heuristic.  If finding maximum cliques is too expensive
+      for large point clouds, conservative approximations may be used
+      instead.</p>
 
     </subsection>
 
@@ -961,7 +963,7 @@ output_ports:
         r^2 + r^2 - 2 r^2 \cos\theta_{err}.$$  And in the case of the circle,
         every other model point contributes the same cost. This is not a convex
         function, but every minima is a globally optimal solution (just wrapped
-        around by $2\pi$.</p>
+        around by $2\pi$).</p>
         
         <p>In fact, even if we have a more complicated, non-circular, geometry,
         then this same argument holds.  Every point will incur and error as it
@@ -969,6 +971,8 @@ output_ports:
         for all of the model points will decrease as $\cos\theta_{err}$ goes to
         one.  So every minima is a globally optimal solution.  We haven't
         actually introduced local minima (yet)!</p>
+
+        <!-- TODO: Is this still true in 3D? -->
 
         <p>It is the correspondences, and other constraints that we might add to
         the problem, that really introduce local minima.</p>
@@ -986,24 +990,27 @@ output_ports:
         thinking about the minimum distance from a scene point to the model, as
         opposed to the pairwise distance between points.  This, I think, it not
         a big sacrifice now that we have stopped enumerating correspondences
-        explicitly.  Let's slightly modify our objective above to be of the form
-        $$\min \sum_{i} \left[ l\left( \min_j \| X^O \: {}^Op^{m_j} - p^{s_i}
-        \|\right)\right].$$  In words, we can an apply arbitrary robust loss function, but we will only apply it to the minimum distance between the scene point and the model.</p>
+        explicitly.  Let's slightly modify our objective above to be of the
+        form $$\min \sum_{i} \left[ l\left( \min_j \| X^O \: {}^Op^{m_j} -
+        p^{s_i} \|\right)\right].$$  In words, we can an apply arbitrary robust
+        loss function, but we will only apply it to the minimum distance
+        between the scene point and the model.</p>
 
         <p>The nested $\min$ functions look a little intimidating from a
-        computational perspective.  But this form, coupled with the fact that in
-        our application the model points are fixed, actually enables a fantastic
-        optimization.  First, let's move our optimization into the model frame
-        by changing the inner term to $$\min_j \|{}^Op^{m_j} - {}^OX^W
-        p^{s_i}\|.$$  Now realize that for any 3D point $x$, we can precompute
-        the minimum distance from $x$ to any point on our model, call it
-        $\phi(x).$  The term above is just $\phi({^OX^Wp^{s_i}}).$ This function
-        of 3D space, sometimes called a <a
-        href="https://en.wikipedia.org/wiki/Distance_transform">distance
-        field</a>, and the closely related signed distance function (SDF) and <a
-        href="https://en.wikipedia.org/wiki/Level-set_method">level sets</a> are
-        a common representation in geometric modeling.  And they are precisely
-        what we need to quickly compute the cost from many scene points.</p>
+        computational perspective.  But this form, coupled with the fact that
+        in our application the model points are fixed, actually enables us to
+        do some pre-computation to make the online step fast.  First, let's move
+        our optimization into the model frame by changing the inner term to
+        $$\min_j \|{}^Op^{m_j} - {}^OX^W p^{s_i}\|.$$  Now realize that for any
+        3D point $x$, we can precompute the minimum distance from $x$ to any
+        point on our model, call it $\phi(x).$  The term above is just
+        $\phi({^OX^Wp^{s_i}}).$ This function of 3D space, sometimes called a
+        <a href="https://en.wikipedia.org/wiki/Distance_transform">distance
+        field</a>, and the closely related signed distance function (SDF) and
+        <a href="https://en.wikipedia.org/wiki/Level-set_method">level sets</a>
+        are a common representation in geometric modeling.  And they are
+        precisely what we need to quickly compute the cost from many scene
+        points.</p>
 
         <figure><img width="48%" src="data/rectangle_points_distance.svg"/><img
         width="48%"
@@ -1154,12 +1161,18 @@ output_ports:
     <p>Ultimately, as much as I prefer the convex formulations with their
     potential for deeper understanding (by us) and for stronger guarantees (for
     the algorithms), the ability to add non-penetration constraints and
-    free-space constraints is simply too valuable to ignore.  I hope that, if
-    you come back to these notes in a year or two, I will be able to report that
-    we have strong results for these more complex formulations.  But for now, in
-    most applications, I will steer you towards the nonlinear optimization
+    free-space constraints is simply too valuable to ignore.  Deep learning
+    methods can now often provide a good initial guess, which can mitigate some
+    of the concerns about local minima. I hope that, if you come back to these
+    notes in a year or two, I will be able to report that we have strong
+    results for these more complex formulations.  But for now, in most
+    applications, I will steer you towards the nonlinear optimization
     approaches and taking advantage of these constraints.</p>
 
+  </section>
+
+  <section><h1>Tracking</h1>
+  
   </section>
 
   <section><h1>Putting it all together</h1>
