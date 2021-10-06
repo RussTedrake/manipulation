@@ -695,19 +695,21 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
   <section id="exercises"><h1>Exercises</h1>
 
     <exercise><h1>Assessing static equilibrium</h1>
-        <p>For this problem, we'll use the Coulomb friction model, where $f_F \le \mu f_N$. In other words, the friction force is large enough to resist any movement up until the force required would exceed $\mu f_N$, in which case $f_F = \mu f_N$.
+        <p>For this problem, we'll use the Coulomb friction model, where $f_t \le \mu f_n$. In other words, the friction force is large enough to resist any movement up until the force required would exceed $\mu f_n$, in which case $f_f = \mu f_n$.
         <ol type="a">
           <li>
-            <p>Consider a box with mass $M$ sitting on a ramp at angle $\theta$, with coefficient of box $\mu$ in between the sphere and the ramp:</p>
+            <p>Consider a box with mass $m$ sitting on a ramp at angle $\theta$, with coefficient of box $\mu$ in between the sphere and the ramp:</p>
             <figure>
                 <img style="width:50%", src="figures/exercises/static_equilibrium_ramp.png"/>
             </figure>
-            <p>For a give angle $\theta$, what is the minimum coefficient of friction required for the box to not slip down the plane? Use $g$ for acceleration due to gravity.</p>
+            <p>For a given angle $\theta$, what is the minimum coefficient of friction required for the box to not slip down the plane? Use $g$ for acceleration due to gravity.</p>
           </li>
         </ol>
-        <p>Now consider a flat plan with three spheres sitting on it, with radius $r$ and mass $M$. Assume they have the same coefficient of friction $\mu$ between each other as with the ground.</p>
+        <p>Now consider a flat plane with three solid (uniform density) spheres sitting on it, with
+             radius $r$ and mass $m$.
+             Assume they have the same coefficient of friction $\mu$ between each other as with the ground.</p>
 
-        <p>For each of the following configurations: could the spheres be in static equilibrium? Explain why or why not. Assume $\mu$, $M$, and $r$ can take on whatever values necessary to achieve static equilibrium (so the answer is only "no" if it would be impossible for any choice of system parameters), up to a coefficient of friction of 1. Remember that both torques and forces need to be balanced for all bodies to be in equilibrium.</p>
+        <p>For each of the following configurations: could the spheres be in static equilibrium for some $\mu\in[0,1]$, $m > 0$, $r > 0$? Explain why or why not. Remember that both torques and forces need to be balanced for all bodies to be in equilibrium.</p>
         <ol start="2" type="a">
           <li> Spheres stacked on top of each other:
             <figure>
@@ -731,7 +733,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
           </li>
         </ol>
         <p>
-        Note that there are multiple ways to solve these problems. One way would be to enumerate all the forces and torques and check that the values work by hand. Another would be to set up an optimization problem using Drake's <a href="https://drake.mit.edu/doxygen_cxx/classdrake_1_1multibody_1_1_static_equilibrium_problem.html">StaticEquilbriumProblem</a> class, which sets up these sorts of problems given these a multi-body plant.
+        Note that there are multiple ways to solve these problems. draw the free-body diagram for each object, which includes gravity and the contact forces, and solve for the conditions when the friction forces are possible. Another would be to set up an optimization problem using Drake's <a href="https://drake.mit.edu/doxygen_cxx/classdrake_1_1multibody_1_1_static_equilibrium_problem.html">StaticEquilbriumProblem</a> class, which sets up these sorts of problems given these a multi-body plant.
         </p>
       </exercise>
 
