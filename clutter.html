@@ -710,6 +710,8 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
              Assume they have the same coefficient of friction $\mu$ between each other as with the ground.</p>
 
         <p>For each of the following configurations: could the spheres be in static equilibrium for some $\mu\in[0,1]$, $m > 0$, $r > 0$? Explain why or why not. Remember that both torques and forces need to be balanced for all bodies to be in equilibrium.</p>
+
+        <p>To help you solve these problems, we have a notebook to help you build intuition and test your answers. It lets you specify the configuration of the spheres and then uses the <a href="https://drake.mit.edu/doxygen_cxx/classdrake_1_1multibody_1_1_static_equilibrium_problem.html">StaticEquilbriumProblem</a> class to solve for static equilibrium. Use this notebook to help visualize and think about the system, but for each of the configurations, you should have a physical explanation for your answer. (An example of such a physical explanation would be a free body diagram of the forces and torques on each sphere, and equations for how they can or cannot not balance. This is essentially what StaticEquilbriumProblem checks for.)</p>
         <ol start="2" type="a">
           <li> Spheres stacked on top of each other:
             <figure>
@@ -732,9 +734,11 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
             </figure>
           </li>
         </ol>
-        <p>
-        Note that there are multiple ways to solve these problems. draw the free-body diagram for each object, which includes gravity and the contact forces, and solve for the conditions when the friction forces are possible. Another would be to set up an optimization problem using Drake's <a href="https://drake.mit.edu/doxygen_cxx/classdrake_1_1multibody_1_1_static_equilibrium_problem.html">StaticEquilbriumProblem</a> class, which sets up these sorts of problems given these a multi-body plant.
-        </p>
+        <p>Finally, a few conceptual questions StaticEquilbriumProblem:</p>
+        <ol start="4" type="a">
+            <li>Why does it matter what initial guess we specify for the system? (Hint: what type of optimization problem is this?)</li>
+            <li>Take a look at the Drake documentation for <a href="https://drake.mit.edu/doxygen_cxx/classdrake_1_1multibody_1_1_static_equilibrium_problem.html">StaticEquilbriumProblem</a>. It lists the constraints that are used when it's solve for equilibrium. Which two of these can a free body diagram answer?</li>
+        </ol>
       </exercise>
 
     <exercise><h1>Normal Estimation from Depth</h1>
