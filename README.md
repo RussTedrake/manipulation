@@ -31,9 +31,10 @@ the `DRAKE_INSTALL_DIR` environment variable. Otherwise it will look in
 
 ## Tips for developers
 
-If you find yourself making modifications to the supporting .py files in addition to the notebook, then adding 
+These are things that I often add to my preamble of the notebook (ever since vs code broke my pythonpath importing)
 ```
 %load_ext autoreload
 %autoreload 2
+import sys
+sys.path.append('/home/russt/drake-install/lib/python3.6/site-packages')
 ```
-to the top of the notebook will force those changes to get reloaded automatically.

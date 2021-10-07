@@ -1075,20 +1075,55 @@ output_ports:
     nonlinear optimization approach.  But there are some examples of convex
     non-penetration constraints (e.g., when points must not penetrate a
     half-plane) and it <i>is</i> possible to include these in our convex
-    optimization approach.  I'll just show it in a simple example.</p>
+    optimization approach.  I'll illustrate both versions here with a simple example.</p>
 
-    <example><h1>Non-penetration of a half-plane via convex optimization</h1>
-    
+    <example><h1>Non-penetration via nonlinear optimization</h1>
+
       <p>For simplicity, I will restrict this example to 2D, where we can
-      leverage our convenient form of the rotation matrices: $$R =
-      \begin{bmatrix} a & -b \\ b & a \end{bmatrix}.$$  Recall that the rotation
-      matrix constraints for this form reduce to $a^2+b^2=1$.  These are
-      non-convex constraints, but we can relax them to $a^2 + b^2 \le 1.$  This
-      is almost exactly the problem we visualized in <a
-      href="#2D_rotation_only">this earlier example</a>, except that we will add
-      translations here.  The relaxation is exactly changing the non-convex unit
-      circle constraint into the convex unit disk constraint.  Based on that
-      visualization, we have reason to be optimistic that the unit disk
+      parameterize the rotation matrices: $$R(\theta) = \begin{bmatrix}
+      \cos(\theta) & -\sin(\theta) \\ \sin(\theta) & \cos(\theta)
+      \end{bmatrix},$$ and will solve the problem with known correspondences.
+      Please do remember, though, that we can also include the correspondence
+      search in the nonlinear optimization framework. </p>
+  
+      <p>Let's solve the following optimization: \begin{align*} \min_{p,\theta}
+      \quad & \sum_i \| p + R(\theta) \: {}^Op^{m_{c_i}} - p^{s_i} \|^2, \\
+      \subjto \quad & {}^W p^{m_i} \ge 0, \quad \forall i \in [1, N_m].
+      \end{align*} In order to add the nonlinear costs and constraints, we use
+      pass a python function and the decision variables to be bound with that
+      function to the <code>MathematicalProgram</code> <code>AddCost</code> and
+      <code>AddConstraint</code> methods. I've provided an implementation in
+      this notebook: </p>
+  
+      <p><a
+        href="https://deepnote.com/project/Ch-4-Geometric-Pose-Estimation-zGNA9TdORJqhlYOaPO3sSg/%2Fpose.ipynb"
+        style="background:none; border:none;" class="deepnote" target="pose">
+        <img
+        src="https://deepnote.com/buttons/launch-in-deepnote-white.svg"></a></p>
+        
+      <figure style="margin-top:-20px"><img style="width:70%"
+      src="data/constrained_nonlinear_pose.svg"/><figcaption>The solution to
+      the constrained pose estimation problem with known correspondences.  I
+      have added constraints that both the $x$ and $y$ positions of all of the
+      points in the estimated pose must be greater than $0$ in the world frame
+      (as illustrated by the green lines).  The red scene points are in
+      penetration, but the solver returns the pose illusutrated by the blue,
+      which satisfies the constraints.  </figcaption></figure>
+        
+    </example>
+
+    <example><h1>Non-penetration via convex optimization</h1>
+    
+      <p>For a convex parameterization of the rotation matrices in this 2D
+      example, we can leverage our convenient form of the rotation matrices:
+      $$R = \begin{bmatrix} a & -b \\ b & a \end{bmatrix}.$$  Recall that the
+      rotation matrix constraints for this form reduce to $a^2+b^2=1$.  These
+      are non-convex constraints, but we can relax them to $a^2 + b^2 \le 1.$
+      This is almost exactly the problem we visualized in <a
+      href="#2D_rotation_only">this earlier example</a>, except that we will
+      add translations here.  The relaxation is exactly changing the non-convex
+      unit circle constraint into the convex unit disk constraint.  Based on
+      that visualization, we have reason to be optimistic that the unit disk
       relaxation could be tight.</p>
 
       <p>Let's solve the following optimization: \begin{align*} \min_{p,a,b}
