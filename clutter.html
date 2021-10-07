@@ -694,6 +694,53 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
 
   <section id="exercises"><h1>Exercises</h1>
 
+    <exercise><h1>Assessing static equilibrium</h1>
+        <p>For this problem, we'll use the Coulomb friction model, where $|f_t| \le \mu f_n$. In other words, the friction force is large enough to resist any movement up until the force required would exceed $\mu f_n$, in which case $|f_t| = \mu f_n$.
+        <ol type="a">
+          <li>
+            <p>Consider a box with mass $m$ sitting on a ramp at angle $\theta$, with coefficient of box $\mu$ in between the sphere and the ramp:</p>
+            <figure>
+                <img style="width:50%", src="figures/exercises/static_equilibrium_ramp.png"/>
+            </figure>
+            <p>For a given angle $\theta$, what is the minimum coefficient of friction required for the box to not slip down the plane? Use $g$ for acceleration due to gravity.</p>
+          </li>
+        </ol>
+        <p>Now consider a flat ground plane with three solid (uniform density) spheres sitting on it, with
+             radius $r$ and mass $m$.
+             Assume they have the same coefficient of friction $\mu$ between each other as with the ground.</p>
+
+        <p>For each of the following configurations: could the spheres be in static equilibrium for some $\mu\in[0,1]$, $m > 0$, $r > 0$? Explain why or why not. Remember that both torques and forces need to be balanced for all bodies to be in equilibrium.</p>
+
+        <p>To help you solve these problems, we have a notebook to help you build intuition and test your answers. It lets you specify the configuration of the spheres and then uses the <a href="https://drake.mit.edu/doxygen_cxx/classdrake_1_1multibody_1_1_static_equilibrium_problem.html">StaticEquilbriumProblem</a> class to solve for static equilibrium. Use this notebook to help visualize and think about the system, but for each of the configurations, you should have a physical explanation for your answer. (An example of such a physical explanation would be a free body diagram of the forces and torques on each sphere, and equations for how they can or cannot sum to zero. This is essentially what StaticEquilbriumProblem checks for.)</p>
+        <ol start="2" type="a">
+          <li> Spheres stacked on top of each other:
+            <figure>
+                <img style="width:50%", src="figures/exercises/static_equilibrium_stacked.png"/>
+            </figure>
+          </li>
+          <li> One sphere on top of another, offset:
+            <figure>
+                <img style="width:50%", src="figures/exercises/static_equilibrium_tilted.png"/>
+            </figure>
+          </li>
+          <li> Spheres stacked in a pyramid:
+            <figure>
+                <img style="width:50%", src="figures/exercises/static_equilibrium_pyramid.png"/>
+            </figure>
+          </li>
+          <li> Spheres stacked in a pyramid, but with a distance $d$ in between the bottom two:
+            <figure>
+                <img style="width:50%", src="figures/exercises/static_equilibrium_pyramid_with_space.png"/>
+            </figure>
+          </li>
+        </ol>
+        <p>Finally, a few conceptual questions StaticEquilbriumProblem:</p>
+        <ol start="4" type="a">
+            <li>Why does it matter what initial guess we specify for the system? (Hint: what type of optimization problem is this?)</li>
+            <li>Take a look at the Drake documentation for <a href="https://drake.mit.edu/doxygen_cxx/classdrake_1_1multibody_1_1_static_equilibrium_problem.html">StaticEquilbriumProblem</a>. It lists the constraints that are used when it's solve for equilibrium. Which two of these can a free body diagram answer?</li>
+        </ol>
+      </exercise>
+
     <exercise><h1>Normal Estimation from Depth</h1>
       <p>For this exercise, you will investigate a slightly different approach to normal vector estimation. In particular, we can exploit the spatial structure that is already in a depth image to avoid computing nearest neighbors. You will work exclusively in <a href="https://colab.research.google.com/github/RussTedrake/manipulation/blob/master/exercises/clutter/normal_estimation_depth.ipynb" target="_blank">this notebook</a>. You will be asked to complete the following steps:</p>
       <ol type="a">
