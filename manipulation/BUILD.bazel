@@ -6,6 +6,7 @@
 
 load("//htmlbook/tools/python:defs.bzl", "rt_py_library", "rt_py_test")
 
+# TODO(russt): break these open so that the dependencies can be more narrow.
 rt_py_library(
     name = "manipulation",
     srcs = [

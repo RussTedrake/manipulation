@@ -7,6 +7,14 @@
 load("//htmlbook/tools/jupyter:defs.bzl", "rt_ipynb_test")
 
 rt_ipynb_test(
+    name = "static_equilibrium",
+    srcs = ["static_equilibrium.ipynb"],
+    deps = [
+        "//manipulation",
+    ],
+)
+
+rt_ipynb_test(
     name = "normal_estimation_depth",
     srcs = ["normal_estimation_depth.ipynb"],
     data = ["//manipulation/models"],
