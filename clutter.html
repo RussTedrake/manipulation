@@ -150,7 +150,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       </example>
 
       <p>It's not really any different to do this with any random objects --
-      here is what it looks like when I run the same code, but replacing the
+      here is what it looks like when I run the same code, but replace the
       brick with a random draw from a few objects from the <a
       href="https://www.ycbbenchmarks.com/">YCB dataset</a>.  It somehow amuses
       me that we can see the <a
@@ -174,16 +174,16 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
           src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
           </p>
 
-        <p>I had to decide how to visualize the results of this one for you. The
-        mesh and texture map files for the YCB objects are very large, so
-        downloading many of them to your browser from Colab felt a bit too
-        painful.  If you've decided to run the notebooks on your local machine,
-        then go ahead and run <code>drake_visualizer</code> before running this
-        test to see the live simulation (drake visualizer will load the mesh
-        files directly from your disk, so avoid the download).  For Colab, I've
-        decided to add a camera to the scene and take a picture after the
-        simulating for a few seconds.  After all, that's perhaps the data that
-        we're actually looking for.</p>
+        <p>I had to decide how to visualize the results of this one for you.
+        The mesh and texture map files for the YCB objects are very large, so
+        downloading many of them to your browser from an online notebook felt a
+        bit too painful.  If you've decided to run the notebooks on your local
+        machine, then go ahead and run <code>drake_visualizer</code> before
+        running this test to see the live simulation (drake visualizer will
+        load the mesh files directly from your disk, so avoids the download).
+        For the cloud notebooks, I've decided to add a camera to the scene and
+        take a picture after simulating for a few seconds.  After all, that's
+        perhaps the data that we're actually looking for.</p>
 
         <figure>
           <img style="width:70%" src="data/ycb_clutter.png"/>
@@ -193,11 +193,11 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
 
       <p>Please appreciate that bins are a particularly simple case for
       generating random scenarios. If you wanted to generate random kitchen
-      environments, for example, then you won't be as happy with a solution that
-      drops refrigerators, toasters, and stools from uniformly random i.i.d.
-      poses.  In those cases, authoring reasonable distributions gets much more
-      interesting; we will revisit the topic of generative scene models later in
-      the notes.</p>
+      environments, for example, then you won't be as happy with a solution
+      that drops refrigerators, toasters, and stools from uniformly random
+      i.i.d. poses.  In those cases, authoring reasonable distributions gets
+      much more interesting; we will revisit the topic of generative scene
+      models <elib>Izatt20</elib> later in the notes.</p>
 
     </subsection>
 
@@ -233,54 +233,32 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       J^T_i(q) F^{c_i}.$$  But we still need to understand where the contact
       forces come from.</p>
 
-      <p>Contact forces, static friction, friction cones...</p>
-      
-    </subsection>
+      <subsubsection><h1>Collision geometry</h1>
 
-    <subsection><h1>A few of the nuances of simulating contact</h1>
-    
-      <example><h1>Contact force inspector</h1>
-      
-        <p>I've created a simple GUI that allows you to pick any two primitive
-        geometry types and inspect the contact information that is computed when
-        those object are put into penetration.  There is a lot of information
-        displayed there!  Take a minute to make sure you understand the colors,
-        and the information provided in the textbox display.
-        </p>
+      <p>Geometry engines for robotics, like <code>SceneGraph</code> in
+      <drake></drake>, distinguish between a few different <a
+      href="https://drake.mit.edu/doxygen_cxx/group__geometry__roles.html"></a>roles
+      that geometry can play</a> in a simulation.  In <a
+      href="http://sdformat.org/spec">robot description files</a>, we
+      distinguish between <a
+      href="http://sdformat.org/spec?ver=1.8&elem=link#link_visual">visual</a>
+      and <a
+      href="http://sdformat.org/spec?ver=1.8&elem=collision">collision</a>
+      geometries.  In particular, every rigid body in the simulation can have
+      multiple
+      <i>collision</i>
+      geometries associated with it (playing the "proximity" role). Collision
+      geometries are often much simpler that the visual geometries we use for
+      illustration and simulating perception -- sometimes they are just a
+      low-polygon-count version of the visual mesh and sometimes we actually
+      use much simpler geometry (like boxes, spheres, and cylinders).  These
+      simpler geometries make the physics engine faster and more robust.</p>
 
-        <p><a target="clutter"
-          href="https://colab.research.google.com/github/RussTedrake/manipulation/blob/master/clutter.ipynb#scrollTo=7aGJ9e3lJlF8"><img
-          src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
-          </p>
-
-      </example>
-
-      <p>When I play with the GUI above, I feel almost overwhelmed.  First,
-      overwhelmed by the sheer number of cases that we have to get right in the
-      code; it's unfortunately extremely common for open-source tools to have
-      bugs in here.  But second, overwhelmed by the sense that we are asking the
-      wrong question.  Asking to summarize the forces between two bodies in deep
-      penetration with a single Cartesian force applied at a point is fraught
-      with peril.  As you move the objects, you will find many discontinuities;
-      this is a common reason why you sometimes see rigid body simulations
-      "explode".  It might seem natural to try to use multiple contact points
-      instead of a single contact point to summarize the forces, and some
-      simulators do, but it is very hard to write an algorithm that only depends
-      on the current configurations of the geometry which applies forces
-      consistently from one time step to the next with these approaches.</p>
-
-      <p>I currently feel that the only fundamental way to get around these
-      numerical issues is to start reasoning about the entire volume of
-      penetration.  The Drake developers have recently proposed a version of
-      this that we believe we can make computationally tractable enough to be
-      viable for real-time simulation <elib>Elandt19</elib>, and are working
-      hard to bring this into full service in Drake.  You will find many
-      references to "hydroelastic" contact throughout the code.  We hope to turn
-      it on by default soon.</p>
-
-      <todo>Add the hyroelastic skittles video here.  https://youtu.be/5-k2Pc6OmzE</todo>
-
-      <p>In the mean time, we can make simulations robust by carefully curating the contact geometry...</p>
+      <p>For subtle reasons we will explore below, in addition to simplifying
+      the geometry, we sometimes over-parameterize the collision geometry in
+      order to make the numerics more robust.  For example, when we simulate
+      the red brick, we actually use <i>nine</i> collision geometries for
+      the one body.</p>
 
       <figure><img style="width:50%"
       src="data/foam_brick_contact_geometry.png"/><figcaption>The (exaggerated)
@@ -289,12 +267,174 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       inset box for the remaining contacts.  <a
       href="data/foam_brick_contact_geometry.html">Here</a> is the interactive
       version.</figcaption></figure>
+    
+      <example><h1>Collision geometry inspector</h1>
+      
+        <p>Coming soon: I'll provide a little notebook gui that lets you view
+        both the visual and collision geometry for your favorite URDF/SDF
+        files.</p>
+
+      </example>
+
+      <p>SceneGraph also implements the concept of a <a
+      href="https://drake.mit.edu/doxygen_cxx/classdrake_1_1geometry_1_1_collision_filter_declaration.html">collision
+      filter</a>.  It can be important to specify that, for instance, the iiwa
+      geometry at link 5 cannot collide with the geometry in links 4 or 6.
+      Specifying that some collisions should be ignored not only speeds up the
+      computation, but it also facilitates the use of simplified collision
+      geometry for links.  It would be extremely hard to approximate link 4 and
+      5 accurately with spheres, and cylinders if I had to make sure that those
+      spheres and cylinders did not overlap in any feasible joint angle.  The
+      default collision filter settings should work fine for most applications,
+      but you can tweak them if you like.</p>
+
+      <p>So where do the contact forces, $F^{c_i}$, come from?  There is
+      potentially an equal and opposite contact force for every <i>pair</i> of
+      collision geometries that are not filtered out by the collision filter.
+      In <code>SceneGraph</code>, the <a
+      href="https://drake.mit.edu/doxygen_cxx/classdrake_1_1geometry_1_1_scene_graph_inspector.html#a79b84ada25718e2a38fd2d13adb4d839"><code>GetCollisionCandidates</code></a>
+      method returns them all.  We'll take to calling the two bodies in a collision pair "body A" and "body B".</p>
+
+    </subsubsection>
+
+    <subsubsection><h1>The Contact Frame</h1>
+
+      <p>We still need to decide the magnitude of these spatial forces, and to
+      write down the magnitude, we need to specify the <i>contact frame</i> in
+      which the spatial force is to be applied.  For instance, we <a
+      href="https://drake.mit.edu/doxygen_cxx/classdrake_1_1multibody_1_1_point_pair_contact_info.html">might
+      use</a> $C_B$ to denote a contact frame on body $B$, with the forces
+      applied at the origin of the frame.</p>
+
+      <p>Most simulators summarize the contact between two bodies as a
+      translational force (e.g. zero torque) at one or more contact points. Our
+      convention will be to align the positive $z$ axis with the "contact
+      normal", with positive forces resisting penetration. Defining this normal
+      can be deceptively complicated.  For instance, what is the normal at the
+      corner of a box?  Taking the normal as the gradient of the
+      signed-distance function for the collision geometry provides a reliable
+      definition that will extend to the distance between two bodies and into
+      generalized coordinates. The $x$ and $y$ axes of the contact frame are
+      any orthogonal basis for the tangential coordinates.</p>
+
+      <todo>Could use another diagram here...</todo>
+      
+    </subsubsection>
+
+    <subsubsection><h1>The (Coulomb) Friction Cone</h1>
+
+      <p>Now the rules governing contact forces can begin to take shape.  First
+      and foremost, we demand that there is no force at a distance. Using
+      $\phi_i(q)$ to denote the distance between two bodies in configuration
+      $q$, we have $$\phi(q) > 0 \Rightarrow F^{c_i} = 0.$$  Second, we demand
+      that the normal force only resists penetration; bodies are never pulled
+      into contact: $$f^{c_i}_{C_z} \ge 0.$$  In <i>rigid</i> contact models, we
+      solve for the smallest normal force enforces the non-penetration
+      constraint (this is known as the principle of least constraint).  In
+      <i>soft</i> contact models, we define the force to be a function of the
+      penetration depth and velocity.</p>  <todo>Citations</todo>
+
+      <todo>Need figures here</todo>
+
+      <p>Forces in the tangential directions are due to friction.  The most
+      commonly used model of friction is Coulomb friction, which states that
+      $$|f^{c_i}_{C_{x,y}}|_2 \le \mu f^{c_i}_{C_z},$$ with $\mu$ a
+      non-negative scalar <i>coefficient of friction</i>.  Typically we define
+      both a $\mu_{static}$, which is applied when the tangential velocity is
+      zero, and $\mu_{dynamic}$, applied when the tangential velocity is
+      non-zero. In the Coulomb friction model, the tangential contact force is
+      the force within this friction cone which produces maximum dissipation.
+      </p>
+
+      <p>Taken together, the geometry of these constraints forms a <a
+      href="https://en.wikipedia.org/wiki/Convex_cone">cone</a> of admissable
+      contact forces.  It is famously known as the "friction cone", and we will
+      refer to it often.</p>
+
+    </subsubsection>
+
+    <subsubsection><h1>Static equilibrium as an optimization problem</h1>
+
+      <p>Rather than dropping objects from a random height, perhaps we can
+      initialize our simulations using optimization to find the initial
+      conditions that are already in static equilibrium.  In <drake></drake>,
+      the
+      <a
+      href="https://drake.mit.edu/doxygen_cxx/classdrake_1_1multibody_1_1_static_equilibrium_problem.html"><code>StaticEquilbriumProblem</code></a>
+      collects all of the constraints we enumerated above into an optimization
+      problem: \begin{align*} \find_q \quad \subjto \quad& \tau_g(q) = - \sum_i
+      J^T_i(q) F^{c_i} & \\ & f^{c_i}_{C_z} \ge 0 & \forall i, \\ &
+      |f^{c_i}_{C_{x,y}}|_2 \le \mu f^{c_i}_{C_z} & \forall i, \\ & \phi_i(q)
+      \ge 0 & \forall i, \\ & \phi(q) = 0 \textbf{ or } f^{c_i}_{C_z} = 0
+      &\forall i, \\ & \text{joint limits}.\end{align*} This is a nonlinear
+      optimization problem: it includes the nonconvex non-penetration
+      constraints we discussed in the last chapter.  The second-to-last
+      constraints (a logical or) is particularly interesting; constraints of
+      the form $x \ge 0, y \ge 0, x =0 \textbf{ or } y = 0$ are known as
+      complementarity constraints, and are often written as $x \ge 0, y \ge 0,
+      xy = 0$.  We can make the problem easier for the nonlinear optimization
+      solver by relaxing the equality to $0 \le \phi(q) f^{c_i}_{C_z} \le
+      \text{tol}$, which provides a proper gradient for the optimizer to follow
+      at the cost of allowing some force at a distance.</p>  
+      
+      <p>It's easy to add additional costs and constraints; for initial
+      conditions we might use an objective that keeps $q$ close to an initial
+      configuration-space sample.</p>
+
+      <example><h1>Tall Towers</h1></example>
+
+      <p>So how well does it work?  </p>  <todo>finish this...</todo>
+
+    </subsubsection>
 
     </subsection>
 
-    <subsection><h1>Static equilibrium as an optimization constraint</h1>
+  </section>
 
-    </subsection>
+  <section><h1>A few of the nuances of simulating contact</h1>
+    
+    <example><h1>Contact force inspector</h1>
+    
+      <p>I've created a simple GUI that allows you to pick any two primitive
+      geometry types and inspect the contact information that is computed when
+      those object are put into penetration.  There is a lot of information
+      displayed there!  Take a minute to make sure you understand the colors,
+      and the information provided in the textbox display.
+      </p>
+
+      <p><a target="clutter"
+        href="https://colab.research.google.com/github/RussTedrake/manipulation/blob/master/clutter.ipynb#scrollTo=7aGJ9e3lJlF8"><img
+        src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
+        </p>
+
+    </example>
+
+    <p>When I play with the GUI above, I feel almost overwhelmed.  First,
+    overwhelmed by the sheer number of cases that we have to get right in the
+    code; it's unfortunately extremely common for open-source tools to have
+    bugs in here.  But second, overwhelmed by the sense that we are asking the
+    wrong question.  Asking to summarize the forces between two bodies in deep
+    penetration with a single Cartesian force applied at a point is fraught
+    with peril.  As you move the objects, you will find many discontinuities;
+    this is a common reason why you sometimes see rigid body simulations
+    "explode".  It might seem natural to try to use multiple contact points
+    instead of a single contact point to summarize the forces, and some
+    simulators do, but it is very hard to write an algorithm that only depends
+    on the current configurations of the geometry which applies forces
+    consistently from one time step to the next with these approaches.</p>
+
+    <p>I currently feel that the only fundamental way to get around these
+    numerical issues is to start reasoning about the entire volume of
+    penetration.  The Drake developers have recently proposed a version of
+    this that we believe we can make computationally tractable enough to be
+    viable for real-time simulation <elib>Elandt19</elib>, and are working
+    hard to bring this into full service in Drake.  You will find many
+    references to "hydroelastic" contact throughout the code.  We hope to turn
+    it on by default soon.</p>
+
+    <todo>Add the hydroelastic skittles video here.  https://youtu.be/5-k2Pc6OmzE</todo>
+
+    <p>In the mean time, we can make simulations robust by carefully curating the contact geometry...</p>
 
   </section>
 
@@ -793,6 +933,13 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
 <div id="references"><section><h1>References</h1>
 <ol>
 
+<li id=Izatt20>
+<span class="author">Gregory Izatt and Russ Tedrake</span>,
+<span class="title">"Generative Modeling of Environments with Scene Grammars and Variational Inference"</span>,
+<span class="publisher">Proceedings of the 2020 IEEE International Conference on Robotics and Automation (ICRA)</span>, <span class="year">2020</span>.
+[&nbsp;<a href="http://groups.csail.mit.edu/robotics-center/public_papers/Izatt20.pdf">link</a>&nbsp;]
+
+</li><br>
 <li id=Elandt19>
 <span class="author">Ryan Elandt and Evan Drumwright and Michael Sherman and Andy Ruina</span>,
 <span class="title">"A pressure field model for fast, robust approximation of net contact force and moment between nominally rigid objects"</span>,
