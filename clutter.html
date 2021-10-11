@@ -317,7 +317,42 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       generalized coordinates. The $x$ and $y$ axes of the contact frame are
       any orthogonal basis for the tangential coordinates.</p>
 
-      <todo>Could use another diagram here...</todo>
+      <example><h1>Brick on a half-plane</h1>
+
+        <p>Let's work through these details on a simple example -- our foam
+        brick sitting on the ground.  The ground is welded to the world, so has
+        no degrees of freedom; we can ignore the forces applied to the ground
+        and focus on the forces applied to the brick.</p>
+
+        <p>Where are the contact forces and contact frames?  If we used only
+        box-on-box geometry, then the locations of the contact forces are
+        ambiguous during this "face-on-face" contact; this is even more true in
+        3D (where three forces would be sufficient).  But by adding extra
+        contact spheres to the corners of our box, we are telling the physics
+        engine that we specifically want contact forces at each of the corners
+        (and all four of the corners in 3D).  I've labeled the frames $C_1$ and
+        $C_2$ in the sketch below.</p>
+
+        <figure>
+          <img src="data/brick_on_half_plane.jpg" width=50%/>
+        </figure>
+
+        <p>In order to achieve static equilibrium, we require that all of the
+        forces and torques on the brick be in balance.  This is a simple
+        manifestation of the equations $$\tau_g(q) = - \sum_i J^T_i(q)
+        F^{c_i},$$ because the configuration $q$ is the $x,z, \theta$ position
+        and orientation of the brick; we have three equations and three
+        unknowns: \begin{gather*} 0 = \sum_i f^{c_i}_{C_{i,x}} \\ mg = \sum_i
+        f^{c_i}_{C_{i,z}} \\ 0 = \sum_i \left[ p^{C_i} - p^{B_{cm}} \right]
+        \times f^{c_i}.\end{gather*}  The last equation represents the torque
+        balance, taken around the center of mass of the brick which I've call
+        $p^{B_{cm}}$.  The torque balance ensures that $f^{c_1}_{C_{1,z}} =
+        f^{c_2}_{C_{2,z}}$ assuming the center of mass is in the middle of the
+        box; force balance in $z$ set them equal to $\frac{mg}{2}$.  We haven't
+        said anything about the horizontal forces yet ($0$ is a reasonable
+        solution here), so let's develop that next.</p>
+
+      </example>
       
     </subsubsection>
 
@@ -350,6 +385,11 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       href="https://en.wikipedia.org/wiki/Convex_cone">cone</a> of admissable
       contact forces.  It is famously known as the "friction cone", and we will
       refer to it often.</p>
+
+      <example><h1>Brick on an inclined half-plane</h1>
+      
+      </example>
+
 
     </subsubsection>
 
