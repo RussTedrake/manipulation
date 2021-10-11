@@ -342,15 +342,17 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
         manifestation of the equations $$\tau_g(q) = - \sum_i J^T_i(q)
         F^{c_i},$$ because the configuration $q$ is the $x,z, \theta$ position
         and orientation of the brick; we have three equations and three
-        unknowns: \begin{gather*} 0 = \sum_i f^{c_i}_{C_{i,x}} \\ mg = \sum_i
-        f^{c_i}_{C_{i,z}} \\ 0 = \sum_i \left[ p^{C_i} - p^{B_{cm}} \right]
-        \times f^{c_i}.\end{gather*}  The last equation represents the torque
-        balance, taken around the center of mass of the brick which I've call
-        $p^{B_{cm}}$.  The torque balance ensures that $f^{c_1}_{C_{1,z}} =
-        f^{c_2}_{C_{2,z}}$ assuming the center of mass is in the middle of the
-        box; force balance in $z$ set them equal to $\frac{mg}{2}$.  We haven't
-        said anything about the horizontal forces yet ($0$ is a reasonable
-        solution here), so let's develop that next.</p>
+        unknowns: \begin{gather*} 0 = \sum_i f^{c_i}_{C_{i,x}} \\ -mg = -\sum_i
+        f^{c_i}_{C_{i,z}} \\ 0 = \sum_i \left[ \left[ p^{C_i} - p^{B_{cm}}
+        \right] \times f^{c_i} \right]_{W_y}.\end{gather*}  The last equation
+        represents the torque balance, taken around the center of mass of the
+        brick which I've call $p^{B_{cm}}$.  Torque about $\theta$ corresponds
+        to the $y$ component of the cross product.  The torque balance ensures
+        that $f^{c_1}_{C_{1,z}} = f^{c_2}_{C_{2,z}}$ assuming the center of
+        mass is in the middle of the box; force balance in $z$ set them equal
+        to $\frac{mg}{2}$.  We haven't said anything about the horizontal
+        forces yet ($0$ is a reasonable solution here). Let's develop that
+        next.</p>
 
       </example>
       
@@ -387,6 +389,47 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       refer to it often.</p>
 
       <example><h1>Brick on an inclined half-plane</h1>
+
+        <p>If we take our last example, but tilt the table to an angle relative
+        to gravity, then the horizontal forces start becoming important.
+        Before going through the equations, let's check your intuition.  Will
+        the magnitude of the forces on the two corners stay the same in this
+        configuration?  Or will there be more contact force on the lower
+        corner?</p>
+
+        <figure>
+          <img src="data/brick_incline.jpg" width=50%/>
+        </figure>
+
+        <p>In the illustration above, you'll notice that the contact frames
+        have rotated so that the $z$ axis is aligned with the contact normals.
+        I've sketched two possible friction cones (dark green and lighter
+        green), corresponding to two different coefficients of friction.  We
+        can tell immediately by inspection that the smaller value of $\mu$
+        (corresponding to the darker green) cannot produce contact forces that
+        will completely counteract gravity (the friction cone does not contain
+        the vertical line).  In this case, the box will slide and no static
+        equilibrium exists in this configuration.</p>
+
+        <p>If we increase the coefficient of (static) friction to the range
+        corresponding to the lighter green, then we can find contact forces
+        that produce an equilibrium.  Indeed, for this problem, if $\gamma$ is
+        the angle of the ramp, then we will need $\mu_{static} \ge
+        \sin|\gamma|$ to have an equilibrium.  In fact, we also need that the
+        vertical projection of the center of mass onto the ramp lands between
+        the two contact points, otherwise the brick will tumble over the bottom
+        edge.  We can see this by writing our same force/torque balance
+        equations.  We can write them in body frame, B, assuming the center of
+        mass in the center of the brick and the brick has length $l$ and height
+        $h$:\begin{gather*} f^{c_1}_{B_x} + f^{c_2}_{B_x} = - mg\sin\gamma \\
+        f^{c_1}_{B_z}  + f^{c_2}_{B_z} = mg\cos\gamma \\ -h f^{c_1}_{B_x} + l
+        f^{c_1}_{B_z} = h f^{c_2}_{B_x} + l f^{c_2}_{B_z} \\ f^{c_1}_{B_z} \ge
+        0, \quad f^{c_2}_{B_z} \ge 0 \\ |f^{c_1}_{B_x}| \le \mu f^{c_1}_{B_z},
+        \quad |f^{c_2}_{B_x}| \le \mu f^{c_2}_{B_z} \end{gather*} </p>
+
+        <p>So, are the magnitude of the contact forces the same or different?
+        Substituting the first equation into the third reveals $$f^{c_2}_{B_z}
+        = f^{c_1}_{B_z} + mg\sin\gamma.$$</p>
       
       </example>
 
