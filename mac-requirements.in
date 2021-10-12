@@ -2,6 +2,7 @@
 altair>=4.1
 gradescope-utils>=0.4
 mpld3>=0.5
+#open3d==0.10.0.0  # doesn't support python3.9
 plotly>=4.14
 pymcubes>=0.1
 requests>=2.25
