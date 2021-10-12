@@ -657,13 +657,18 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       <p>In order to approximate the local curvature of a mesh represented by a
       point cloud, we can use our fast nearest neighbor queries to find a
       handful of local points, and use this plane fitting algorithm on just
-      those points.  Then we can repeat that entire procedure for every point in
-      the point cloud.  I remember when working with point clouds started to
-      become a bigger part of my life, I thought that surely doing anything
-      moderately computational like this on every point in some dense point
-      cloud would be incompatible with online perception.  But I was wrong! Even
-      years ago, operations like this one were often used inside real-time
-      perception loops.  (And they pale in comparison to the number of <a
+      those points. When doing normal estimation directly on a depth image,
+      people often forgo the nearest-neighbor query entirely; simply using the
+      approximation that neighboring points in pixel coordinates are often
+      nearest neighbors in the point cloud.  We can repeat that entire
+      procedure for every point in the point cloud.</p>  
+      
+      <p>I remember when working with point clouds started to become a bigger
+      part of my life, I thought that surely doing anything moderately
+      computational like this on every point in some dense point cloud would be
+      incompatible with online perception.  But I was wrong! Even years ago,
+      operations like this one were often used inside real-time perception
+      loops. (And they pale in comparison to the number of <a
       href="https://en.wikipedia.org/wiki/FLOPS">FLOPs</a> we spend these days
       evaluating large neural networks).</p>
 
