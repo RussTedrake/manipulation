@@ -7,6 +7,7 @@ import numpy as np
 
 from pydrake.common import set_log_level
 from pydrake.geometry import Meshcat, Cylinder, Rgba
+from pydrake.perception import PointCloud, Fields, BaseField
 
 # imports for the pose sliders
 from collections import namedtuple
@@ -253,10 +254,6 @@ class MeshcatJointSlidersThatPublish():
 
             resolution:   A scalar or vector of length robot.num_positions()
                           that specifies the step argument of the FloatSlider.
-
-        Note: Some publishers (like MeshcatVisualizer) use an initialization
-        event to "load" the geometry.  You should call that *before* calling
-        this method (e.g. with `meshcat.load()`).
         """
 
         def _broadcast(x, num):
@@ -345,3 +342,24 @@ def AddMeshcatTriad(meshcat,
     meshcat.SetTransform(path + "/z-axis", X_TG)
     meshcat.SetObject(path + "/z-axis", Cylinder(radius, length),
                       Rgba(0, 0, 1, opacity))
+
+
+def draw_open3d_point_cloud(meshcat,
+                            path,
+                            pcd,
+                            normals_scale=0.0,
+                            point_size=0.001):
+    pts = np.asarray(pcd.points)
+    assert (pcd.has_colors())  # TODO(russt): handle this case better
+    cloud = PointCloud(pts.shape[0], Fields(BaseField.kXYZs | BaseField.kRGBs))
+    cloud.mutable_xyzs()[:] = pts.T
+    cloud.mutable_rgbs()[:] = 255 * np.asarray(pcd.colors).T
+    meshcat.SetObject(path, cloud, point_size=point_size)
+    if pcd.has_normals() and normals_scale > 0.0:
+        assert ('need to implement LineSegments in meshcat c++')
+        normals = np.asarray(pcd.normals)
+        vertices = np.hstack(
+            (pts, pts + normals_scale * normals)).reshape(-1, 3).T
+        meshcat["normals"].set_object(
+            g.LineSegments(g.PointsGeometry(vertices),
+                           g.MeshBasicMaterial(color=0x000000)))
