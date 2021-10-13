@@ -135,29 +135,6 @@ class TestGraspCandidate(unittest.TestCase):
         self.assertLessEqual(np.linalg.norm(X_new_target - X_new_eval), 1e-4,
                              "The returned transform is not correct.")
 
-    @weight(2)
-    @timeout_decorator.timeout(10.)
-    def test_nonempty(self):
-        """Test check_nonempty"""
-        pcd = self.notebook_locals["pcd"]
-        f = self.notebook_locals["check_nonempty"]
-
-        # Test some transforms that should evaluate to true
-        for i in range(4):
-            self.assertTrue(f(pcd, RigidTransform(X_lst_target[i])),
-                            "Should return true but returns false.")
-
-        X_fake = [
-            RigidTransform([1, 0, 0]),
-            RigidTransform([0, 1, 0]),
-            RigidTransform([0, 0, 1])
-        ]
-
-        # Test some transforms that should evaluate to false
-        for i in range(3):
-            self.assertTrue(not f(pcd, X_fake[i]),
-                            "Should return false but returns true")
-
     @weight(4)
     @timeout_decorator.timeout(60.)
     def test_candidate_grasps(self):
