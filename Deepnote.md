@@ -30,7 +30,11 @@ Note that the git sha will change if I merge a branch into master.  Pegging to a
 
 The manipulation dockerfile builds on the drake dockerfile.  Ideally this would be `robotlocomotion/drake:focal`.  This is updated nightly with binaries representing the master branch.  If we need changes to drake that are not yet in the nightly binaries then we can:
 - [Create experimental drake binaries](https://drake.mit.edu/jenkins.html#building-binary-packages-on-demand)
-- [Create a drake dockerfile](https://github.com/RobotLocomotion/drake/tree/master/tools/install/dockerhub/focal)
+- [Create a drake dockerfile](https://github.com/RobotLocomotion/drake/tree/master/tools/install/dockerhub/focal) with e.g.
+```
+docker build . -t russtedrake/drake:meshcat_contact_visualizer
+docker push russtedrake/drake:meshcat_contact_visualizer
+```
 - Push the experimental drake dockerfile with e.g. `docker push russtedrake/drake:tagname` .
 
 
