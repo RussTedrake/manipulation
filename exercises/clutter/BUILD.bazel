@@ -41,13 +41,16 @@ rt_ipynb_test(
     ],
 )
 
-# rt_ipynb_test(
-#     name = "grasp_candidate",
-#     srcs = ["grasp_candidate.ipynb"],
-#     data = ["//manipulation/models"],
-#     deps = [
-#         "//manipulation",
-#         "//manipulation/exercises:grader",
-#         "//manipulation/exercises/clutter:test_grasp_candidate",
-#     ],
-# )
+rt_ipynb_test(
+    name = "grasp_candidate",
+    srcs = ["grasp_candidate.ipynb"],
+    data = [
+      "//manipulation/models",
+      "//data:mustard_bottle.pcd",
+    ],
+    deps = [
+        "//manipulation",
+        "//manipulation/exercises:grader",
+        "//manipulation/exercises/clutter:test_grasp_candidate",
+    ],
+)
