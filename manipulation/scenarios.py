@@ -10,7 +10,8 @@ from pydrake.all import (AbstractValue, BaseField, ModelInstanceIndex,
                          DepthRenderCamera, RenderCameraCore, RgbdSensor,
                          CameraInfo, ClippingRange, DepthRange,
                          DepthImageToPointCloud, LeafSystem,
-                         MakeRenderEngineVtk, RenderEngineVtkParams, RgbdSensor)
+                         MakeRenderEngineVtk, RenderEngineVtkParams, RgbdSensor,
+                         PrismaticJoint, BallRpyJoint, SpatialInertia)
 from pydrake.geometry import (Cylinder, GeometryInstance,
                               MakePhongIllustrationProperties)
 from pydrake.math import RigidTransform, RollPitchYaw, RotationMatrix
@@ -111,6 +112,29 @@ def AddWsg(plant, iiwa_model_instance, roll=np.pi / 2.0, welded=False):
     return gripper
 
 
+def AddFloatingRpyJoint(plant, frame, instance):
+    inertia = pydrake.multibody.tree.UnitInertia.SolidSphere(1.0)
+    x_body = plant.AddRigidBody(
+        "x", instance,
+        SpatialInertia(mass=0, p_PScm_E=[0., 0., 0.], G_SP_E=inertia))
+    plant.AddJoint(
+        PrismaticJoint("x", plant.world_frame(), x_body.body_frame(),
+                       [1, 0, 0]))
+    y_body = plant.AddRigidBody(
+        "y", instance,
+        SpatialInertia(mass=0, p_PScm_E=[0., 0., 0.], G_SP_E=inertia))
+    plant.AddJoint(
+        PrismaticJoint("y", x_body.body_frame(), y_body.body_frame(),
+                       [0, 1, 0]))
+    z_body = plant.AddRigidBody(
+        "z", instance,
+        SpatialInertia(mass=0, p_PScm_E=[0., 0., 0.], G_SP_E=inertia))
+    plant.AddJoint(
+        PrismaticJoint("z", y_body.body_frame(), z_body.body_frame(),
+                       [0, 0, 1]))
+    plant.AddJoint(BallRpyJoint("ball", z_body.body_frame(), frame))
+
+
 def AddShape(plant, shape, name, mass=1, mu=1, color=[.5, .5, .9, 1.0]):
     instance = plant.AddModelInstance(name)
     # TODO: Add a method to UnitInertia that accepts a geometry shape (unless
@@ -128,9 +152,9 @@ def AddShape(plant, shape, name, mass=1, mu=1, color=[.5, .5, .9, 1.0]):
             f"need to write the unit inertia for shapes of type {shape}")
     body = plant.AddRigidBody(
         name, instance,
-        pydrake.multibody.tree.SpatialInertia(mass=mass,
-                                              p_PScm_E=np.array([0., 0., 0.]),
-                                              G_SP_E=inertia))
+        SpatialInertia(mass=mass,
+                       p_PScm_E=np.array([0., 0., 0.]),
+                       G_SP_E=inertia))
     if plant.geometry_source_is_registered():
         if isinstance(shape, pydrake.geometry.Box):
             plant.RegisterCollisionGeometry(
