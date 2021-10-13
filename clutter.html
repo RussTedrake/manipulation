@@ -723,6 +723,73 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       target="_blank">this notebook</a>.</p>
     </exercise>    
 
+    <exercise id="behaviorTrees"><h1>Behavior Trees</h1>
+
+      <p>Let's reintroduce the terminology of behavior trees. Behavior trees provide a structure for switching between different tasks in a way that is both modular and reactive. Behavior trees are a directed rooted tree where the internal nodes manage the control flow and the leaf nodes are actions to be executed or conditions to be evaluated. For example, an action may be to "pick ball". This action can succeed or fail. A condition may be "Is my hand empty?" which can be true (thus the condition succeeds) or can be false (the condition fails). <br/><br/>
+
+      We'll consider two categories of control flow nodes:
+      <dl>
+        <dt>Sequence Node: ($\rightarrow$)</dt> <dd>Sequence nodes execute each of the child behaviors one after another. The sequence <i>fails if any of the children fail</i>. One way to think about this operator is that a sequence node takes an "and" over all of the child behaviors.</dd>
+        <dt>Fallback Node: (?)</dt> <dd>Fallback nodes also execute each of the child behaviors one after another. However, fallback <i>succeeds if any of the children succeed</i>. One way to think about this operator is that the fallback node takes an "or" over all of the children behaviors.</dd>
+</dl>
+
+    The symbols are visualized below. Sequence nodes are represented as an arrow in a box, fallback nodes are represented as a question mark in a box, actions are inside boxes and conditions are inside ovals.</p>
+    <figure><img style="width:70%", src="figures/exercises/behaviorTree_symbols.png"/></figure>
+
+    <p>Let's apply our understanding of behavior trees in the context of a simple task where a robot's goal is to: find a ball, pick the ball up and place the ball in a bin. We can describe task with the high level behavior tree:</p>
+    <figure><img style="width:80%", src="figures/exercises/behaviorTree_highLevel.png"/></figure>
+
+    <p>Confirm to yourself that this small behavior tree captures the task! We can go one level deeper and and expand out our "Pick Ball" behavior:</p>
+    <figure><img style="width:80%", src="figures/exercises/behaviorTree_pick.png"/></figure>
+
+    <p>The pick ball behavior can be considered as such: Let's start with the left branch. If the ball is already close, the condition "Ball Close?" returns true. If the ball is not close, we execute an action to "Approach ball", thus making the ball close. Thus either the ball is already close (i.e. the condition "Ball Close?" is true) or we approach the ball (i.e. the action "Approach ball" is successfully executed) to make the ball close. Given that the ball is now close, we consider the right branch of the pick action. If the ball is already grasped, the condition "Ball Grasped?" returns true. if the ball is not grasped, we execute the action, "Grasp Ball".<br/>
+
+    We can expand our our behavior tree even further to give our full behavior:</p>
+    <figure><img style="width:99%", src="figures/exercises/behaviorTree_detail.png"/>
+            <figcaption>Decision Tree for Pick-Up Task</figcaption></figure>
+
+    <p>Here we've added the behavior that if the robot cannot complete the task, it can ask a kind human for help. Take a few minutes to walk through the behavior tree and convince yourself it encodes the desired task behavior.</p>
+
+    <ol type="a">
+        <li> We claimed behavior trees enable reactive behavior. Let's explore that. Imagine we have a robot executing our behavior tree (Fig. 5.13). As the robot is executing the action "Approach Bin", a rude human knocks the ball out of the robot's hand. The ball rolls to a position that the robot can still see, but is quite far away. Following the logic of the behavior tree, what condition fails and what action is executed because of this?</li>
+
+        <li>Another way to mathematically model computation is through finite state machines (FSM). Finite state machines are composed of states, transitions and events. We can encode the behavior of our behavior tree for our pick-up task through a finite state machine, as shown below:
+
+
+    <figure><img style="width:99%", src="figures/exercises/fsm_blanked.png"/></figure>
+    We have left a few states and transitions blank. Your task is to fill in those 4 values such that the finite state machine produces the same behavior as the behavior tree. </li>
+    </ol>
+
+    <p>From this simple task we can see that while finite state machines can often be easy to understand and intuitive, they can quickly get quite messy!</p>
+
+    <ol type="a" start=3> 
+        <li> Throughout this chapter and the lectures we've discussed a bin picking task. Our goal is to now capture the behavior of the bin picking task using a behavior tree. We want to encode the following behavior: while Bin 1 is not empty, we are going to select a feasible grasp within the bin, execute our grasp and transport what's within our grasp to Bin 2. If there are still objects within Bin 1, but we cannot find a feasible grasp, assume we have some action that shakes the bin, hence randomizing the objects and (hopefully) making feasible grasps available.<br/><br/>
+
+        We define the following conditions:
+        <ul>
+          <li>"Bin 1 empty?</li>
+          <li>"Feasible Grasp Exists?"</li>
+          <li>"Grasp selected?"</li>
+          <li>"Grasped Object(s) above Bin 2?"</li>
+          <li>"Object Grasped?"</li>
+          <li>"Object(s) in Bin 2?"</li>
+        </ul><br/>
+        And the following actions:
+
+        <ul>
+          <li>"Drop grasped object(s) into Bin 2"</li>
+          <li>"Grasp Object(s)"</li>
+          <li>"Select Grasp"</li>
+          <li>"Shake Bin"</li>
+          <li>"Transport grasped object(s) to above Bin 2"</li>
+        </ul><br/>
+        Using these conditions, actions and our two control flow nodes (Sequence and Fallback), draw a behavior tree that captures the behavior of our bin picking task. 
+        </li>
+    </ol>
+
+    <p>A final note: We claimed behavior trees are modular. Their modularity comes from the fact that we can write reusable snippets of code that define actions and conditions and then compose them using behavior trees. For example, we can imagine that the "Select Grasp" action from part (c) is implemented using the antipodal grasping mechanism we have built up throughout this chapter. And the "Transport grasped object(s) to above Bin 2" action could be implemented using the pick and place tools we developed in Chapter 3.</p>
+    </exercise>   
+
   </section>
 
 
