@@ -415,7 +415,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
         corresponding to the lighter green, then we can find contact forces
         that produce an equilibrium.  Indeed, for this problem, if $\gamma$ is
         the angle of the ramp, then we will need $\mu_{static} \ge
-        \sin|\gamma|$ to have an equilibrium.  In fact, we also need that the
+        |\tan\gamma|$ to have an equilibrium.  In fact, we also need that the
         vertical projection of the center of mass onto the ramp lands between
         the two contact points, otherwise the brick will tumble over the bottom
         edge.  We can see this by writing our same force/torque balance
@@ -429,7 +429,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
 
         <p>So, are the magnitude of the contact forces the same or different?
         Substituting the first equation into the third reveals $$f^{c_2}_{B_z}
-        = f^{c_1}_{B_z} + mg\sin\gamma.$$</p>
+        = f^{c_1}_{B_z} + \frac{mgh}{l}\sin\gamma.$$</p>
       
       </example>
 
@@ -672,7 +672,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       href="https://en.wikipedia.org/wiki/FLOPS">FLOPs</a> we spend these days
       evaluating large neural networks).</p>
 
-      <example><h1>Normals and local curvature of the mustard bottle.</h1>
+      <example id="normal_estimation"><h1>Normals and local curvature of the mustard bottle.</h1>
     
         <figure><img style="width:60%"
         src="data/mustard_surface_estimation.png"></figure>

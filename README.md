@@ -37,4 +37,5 @@ These are things that I often add to my preamble of the notebook (ever since vs 
 %autoreload 2
 import sys
 sys.path.append('/home/russt/drake-install/lib/python3.6/site-packages')
+sys.path.append('/home/russt/manipulation')
 ```
