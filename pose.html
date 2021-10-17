@@ -854,16 +854,17 @@ output_ports:
       points: \begin{equation} C_{ij} = \frac{1}{a_i}
       \exp^{-\frac{1}{2}\left\|\frac{X^O \: {}^Op^{m_j} - p^{s_i}}{\sigma^2}
       \right\|^2},\end{equation} which is the standard density function for a
-      Gaussian, $\sigma$ is the and $a_i$ is the proper normalization constant
-      to make the probabilities sum to one.  It is also natural to encode the
-      probability of an outlier in this formulation (it simply modifies the
-      normalization constant).  <details><summary>Click to see the normalization
-      constant, but it's really an implementation detail.</summary> The
-      normalization works out to be \begin{equation}a_i = \sum_{j=1}^{N_m}
-      \exp^{-\frac{1}{2}\left\|\frac{X^O \: {}^Op^{m_j} - p^{s_i}}{\sigma^2}
-      \right\|^2} + (2\pi\sigma^2)^\frac{3}{2} \frac{w}{1-w}\frac{N_m}{N_s},
-      \end{equation} with $0 \le w \le 1$ the probability of a sample point
-      being an outlier <elib>Myronenko10</elib>.</details></div>
+      Gaussian, $\sigma$ is the standard deviation and $a_i$ is the proper
+      normalization constant to make the probabilities sum to one.  It is also
+      natural to encode the probability of an outlier in this formulation (it
+      simply modifies the normalization constant).  <details><summary>Click to
+      see the normalization constant, but it's really an implementation
+      detail.</summary> The normalization works out to be \begin{equation}a_i =
+      \sum_{j=1}^{N_m} \exp^{-\frac{1}{2}\left\|\frac{X^O \: {}^Op^{m_j} -
+      p^{s_i}}{\sigma^2} \right\|^2} + (2\pi\sigma^2)^\frac{3}{2}
+      \frac{w}{1-w}\frac{N_m}{N_s}, \end{equation} with $0 \le w \le 1$ the
+      probability of a sample point being an outlier
+      <elib>Myronenko10</elib>.</details></div>
 
       <p>The CPD algorithm is now very similar to ICP, alternating between
       assigning the correspondence weights and updating the pose estimate.  The
