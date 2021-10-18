@@ -1037,17 +1037,17 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
     The symbols are visualized below. Sequence nodes are represented as an arrow in a box, fallback nodes are represented as a question mark in a box, actions are inside boxes and conditions are inside ovals.</p>
     <figure><img style="width:70%", src="figures/exercises/behaviorTree_symbols.png"/></figure>
 
-    <p>Let's apply our understanding of behavior trees in the context of a simple task where a robot's goal is to: find a ball, pick the ball up and place the ball in a bin. We can describe task with the high level behavior tree:</p>
+    <p>Let's apply our understanding of behavior trees in the context of a simple task where a robot's goal is to: find a ball, pick the ball up and place the ball in a bin. We can describe task with the high-level behavior tree:</p>
     <figure><img style="width:80%", src="figures/exercises/behaviorTree_highLevel.png"/></figure>
 
-    <p>Confirm to yourself that this small behavior tree captures the task! We can go one level deeper and and expand out our "Pick Ball" behavior:</p>
+    <p>Confirm to yourself that this small behavior tree captures the task! We can go one level deeper and expand out our "Pick Ball" behavior:</p>
     <figure><img style="width:80%", src="figures/exercises/behaviorTree_pick.png"/></figure>
 
     <p>The pick ball behavior can be considered as such: Let's start with the left branch. If the ball is already close, the condition "Ball Close?" returns true. If the ball is not close, we execute an action to "Approach ball", thus making the ball close. Thus either the ball is already close (i.e. the condition "Ball Close?" is true) or we approach the ball (i.e. the action "Approach ball" is successfully executed) to make the ball close. Given that the ball is now close, we consider the right branch of the pick action. If the ball is already grasped, the condition "Ball Grasped?" returns true. if the ball is not grasped, we execute the action, "Grasp Ball".<br/>
 
     We can expand our our behavior tree even further to give our full behavior:</p>
     <figure><img style="width:99%", src="figures/exercises/behaviorTree_detail.png" id="behaviorTree"/>
-            <figcaption>Decision Tree for Pick-Up Task</figcaption></figure>
+            <figcaption>Behavior Tree for Pick-Up Task</figcaption></figure>
 
     <p>Here we've added the behavior that if the robot cannot complete the task, it can ask a kind human for help. Take a few minutes to walk through the behavior tree and convince yourself it encodes the desired task behavior.</p>
 
@@ -1064,7 +1064,15 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
     <p>From this simple task we can see that while finite state machines can often be easy to understand and intuitive, they can quickly get quite messy!</p>
 
     <ol type="a" start=3> 
-        <li> Throughout this chapter and the lectures we've discussed a bin picking task. Our goal is to now capture the behavior of the bin picking task using a behavior tree. We want to encode the following behavior: while Bin 1 is not empty, we are going to select a feasible grasp within the bin, execute our grasp and transport what's within our grasp to Bin 2. If there are still objects within Bin 1, but we cannot find a feasible grasp, assume we have some action that shakes the bin, hence randomizing the objects and (hopefully) making feasible grasps available.<br/><br/>
+        <li> Throughout this chapter and the lectures we've discussed a bin
+        picking task. Our goal is to now capture the behavior of the
+        bin-picking task using a behavior tree. We want to encode the following
+        behavior: while Bin 1 is not empty, we are going to select a feasible
+        grasp within the bin, execute our grasp and transport what's within our
+        grasp to Bin 2. If there are still objects within Bin 1, but we cannot
+        find a feasible grasp, assume we have some action that shakes the bin,
+        hence randomizing the objects and (hopefully) making feasible grasps
+        available.<br/><br/>
 
         We define the following conditions:
         <ul>
