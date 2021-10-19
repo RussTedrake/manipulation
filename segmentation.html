@@ -145,8 +145,8 @@ segmentation</h1>
 
       <p>One of the most amazing and magical properties of the deep
       architectures that have been working so well for instance-level
-      segmentation is that they appear to have some modularity in them.  An
-      image that was pre-trained on a large dataset like ImageNet or COCO can be
+      segmentation is their ability to transfer to new tasks.  An image that
+      was pre-trained on a large dataset like ImageNet or COCO can be
       fine-tuned with a relatively much smaller amount of labeled data to a new
       set of classes that are relevant to our particular application.  In fact,
       the architectures are often referred to as having a "backbone" and a
@@ -154,8 +154,8 @@ segmentation</h1>
       just pop off the existing head and replace it with a new head for the new
       labels.  A relatively small amount of training with a relatively small
       dataset can still achieve surprisingly robust performance.  Moreover, it
-      seems that training initially on the diverse dataset (ImageNet or COCO) is
-      actually important to learn the robust perceptual representations that
+      seems that training initially on the diverse dataset (ImageNet or COCO)
+      is actually important to learn the robust perceptual representations that
       work for a broad class of perception tasks.  Incredible!</p>
 
       <p>This is great news!  But we still need some amount of labeled data for
@@ -183,17 +183,18 @@ segmentation</h1>
       </figure>
       
       <p>In LabelFusion, we provide multiple RGB-D images of a static scene
-      containing some objects of interest, and the CAD models for those objects.
-      First we use a dense reconstruction algorithm, ElasticFusion, to merge the
-      point clouds from the individual images into a single dense
-      reconstruction; this is just another instance of the point cloud
-      registration problem.  The dense reconstruction algorithm also localizes
-      the camera relative to the point cloud.  Then we provide a simple gui that
-      asks the user to click on three points on the model and three points in
-      the scene to establish the "global" correspondence, and then we run ICP to
-      snap refine the pose estimate.  Finally, we render the pixels from the CAD
-      model on top of all of the images in the established pose giving beautiful
-      pixel-wise labels.</p>
+      containing some objects of interest, and the CAD models for those
+      objects. First we use a dense reconstruction algorithm,
+      ElasticFusion<elib>Whelan16</elib>, to merge the point clouds from the
+      individual images into a single dense reconstruction; this is just
+      another instance of the point cloud registration problem.  The dense
+      reconstruction algorithm also localizes the camera relative to the point
+      cloud.  Then we provide a simple gui that asks the user to click on three
+      points on the model and three points in the scene to establish the
+      "global" correspondence, and then we run ICP to snap refine the pose
+      estimate.  Finally, we render the pixels from the CAD model on top of all
+      of the images in the established pose giving beautiful pixel-wise
+      labels.</p>
 
       <p>Tools like LabelFusion can be use to label large numbers of images very
       quickly (three clicks from a user produces ground truth labels in many
@@ -211,20 +212,21 @@ segmentation</h1>
       it aggressively to supplement or even replace their real-world datasets.
       The annual robotics conferences now feature regular <a
       href="https://sim2real.github.io/">workshops and/or debates</a> on the
-      topic of "sim2real".  It is still not clear whether we can generate
-      accurate enough art assets (with tune material properties) and environment
-      maps / lighting conditions to represent even specific scenes to the
-      fidelity we need.  An even bigger question is whether we can generate a
-      diverse enough set of data with distributions representative of the real
-      world to train robust feature detectors in the way that we've managed to
-      train with ImageNet.  But for many serious robotics groups, synthetic data
-      generation pipelines have significantly augmented or even replaced
-      real-world labeled data.</p>
+      topic of "sim2real".  For any specific scene or narrow class of objects,
+      we can typically generate accurate enough art assets (with material
+      properties that are often still tuned by an artist) and environment maps
+      / lighting conditions that rendered images can be highly effective in a
+      training dataset.  The bigger question is whether we can generate a
+      <i>diverse</i> enough set of data with distributions representative of
+      the real world to train robust feature detectors in the way that we've
+      managed to train with ImageNet.  But for many serious robotics groups,
+      synthetic data generation pipelines have significantly augmented or even
+      replaced real-world labeled data.</p>
     
       <p>For the purposes of this chapter, I aim to train an instance-level
-      segmentation system that will work well on our simulated images.  For this
-      use case, there is (almost) no debate!  Leveraging the pretrained backbone
-      from COCO, I will use only synthetic data for fine tuning.</p>
+      segmentation system that will work well on our simulated images.  For
+      this use case, there is (almost) no debate!  Leveraging the pre-trained
+      backbone from COCO, I will use only synthetic data for fine tuning.</p>
 
       <p>You may have noticed it already, but the <code>RgbdSensor</code> that we've been using in Drake actually has a "label image" output port that we haven't used yet.</p>
 
@@ -257,10 +259,10 @@ segmentation</h1>
         identifiers) to disk.</p>
 
         <p>I've verified that this code <i>can</i> run on Colab, but to make a
-        dataset of 10k images using this un-optmized process takes about an hour
-        on my big development desktop. And curating the files is just easier if
-        you run it locally.  So I've provided this one as a python script
-        instead.</p>
+        dataset of 10k images using this un-optimized process takes about an
+        hour on my big development desktop. And curating the files is just
+        easier if you run it locally.  So I've provided this one as a python
+        script instead.</p>
 
         <pysrc no_colab=True>manipulation/clutter_maskrcnn_data.py</pysrc>
       
@@ -274,6 +276,16 @@ segmentation</h1>
       </example>
 
 
+    </subsection>
+
+    <subsection id="self-supervised"><h1>Self-supervised learning</h1>
+      
+        <!-- simclr https://arxiv.org/abs/2002.05709 -->
+        <!-- tcc https://arxiv.org/abs/1904.07846 -->
+        <!-- mention dense descriptors? -->
+        <!-- GPT-3 and DALL-E https://openai.com/blog/dall-e/ -->
+        <!-- clip https://openai.com/blog/clip/ out of the box detectors -->
+      
     </subsection>
 
   </section>
@@ -329,7 +341,7 @@ segmentation</h1>
 
       <p>The following notebook loads our 10k image dataset and a Mask R-CNN
       network pre-trained on the COCO dataset.  It then replaces the head of the
-      pretrained network with a new head with the right number of outputs for
+      pre-trained network with a new head with the right number of outputs for
       our YCB recognition task, and then runs just a 10 epochs of training with
       my new dataset.</p>
 
@@ -417,6 +429,12 @@ segmentation</h1>
 <span class="title">"A Pipeline for Generating Ground Truth Labels for Real {RGBD} Data of Cluttered Scenes"</span>,
 <span class="publisher">International Conference on Robotics and Automation (ICRA), Brisbane, Australia</span>, May, <span class="year">2018</span>.
 [&nbsp;<a href="https://arxiv.org/abs/1707.04796">link</a>&nbsp;]
+
+</li><br>
+<li id=Whelan16>
+<span class="author">Thomas Whelan and Renato F Salas-Moreno and Ben Glocker and Andrew J Davison and Stefan Leutenegger</span>,
+<span class="title">"{ElasticFusion}: Real-time dense {SLAM} and light source estimation"</span>,
+<span class="publisher">The International Journal of Robotics Research</span>, vol. 35, no. 14, pp. 1697--1716, <span class="year">2016</span>.
 
 </li><br>
 <li id=Long15>
