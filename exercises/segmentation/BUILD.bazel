@@ -18,3 +18,14 @@
 #         "//manipulation/exercises/segmentation:test_mask",
 #     ],
 # )
+
+rt_ipynb_test(
+    name = "label_generation",
+    srcs = ["label_generation.ipynb"],
+    data = ["//manipulation/models"],
+    deps = [
+        "//manipulation",
+        "//manipulation/exercises:grader",
+        "//manipulation/exercises/segmentation:test_segmentation_and_grasp",
+    ],
+
