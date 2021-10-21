@@ -84,21 +84,22 @@ rt_html_test(
     srcs = ["clutter.html"],
 )
 
-rt_ipynb_test(
-    name = "clutter",
-    srcs = ["clutter.ipynb"],
-    data = ["//manipulation/models"],
-    tags = ["no-sandbox"],  # from vtk-test-tags() in drake
-    # Open3D 0.10 is not compatible with Python 3.9.
-    target_compatible_with = [
-        "@platforms//cpu:x86_64",
-        "@platforms//os:linux",
-    ],
-    deps = [
-        "//manipulation",
-        "//manipulation:mustard_depth_camera_example",
-    ],
-)
+# TODO(russt): Re-enable once the MeshcatContactVisualizer lands.
+#rt_ipynb_test(
+#    name = "clutter",
+#    srcs = ["clutter.ipynb"],
+#    data = ["//manipulation/models"],
+#    tags = ["no-sandbox"],  # from vtk-test-tags() in drake
+#    # Open3D 0.10 is not compatible with Python 3.9.
+#    target_compatible_with = [
+#        "@platforms//cpu:x86_64",
+#        "@platforms//os:linux",
+#    ],
+#    deps = [
+#        "//manipulation",
+#        "//manipulation:mustard_depth_camera_example",
+#    ],
+#)
 
 rt_html_test(
     srcs = ["force.html"],
