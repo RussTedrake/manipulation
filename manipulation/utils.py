@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 import matplotlib as mpl
 import numpy as np
 import os
+from urllib.request import urlretrieve
 from IPython import get_ipython
 
 import pydrake.all
@@ -15,6 +16,17 @@ running_as_notebook = "COLAB_TESTING" not in os.environ and get_ipython(
 
 def FindResource(filename):
     return os.path.join(os.path.dirname(__file__), filename)
+
+
+# A filename from the data directory.  Will download if necessary.
+def LoadDataResource(filename):
+    data = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data")
+    if not os.path.exists(data):
+        os.makedirs(data)
+    path = os.path.join(data, filename)
+    if not os.path.exists(path):
+        urlretrieve(f"https://manipulation.csail.mit.edu/data/{filename}", path)
+    return path
 
 
 def AddPackagePaths(parser):
