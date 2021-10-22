@@ -17,3 +17,6 @@ rt_ipynb_test(
         "//manipulation/exercises/segmentation:test_mask",
     ],
 )
+
+# TODO(russt):
+# Add test coverage for segmentation_and_grasp.ipynb
