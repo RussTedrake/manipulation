@@ -8,4 +8,5 @@ open3d==0.10.0.0 # new dependencies added from 0.11
 plotly>=4.4.1
 PyMCubes>=0.0.9
 timeout-decorator>=0.4.1
-#torch>=1.7.0
+torch>=1.7.0
+torchvision>=0.9.0

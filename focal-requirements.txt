@@ -116,6 +116,7 @@ numpy==1.21.1
     #   matplotlib
     #   open3d
     #   pandas
+    #   torchvision
 open3d==0.10.0.0
     # via -r focal-requirements.in
 packaging==21.0
@@ -131,7 +132,9 @@ pexpect==4.8.0
 pickleshare==0.7.5
     # via ipython
 pillow==8.3.1
-    # via matplotlib
+    # via
+    #   matplotlib
+    #   torchvision
 plotly==5.1.0
     # via -r focal-requirements.in
 prometheus-client==0.11.0
@@ -196,6 +199,12 @@ timeout-decorator==0.5.0
     # via -r focal-requirements.in
 toolz==0.11.1
     # via altair
+torch==1.10.0
+    # via
+    #   -r focal-requirements.in
+    #   torchvision
+torchvision==0.11.1
+    # via -r focal-requirements.in
 tornado==6.1
     # via
     #   ipykernel
@@ -214,6 +223,8 @@ traitlets==5.1.0
     #   nbconvert
     #   nbformat
     #   notebook
+typing-extensions==3.10.0.2
+    # via torch
 wcwidth==0.2.5
     # via prompt-toolkit
 webencodings==0.5.1
