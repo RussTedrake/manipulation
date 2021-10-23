@@ -112,13 +112,25 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
     <p style="text-align:center">
     <span class="bionic">
       <b>Ubuntu Linux (Bionic)</b>  |
+      <span onclick="setPlatform('focal');"
+      style="text-decoration:underline;cursor:pointer">Ubuntu Linux
+      (Focal)</span> |
+      <span onclick="setPlatform('mac');" style="text-decoration:underline;cursor:pointer">Mac Homebrew</span>
+    </span>
+    <span class="focal">
+      <span onclick="setPlatform('bionic');"
+            style="text-decoration:underline;cursor:pointer">Ubuntu Linux (Bionic)</span>  | <b>Ubuntu Linux (Focal)</b> |
       <span onclick="setPlatform('mac');" style="text-decoration:underline;cursor:pointer">Mac Homebrew</span>
     </span>
     <span class="mac">
       <span onclick="setPlatform('bionic');"
-            style="text-decoration:underline;cursor:pointer">Ubuntu Linux
-        (Bionic)</span>  |
-      <b>Mac Homebrew</b> </span></p>
+      style="text-decoration:underline;cursor:pointer">Ubuntu Linux
+      (Bionic)</span>  |
+      <span onclick="setPlatform('focal');"
+      style="text-decoration:underline;cursor:pointer">Ubuntu Linux
+      (Focal)</span> |
+      <b>Mac Homebrew</b> </span>
+    </p>
 
     <subsection><h1>Install Drake</h1>
 
@@ -128,6 +140,8 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       <h4 >Download the binaries</h4>
 
       <div class="bionic"><pre class="highlight"><code>curl -o drake.tar.gz <div id="drake-bionic-binaries" style="display:inline">https://drake-packages.csail.mit.edu/drake/nightly/drake-latest-bionic.tar.gz</div></code></pre></div>
+
+      <div class="focal"><pre class="highlight"><code>curl -o drake.tar.gz <div id="drake-focal-binaries" style="display:inline">https://drake-packages.csail.mit.edu/drake/nightly/drake-latest-focal.tar.gz</div></code></pre></div>
 
       <div class="mac"><pre class="highlight"><code>curl -o drake.tar.gz <div id="drake-mac-binaries" style="display:inline">https://drake-packages.csail.mit.edu/drake/nightly/drake-latest-mac.tar.gz</div></code></pre></div>
 
@@ -139,7 +153,13 @@ export PYTHONPATH=/opt/drake/lib/python3.6/site-packages:${PYTHONPATH}
 
 python3 -c 'import pydrake; print(pydrake.__file__)'</code></pre></div>
 
-      <div class="mac"><pre class="highlight"><code>sudo tar -xvzf drake.tar.gz -C /opt
+      <div class="focal"><pre class="highlight"><code>sudo tar -xvzf drake.tar.gz -C /opt
+sudo /opt/drake/share/drake/setup/install_prereqs
+export PYTHONPATH=/opt/drake/lib/python3.8/site-packages:${PYTHONPATH}
+  
+python3 -c 'import pydrake; print(pydrake.__file__)'</code></pre></div>
+
+  <div class="mac"><pre class="highlight"><code>sudo tar -xvzf drake.tar.gz -C /opt
 /opt/drake/share/drake/setup/install_prereqs
 export PYTHONPATH=/opt/drake/lib/python3.9/site-packages:${PYTHONPATH}
 
@@ -158,7 +178,12 @@ sudo setup/ubuntu/18.04/install_prereqs.sh
 pip3 install --requirement requirements.txt
 export PYTHONPATH=`pwd`:${PYTHONPATH}</code></pre></div>
 
-      <div class="mac"><pre class="highlight"><code>cd manipulation
+      <div class="focal"><pre class="highlight"><code>cd manipulation
+sudo setup/ubuntu/20.04/install_prereqs.sh
+pip3 install --requirement requirements.txt
+export PYTHONPATH=`pwd`:${PYTHONPATH}</code></pre></div>
+
+  <div class="mac"><pre class="highlight"><code>cd manipulation
 setup/mac/install_prereqs.sh
 pip3.9 install --requirement /opt/drake/share/drake/setup/requirements.txt --requirement requirements.txt
 export PYTHONPATH=`pwd`:${PYTHONPATH}</code></pre></div>
