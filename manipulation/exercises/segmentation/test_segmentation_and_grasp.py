@@ -14,8 +14,12 @@ class TestSegmentationAndGrasp(unittest.TestCase):
     @weight(4)
     @timeout_decorator.timeout(10.)
     def test_get_merged_masked_pcd(self):
-        """Test find_antipodal_pts"""
-        predictions = self.notebook_locals["predictions"]
+        """Test get_merged_masked_pcd"""
+        predictions = []
+        for i in range(2):
+            prediction = []
+            prediction.append(np.load(LoadDataResource("prediction_{}.npz".format(i))))
+            predictions.append(prediction)
         cameras = self.notebook_locals["cameras"]
         get_merged_masked_pcd = self.notebook_locals["get_merged_masked_pcd"]
 
