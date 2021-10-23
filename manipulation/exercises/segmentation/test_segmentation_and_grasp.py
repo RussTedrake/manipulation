@@ -38,15 +38,19 @@ class TestSegmentationAndGrasp(unittest.TestCase):
         # Allow some deviation in the number of points
         self.assertLessEqual(
             np.linalg.norm(num_points_target - num_points_eval), 200,
-            "Wrong number of points returned.")
+            "Wrong number of points returned. (Note that this is *after* downsampling.)")
 
         # Make sure the sizes match
         min_num_pts = min(num_points_eval, num_points_target)
+        idxs_eval = np.argsort(pcd_pts_eval[:,0])
+        idxs_target = np.argsort(pcd_pts_target[:,0])
 
+        # Ordering of the point clouds may not match. So just sort them.
         self.assertLessEqual(
-            np.linalg.norm(pcd_pts_target[:min_num_pts,:] - pcd_pts_eval[:min_num_pts,:]), 1e-4,
+            np.linalg.norm(pcd_pts_target[idxs_target][:min_num_pts,:] - pcd_pts_eval[idxs_eval][:min_num_pts,:]), 10,
             "Point cloud points are not close enough to the solution values.")
 
+        # Color points are larger, so they get a large cap
         self.assertLessEqual(
-            np.linalg.norm(pcd_colors_target[:min_num_pts,:] - pcd_colors_eval[:min_num_pts,:]), 1e-4,
+            np.linalg.norm(pcd_colors_target[:min_num_pts,:] - pcd_colors_eval[:min_num_pts,:]), 50,
             "Point cloud colors are not close enough to the solution values.")
