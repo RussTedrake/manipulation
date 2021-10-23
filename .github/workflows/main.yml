@@ -68,9 +68,33 @@ jobs:
       - name: test
         run: ./htmlbook/workflows/ci/bionic/test
         shell: bash
+  focal-docker:
+    name: ubuntu 20.04 focal dockerfile
+    runs-on: ubuntu-latest
+    container: russtedrake/manipulation:latest
+    steps:
+      - name: pre-checkout setup
+        run: |
+          export APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=1 DEBIAN_FRONTEND=noninteractive
+          apt-get update -qq || (sleep 15; apt-get update -qq)
+          apt-get install -o APT::Acquire::Retries=4 -o Dpkg::Use-Pty=0 -qy --no-install-recommends ca-certificates gnupg
+          apt-key adv -q --keyserver keyserver.ubuntu.com --recv-keys E1DD270288B4E6030699E45FA1715D88E1DF1F24
+          echo 'deb http://ppa.launchpad.net/git-core/ppa/ubuntu focal main' > /etc/apt/sources.list.d/git.list
+          apt-get update -qq || (sleep 15; apt-get update -qq)
+          apt-get install -o APT::Acquire::Retries=4 -o Dpkg::Use-Pty=0 -qy --no-install-recommends git
+          rm -rf /var/cache/apt/archives/*.deb /var/cache/apt/archives/partial/*.deb /var/cache/apt/*.bin /var/lib/apt/lists/* /var/log/apt/*
+        shell: bash      
+      - name: checkout
+        uses: actions/checkout@v2
+      - name: submodule checkout
+        run:  ./setup/submodule_checkout
+        shell: bash
+      - name: test
+        run: ./htmlbook/workflows/ci/bionic/test
+        shell: bash
   catalina:
-    name: macos catalina 10.15
-    runs-on: macos-10.15
+    name: macos big sur 11
+    runs-on: macos-11
     steps:
       - name: checkout
         uses: actions/checkout@v2
