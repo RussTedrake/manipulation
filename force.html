@@ -161,14 +161,13 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
         </script>
       </div>
 
-      <p>Let us assume that the robot is already in contact.  What information
-      do we need to regulate the contact forces?  Certainly we need the desired
-      contact force, $f^{c_d}$.  In general, we will need the robot's state
-      (though in the immediate example, the dynamics of our point mass are not
-      state dependent).  But we also need to either (1) measure the robot
-      accelerations (which we've repeatedly tried to avoid), (2) assume the
-      robot accelerations are zero, or (3) provide a measurement of the contact
-      force so that we can regulate it with feedback.</p>
+      <p>What information do we need to regulate the contact forces?  Certainly
+      we need the desired contact force, $f^{c_d}$.  In general, we will need
+      the robot's state (though in the immediate example, the dynamics of our
+      point mass are not state dependent).  But we also need to either (1)
+      measure the robot accelerations (which we've repeatedly tried to avoid),
+      (2) assume the robot accelerations are zero, or (3) provide a measurement
+      of the contact force so that we can regulate it with feedback.</p>
       
       <p>Let's consider the case where the robot is already in contact with the
       box.  Let's also assume for a moment that the accelerations are (nearly)
@@ -457,7 +456,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       <figure><img style="width:70%" src="data/impedance-based-flip-up.jpeg"></figure>
     
       <p>To make this one happen, I'd like to imagine creating a virtual spring
-      -- you can think of it like a taught rubber band -- that we attach from
+      -- you can think of it like a taut rubber band -- that we attach from
       the finger to a point near the wall just a little above the top left
       corner of the box.  The box will act like a pendulum, rotating around the
       top corner, with the rubber band creating the moment.  At some point the
@@ -512,11 +511,12 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       follow the wall.</p>
 
       <p>The choice of position control or force control need not be a binary
-      decision.  We can simply apply both the position command and a
-      "feed-forward" force command: $$u = -mg + {}^WR^C \left[K_p (p^{C_d}_C -
-      p^{C}_C) + K_d (v^{C_d}_C - v^{C}_C) + f^{ff}_C \right].$$ As we'll see,
-      this is quite similar to the interface provided by the iiwa (and many
-      other torque-controlled robots).</p>      
+      decision.  We can simply apply both the position command (as in
+      stiffness/impedance control) and a "feed-forward" force command: $$u =
+      -mg + {}^WR^C \left[K_p (p^{C_d}_C - p^{C}_C) + K_d (v^{C_d}_C - v^{C}_C)
+      + f^{ff}_C \right].$$ As we'll see, this is quite similar to the
+      interface provided by the iiwa (and many other torque-controlled
+      robots).</p>      
 
     </subsection>
 
@@ -546,18 +546,19 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
     alignment to be accounted for with a simple compliance in the horizontal
     direction.  Misalignment in orientation is even more interesting.  Small
     misalignments can cause the object to become "jammed", at which point the
-    frictional forces become large and ambiguous; we really want to avoid this.
-    Again, we can avoid jamming by allowing a rotational compliance at the
-    contact.  I think you can see why this is a great example for force
-    control!</p>
+    frictional forces become large and ambiguous (under the Coulomb model); we
+    really want to avoid this. Again, we can avoid jamming by allowing a
+    rotational compliance at the contact.  I think you can see why this is a
+    great example for force control!</p>
 
-    <p>The key insight here is that the rotational stiffness that we want should
-    result in rotations around the part/contact, not around the gripper.  We can
-    program this with stiffness control; but for very tight tolerances the
-    sensing and bandwidth requirements become a real limitation.  One of the
-    coolest results in force control is the realization that a clever physical
-    mechanism can be used to produce a remote-centered compliance completely
-    mechanically, with infinite bandwidth and no sensing required
+    <p>The key insight here is that the rotational stiffness that we want
+    should result in rotations around the part/contact, not around the gripper.
+    We can program this with stiffness control; but for very tight tolerances
+    the sensing and bandwidth requirements become a real limitation.  One of
+    the coolest results in force control is the realization that a clever
+    physical mechanism can be used to produce a "remote-centered compliance"
+    (RCC) completely mechanically, with infinite bandwidth and no sensing
+    required
     <elib>Drake78</elib>!</p>
 
     <figure><img width="40%" src="data/passive_remote_center_compliance.png">
