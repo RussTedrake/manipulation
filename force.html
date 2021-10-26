@@ -390,15 +390,15 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
 
       <p>Our simple model with a point finger is ideal for understanding the
       essence of indirect force control.  The original equations of motion of
-      our system are $$m\begin{bmatrix}\ddot{x} \\ \ddot{z} \end{bmatrix} = u +
+      our system are $$m\begin{bmatrix}\ddot{x} \\ \ddot{z} \end{bmatrix} = mg + u +
       f^c.$$  We can write a simple controller to make this system act, instead,
       like (passive) mass-spring-damper system: $$m \begin{bmatrix}\ddot{x} \\
       \ddot{z} \end{bmatrix} + b \begin{bmatrix} \dot{x} \\ \dot{z}
       \end{bmatrix} + k \begin{bmatrix} x - x_d \\ z - z_d \end{bmatrix} =
       f^c,$$ with the rest position of the spring at $(x_d, z_d).$  The
       controller that implements this follows easily; in the point finger case
-      this has exactly the familiar form of a proportional-derivative (PD)
-      controller!</p>
+      this has the familiar form of a proportional-derivative (PD)
+      controller, but with an additional "feed-forward" term to cancel out gravity.</p>
 
       <p>Technically, if we are just programming the stiffness and damping, as
       I've written here, then a controller of this form would commonly be
