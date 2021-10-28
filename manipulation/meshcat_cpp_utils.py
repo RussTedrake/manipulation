@@ -1,3 +1,4 @@
+from functools import partial
 import os
 import sys
 import time
@@ -70,6 +71,43 @@ def StartMeshcat(open_window=False):
 
 
 # Some GUI code that will be moved into Drake.
+
+
+class MeshcatSliders(LeafSystem):
+    """
+    A system that outputs the ``value``s from meshcat sliders.
+
+    .. pydrake_system::
+
+      name: MeshcatSliderSystem
+      output_ports:
+      - slider_group_0
+      - ...
+      - slider_group_{N-1}
+    """
+
+    def __init__(self, meshcat, slider_names):
+        """
+        An output port is created for each element in the list `slider_names`.
+        Each element of `slider_names` must itself be an iterable collection
+        (list, tuple, set, ...) of strings, with the names of sliders that have
+        *already* been added to Meshcat via Meshcat.AddSlider().
+
+        The same slider may be used in multiple ports.
+        """
+        LeafSystem.__init__(self)
+
+        self._meshcat = meshcat
+        self._sliders = slider_names
+        for i, slider_iterable in enumerate(self._sliders):
+            port = self.DeclareVectorOutputPort(
+                f"slider_group_{i}", len(slider_iterable),
+                partial(self.DoCalcOutput, port_index=i))
+            port.disable_caching_by_default()
+
+    def DoCalcOutput(self, context, output, port_index):
+        for i, slider in enumerate(self._sliders[port_index]):
+            output[i] = self._meshcat.GetSliderValue(slider)
 
 
 class MeshcatPoseSliders(LeafSystem):
@@ -240,15 +278,25 @@ class WsgButton(LeafSystem):
         output.SetAtIndex(0, position)
 
 
-# TODO: Change this to be more like MeshcatPoseSliders : a system that can also
-# run a small callback loop.
-class MeshcatJointSlidersThatPublish():
+# TODO(russt): Add floating base support (as in manipulation.jupyter_widgets
+# MakeJointSlidersThatPublish)
+class MeshcatJointSliders(LeafSystem):
+    """
+    Adds one slider per joint of the MultibodyPlant.  Any positions that are
+    not associated with joints (e.g. floating-base "mobilizers") are held
+    constant at the default value obtained from robot.CreateDefaultContext().
+
+    .. pydrake_system::
+
+        name: JointSliders
+        output_ports:
+        - positions
+    """
 
     def __init__(self,
                  meshcat,
                  plant,
-                 publishing_system,
-                 root_context,
+                 root_context=None,
                  lower_limit=-10.,
                  upper_limit=10.,
                  resolution=0.01):
@@ -260,18 +308,12 @@ class MeshcatJointSlidersThatPublish():
 
         Args:
             meshcat:      A Meshcat instance.
-
             plant:        A MultibodyPlant. publishing_system: The System whose
                           Publish method will be called.  Can be the entire
                           Diagram, but can also be a subsystem.
-
-            publishing_system:  The system to call publish on.  Probably a
-                          MeshcatVisualizerCpp.
-
-            root_context: A mutable root Context of the Diagram containing both
-                          the ``plant`` and the ``publishing_system``; we will
-                          extract the subcontext's using `GetMyContextFromRoot`.
-
+            root_context: A mutable root Context of the Diagram containing the
+                          ``plant``; we will extract the subcontext's using
+                          `GetMyContextFromRoot`.
             lower_limit:  A scalar or vector of length robot.num_positions().
                           The lower limit of the slider will be the maximum
                           value of this number and any limit specified in the
@@ -285,6 +327,7 @@ class MeshcatJointSlidersThatPublish():
             resolution:   A scalar or vector of length robot.num_positions()
                           that specifies the step argument of the FloatSlider.
         """
+        LeafSystem.__init__(self)
 
         def _broadcast(x, num):
             x = np.array(x)
@@ -297,13 +340,11 @@ class MeshcatJointSlidersThatPublish():
 
         self._meshcat = meshcat
         self._plant = plant
-        self._plant_context = plant.GetMyContextFromRoot(root_context)
-        self._publishing_system = publishing_system
-        self._publishing_context = publishing_system.GetMyContextFromRoot(
-            root_context)
+        plant_context = plant.GetMyContextFromRoot(root_context) if \
+            root_context else plant.CreateDefaultContext()
 
         self._sliders = []
-        positions = plant.GetPositions(self._plant_context)
+        positions = plant.GetPositions(plant_context)
         slider_num = 0
         for i in range(plant.num_joints()):
             joint = plant.get_joint(JointIndex(i))
@@ -322,21 +363,44 @@ class MeshcatJointSlidersThatPublish():
                 self._sliders.append(description)
                 slider_num += 1
 
-    def Run(self, callback=None):
+        port = self.DeclareVectorOutputPort("positions", slider_num,
+                                            self.DoCalcOutput)
+        port.disable_caching_by_default()
+
+    def DoCalcOutput(self, context, output):
+        for i, s in enumerate(self._sliders):
+            output[i] = self._meshcat.GetSliderValue(s)
+
+    def Run(self, publishing_system, root_context, callback=None):
+        """
+        Args:
+            publishing_system:  The system to call publish on.  Probably a
+                          MeshcatVisualizerCpp.
+            root_context: A mutable root Context of the Diagram containing both
+                          the ``plant`` and the ``publishing_system``; we will
+                          extract the subcontext's using `GetMyContextFromRoot`.
+            callback: callback(plant_context) will be called whenever the
+                      slider values change.
+        """
         if not running_as_notebook:
             return
         print("Press the 'Stop JointSliders' button in Meshcat to continue.")
         self._meshcat.AddButton("Stop JointSliders")
+
+        plant_context = self._plant.GetMyContextFromRoot(root_context)
+        publishing_context = publishing_system.GetMyContextFromRoot(
+            root_context)
+
         while self._meshcat.GetButtonClicks("Stop JointSliders") < 1:
-            old_positions = self._plant.GetPositions(self._plant_context)
+            old_positions = self._plant.GetPositions(plant_context)
             positions = np.zeros((len(self._sliders), 1))
             for i, s in enumerate(self._sliders):
                 positions[i] = self._meshcat.GetSliderValue(s)
             if not np.array_equal(positions, old_positions):
-                self._plant.SetPositions(self._plant_context, positions)
+                self._plant.SetPositions(plant_context, positions)
                 if callback:
-                    callback(self._plant_context)
-                self._publishing_system.Publish(self._publishing_context)
+                    callback(plant_context)
+                publishing_system.Publish(publishing_context)
             time.sleep(.1)
 
         self._meshcat.DeleteButton("Stop JointSliders")
