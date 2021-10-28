@@ -786,9 +786,8 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       $$e = (x - x_d)^2 + (f^c - f^c_d)^2$$
 
       <ol type="a">
-        <li> In free-space (i.e. $f^c=0$), can we achieve zero error for $x_d=0$ and a non-zero desired force $f^c_d$? Show your answer by writing down the steady-state ($\dot{x},\ddot{x}=0$) error as a function of the gains and the desired force, thus arguing that both terms of the error do not achieve zero (i.e. we cannot achieve desired position or force).
-        </li>
-        <li> Assume a rigid-body contact with a wall located at $x_d=0$, where a desired non-zero force of $f^c_d$ is commanded. By writing down the error at equilibrium, show that we are able to achieve zero-error.</li>
+        <li>Let's consider the case where our system is in free space (i.e. $f^c=0$) and we want to exert a non-zero desired force ($f^c_d \neq 0$) and drive our position to zero ($x_d = 0$). You wil show that this is not possible, i.e. we cannot achieve zero error for our desired force and desired position. You can show this by considering the steady-state error (i.e. set $\dot{x}=0,\ddot{x}=0$) as a function of the system dynamics, controller, desired position and desired force.</li>
+        <li>Now consider the system is in rigid body contact with a wall located at $x_d = 0$ and a desired non-zero force ($f^c_d > 0$) is being commanded. Considering the steady-state error in this case, show that system can achieve zero error.</li>
       </ol>
     </exercise>
 
@@ -801,7 +800,8 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       <ol type="a">
         <li> If we do not push hard enough (i.e. $f^C_{C_z}$ is too small), then we will not be able to create enough friction ($f^C_{C_x}$) to counteract gravity. By summing the torques around the pivot point $A$, derive a lower bound for the required normal force $f^C_{C_z}$, as a function of $m,g,$ and $\mu^C$. You may assume that the moment arm of gravity is half that of the moment arm on C, and that the box is square.
         </li>
-        <li> If we push too hard (i.e. $f^C_{C_z}$ is too big), then the pivot point will end up sliding to the left. By writing the force balance along the axii, derive an upper bound for the required normal force $f^C_{C_z}$, as a function of $m,g,$ and $\mu^A$. (HINT: It will be necessary to use the torque balance equation from before) </li>
+        <li> If we push too hard (i.e. $f^C_{C_z}$ is too big), then the pivot point will end up sliding to the left. By writing the force balance along the horizontal axis, derive an upper bound for the required normal force $f^C_{C_z}$, as a function of $m,g,$ and $\mu^A$. (HINT: It will be necessary to use the torque balance equation from before) </li>
+
         <li> By combining the lower bounds and upper bounds from the previous problems, derive a relation for $\mu^A,\mu^C$ that must hold in order for this motion to be possible. If $\mu^A\approx 0.25$ (wood-metal), how high does $\mu^C$ have to be in order for the motion to be feasible? What if $\mu^A=1$ (concrete-rubber)?
         </li>
       </ol>
