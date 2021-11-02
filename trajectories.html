@@ -84,8 +84,6 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
   cover this now for another reason, too: it will also soon help us think about
   programming a more dexterous hand.</p>
 
-  <todo>Add atlas "big robot little car"</todo>
-
   <p>I do need to make one important caveat.  Despite having done some work in
   this field myself, I actually really dislike the problem formulation of
   collision-free motion planning.  I think that on the whole, robots are too
@@ -178,12 +176,14 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       uses a number of approximations to provide fast and numerically robust
       solutions to the "easy" kinematics problems.  It leverages the fact that a
       six-DOF pose constraint on a six-DOF manipulator has a closed-form
-      solutions with a finite number of joint space configurations that produce
+      solution with a finite number of joint space configurations that produce
       the same end-effector pose, and for seven-DOF manipulators it adds a layer
       of sampling in the last degree of freedom on top of the six-DOF
       solver.</p>
 
-      <todo>add an example of calling (or implementing something equivalent to) ikfast and/or bertini.  looks like bertini 2 has python bindings (but not pip) and is GPL3.</todo>
+      <todo>add an example of calling (or implementing something equivalent to)
+      IKFast and/or Bertini. looks like bertini 2 has python bindings (but not
+      pip) and is GPL3.</todo>
 
       <p>These closed-form solutions are important to understand because they
       provide deep insight into the equations, and because they can be fast

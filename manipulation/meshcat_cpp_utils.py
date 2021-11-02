@@ -179,16 +179,44 @@ class MeshcatPoseSliders(LeafSystem):
                 self._meshcat.SetSliderValue(self._visible._fields[i],
                                              self._value[i])
 
-    def DoCalcOutput(self, context, output):
-        """Constructs the output values from the widget elements."""
+    def _update_values(self):
+        changed = False
         for i in range(6):
             if self._visible[i]:
+                old_value = self._value[i]
                 self._value[i] = self._meshcat.GetSliderValue(
                     self._visible._fields[i])
-        output.set_value(
-            RigidTransform(
-                RollPitchYaw(self._value[0], self._value[1], self._value[2]),
-                self._value[3:]))
+                changed = changed or self._value[i] != old_value
+        return changed
+
+    def _get_transform(self):
+        return RigidTransform(
+            RollPitchYaw(self._value[0], self._value[1], self._value[2]),
+            self._value[3:])
+
+    def DoCalcOutput(self, context, output):
+        """Constructs the output values from the sliders."""
+        self._update_values()
+        output.set_value(self._get_transform())
+
+    def Run(self, publishing_system, root_context, callback):
+        # Calls callback(root_context, pose), then publishing_system.Publish()
+        # each time the sliders change value.
+        if not running_as_notebook:
+            return
+
+        publishing_context = publishing_system.GetMyContextFromRoot(
+            root_context)
+
+        print("Press the 'Stop PoseSliders' button in Meshcat to continue.")
+        self._meshcat.AddButton("Stop PoseSliders")
+        while self._meshcat.GetButtonClicks("Stop PoseSliders") < 1:
+            if self._update_values():
+                callback(root_context, self._get_transform())
+                publishing_system.Publish(publishing_context)
+            time.sleep(.1)
+
+        self._meshcat.DeleteButton("Stop PoseSliders")
 
 
 class WsgButton(LeafSystem):
@@ -212,6 +240,8 @@ class WsgButton(LeafSystem):
         output.SetAtIndex(0, position)
 
 
+# TODO: Change this to be more like MeshcatPoseSliders : a system that can also
+# run a small callback loop.
 class MeshcatJointSlidersThatPublish():
 
     def __init__(self,
@@ -292,25 +322,21 @@ class MeshcatJointSlidersThatPublish():
                 self._sliders.append(description)
                 slider_num += 1
 
-    def Publish(self):
-        old_positions = self._plant.GetPositions(self._plant_context)
-        positions = np.zeros((len(self._sliders), 1))
-        for i, s in enumerate(self._sliders):
-            positions[i] = self._meshcat.GetSliderValue(s)
-        if not np.array_equal(positions, old_positions):
-            self._plant.SetPositions(self._plant_context, positions)
-            self._publishing_system.Publish(self._publishing_context)
-            return True
-        return False
-
     def Run(self, callback=None):
         if not running_as_notebook:
             return
         print("Press the 'Stop JointSliders' button in Meshcat to continue.")
         self._meshcat.AddButton("Stop JointSliders")
         while self._meshcat.GetButtonClicks("Stop JointSliders") < 1:
-            if self.Publish() and callback:
-                callback(self._plant_context)
+            old_positions = self._plant.GetPositions(self._plant_context)
+            positions = np.zeros((len(self._sliders), 1))
+            for i, s in enumerate(self._sliders):
+                positions[i] = self._meshcat.GetSliderValue(s)
+            if not np.array_equal(positions, old_positions):
+                self._plant.SetPositions(self._plant_context, positions)
+                if callback:
+                    callback(self._plant_context)
+                self._publishing_system.Publish(self._publishing_context)
             time.sleep(.1)
 
         self._meshcat.DeleteButton("Stop JointSliders")
