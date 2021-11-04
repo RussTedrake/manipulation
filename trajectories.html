@@ -233,6 +233,16 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
 
       <p>Global IK.</p>      
 
+      <p>When should we use IK vs Differential IK?  IK solves a more global
+      problem, but is not guaranteed to succeed.  It is also not guaranteed to
+      make small changes to $q$ as you make small changes in the
+      cost/constraints; so you might end up sending large $\Delta q$ commands
+      to your robot.  Use IK when you need to solve the more global problem,
+      but then produce the actual $q$ trajectories with trajectory
+      optimization, etc.  Or use differential IK if you are able to design
+      smooth commands in end-effector space and simply track them in joint
+      space.</p>
+
     </subsection>
 
     <subsection><h1>Grasp planning as IK</h1>
@@ -247,25 +257,86 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
 
   <section><h1>Kinematic trajectory optimization</h1>
   
-    <!-- trajectories in joint space versus EE space -->
+    <p>In our previous approach, we designed (simple) trajectories in the
+    end-effector coordinates, then used differential IK to get the joint
+    velocity commands.  Now we will switch to design the motions directly in
+    joint coordinates, and just add (forward) kinematics constraints.</p>
 
-    <!-- pp trajectories -->
+    <subsection><h1>Trajectory parameterizations</h1>
+    
+      <p>Piecewise polynomial trajectories</p>
+      <p>B-spline trajectories</p>
+        
+    </subsection>
 
-    <!-- b-spline trajectories -->
+    <subsection><h1>Optimization algorithms</h1>
 
-    <!-- anytime b-spline smoother? -->
+      <p><a
+      href="https://github.com/RobotLocomotion/drake/issues/10188">B-spline
+      kinematic trajectory optimization</a>.</p>
 
-    <!-- chomp? (and friends?) -->
+      <p>CHOMP <elib>Ratliff09a</elib>, STOMP <elib>Kalakrishnan11a</elib>,
+      KOMO<elib>Toussaint17</elib>.  SQP methods vs Augmented Lagrangian</p>
 
-    <!-- snopt vs augmented lagrangian? -->
+    </subsection>
 
   </section>
 
   <section><h1>Sample-based motion planning</h1>
-  
+
+    <p>The <a href="https://ompl.kavrakilab.org/">Open Motion Planning
+    Library</a>. We have our <a
+    href="https://github.com/RobotLocomotion/drake/issues/14431">own
+    implementations in Drake</a>
+        that are optimized for our collision engines.</p>
+
+    <subsection><h1>Rapidly-exploring random trees (RRT)</h1>
+    
+      <example><h1>The basic RRT</h1>
+    
+        <p><a
+        href="https://deepnote.com/project/Ch-8-Motion-Planning-B2KxZ0AqQ2KXAn1Vnw5zuw/%2Ftrajectories.ipynb"
+        style="background:none; border:none;" class="deepnote"
+        target="trajectories">  <img
+        src="https://deepnote.com/buttons/launch-in-deepnote-white.svg"></a></p>
+      </example>
+    
+    </subsection>
+
+    <example><h1>The RRT "Bug Trap"</h1>
+    
+        <p><a
+        href="https://deepnote.com/project/Ch-8-Motion-Planning-B2KxZ0AqQ2KXAn1Vnw5zuw/%2Ftrajectories.ipynb"
+        style="background:none; border:none;" class="deepnote"
+        target="trajectories"> <img
+        src="https://deepnote.com/buttons/launch-in-deepnote-white.svg"></a></p>
+      </example>
+    
+    </subsection>
+
+    <subsection><h1>The Probabilistic Roadmap (PRM)</h1>
+    </subsection>
+
+    <subsection><h1>Post-processing</h1>
+
+      <p><a
+      href="https://github.com/RobotLocomotion/drake/issues/11827">anytime
+      b-spline smoother</a></p>
+
+    </subsection>
+
   </section>
 
-  <!-- time-scaling trajectories (TOPPRA?) -->
+  <section><h1>Time-optimal path parameterizations</h1>
+
+    <!-- time-scaling trajectories (TOPPRA?) -->
+  </section>
+
+  <section><h1>Active areas of research</h1>
+
+    <p>Task and motion planning, graphs of convex sets, ...</p>
+
+  </section>
 
   <section><h1>Exercises</h1>
     <exercise><h1>Door Opening</h1>
@@ -335,6 +406,24 @@ Name one pair of nodes for which the shortcutting algorithm would result in a sh
 <span class="author">Rosen Diankov</span>,
 <span class="title">"Automated Construction of Robotic Manipulation Programs"</span>,
 PhD thesis, Carnegie Mellon University, August, <span class="year">2010</span>.
+
+</li><br>
+<li id=Ratliff09a>
+<span class="author">Nathan Ratliff and Matthew Zucker and J. Andrew (Drew) Bagnell and Siddhartha Srinivasa</span>,
+<span class="title">"{CHOMP}: Gradient Optimization Techniques for Efficient Motion Planning"</span>,
+<span class="publisher">IEEE International Conference on Robotics and Automation (ICRA)</span>, May, <span class="year">2009</span>.
+
+</li><br>
+<li id=Kalakrishnan11a>
+<span class="author">Mrinal Kalakrishnan and Sachin Chitta and Evangelos Theodorou and Peter Pastor and Stefan Schaal</span>,
+<span class="title">"{STOMP}: Stochastic trajectory optimization for motion planning"</span>,
+<span class="publisher">2011 IEEE international conference on robotics and automation</span>, pp. 4569--4574, <span class="year">2011</span>.
+
+</li><br>
+<li id=Toussaint17>
+<span class="author">Marc Toussaint</span>,
+<span class="title">"A tutorial on Newton methods for constrained trajectory optimization and relations to SLAM, Gaussian Process smoothing, optimal control, and probabilistic inference"</span>,
+<span class="publisher">Geometric and numerical foundations of movements</span>, pp. 361--392, <span class="year">2017</span>.
 
 </li><br>
 <li id=Geraerts04>

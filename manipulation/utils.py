@@ -1,7 +1,6 @@
-import matplotlib.pyplot as plt
-import matplotlib as mpl
 import numpy as np
 import os
+import sys
 from urllib.request import urlretrieve
 from IPython import get_ipython
 
@@ -12,6 +11,13 @@ import pydrake.all
 # happens.
 running_as_notebook = "COLAB_TESTING" not in os.environ and get_ipython(
 ) and hasattr(get_ipython(), 'kernel')
+
+
+def pyplot_is_interactive():
+    # import needs to happen after the backend is set.
+    import matplotlib.pyplot as plt
+    from matplotlib.rcsetup import interactive_bk
+    return plt.get_backend() in interactive_bk
 
 
 def FindResource(filename):
@@ -54,6 +60,9 @@ reserved_labels = [
 
 
 def colorize_labels(image):
+    # import needs to happen after backend is set up.
+    import matplotlib.pyplot as plt
+    import matplotlib as mpl
     """Colorizes labels."""
     # TODO(eric.cousineau): Revive and use Kuni's palette.
     cc = mpl.colors.ColorConverter()
@@ -68,3 +77,35 @@ def colorize_labels(image):
     color_image = colors[image % len(colors)]
     color_image[background] = bg_color
     return color_image
+
+
+def SetupMatplotlibBackend(wishlist=["notebook"]):
+    """
+    Helper to support multiple workflows:
+        1) nominal -- running locally w/ jupyter notebook
+        2) unit tests (no ipython, backend is template)
+        3) binder -- does have notebook backend
+        4) colab -- claims to have notebook, but it doesn't work
+    Puts the matplotlib backend into notebook mode, if possible,
+    otherwise falls back to inline mode.
+    Returns True iff the final backend is interactive.
+    """
+    # To find available backends, one can access the lists:
+    # matplotlib.rcsetup.interactive_bk
+    # matplotlib.rcsetup.non_interactive_bk
+    # matplotlib.rcsetup.all_backends
+    if running_as_notebook:
+        ipython = get_ipython()
+        # Short-circuit for google colab.
+        if 'google.colab' in sys.modules:
+            ipython.run_line_magic("matplotlib", "inline")
+            return False
+        # TODO: Find a way to detect vscode, and use inline instead of notebook
+        for backend in wishlist:
+            try:
+                ipython.run_line_magic("matplotlib", backend)
+                return pyplot_is_interactive()
+            except KeyError:
+                continue
+        ipython.run_line_magic("matplotlib", "inline")
+    return False
