@@ -134,7 +134,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       </figcaption>
     </figure>
   
-    <subsection><h1>Closed-form solutions</h1>
+    <subsection><h1>From end-effector pose to joint angles</h1>
 
       <p>With its obvious importance in robotics, you probably won't be
       surprised to hear that there is an extensive literature on inverse
@@ -178,7 +178,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       open-source implementation.  Rather than focus on completeness, IKFast
       uses a number of approximations to provide fast and numerically robust
       solutions to the "easy" kinematics problems.  It leverages the fact that a
-      six-DOF pose constraint on a six-DOF manipulator has a closed-form
+      six-DOF pose constraint on a six-DOF manipulator has a "closed-form"
       solution with a finite number of joint space configurations that produce
       the same end-effector pose, and for seven-DOF manipulators it adds a layer
       of sampling in the last degree of freedom on top of the six-DOF
@@ -188,40 +188,130 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       IKFast and/or Bertini. looks like bertini 2 has python bindings (but not
       pip) and is GPL3.</todo>
 
-      <p>These closed-form solutions are important to understand because they
+      <p>These explicit solutions are important to understand because they
       provide deep insight into the equations, and because they can be fast
       enough to use inside a more sophisticated solution approach.  But the
-      closed-form solutions don't provide the rich specification I advocated for
-      above; in particular, they break down once we have inequality constraints
-      instead of equality constraints.  For those richer specifications, we will
-      turn to optimization.</p>
+      solutions don't provide the rich specification I advocated for above; in
+      particular, they break down once we have inequality constraints instead
+      of equality constraints.  For those richer specifications, we will turn
+      to optimization.</p>
 
     </subsection>
 
     <subsection><h1>IK as constrained optimization</h1>
 
-      <figure><img style="width:60%" src="data/shelf_ik.png"><figcaption>A richer inverse kinematics problem: solve for the joint angles, $q$, that allow the robot to reach into the shelf and grab the object, while avoiding collisions.</figcaption></figure>
+      <figure><img style="width:60%" src="data/shelf_ik.png"><figcaption>A
+      richer inverse kinematics problem: solve for the joint angles, $q$, that
+      allow the robot to reach into the shelf and grab the object, while
+      avoiding collisions.</figcaption></figure>
 
-      <p>We have <a href="pick.html#diff_ik_w_constraints">already discussed</a> the idea of solving <i>differential</i> inverse kinematics as an optimization problem.  This was a very nice use case, where the </p>
+      <p>We have <a href="pick.html#diff_ik_w_constraints">already
+      discussed</a> the idea of solving <i>differential</i> inverse kinematics
+      as an optimization problem.  In that workflow, we started by using the
+      pseudo-inverse of the kinematic Jacobian, but then graduated to thinking
+      about the least-squares formulation of the inverse problem.  The the more
+      general least-squares setting, we could add additional costs and
+      constraints that would protect us from (nearly) singular Jacobians and
+      could take into account additional constraints from joint limits, joint
+      velocity limits, etc.  We could even add collision avoidance constraints.
+      Some of these constraints are quite nonlinear / nonconvex functions of
+      the configuration $q$, but in the differential kinematics setting we were
+      only seeking to find a small change $\Delta q$ around the nominal
+      configuration, so it was quite reasonable to make linear/convex
+      approximations of these nonlinear/nonconvex constraints.
+      </p>
 
-      <!-- the differential IK controller that we discussed before is just doing gradient descent on the objective ... -->
+      <p>Now we will consider the full formulation, where we try to solve the
+      nonlinear / nonconvex optimization directly, without any constraints on
+      only making a small change to an initial $q$.  This is a much harder
+      problem computationally.  Using powerful nonlinear optimization solvers
+      like SNOPT, we are often able to solve the problems, even at interactive
+      rates (the example below is quite fun).  But there are no guarantees.  It
+      could be that a solution exists even if the solver returns
+      "infeasible".</p>
+
+      <p>Of course, the differential IK problem and the full IK problem are
+      closely related.  In fact, you can think about the differential IK
+      algorithm as doing one step of (projected) gradient descent or  one-step
+      of <a
+      href="https://en.wikipedia.org/wiki/Sequential_quadratic_programming">SQP</a>,
+      for the full nonlinear problem.</p>
+
+      <p>Drake provides a nice <a
+      href="https://drake.mit.edu/doxygen_cxx/classdrake_1_1multibody_1_1_inverse_kinematics.html"></a>InverseKinematics</a>
+      class that makes it easy to assemble many of the standard
+      kinematic/multibody constraints into a
+      <code>MathematicalProgram</code>.  Take a minute to look at the
+      constraints that are offered.  You can add constraints on the relative
+      position and/or orientation on two bodies, or that two bodies are more
+      than some minimal distance apart (e.g. for non-penetration) or closer
+      than some distance, and more.  This is the way that I want you to think
+      about the IK problem; it is an inverse problem, but one with a
+      potentially very rich set of costs and constraints.</p>
 
       <example><h1>Interactive IK</h1>
 
+        <p>Despite the nonconvexity of the problem and nontrivial computational
+        cost of evaluating the constraints, we can often solve it at
+        interactive rates.  I've assembled a few examples of this in the
+        chapter notebook:</p>
+
+        <p><a href="https://deepnote.com/project/Ch-8-Motion-Planning-B2KxZ0AqQ2KXAn1Vnw5zuw/%2Ftrajectories.ipynb" style="background:none; border:none;" class="deepnote" target="trajectories">  <img src="https://deepnote.com/buttons/launch-in-deepnote-white.svg"></a></p>
+
+        <p>In the first version, I've added sliders to let you control the
+        desired pose of the end-effector.  This is the simple version of the IK
+        problem, amenable to more explicit solutions, but we nevertheless solve
+        it with our full nonlinear optimization IK engine (and it does include
+        joint limit constraints).  This demo won't look too different from the
+        very first example in the notes, where you used teleop to command the
+        robot to pick up the red brick.  In fact, differential IK offers a fine
+        solution to this problem, too.</p>
+
+        <p>In the second example, I've tried to highlight the differences
+        between the nonlinear IK problem and the differential IK problem by
+        adding an obstacle directly in front of the robot.  Because both our
+        differential IK and IK formulations are able to consume the
+        collision-avoidance constraints, both solutions will try to prevent you
+        from crashing the arm into the post.  But if you move the target
+        end-effector position from one side of the post to the other, the full
+        IK solver can switch over to a new solution with the arm on the other
+        side of the post, but the differential IK will never be able to make
+        that leap (it will stay on the first side of the post, refusing to
+        allow a collision).</p>
+
+        <figure>
+            <img width="40%" src="data/ik_post_1.png"/>
+            <img width="40%" src="data/ik_post_2.png"/>
+            <figcaption>As the desired end-effector position moves along
+            positive $y$, the IK solver is able to find a new solution with the
+            arm wrapped the other way around the post.</figcaption>
+        </figure>
+
+
+      </example>
+
+      <p>With great power comes great responsibility.  The inverse kinematics
+      toolbox allows you to formulate complex optimizations, but your success
+      with solving them will depend partially on how thoughtful you are about
+      choosing your costs and constraints.  My basic advice is this: <ol>
+      <li>Try to keep the objective (costs) simple; I typically only use the
+      "joint-centering" quadratic cost on $q$.  Putting terms that should be
+      constraints into the cost as penalties leads to lots of cost-function
+      tuning, which can be a nasty business.</li><li>Write minimal constraints.
+      You want the set of feasible configurations to be as big as possible.
+      For instance, if you don't need to fully constrain the orientation of the
+      gripper, then don't do it.</li></ol>  I'll follow-up with that second
+      point using the following example.</p>
+
+      <example><h1>Grasp the cylinder.</h1>
+      
         <p><a href="https://deepnote.com/project/Ch-8-Motion-Planning-B2KxZ0AqQ2KXAn1Vnw5zuw/%2Ftrajectories.ipynb" style="background:none; border:none;" class="deepnote" target="trajectories">  <img src="https://deepnote.com/buttons/launch-in-deepnote-white.svg"></a></p>
 
       </example>
 
-      <!-- a rich library of constraints -->
-      <p>Write minimal constraints.</p>
-
-      <example><h1>Grasp the cylinder.</h1>
-      
-      </example>
-
       <p>Collision avoidance constraints.</p>
 
-      <example><h1>Visualizing the configuration stace</h1>
+      <example><h1>Visualizing the configuration space</h1>
       
       </example>
 
