@@ -305,17 +305,84 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
 
       <example><h1>Grasp the cylinder.</h1>
       
+        <p>Let's use IK to grasp a cylinder (call it a hand rail).  Suppose it
+        doesn't matter where along the cylinder we grasp, nor the orientation
+        at which we grasp it.  Then we should write the the IK problem using
+        only the minimal version of those constraints.</p>
+
+        <p>In the notebook, I've coded up one version of this.  I've put the
+        cylinder's pose on the sliders now, so you can move it around the
+        workspace, and watch how the IK solver decides to position the robot.
+        In particular, if you move the cylinder in $\pm y$, you'll see that the
+        robot doesn't try to follow... until the hand gets to the end of the
+        cylinder.  Very nice!</p>
+
+        <figure>
+            <img width="30%" src="data/grasp_cylinder_1.png"/>
+            <img width="30%" src="data/grasp_cylinder_2.png"/>
+            <img width="30%" src="data/grasp_cylinder_3.png"/>
+        </figure>
+
+        <p>One could imagine multiple ways to implement that constraint.
+        Here's how I did it: 
+
+<pre><code class="language-python">ik.AddPositionConstraint(
+    frameB=gripper_frame, p_BQ=[0, 0.1, -0.02],
+    frameA=cylinder_frame, p_AQ_lower=[0, 0, -0.5], p_AQ_upper=[0, 0, 0.5])
+ik.AddPositionConstraint(
+    frameB=gripper_frame, p_BQ=[0, 0.1, 0.02], 
+    frameA=cylinder_frame, p_AQ_lower=[0, 0, -0.5], p_AQ_upper=[0, 0, 0.5])</code></pre>  
+    
+        In words, I've defined two points in the gripper frame; in the notation
+        of the <code>AddPositionConstraint</code> method they are ${}^Bp^{Q}$.
+        Recall the <a href="pick.html#grasp_frames">gripper frame</a> is such
+        that $[0, .1, 0]$ is right between the two gripper pads; you should
+        take a moment to make sure you understand where $[0,.1,-0.02]$ and
+        $[0,.1,0.02]$ are.  Our constraints require that both of those points
+        should lie exactly on the center line segment of the cylinder.  This
+        was a compact way for me to leave the orientation around the cylinder
+        axis as unconstrained, and capture the cylinder position constraints
+        all quite nicely.</p>
+
         <p><a href="https://deepnote.com/project/Ch-8-Motion-Planning-B2KxZ0AqQ2KXAn1Vnw5zuw/%2Ftrajectories.ipynb" style="background:none; border:none;" class="deepnote" target="trajectories">  <img src="https://deepnote.com/buttons/launch-in-deepnote-white.svg"></a></p>
 
       </example>
 
-      <p>Collision avoidance constraints.</p>
+      <p>We've provided a rich language of constraints for specifying IK
+      problems, including many which involve the kinematics of the robot and
+      the geometry of the robot and the world (e.g., the minimum-distance
+      constraints).  Let's take a moment to appreciate the geometric puzzle
+      that we are asking the optimizer to solve.</p>
 
-      <example><h1>Visualizing the configuration stace</h1>
+      <example><h1>Visualizing the configuration space</h1>
 
-        <p><a href="data/iiwa_shelves_configuration_space.html">Here is a
-        visualizaiton</a> of the configuration space for reaching into the
-        shelves.  Scary!</p>
+        <p>Let's return to the example of the iiwa reaching into the shelf.
+        This IK problem has two major constraints: 1) we want the center of the
+        target sphere to be in the center of the gripper, and 2) we want the
+        arm to avoid collisions with the shelves.  In order to plot these
+        constraints, I've frozen three of the joints on the iiwa, leaving only
+        the three corresponding motion in the $x-z$ plane.</p>
+
+        <figure>
+            <img width="40%" src="data/shelf_ik2.png"/>
+            <img width="40%" src="data/shelf_ik_cspace_grasp_constraint.png"/>
+            <figcaption>The image on the right is a visualization of the "grasp
+            the sphere" constraint in configuration space -- the x,y,z, axes in
+            the visualizer correspond to the three joint angles of the
+            planarized iiwa.</figcaption>
+        </figure>
+
+        <p>To visualize the constraints, I've sampled a dense grid in the three
+        joint angles of the planarized iiwa, assigning each grid element to 1
+        if the constraint is satisfied or 0 otherwise, then run a marching
+        cubes algorithm to extract an approximation of the true 3D geometry of
+        this constraint in the configuration space.  The "grasp the sphere"
+        constraint produces the nice green geometry I've pictured above on the
+        right; it is clipped by the joint limits.  The collision-avoidance
+        constraint, on the other hand, is quite a bit more complicated.  To see
+        that, you'd better open up this
+        <a href="data/iiwa_shelves_configuration_space.html">3D
+        visualization</a> so you can navigate around it yourself.  Scary!</p>
 
         <p><a
         href="https://deepnote.com/project/Ch-8-Motion-Planning-B2KxZ0AqQ2KXAn1Vnw5zuw/%2Ftrajectories.ipynb"
