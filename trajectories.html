@@ -55,7 +55,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
 
 <!-- EVERYTHING ABOVE THIS LINE IS OVERWRITTEN BY THE INSTALL SCRIPT -->
 <chapter style="counter-reset: chapter 7"><h1>Motion Planning</h1>
-    <a href="https://deepnote.com/project/Ch-8-Motion-Planning-B2KxZ0AqQ2KXAn1Vnw5zuw/%2Ftrajectories.ipynb" style="float:right; margin-top:-70px;background:white;border:0;" class="deepnote" target="trajectories">
+    <a href="https://deepnote.com/project/Ch-8-Motion-Planning-B2KxZ0AqQ2KXAn1Vnw5zuw/%2Ftrajectories.ipynb" style="float:right; margin-top:-70px;background:white;border:0;" target="trajectories">
         <img src="https://deepnote.com/buttons/launch-in-deepnote-white.svg"></a>
         <div style="clear:right;"></div>
     
@@ -157,14 +157,15 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       <todo>example: trig and polynomial kinematics of a two-link arm.</todo>
 
       <p>Understanding the solutions to polynomial equations is the subject of
-      algebraic geometry.  There is a deep literature on the theory, on symbolic
-      algorithms, and on numerical algorithms.  For even very complex kinematic
-      topologies, such as <a
+      algebraic geometry.  There is a deep literature on kinematics theory, on
+      symbolic algorithms, and on numerical algorithms.  For even very complex
+      kinematic topologies, such as <a
       href="https://en.wikipedia.org/wiki/Four-bar_linkage">four-bar
       linkages</a> and <a
       href="https://en.wikipedia.org/wiki/Stewart_platform">Stewart-Gough
-      platforms</a>, we can count the number of solutions, and/or understand the
-      continuous manifold of solutions.  For instance, <elib>Wampler11</elib>
+      platforms</a>, we can count the number of solutions, and/or understand
+      the continuous manifold of solutions.  For instance,
+      <elib>Wampler11</elib>
       describes a substantial toolbox for numerical algebraic geometry (based on
       homotopy methods) with impressive results on difficult kinematics
       problems.</p>
@@ -209,7 +210,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       discussed</a> the idea of solving <i>differential</i> inverse kinematics
       as an optimization problem.  In that workflow, we started by using the
       pseudo-inverse of the kinematic Jacobian, but then graduated to thinking
-      about the least-squares formulation of the inverse problem.  The the more
+      about the least-squares formulation of the inverse problem.  The more
       general least-squares setting, we could add additional costs and
       constraints that would protect us from (nearly) singular Jacobians and
       could take into account additional constraints from joint limits, joint
@@ -256,7 +257,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
         interactive rates.  I've assembled a few examples of this in the
         chapter notebook:</p>
 
-        <p><a href="https://deepnote.com/project/Ch-8-Motion-Planning-B2KxZ0AqQ2KXAn1Vnw5zuw/%2Ftrajectories.ipynb" style="background:none; border:none;" class="deepnote" target="trajectories">  <img src="https://deepnote.com/buttons/launch-in-deepnote-white.svg"></a></p>
+        <p><a href="https://deepnote.com/project/Ch-8-Motion-Planning-B2KxZ0AqQ2KXAn1Vnw5zuw/%2Ftrajectories.ipynb" style="background:none; border:none;" target="trajectories">  <img src="https://deepnote.com/buttons/launch-in-deepnote-white.svg"></a></p>
 
         <p>In the first version, I've added sliders to let you control the
         desired pose of the end-effector.  This is the simple version of the IK
@@ -307,7 +308,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       
         <p>Let's use IK to grasp a cylinder (call it a hand rail).  Suppose it
         doesn't matter where along the cylinder we grasp, nor the orientation
-        at which we grasp it.  Then we should write the the IK problem using
+        at which we grasp it.  Then we should write the IK problem using
         only the minimal version of those constraints.</p>
 
         <p>In the notebook, I've coded up one version of this.  I've put the
@@ -344,7 +345,7 @@ ik.AddPositionConstraint(
         axis as unconstrained, and capture the cylinder position constraints
         all quite nicely.</p>
 
-        <p><a href="https://deepnote.com/project/Ch-8-Motion-Planning-B2KxZ0AqQ2KXAn1Vnw5zuw/%2Ftrajectories.ipynb" style="background:none; border:none;" class="deepnote" target="trajectories">  <img src="https://deepnote.com/buttons/launch-in-deepnote-white.svg"></a></p>
+        <p><a href="https://deepnote.com/project/Ch-8-Motion-Planning-B2KxZ0AqQ2KXAn1Vnw5zuw/%2Ftrajectories.ipynb" style="background:none; border:none;" target="trajectories">  <img src="https://deepnote.com/buttons/launch-in-deepnote-white.svg"></a></p>
 
       </example>
 

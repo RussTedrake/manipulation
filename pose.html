@@ -55,7 +55,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
 
 <!-- EVERYTHING ABOVE THIS LINE IS OVERWRITTEN BY THE INSTALL SCRIPT -->
 <chapter style="counter-reset: chapter 3"><h1>Geometric Pose Estimation</h1>
-  <a href="https://deepnote.com/project/Ch-4-Geometric-Pose-Estimation-zGNA9TdORJqhlYOaPO3sSg/%2Fpose.ipynb" style="float:right; margin-top:-70px;background:white;border:0;" class="deepnote" target="pose">
+  <a href="https://deepnote.com/project/Ch-4-Geometric-Pose-Estimation-zGNA9TdORJqhlYOaPO3sSg/%2Fpose.ipynb" style="float:right; margin-top:-70px;background:white;border:0;" target="pose">
     <img src="https://deepnote.com/buttons/launch-in-deepnote-white.svg"></a>
     <div style="clear:right;"></div>
 
@@ -170,7 +170,7 @@ output_ports:
 
         <p><a
         href="https://deepnote.com/project/Ch-4-Geometric-Pose-Estimation-zGNA9TdORJqhlYOaPO3sSg/%2Fpose.ipynb"
-        style="background:none; border:none;" class="deepnote" target="pose">
+        style="background:none; border:none;" target="pose">
         <img
         src="https://deepnote.com/buttons/launch-in-deepnote-white.svg"></a></p>
 
@@ -571,7 +571,7 @@ output_ports:
 
       <p><a
         href="https://deepnote.com/project/Ch-4-Geometric-Pose-Estimation-zGNA9TdORJqhlYOaPO3sSg/%2Fpose.ipynb"
-        style="background:none; border:none;" class="deepnote" target="pose">
+        style="background:none; border:none;" target="pose">
         <img
         src="https://deepnote.com/buttons/launch-in-deepnote-white.svg"></a></p>
 
@@ -641,7 +641,7 @@ output_ports:
   
       <p><a
         href="https://deepnote.com/project/Ch-4-Geometric-Pose-Estimation-zGNA9TdORJqhlYOaPO3sSg/%2Fpose.ipynb"
-        style="background:none; border:none;" class="deepnote" target="pose">
+        style="background:none; border:none;" target="pose">
         <img
         src="https://deepnote.com/buttons/launch-in-deepnote-white.svg"></a></p>
   
@@ -685,7 +685,7 @@ output_ports:
 
       <p><a
         href="https://deepnote.com/project/Ch-4-Geometric-Pose-Estimation-zGNA9TdORJqhlYOaPO3sSg/%2Fpose.ipynb"
-        style="background:none; border:none;" class="deepnote" target="pose">
+        style="background:none; border:none;" target="pose">
         <img
         src="https://deepnote.com/buttons/launch-in-deepnote-white.svg"></a></p>
   
@@ -1098,7 +1098,7 @@ output_ports:
   
       <p><a
         href="https://deepnote.com/project/Ch-4-Geometric-Pose-Estimation-zGNA9TdORJqhlYOaPO3sSg/%2Fpose.ipynb"
-        style="background:none; border:none;" class="deepnote" target="pose">
+        style="background:none; border:none;" target="pose">
         <img
         src="https://deepnote.com/buttons/launch-in-deepnote-white.svg"></a></p>
         
@@ -1140,7 +1140,7 @@ output_ports:
 
       <p><a
         href="https://deepnote.com/project/Ch-4-Geometric-Pose-Estimation-zGNA9TdORJqhlYOaPO3sSg/%2Fpose.ipynb"
-        style="background:none; border:none;" class="deepnote" target="pose">
+        style="background:none; border:none;" target="pose">
         <img
         src="https://deepnote.com/buttons/launch-in-deepnote-white.svg"></a></p>
       
@@ -1543,10 +1543,24 @@ Using your experience from part (b), describe an analogous method for compute th
     Let's see how we can use this!</p>     
 
     <ol type="a" start=4>
-      <li>  As discussed in class, for rigid objects, we can precompute the SDF for the object, which enables us to greatly speed up computations. However, if we are dealing with an articulated body, such as a robot arm, where the configuration of the arm is dependent on the joint values, we can no longer precompute the SDF. Recomputing this "global" SDF every time the robot's configuration changes gets very expensive. (By global we mean an SDF of the entire articulated body.)<br/>
+      <li>  As discussed in class, for rigid objects, we can precompute the SDF
+      for the object, which enables us to greatly speed up computations.
+      However, if we are dealing with an articulated body, such as a robot arm,
+      where the configuration of the arm is dependent on the joint values, we
+      can no longer precompute the SDF. Recomputing this "global" SDF every
+      time the robot's configuration changes gets very expensive. (By global we
+      mean an SDF of the entire articulated body.)<br/>
 
-      Instead, the DART (Dense Articulated Real-Time Tracking)<elib>Schmidt15</elib> algorithm considers that for each link in the articulated body, we have a "local" SDF. A local SDF gives the signed distance value to a point in the link's coordinate frame. Because we are operating in the link's coordinate frame, we can precompute these local SDFs. 
-Consider that we have our favorite, planar two-link arm, picture below. Given $q_{0}, q_{1}$ and the the precomputed local SDFS for each of the links (link AB, link BC), briefly describe how you could compute the value of the global Penetration-Constraint-SDF for a point $(^{W}x_{p}, ^{W}y_{p})$. </li>
+      Instead, the DART (Dense Articulated Real-Time Tracking)
+      <elib>Schmidt15</elib> algorithm considers that for each link in the
+      articulated body, we have a "local" SDF. A local SDF gives the signed
+      distance value to a point in the link's coordinate frame. Because we are
+      operating in the link's coordinate frame, we can precompute these local
+      SDFs. Consider that we have our favorite, planar two-link arm, picture
+      below. Given $q_{0}, q_{1}$ and the precomputed local SDFS for each of
+      the links (link AB, link BC), briefly describe how you could compute the
+      value of the global Penetration-Constraint-SDF for a point $(^{W}x_{p},
+      ^{W}y_{p})$. </li>
 
     <figure>,
       <img style="width:65%", src="figures/exercises/planar_two_link_sdf.png"/>

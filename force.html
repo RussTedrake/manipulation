@@ -55,7 +55,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
 
 <!-- EVERYTHING ABOVE THIS LINE IS OVERWRITTEN BY THE INSTALL SCRIPT -->
 <chapter style="counter-reset: chapter 6"><h1>Force Control</h1>
-    <a href="https://deepnote.com/project/Ch-7-Force-Control-h9gETz6yTyW1L_UaXspotw/%2Fforce.ipynb" style="float:right; margin-top:-70px;background:white;border:0;" class="deepnote" target="force">
+    <a href="https://deepnote.com/project/Ch-7-Force-Control-h9gETz6yTyW1L_UaXspotw/%2Fforce.ipynb" style="float:right; margin-top:-70px;background:white;border:0;" target="force">
         <img src="https://deepnote.com/buttons/launch-in-deepnote-white.svg"></a>
         <div style="clear:right;"></div>
     
@@ -212,7 +212,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
 
         <p><a
         href="https://deepnote.com/project/Ch-7-Force-Control-h9gETz6yTyW1L_UaXspotw/%2Fforce.ipynb
-        style="background:none; border:none;" class="deepnote" target="force">
+        style="background:none; border:none;" target="force">
         <img
         src="https://deepnote.com/buttons/launch-in-deepnote-white.svg"></a></p>
           
@@ -253,16 +253,18 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
 
       <example id="force_flip_up"><h1>A force-based flip-up strategy</h1>
       
+        <todo>Flip theta. Right now tau_W_y makes theta more negative.</todo>
+
         <p>Let's encode the textual description above.  I'll use $C$ for the
         contact frame between the finger and the box, and $A$ for the contact
         frame for the lower left corner of the box contacting the bin.  The
         friction cone provides (linear inequality) constraints on the forces we
         want to apply. Within those constraints, we would like to rotate up the
         box. Constrained least-squares is as natural a formulation for this as
-        any! Here is one version: \begin{align*}\min_{f^C_W} \quad& \left|
+        any! Here is one version: \begin{align*}\min_{f^C_W} \quad& \left| w
         f^{C}_{C_x} - \text{PID}(\theta_d, \theta) \right|^2,\\ \subjto \quad &
-        |f^C_{W_x}| \le \hat\mu_A (\hat{m}g - f^C_{W_z}), \\  & f^C_{C_z} \ge 0,
-        \qquad |f^C_{C_x}| \le \hat\mu_C f^C_{C_z}, \\ \text{with} \quad &
+        |f^C_{W_x}| \le \hat\mu_A (\hat{m}g - f^C_{W_z}), \\  & f^C_{C_z} \ge
+        0, \qquad |f^C_{C_x}| \le \hat\mu_C f^C_{C_z}, \\ \text{with} \quad &
         {}^WR^C(\theta) = \begin{bmatrix} -\sin\theta & -\cos\theta \\
         \cos\theta & -\sin\theta \end{bmatrix}.\end{align*} I've used
         $\text{PID}$ here as shorthand for a simple
@@ -288,7 +290,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
 
         <p><a
             href="https://deepnote.com/project/Ch-7-Force-Control-h9gETz6yTyW1L_UaXspotw/%2Fforce.ipynb
-            style="background:none; border:none;" class="deepnote" target="force">
+            style="background:none; border:none;" target="force">
             <img
             src="https://deepnote.com/buttons/launch-in-deepnote-white.svg"></a></p>
     
@@ -334,13 +336,14 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
 
         <p>Now here's a nice approximation.  By choosing to make contact near
         the bottom of the box (since we know where the bin is), we can
-        approximate $${}^Ap^{C}_W \times f^C_W \approx -{}^Ap^C_{C_z}
-        f^C_{C_x}.$$  In words, the moment produce by the finger contact is
-        approximately the tangential force on the box (times the width of the
-        box).  I therefore claim that choosing $$f^{C_d}_{C_x} =
+        approximate $${}^A\tau^{Box}_{W_y} = {}^Ap^{C}_W \times f^C_W \approx
+        -{}^Ap^C_{C_z} f^C_{C_x} = -w f^C_{C_x}.$$  In words, the moment
+        produce by the finger contact is approximately the tangential force on
+        the box (times the width of the box).  I therefore claim that choosing
+        the desired torque to be equal to $$w f^{C_d}_{C_x} \approx
         \text{PID}(\theta_d, \theta),$$ is a good strategy for regulating the
-        orientation of the box.  It does not assume we know the box geometry nor
-        inertial properties.</p>
+        orientation of the box.  It does not assume we know the box geometry
+        nor inertial properties.</p>
 
         <p>That's a lot of details, but all to justify a very simple and robust
         controller.</p>
@@ -436,7 +439,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
 
         <p><a
             href="https://deepnote.com/project/Ch-7-Force-Control-h9gETz6yTyW1L_UaXspotw/%2Fforce.ipynb
-            style="background:none; border:none;" class="deepnote" target="force">
+            style="background:none; border:none;" target="force">
             <img
             src="https://deepnote.com/buttons/launch-in-deepnote-white.svg"></a></p>
     
@@ -484,7 +487,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
 
         <p><a
             href="https://deepnote.com/project/Ch-7-Force-Control-h9gETz6yTyW1L_UaXspotw/%2Fforce.ipynb
-            style="background:none; border:none;" class="deepnote" target="force">
+            style="background:none; border:none;" target="force">
             <img
             src="https://deepnote.com/buttons/launch-in-deepnote-white.svg"></a></p>
     
@@ -697,21 +700,26 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       \qquad v^C = \dot{p}^C = J(q) \dot{q}, \qquad a^C = \ddot{p}^C =
       J(q)\ddot{q} + \dot{J}(q) \dot{q}.\label{eq:kinematics}\end{equation} We
       haven't actually written the second derivative before, but it follows
-      naturally from the chain rule. Also, I've restricted this to the Cartesian positions; one can think about the orientation of the end-effector, but this requires some care in defining the 3D stiffness in orientation.</p>
+      naturally from the chain rule. Also, I've restricted this to the
+      Cartesian positions; one can think about the orientation of the
+      end-effector, but this requires some care in defining the 3D stiffness in
+      orientation.</p>
 
       <p>One of the big ideas from manipulator control is that we can actually
       write the dynamics of the robot in the frame $C$, by writing the joint
-      torques in terms of a spatial force command, $F^u$: $u = J^T(q) F^u$. By
-      substituting this and the manipulator equations (\ref{eq:manipulator})
-      into (\ref{eq:kinematics}) and assuming that the only external contacts
-      happen at $C$, we can write the dynamics: \begin{equation} M_C(q)
-      \ddot{p}^C + C_C(q,\dot{q})\dot{q} = {}^C F^{g}(q) + F^u + F^{ext}
-      \label{eq:cartesian_dynamics},\end{equation} where $$M_C = (J M^{-1}
-      J^T)^{-1}, \qquad C_C = M_C \left(J M^{-1} C+ \dot{J} \right),
-      \qquad {}^CF^g = M_C J M^{-1} \tau_g.$$  Now we can simply apply the
-      controller we used in joint space, e.g.: $$F^u = -{}^C F^{g}(q) +
-      K_p(p^{C_d} - p^C) + K_d(\dot{p}^{C_d} - \dot{p}^C) + F^{ff}.$$  Please
-      don't forget to add some terms to
+      torques in terms of a spatial force command, $F^u$: $u = J^T(q) F^u$.
+      This comes from the <a
+      href="https://ocw.mit.edu/courses/mechanical-engineering/2-12-introduction-to-robotics-fall-2005/lecture-notes/chapter6.pdf">principle
+      of virtual work</a>.  By substituting this and the manipulator equations
+      (\ref{eq:manipulator}) into (\ref{eq:kinematics}) and assuming that the
+      only external contacts happen at $C$, we can write the dynamics:
+      \begin{equation} M_C(q) \ddot{p}^C + C_C(q,\dot{q})\dot{q} = {}^C
+      F^{g}(q) + F^u + F^{ext} \label{eq:cartesian_dynamics},\end{equation}
+      where $$M_C = (J M^{-1} J^T)^{-1}, \qquad C_C = M_C \left(J M^{-1} C+
+      \dot{J} \right), \qquad {}^CF^g = M_C J M^{-1} \tau_g.$$  Now we can
+      simply apply the controller we used in joint space, e.g.: $$F^u = -{}^C
+      F^{g}(q) + K_p(p^{C_d} - p^C) + K_d(\dot{p}^{C_d} - \dot{p}^C) +
+      F^{ff}.$$  Please don't forget to add some terms to
       <a href="pick.html#joint_centering">stabilize the null space of your
       Jacobian</a> if necessary.</p>
 
