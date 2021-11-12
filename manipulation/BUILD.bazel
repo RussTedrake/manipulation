@@ -13,7 +13,6 @@ rt_py_library(
         "__init__.py",
         "jupyter_widgets.py",
         "meshcat_cpp_utils.py",
-        "meshcat_utils.py",
         "open3d_utils.py",
         "scenarios.py",
         "utils.py",

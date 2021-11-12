@@ -6,10 +6,10 @@ Open3D RGBD image representation.
 import matplotlib.pyplot as plt
 import numpy as np
 import open3d as o3d
-import meshcat
 
+from pydrake.all import Meshcat
 from manipulation.mustard_depth_camera_example import MustardExampleSystem
-from manipulation.meshcat_utils import draw_open3d_point_cloud
+from manipulation.meshcat_cpp_utils import draw_open3d_point_cloud
 from manipulation.open3d_utils import *
 
 system = MustardExampleSystem()
@@ -17,7 +17,7 @@ system = MustardExampleSystem()
 # Evaluate the camera output ports to get the images.
 context = system.CreateDefaultContext()
 
-v = meshcat.Visualizer()
+meshcat = Meshcat()
 
 for i in range(3):
     color_image = system.GetOutputPort(f"camera{i}_rgb_image").Eval(context)
@@ -34,6 +34,6 @@ for i in range(3):
 
     point_cloud = system.GetOutputPort(f"camera{i}_point_cloud").Eval(context)
     pcd = create_open3d_point_cloud(point_cloud)
-    draw_open3d_point_cloud(v[f"camera{i}_point_cloud"], pcd)
+    draw_open3d_point_cloud(meshcat, f"camera{i}_point_cloud", pcd)
 
 plt.show()
