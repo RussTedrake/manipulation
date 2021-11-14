@@ -18,6 +18,7 @@ rt_ipynb_test(
     deps = [
         "//manipulation",
         "//manipulation:mustard_depth_camera_example",
+        "//manipulation:scenarios",
         "//manipulation/exercises:grader",
         "//manipulation/exercises/segmentation:test_mask",
     ],

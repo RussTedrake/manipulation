@@ -41,7 +41,9 @@ def StartMeshcat(open_window=False):
         else:
             set_log_level(prev_log_level)
             web_url = f"https://{os.environ['DEEPNOTE_PROJECT_ID']}.deepnoteproject.com"  # noqa
-            print(f"Meshcat is now available at {web_url}")
+            display(
+                HTML('Meshcat is now available at '
+                     f'<a href="{web_url}">{web_url}</a>'))
             if open_window:
                 display(Javascript(f'window.open("{web_url}");'))
             return meshcat

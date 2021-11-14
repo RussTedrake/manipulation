@@ -22,5 +22,8 @@ rt_ipynb_test(
     srcs = ["qp_diff_ik.ipynb"],
     tags = ["requires-network"], # For gurobi
     data = ["//manipulation/models:two_link_iiwa14.urdf"],
-    deps = ["//manipulation"],
+    deps = [
+      "//manipulation",
+      "//manipulation:scenarios",
+    ],
 )

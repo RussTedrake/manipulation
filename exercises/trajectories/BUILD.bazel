@@ -12,6 +12,7 @@ rt_ipynb_test(
     tags = ["requires-network"], # For gurobi
     deps = [
         "//manipulation",
+        "//manipulation:scenarios",
         "//manipulation/exercises:grader",
         "//manipulation/exercises/trajectories:test_door_opening",
     ],

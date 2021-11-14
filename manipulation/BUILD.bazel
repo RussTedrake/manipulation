@@ -6,17 +6,44 @@
 
 load("//htmlbook/tools/python:defs.bzl", "rt_py_library", "rt_py_test")
 
-# TODO(russt): break these open so that the dependencies can be more narrow.
 rt_py_library(
     name = "manipulation",
     srcs = [
         "__init__.py",
-        "jupyter_widgets.py",
         "meshcat_cpp_utils.py",
-        "open3d_utils.py",
-        "scenarios.py",
         "utils.py",
     ],
+    imports = [".."],
+    visibility = ["//visibility:public"],
+)
+
+rt_py_library(
+    name = "gym",
+    srcs = ["gym.py"],
+    imports = [".."],
+    visibility = ["//visibility:public"],
+)
+
+rt_py_library(
+    name = "mustard_depth_camera_example",
+    srcs = ["mustard_depth_camera_example.py"],
+    imports = [".."],
+    visibility = ["//visibility:public"],
+    deps = [
+      "scenarios",
+    ],
+)
+
+rt_py_library(
+    name = "open3d_utils",
+    srcs = ["open3d_utils.py"],
+    imports = [".."],
+    visibility = ["//visibility:public"],
+)
+
+rt_py_library(
+    name = "scenarios",
+    srcs = ["scenarios.py"],
     imports = [".."],
     visibility = ["//visibility:public"],
 )
@@ -50,12 +77,8 @@ rt_py_test(
     deps = [
         "manipulation",
         "mustard_depth_camera_example",
+        "open3d_utils",
     ],
 )
 
-rt_py_library(
-    name = "mustard_depth_camera_example",
-    srcs = ["mustard_depth_camera_example.py"],
-    imports = [".."],
-    visibility = ["//visibility:public"],
-)
+

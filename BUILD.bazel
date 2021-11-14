@@ -60,7 +60,10 @@ rt_html_test(
 rt_ipynb_test(
     name = "pick",
     srcs = ["pick.ipynb"],
-    deps = ["//manipulation"],
+    deps = [
+      "//manipulation",
+      "//manipulation:scenarios",
+    ],
 )
 
 rt_html_test(
@@ -77,7 +80,10 @@ rt_ipynb_test(
         "@platforms//cpu:x86_64",
         "@platforms//os:linux",
     ],
-    deps = ["//manipulation"],
+    deps = [
+      "//manipulation",
+      "//manipulation:scenarios",
+    ],
 )
 
 rt_html_test(
@@ -97,6 +103,7 @@ rt_ipynb_test(
     deps = [
         "//manipulation",
         "//manipulation:mustard_depth_camera_example",
+        "//manipulation:open3d_utils",
     ],
 )
 
@@ -121,7 +128,10 @@ rt_ipynb_test(
     srcs = ["force.ipynb"],
     tags = ["requires-network"], # For gurobi
     data = ["//manipulation/models"],
-    deps = ["//manipulation"],
+    deps = [
+      "//manipulation",
+      "//manipulation:scenarios",
+    ],
 )
 
 rt_html_test(
@@ -132,7 +142,10 @@ rt_ipynb_test(
     name = "trajectories",
     srcs = ["trajectories.ipynb"],
     data = ["//manipulation/models"],
-    deps = ["//manipulation"],
+    deps = [
+      "//manipulation",
+      "//manipulation:scenarios",
+    ],
 )
 
 rt_html_test(
@@ -155,7 +168,10 @@ rt_ipynb_test(
     name = "manipulation_station",
     srcs = ["manipulation_station.ipynb"],
     data = ["//manipulation/models"],
-    deps = ["//manipulation"],
+    deps = [
+      "//manipulation",
+      "//manipulation:scenarios",
+    ],
 )
 
 filegroup(

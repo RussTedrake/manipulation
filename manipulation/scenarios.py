@@ -183,6 +183,39 @@ def AddShape(plant, shape, name, mass=1, mu=1, color=[.5, .5, .9, 1.0]):
     return instance
 
 
+def AddCamera(builder, scene_graph, X_WC, depth_camera=None, renderer=None):
+    """
+    Adds a RgbdSensor to to the scene_graph at (fixed) pose X_WC.  If
+    depth_camera is None, then a default camera info will be used.  If renderer
+    is None, then we will assume the name 'my_renderer', and create a VTK
+    renderer if a renderer of that name doesn't exist.
+    """
+    if not renderer:
+        renderer = "my_renderer"
+
+    if not scene_graph.HasRenderer(renderer):
+        scene_graph.AddRenderer(renderer,
+                                MakeRenderEngineVtk(RenderEngineVtkParams()))
+
+    if not depth_camera:
+        depth_camera = DepthRenderCamera(
+            RenderCameraCore(
+                renderer, CameraInfo(width=640, height=480, fov_y=np.pi / 4.0),
+                ClippingRange(near=0.1, far=10.0), RigidTransform()),
+            DepthRange(0.1, 10.0))
+
+    rgbd = builder.AddSystem(
+        RgbdSensor(parent_id=scene_graph.world_frame(),
+                   X_PB=X_WC,
+                   depth_camera=depth_camera,
+                   show_window=False))
+
+    builder.Connect(scene_graph.get_query_output_port(),
+                    rgbd.query_object_input_port())
+
+    return rgbd
+
+
 def AddRgbdSensors(builder,
                    plant,
                    scene_graph,
@@ -192,7 +225,7 @@ def AddRgbdSensors(builder,
                    renderer=None):
     """
     Adds a RgbdSensor to every body in the plant with a name starting with
-    body_prefix.  If camera_info is None, then a default camera info will be
+    body_prefix.  If depth_camera is None, then a default camera info will be
     used.  If renderer is None, then we will assume the name 'my_renderer', and
     create a VTK renderer if a renderer of that name doesn't exist.
     """

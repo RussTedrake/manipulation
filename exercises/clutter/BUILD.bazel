@@ -11,6 +11,7 @@ rt_ipynb_test(
     srcs = ["static_equilibrium.ipynb"],
     deps = [
         "//manipulation",
+        "//manipulation:scenarios",
     ],
 )
 
@@ -25,6 +26,8 @@ rt_ipynb_test(
     ],
     deps = [
         "//manipulation",
+        "//manipulation:open3d_utils",
+        "//manipulation:scenarios",
         "//manipulation:mustard_depth_camera_example",
         "//manipulation/exercises:grader",
         "//manipulation/exercises/clutter:test_normal",
@@ -55,6 +58,7 @@ rt_ipynb_test(
     ],
     deps = [
         "//manipulation",
+        "//manipulation:scenarios",
         "//manipulation/exercises:grader",
         "//manipulation/exercises/clutter:test_grasp_candidate",
     ],
