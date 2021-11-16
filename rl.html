@@ -57,7 +57,145 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
 <chapter style="counter-reset: chapter 8"><h1>Reinforcement Learning</h1>
   <div style="clear:right;"></div>
 
-  <p>This is a placeholder chapter. Content to be filled in.  In the mean time, I have some relevant notes <a href="http://underactuated.csail.mit.edu/rl_policy_search.html">here</a>.</p>
+  <p>These days, there is a lot of excitement around reinforcement learning
+  (RL), and a lot of literature available.  The scope of what one might
+  consider to be a reinforcement learning algorithm has also broaden
+  significantly. The classic (and now updated) and still best introduction to
+  RL is the book by Sutton and Barto <elib>Sutton18</elib> .  For a more
+  theoretical view, try <elib>Agarwal20b+Szepesvari10</elib>.  There
+  are some great online courses, as well: <a
+  href="http://web.stanford.edu/class/cs234/">Stanford CS234</a>, <a
+  href="https://rail.eecs.berkeley.edu/deeprlcourse/">Berkeley CS285</a>, <a
+  href="https://deepmind.com/learning-resources/-introduction-reinforcement-learning-david-silver">DeepMind
+  x UCL</a>.</p>
+
+  <p>My goal for this chapter is to provide enough of the fundamentals to get
+  us all on the same page, but to focus primarily on the RL ideas (and
+  examples) that are particularly relevant for manipulation.  And manipulation
+  is a great playground for RL, due to the need for rich perception, for
+  operating in diverse environments, and potentially with rich contact
+  mechanics.  Many of the core applied research results have been motivated by
+  and demonstrated on manipulation examples!</p>
+
+  <section><h1>RL Software</h1>
+  
+    <p>There are now a huge variety of RL toolboxes available online, with
+    widely varying levels of quality and sophistication.  But there is one
+    standard that has clearly won out as the default interface with which one
+    should wrap up their simulator in order to connect to a variety of RL
+    algorithms: the <a href="https://gym.openai.com/">OpenAI gym</a>.</p>
+
+    <p>It's worth taking a minute to appreciate the difference in the OpenAI
+    Gym <a href="https://gym.openai.com/docs/#environments">Environments</a>
+    (<code>gym.Env</code>) interface and the Drake System interface; I think it
+    is very telling.  My goal (in Drake), is to present you with a rich and
+    beautiful interface to express and optimize dynamical systems, to expose
+    and exploit all possible structure in the governing equations.  The goal in
+    Gym is to expose the absolute minimal details, so that it's possible to
+    easily wrap every possible system under the same common interface. Almost
+    by definition, you can wrap any Drake system as a Gym Environment; I have
+    examples of how to do it correctly <a href="<a
+    href="https://github.com/RobotLocomotion/drake/issues/15508">here</a>.  You
+    can also use any Gym environment in the Drake ecosystem; you just won't be
+    able to apply some of the more advanced algorithms that Drake provides.  Of
+    course, I think that you should use Drake for your work in RL, too (many
+    people do), because it provides the rich library of dynamical systems that
+    are rigorously authored and tested, and leaves open the option to put RL
+    approaches head-to-head against more model-based alternatives. I admit I
+    might be a little biased. At any rate, that's the approach we will take in
+    these notes.</p>
+    
+    <p>Some people <a
+    href="http://www.incompleteideas.net/IncIdeas/BitterLesson.html">might
+    argue</a> that the more thoughtfully you model your system, the more
+    assumptions you have baked in, making yourself susceptible to "sim2real"
+    gaps; but I think that's simply not the case.  Thoughtful modeling includes
+    making uncertainty models that can account for as narrow or broad of a
+    class of systems as we aim to explore; good things happen when we can make
+    the uncertainty models themselves <i>structured</i>. I think one of the
+    most fundamental challenges waiting for us at the intersection of
+    reinforcement learning and control deeper understanding of the class of
+    models that is rich enough to describe the diversity and richness of
+    problems we are exploring in manipulation (e.g. with RGB cameras as inputs)
+    while providing somewhat more structure that we can exploit with stronger
+    algorithms and still allowing them to continually expand and improve with
+    data.</p>  <todo>callout to intuitive physics chapter once it exists</todo>
+
+    <!-- another point: the RL approach has been successful in part because
+    it's easy.  approachable with less training, and as a result got more
+    people/funding put against it. that's super valuable.  controls as a field,
+    on the other hand, has made itself somewhat intentionally obscure, perhaps
+    partly out of arrogance.  that is perhaps the more bitter lesson.  -->
+
+    <p>The OpenAI Gym provides an interface for RL environments, but doesn't
+    provide the implementation of the actual RL algorithms.  There are a large
+    number of popular repositories for the algorithms, too.  As of this
+    writing, I would recommend <a
+    href="https://stable-baselines3.readthedocs.io/en/master/index.html">Stable
+    Baselines 3</a>: it provides a very nice and thoughfully-documented set of
+    implementations in PyTorch.</p>
+
+    <p>One other class of algorithms that is very relevant to RL but not
+    specifically designed for RL is algorithms for black-box optimization.  I
+    quite like <a
+    href="https://facebookresearch.github.io/nevergrad/">Nevergrad</a>, and
+    will also use that here.</p>
+  
+  </section>
+
+  <section><h1>Policy-gradient methods</h1>
+
+    <subsection><h1>Black-box optimization</h1>
+
+      <p></p>
+  
+    </subsection>
+  
+    <subsection><h1>Stochastic optimal control</h1>
+    
+    </subsection>
+
+    <subsection><h1>Using gradients of the policy, but not the environment</h1>
+    
+      <p>You can find more details on the derivation and some basic analysis of
+      these algorithms <a
+      href="http://underactuated.csail.mit.edu/rl_policy_search.html">here</a>.</p>
+    
+    </subsection>
+
+    <subsection><h1>REINFORCE, PPO, TRPO</h1>
+    
+    </subsection>
+
+    <subsection><h1>Control for manipulation should be easy</h1>
+    
+    
+      <p>This is a great time for theoretical RL + controls, with experts from
+      controls embracing new techniques and insights from machine learning, and
+      vice versa.  As a simple example, we've increasingly come to understand
+      that, even though the cost landscape for many classical control problems
+      (like the linear quadratic regulator) is not convex in the typical policy
+      parameters, we <a
+      href="http://underactuated.csail.mit.edu/policy_search.html">now
+      understand that gradient descent still works</a> for these problems
+      (there are no local minima), and the class of problems/parameterizations
+      for which we can make statements like this is growing rapidly.</p>
+    </subsection>
+
+
+  </section>
+
+  <section><h1>Value-based methods</h1>
+  
+  
+  
+  </section>
+
+  <section><h1>Model-based RL</h1>
+  
+    <todo>MPC with learned models, typically represented with a neural network.</todo>
+
+  </section>
 
   <section><h1>Exercises</h1>
     <exercise><h1>Stochastic Optimization</h1>
@@ -85,7 +223,30 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
 </chapter>
 <!-- EVERYTHING BELOW THIS LINE IS OVERWRITTEN BY THE INSTALL SCRIPT -->
 
-<div id="references"></div>
+<div id="references"><section><h1>References</h1>
+<ol>
+
+<li id=Sutton18>
+<span class="author">Richard S. Sutton and Andrew G. Barto</span>, 
+<span class="title">"Reinforcement Learning: An Introduction"</span>, MIT Press
+, <span class="year">2018</span>.
+
+</li><br>
+<li id=Agarwal20b>
+<span class="author">Alekh Agarwal and Nan Jiang and Sham M. Kakade and Wen Sun</span>, 
+<span class="title">"Reinforcement Learning: Theory and Algorithms"</span>, Online Draft
+, <span class="year">2020</span>.
+
+</li><br>
+<li id=Szepesvari10>
+<span class="author">Csaba Szepesvari</span>, 
+<span class="title">"Algorithms for Reinforcement Learning"</span>, Morgan and Claypool Publishers
+, <span class="year">2010</span>.
+
+</li><br>
+</ol>
+</section><p/>
+</div>
 
 <table style="width:100%;" pdf="no"><tr style="width:100%">
   <td style="width:33%;text-align:left;"><a class="previous_chapter" href=trajectories.html>Previous Chapter</a></td>
