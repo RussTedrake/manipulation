@@ -57,7 +57,9 @@ class Grader:
         ipynb = json.load(open(notebook_ipynb))
 
         for cell in ipynb['cells']:
-            # For now, clearOutputs is unsupported, so we filter out those lines
+            # clearOutput as an output type is not supported
+            # by nbformat.reads(). Therefore, filter out
+            # any output cells with the clearOutput warning
             if ('outputs' in cell.keys()):
                 if any('clearOutput' in line['output_type']
                        for line in cell['outputs']):
