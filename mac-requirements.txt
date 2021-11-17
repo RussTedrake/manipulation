@@ -84,8 +84,9 @@ nest-asyncio==1.5.1
     # via nbclient
 nevergrad==0.4.3.post9
     # via -r mac-requirements.in
-numpy==1.20.2
+numpy==1.21.1
     # via
+    #   -c htmlbook/mac-constraints.txt
     #   altair
     #   bayesian-optimization
     #   matplotlib
