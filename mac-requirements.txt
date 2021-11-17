@@ -30,14 +30,14 @@ entrypoints==0.3
     # via
     #   altair
     #   nbconvert
+fonttools==4.28.1
+    # via matplotlib
 gradescope-utils==0.4.0
     # via -r mac-requirements.in
 idna==2.10
     # via requests
 ipython-genutils==0.2.0
-    # via
-    #   nbformat
-    #   traitlets
+    # via nbformat
 jinja2==2.11.3
     # via
     #   altair
@@ -64,7 +64,7 @@ lxml==4.6.3
     # via -r htmlbook/mac-requirements.in
 markupsafe==1.1.1
     # via jinja2
-matplotlib==3.4.1
+matplotlib==3.5.0
     # via
     #   -r htmlbook/mac-requirements.in
     #   mpld3
@@ -97,7 +97,10 @@ numpy==1.20.2
     #   scipy
     #   torch
 packaging==20.9
-    # via bleach
+    # via
+    #   bleach
+    #   matplotlib
+    #   setuptools-scm
 pandas==1.2.2
     # via altair
 pandocfilters==1.4.3
@@ -145,6 +148,8 @@ scipy==1.7.2
     # via
     #   bayesian-optimization
     #   scikit-learn
+setuptools-scm==6.3.2
+    # via matplotlib
 six==1.15.0
     # via
     #   bleach
@@ -164,13 +169,15 @@ threadpoolctl==3.0.0
     # via scikit-learn
 timeout-decorator==0.5.0
     # via -r mac-requirements.in
+tomli==1.2.2
+    # via setuptools-scm
 toolz==0.11.1
     # via altair
 https://download.pytorch.org/whl/nightly/cpu/torch-1.9.0.dev20210218-cp39-none-macosx_10_9_x86_64.whl
     # via -r mac-requirements.in
 tornado==6.1
     # via jupyter-client
-traitlets==5.0.5
+traitlets==5.1.1
     # via
     #   jupyter-client
     #   jupyter-core
