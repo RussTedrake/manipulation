@@ -12,10 +12,14 @@ attrs==21.2.0
     # via jsonschema
 backcall==0.2.0
     # via ipython
+bayesian-optimization==1.2.0
+    # via nevergrad
 bleach==4.1.0
     # via nbconvert
 cffi==1.14.6
     # via argon2-cffi
+cma==3.1.0
+    # via nevergrad
 cycler==0.10.0
     # via matplotlib
 debugpy==1.4.3
@@ -55,6 +59,8 @@ jinja2==3.0.1
     #   mpld3
     #   nbconvert
     #   notebook
+joblib==1.1.0
+    # via scikit-learn
 jsonschema==3.2.0
     # via
     #   altair
@@ -106,6 +112,8 @@ nest-asyncio==1.5.1
     # via
     #   jupyter-client
     #   nbclient
+nevergrad==0.4.3.post9
+    # via -r focal-requirements.in
 notebook==6.4.4
     # via
     #   open3d
@@ -113,9 +121,13 @@ notebook==6.4.4
 numpy==1.21.1
     # via
     #   altair
+    #   bayesian-optimization
     #   matplotlib
+    #   nevergrad
     #   open3d
     #   pandas
+    #   scikit-learn
+    #   scipy
     #   torchvision
 open3d==0.10.0.0
     # via -r focal-requirements.in
@@ -177,6 +189,12 @@ pyzmq==22.3.0
     # via
     #   jupyter-client
     #   notebook
+scikit-learn==1.0.1
+    # via bayesian-optimization
+scipy==1.7.2
+    # via
+    #   bayesian-optimization
+    #   scikit-learn
 send2trash==1.8.0
     # via notebook
 six==1.16.0
@@ -195,6 +213,8 @@ terminado==0.12.1
     # via notebook
 testpath==0.5.0
     # via nbconvert
+threadpoolctl==3.0.0
+    # via scikit-learn
 timeout-decorator==0.5.0
     # via -r focal-requirements.in
 toolz==0.11.1
@@ -224,7 +244,9 @@ traitlets==5.1.0
     #   nbformat
     #   notebook
 typing-extensions==3.10.0.2
-    # via torch
+    # via
+    #   nevergrad
+    #   torch
 wcwidth==0.2.5
     # via prompt-toolkit
 webencodings==0.5.1

@@ -152,6 +152,15 @@ rt_html_test(
     srcs = ["rl.html"],
 )
 
+rt_ipynb_test(
+    name = "rl",
+    srcs = ["rl.ipynb"],
+    deps = [
+      "//manipulation",
+    ],
+)
+
+
 rt_html_test(
     srcs = ["drake.html"],
 )
