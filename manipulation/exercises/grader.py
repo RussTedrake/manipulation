@@ -57,11 +57,12 @@ class Grader:
         ipynb = json.load(open(notebook_ipynb))
 
         for cell in ipynb['cells']:
-            #For now, clearOutputs is unsupported, so we filter out those lines
+            # For now, clearOutputs is unsupported, so we filter out those lines
             if ('outputs' in cell.keys()):
-                if any('clearOutput' in line['output_type'] for line in cell['outputs']):
+                if any('clearOutput' in line['output_type']
+                       for line in cell['outputs']):
                     cell['outputs'] = []
-            
+
             # erase test cells, this is optional and useful for debugging
             # to avoid recursions when developing
             if any('## TEST ##' in line for line in cell['source']):
