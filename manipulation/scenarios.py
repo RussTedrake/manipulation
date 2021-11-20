@@ -4,13 +4,14 @@ experiments with less code.
 """
 import numpy as np
 import os
+import warnings
 
 import pydrake.all
 from pydrake.all import (AbstractValue, BaseField, ModelInstanceIndex,
                          DepthRenderCamera, RenderCameraCore, RgbdSensor,
                          CameraInfo, ClippingRange, DepthRange,
                          DepthImageToPointCloud, LeafSystem,
-                         MakeRenderEngineVtk, RenderEngineVtkParams, RgbdSensor,
+                         MakeRenderEngineVtk, RenderEngineVtkParams,
                          PrismaticJoint, BallRpyJoint, SpatialInertia)
 from pydrake.geometry import (Cylinder, GeometryInstance,
                               MakePhongIllustrationProperties)
@@ -184,14 +185,34 @@ def AddShape(plant, shape, name, mass=1, mu=1, color=[.5, .5, .9, 1.0]):
 
 
 def AddCamera(builder, scene_graph, X_WC, depth_camera=None, renderer=None):
+    warnings.warn("Please use AddRgbdSensor instead.",
+                  warnings.DeprecationWarning)
+    return AddRgbdSensor(builder, scene_graph, X_WC, depth_camera, renderer)
+
+
+def AddRgbdSensor(builder,
+                  scene_graph,
+                  X_PC,
+                  depth_camera=None,
+                  renderer=None,
+                  parent_frame_id=None):
     """
-    Adds a RgbdSensor to to the scene_graph at (fixed) pose X_WC.  If
-    depth_camera is None, then a default camera info will be used.  If renderer
-    is None, then we will assume the name 'my_renderer', and create a VTK
-    renderer if a renderer of that name doesn't exist.
+    Adds a RgbdSensor to to the scene_graph at (fixed) pose X_PC relative to
+    the parent_frame.  If depth_camera is None, then a default camera info will
+    be used.  If renderer is None, then we will assume the name 'my_renderer',
+    and create a VTK renderer if a renderer of that name doesn't exist.  If
+    parent_frame is None, then the world frame is used.
     """
+    if os.getenv("DISPLAY") is None:
+        from pyvirtualdisplay import Display
+        virtual_display = Display(visible=0, size=(1400, 900))
+        virtual_display.start()
+
     if not renderer:
         renderer = "my_renderer"
+
+    if not parent_frame_id:
+        parent_frame_id = scene_graph.world_frame_id()
 
     if not scene_graph.HasRenderer(renderer):
         scene_graph.AddRenderer(renderer,
@@ -205,8 +226,8 @@ def AddCamera(builder, scene_graph, X_WC, depth_camera=None, renderer=None):
             DepthRange(0.1, 10.0))
 
     rgbd = builder.AddSystem(
-        RgbdSensor(parent_id=scene_graph.world_frame(),
-                   X_PB=X_WC,
+        RgbdSensor(parent_id=parent_frame_id,
+                   X_PB=X_PC,
                    depth_camera=depth_camera,
                    show_window=False))
 
@@ -229,6 +250,11 @@ def AddRgbdSensors(builder,
     used.  If renderer is None, then we will assume the name 'my_renderer', and
     create a VTK renderer if a renderer of that name doesn't exist.
     """
+    if os.getenv("DISPLAY") is None:
+        from pyvirtualdisplay import Display
+        virtual_display = Display(visible=0, size=(1400, 900))
+        virtual_display.start()
+
     if not renderer:
         renderer = "my_renderer"
 

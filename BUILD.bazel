@@ -6,6 +6,7 @@
 
 load("//htmlbook/tools/html:defs.bzl", "rt_html_test")
 load("//htmlbook/tools/jupyter:defs.bzl", "rt_ipynb_test")
+load("//htmlbook/tools/python:defs.bzl", "rt_py_test")
 load("//htmlbook/tools/tidy:def.bzl", "html_tidy_test")
 
 exports_files(
@@ -119,6 +120,18 @@ rt_html_test(
 #    deps = ["//manipulation"],
 #    data = ["//data:clutter_maskrcnn_data"],
 #)
+
+rt_py_test(
+  name = "segmentation_data",
+    srcs = ["segmentation_data.py"],
+    data = ["//manipulation/models"],
+    args = ["--test"],
+    imports = [".."],
+    deps = [
+      "//manipulation",
+      "//manipulation:scenarios",
+    ],
+)
 
 rt_html_test(
     srcs = ["force.html"],
