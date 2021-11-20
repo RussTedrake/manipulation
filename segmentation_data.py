@@ -14,7 +14,6 @@ import numpy as np
 from PIL import Image
 import os
 import shutil
-from tqdm import tqdm
 import warnings
 
 from pydrake.all import (
@@ -144,6 +143,7 @@ if args.test or debug:
     for image_num in range(num_images):
         generate_image(image_num)
 else:
+    from tqdm import tqdm
     pool = multiprocessing.Pool(10)
     list(tqdm(pool.imap(generate_image, range(num_images)), total=num_images))
     pool.close()

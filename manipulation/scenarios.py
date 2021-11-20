@@ -4,6 +4,7 @@ experiments with less code.
 """
 import numpy as np
 import os
+import sys
 import warnings
 
 import pydrake.all
@@ -203,7 +204,7 @@ def AddRgbdSensor(builder,
     and create a VTK renderer if a renderer of that name doesn't exist.  If
     parent_frame is None, then the world frame is used.
     """
-    if os.getenv("DISPLAY") is None:
+    if sys.platform == "linux" and os.getenv("DISPLAY") is None:
         from pyvirtualdisplay import Display
         virtual_display = Display(visible=0, size=(1400, 900))
         virtual_display.start()
@@ -250,7 +251,7 @@ def AddRgbdSensors(builder,
     used.  If renderer is None, then we will assume the name 'my_renderer', and
     create a VTK renderer if a renderer of that name doesn't exist.
     """
-    if os.getenv("DISPLAY") is None:
+    if sys.platform == "linux" and os.getenv("DISPLAY") is None:
         from pyvirtualdisplay import Display
         virtual_display = Display(visible=0, size=(1400, 900))
         virtual_display.start()
