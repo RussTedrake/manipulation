@@ -1,0 +1,14 @@
+{
+  "python.linting.pylintEnabled": false,
+  "python.linting.pycodestyleEnabled": true,
+  "python.linting.enabled": true,
+  "jupyter.jupyterServerType": "local",
+  "search.exclude": {
+    "exercises/**": true
+  },
+  "files.watcherExclude": {
+    "**/Mathjax/**": true,
+    "bazel-*/**": true,
+    "data/**": true
+  }
+}
