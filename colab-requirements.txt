@@ -8,11 +8,20 @@ altair==4.1.0
     # via
     #   -c htmlbook/colab-constraints-colab.txt
     #   -r bionic-shared-requirements.in
+bayesian-optimization==1.2.0
+    # via nevergrad
 bleach==3.3.0
     # via
     #   -c htmlbook/colab-constraints-colab.txt
     #   -r bionic-shared-requirements.in
     #   nbconvert
+cloudpickle==1.3.0
+    # via
+    #   -c htmlbook/colab-constraints-colab.txt
+    #   gym
+    #   stable-baselines3
+cma==3.1.0
+    # via nevergrad
 cycler==0.10.0
     # via
     #   -c htmlbook/colab-constraints-colab.txt
@@ -33,8 +42,16 @@ entrypoints==0.3
     #   -c htmlbook/colab-constraints-colab.txt
     #   altair
     #   nbconvert
+future==0.16.0
+    # via
+    #   -c htmlbook/colab-constraints-colab.txt
+    #   pyglet
 gradescope-utils==0.4.0
     # via -r bionic-shared-requirements.in
+gym==0.17.3
+    # via
+    #   -c htmlbook/colab-constraints-colab.txt
+    #   stable-baselines3
 imageio==2.4.1
     # via
     #   -c htmlbook/colab-constraints-colab.txt
@@ -68,6 +85,10 @@ jinja2==2.11.3
     #   mpld3
     #   nbconvert
     #   notebook
+joblib==1.0.1
+    # via
+    #   -c htmlbook/colab-constraints-colab.txt
+    #   scikit-learn
 jsonschema==2.6.0
     # via
     #   -c htmlbook/colab-constraints-colab.txt
@@ -103,6 +124,7 @@ matplotlib==3.2.2
     #   mpld3
     #   open3d
     #   scikit-image
+    #   stable-baselines3
 mistune==0.8.4
     # via
     #   -c htmlbook/colab-constraints-colab.txt
@@ -123,6 +145,8 @@ networkx==2.5.1
     # via
     #   -c htmlbook/colab-constraints-colab.txt
     #   scikit-image
+nevergrad==0.4.3.post9
+    # via -r bionic-shared-requirements.in
 notebook==5.3.1
     # via
     #   -c htmlbook/colab-constraints-colab.txt
@@ -132,13 +156,19 @@ numpy==1.19.5
     # via
     #   -c htmlbook/colab-constraints-colab.txt
     #   altair
+    #   bayesian-optimization
+    #   gym
     #   imageio
     #   imgaug
     #   matplotlib
+    #   nevergrad
     #   open3d
     #   pandas
     #   pywavelets
+    #   scikit-learn
     #   scipy
+    #   stable-baselines3
+    #   torch
 open3d==0.10.0.0
     # via -r bionic-shared-requirements.in
 packaging==20.9
@@ -149,6 +179,7 @@ pandas==1.1.5
     # via
     #   -c htmlbook/colab-constraints-colab.txt
     #   altair
+    #   stable-baselines3
 pandocfilters==1.4.3
     # via
     #   -c htmlbook/colab-constraints-colab.txt
@@ -179,6 +210,10 @@ ptyprocess==0.7.0
     #   -c htmlbook/colab-constraints-colab.txt
     #   pexpect
     #   terminado
+pyglet==1.5.0
+    # via
+    #   -c htmlbook/colab-constraints-colab.txt
+    #   gym
 pygments==2.6.1
     # via
     #   -c htmlbook/colab-constraints-colab.txt
@@ -225,12 +260,19 @@ scikit-image==0.16.2
     # via
     #   -c htmlbook/colab-constraints-colab.txt
     #   imgaug
+scikit-learn==0.22.2.post1
+    # via
+    #   -c htmlbook/colab-constraints-colab.txt
+    #   bayesian-optimization
 scipy==1.5.3
     # via
     #   -c htmlbook/colab-constraints-colab.txt
     #   -r bionic-shared-requirements.in
+    #   bayesian-optimization
+    #   gym
     #   imgaug
     #   scikit-image
+    #   scikit-learn
 send2trash==1.5.0
     # via
     #   -c htmlbook/colab-constraints-colab.txt
@@ -249,6 +291,8 @@ six==1.15.0
     #   prompt-toolkit
     #   python-dateutil
     #   retrying
+stable-baselines3==1.3.0
+    # via -r bionic-shared-requirements.in
 terminado==0.10.0
     # via
     #   -c htmlbook/colab-constraints-colab.txt
@@ -263,6 +307,10 @@ toolz==0.11.1
     # via
     #   -c htmlbook/colab-constraints-colab.txt
     #   altair
+torch==1.8.1
+    # via
+    #   -c htmlbook/colab-constraints-colab.txt
+    #   stable-baselines3
 tornado==5.1.1
     # via
     #   -c htmlbook/colab-constraints-colab.txt
@@ -281,6 +329,11 @@ traitlets==5.0.5
     #   nbconvert
     #   nbformat
     #   notebook
+typing-extensions==3.7.4.3
+    # via
+    #   -c htmlbook/colab-constraints-colab.txt
+    #   nevergrad
+    #   torch
 wcwidth==0.2.5
     # via
     #   -c htmlbook/colab-constraints-colab.txt
