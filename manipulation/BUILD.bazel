@@ -49,6 +49,17 @@ rt_py_library(
 )
 
 rt_py_test(
+    name = "test_gym",
+    srcs = ["test/test_gym.py"],
+    imports = [".."],
+    deps = [
+      "gym",
+      "manipulation",
+      "scenarios",
+    ],
+)
+
+rt_py_test(
     name = "test_meshcat_utils",
     srcs = ["test/test_meshcat_utils.py"],
     tags = ["requires-network"], # For gurobi

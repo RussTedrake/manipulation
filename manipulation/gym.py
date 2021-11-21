@@ -2,11 +2,20 @@
 
 import gym
 import numpy as np
+from typing import Callable, Union
 
 from pydrake.common import RandomGenerator
 from pydrake.systems.sensors import ImageRgba8U
-from pydrake.systems.framework import (InputPort, EventStatus, OutputPort,
-                                       PortDataType)
+from pydrake.systems.framework import (
+    Context,
+    InputPort,
+    InputPortIndex,
+    EventStatus,
+    OutputPort,
+    OutputPortIndex,
+    PortDataType,
+    System,
+)
 from pydrake.systems.analysis import Simulator
 
 
@@ -17,20 +26,22 @@ class DrakeGymEnv(gym.Env):
     """
 
     def __init__(self,
-                 system,
-                 time_step,
-                 reward_callback_or_port,
-                 action_port=None,
-                 action_space=None,
-                 observation_port=None,
-                 observation_space=None,
-                 render_rgb_port=None):
+                 simulator: Union[Simulator, Callable[[RandomGenerator],
+                                                      Simulator]],
+                 time_step: float,
+                 action_space: gym.spaces.space,
+                 observation_space: gym.spaces.space,
+                 reward: Union[Callable[[System, Context], float],
+                               OutputPortIndex, str],
+                 action_port_id: Union[InputPort, InputPortIndex, str] = None,
+                 observation_port_id: Union[OutputPortIndex, str] = None,
+                 render_rgb_port_id: Union[OutputPortIndex, str] = None):
         """
         Args:
             system: A Drake System
             time_step: Each call to step() will advance the simulator by
                 `time_step` seconds.
-            reward_callback_or_port: The reward can be specified in one of two
+            reward: The reward can be specified in one of two
                 ways: (1) by passing a callable with the signature
                 `value = reward(context)` or (2) by passing a scalar
                 vector-valued output port of `system`.
@@ -67,82 +78,100 @@ class DrakeGymEnv(gym.Env):
         - You may additionally wish to directly set `env.reward_range` and/or
           `env.spec`.  See the docs for gym.Env for more details.
         """
-        self.system = system
+        if isinstance(simulator, Simulator):
+            self.simulator = simulator
+            self.make_simulator = None
+        elif callable(simulator):
+            self.simulator = None
+            self.make_simulator = simulator
+        else:
+            raise ValueError("Invalid simulator argument")
+
+        assert time_step > 0
         self.time_step = time_step
-        self.simulator = Simulator(self.system)
-        self.generator = RandomGenerator()
 
-        # Setup rewards
-        if isinstance(reward_callback_or_port, OutputPort):
-            assert reward_callback_or_port.get_datatype(
-            ) == PortDataType.kVectorValued
-            assert reward_callback_or_port.size() == 1
-            self.reward = lambda context: reward_callback_or_port.Eval(context)[
-                0]
-        else:
-            assert callable(reward_callback_or_port)
-            self.reward = reward_callback_or_port
+        assert isinstance(action_space, gym.spaces.Space)
+        self.action_space = action_space
 
-        # Setup actions (resorting to defaults whenever possible)
-        if action_port:
-            assert isinstance(action_port, InputPort)
-            self.action_port = action_port
-        else:
-            self.action_port = system.get_input_port(0)
-        if action_space:
-            self.action_space = action_space
-            if self.action_port.get_data_type() == PortDataType.kVectorValued:
-                assert np.array_equal(self.action_space.shape,
-                                      [self.action_port.size()])
-        elif self.action_port.get_data_type() == PortDataType.kVectorValued:
-            # TODO(russt): Is this helpful, or is it better to force people to
-            # specify a bounded box?
-            num_actions = self.action_port.size()
-            self.action_space = gym.spaces.Box(low=np.full((num_actions),
-                                                           -np.inf),
-                                               high=np.full((num_actions),
-                                                            np.inf))
-        else:
-            raise ValueError(
-                "Could not infer the action space from your action port; "
-                "please pass in the action_space argument.")
+        assert isinstance(observation_space, gym.spaces.Space)
+        self.observation_space = observation_space
 
-        # Setup observations (resorting to defaults whenever possible)
-        if observation_port:
-            assert isinstance(observation_port, OutputPort)
-            self.observation_port = observation_port
+        if isinstance(reward, (OutputPortIndex, str)):
+            self.reward_port_id = reward
+            self.reward = None
+        elif callable(reward):
+            self.reward_port_id = None
+            self.reward = reward
         else:
-            self.observation_port = system.get_output_port(0)
-        if observation_space:
-            self.observation_space = observation_space
-            if self.observation_port.get_data_type() == \
-                    PortDataType.kVectorValued:
-                assert np.array_equal(self.observation_space.shape,
-                                      [self.observation_port.size()])
-        elif self.observation_port.get_data_type() == \
-                PortDataType.kVectorValued:
-            num_obs = self.observation_port.size()
-            self.observation_space = gym.spaces.Box(low=np.full((num_obs),
-                                                                -np.inf),
-                                                    high=np.full((num_obs),
-                                                                 np.inf))
+            raise ValueError("Invalid reward argument")
+
+        if action_port_id:
+            assert isinstance(action_port, (InputPortIndex, str))
+            self.action_port_id = action_port
         else:
-            raise ValueError(
-                "Could not infer the observation space from your "
-                "observation port; please pass in the observation_space "
-                "argument.")
+            self.action_port_id = InputPortIndex(0)
+
+        if observation_port_id:
+            assert isinstance(observation_port_id, (OutputPortIndex, str))
+            self.observation_port_id = observation_port_id
+        else:
+            self.observation_port_id = OutputPortIndex(0)
 
         self.metadata['render.modes'] = ['human', 'ascii']
 
         # (Maybe) setup rendering
-        if render_rgb_port:
-            assert isinstance(render_rgb_port, OutputPort)
-            assert render_rgb_port.get_data_type() == \
-                PortDataType.kAbstractValued
-            assert isinstance(render_rgb_port.Allocate().get_value(),
-                              ImageRgba8U)
+        if render_rgb_port_id:
+            assert isinstance(render_rgb_port_id, (OutputPortIndex, str))
             self.metadata['render.modes'].append('rgb_array')
-        self.render_rgb_port = render_rgb_port
+        self.render_rgb_port_id = render_rgb_port_id
+
+        self.generator = RandomGenerator()
+
+        if self.simulator:
+            self._setup()
+
+    def _setup(self):
+        """Completes the setup once we have a self.simulator."""
+        system = self.simulator.get_system()
+
+        # Setup action port
+        if self.action_port_id:
+            if isinstance(self.action_port_id, InputPortIndex):
+                self.action_port = system.get_input_port(self.action_port_id)
+            else:
+                self.action_port = system.GetInputPort(self.action_port_id)
+        if self.action_port.get_data_type() == PortDataType.kVectorValued:
+            assert np.array_equal(self.action_space.shape,
+                                  [self.action_port.size()])
+
+        def get_output_port(id):
+            if isinstance(id, OutputPortIndex):
+                return system.get_output_port(id)
+            return system.GetOutputPort(id)
+
+        # Setup observation port
+        if self.observation_port_id:
+            self.observation_port = get_output_port(self.observation_port_id)
+        if self.observation_port.get_data_type() == PortDataType.kVectorValued:
+            assert np.array_equal(self.observation_space.shape,
+                                  [self.observation_port.size()])
+
+        # Note: We require that there is no direct feedthrough action_port to
+        # observation_port.  Unfortunately, HasDirectFeedthrough returns false
+        # positives, and would produce noisy warnings.
+
+        # Setup reward
+        if self.reward_port_id:
+            reward_port = get_output_port(self.reward_port_id)
+            self.reward = lambda system, context: reward_port.Eval(context)[0]
+
+        # (Maybe) setup rendering port
+        if self.render_rgb_port_id:
+            self.render_rgb_port = get_output_port(self.render_rgb_port_id)
+            assert self.render_rgb_port.get_data_type() == \
+                PortDataType.kAbstractValued
+            assert isinstance(self.render_rgb_port.Allocate().get_value(),
+                              ImageRgba8U)
 
     def step(self, action):
         """
@@ -152,6 +181,8 @@ class DrakeGymEnv(gym.Env):
         Args:
             action: an element from self.action_space
         """
+        assert self.simulator, "You must call reset() first"
+
         context = self.simulator.get_context()
         time = context.get_time()
 
@@ -159,7 +190,7 @@ class DrakeGymEnv(gym.Env):
         self.simulator.AdvanceTo(time + self.time_step)
 
         observation = self.observation_port.Eval(context)
-        reward = self.reward(context)
+        reward = self.reward(self.simulator.get_system(), context)
         done = False
         monitor = self.simulator.get_monitor()
         if monitor:
@@ -171,9 +202,17 @@ class DrakeGymEnv(gym.Env):
         return observation, reward, done, info
 
     def reset(self):
-        """Resets the `simulator` and its Context."""
+        """
+        If a callable "simulator factory" was passed to the constructor, then a
+        new simulator is created.  Otherwise this method simply resets the
+        `simulator` and its Context.
+        """
+        if self.make_simulator:
+            self.simulator = self.make_simulator(generator)
+            self._setup()
+
         context = self.simulator.get_mutable_context()
-        self.system.SetRandomContext(context, self.generator)
+        self.simulator.get_system().SetRandomContext(context, self.generator)
         self.simulator.Initialize()
         # Note: The output port will be evaluated without fixing the input port.
         return self.observation_port.Eval(context)
@@ -181,7 +220,7 @@ class DrakeGymEnv(gym.Env):
     def render(self, mode='human'):
         """
         Rendering in `human` mode is accomplished by calling Publish on
-        `self.system`.  This should cause visualizers inside the System (e.g.
+        `system`.  This should cause visualizers inside the System (e.g.
         MeshcatVisualizer, PlanarSceneGraphVisualizer, etc.) to draw their
         outputs.  To be fully compliant, those visualizers should set their
         default publishing period to `np.inf` (do not publish periodically).
@@ -191,8 +230,10 @@ class DrakeGymEnv(gym.Env):
         Rendering in `rgb_array` mode is enabled by passing a compatible
         `render_rgb_port` to the class constructor.
         """
+        assert self.simulator, "You must call reset() first"
+
         if mode == 'human':
-            self.system.Publish(self.simulator.get_context())
+            system.Publish(self.simulator.get_context())
             return
         elif mode == 'ansi':
             return __repr__(self.simulator.get_context())
