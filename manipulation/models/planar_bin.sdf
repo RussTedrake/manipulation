@@ -3,7 +3,7 @@
   <model name="bin_model">
     <!--
     Axes:
-      +X - Pointing towards front (slope)
+      +X - Pointing towards the front (open)
       +Y - Pointing to left side
       +Z - Up
     Origin:

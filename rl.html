@@ -92,7 +92,8 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
     beautiful interface to express and optimize dynamical systems, to expose
     and exploit all possible structure in the governing equations.  The goal in
     Gym is to expose the absolute minimal details, so that it's possible to
-    easily wrap every possible system under the same common interface. Almost
+    easily wrap every possible system under the same common interface (it doesn't matter if it's a robot, an Atari game, or
+    even a <a href="https://github.com/facebookresearch/CompilerGym">compiler</a>). Almost
     by definition, you can wrap any Drake system as a Gym Environment; I have
     examples of how to do it correctly <a href="<a
     href="https://github.com/RobotLocomotion/drake/issues/15508">here</a>.  You
@@ -135,15 +136,34 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
     Baselines 3</a>: it provides a very nice and thoughfully-documented set of
     implementations in PyTorch.</p>
 
+    <!--
+      - the env interface is now standard, but the policy interface is not.
+        everyone rolls their own, and mostly assumes nn.Module as a base class.
+      - SB3 lets you define a custom "policy" (actually policy + value func),
+        but doesn't currently support dynamic policies (LSTM was removed at
+        some point; hopefully it will come back)
+      - I really dislike that the notion of value function and Q function are
+        applied directly to observations.  (In SB3, but most other packages,
+        too).  That's bad form.
+      -->
+
+
     <p>One other class of algorithms that is very relevant to RL but not
     specifically designed for RL is algorithms for black-box optimization.  I
     quite like <a
     href="https://facebookresearch.github.io/nevergrad/">Nevergrad</a>, and
     will also use that here.</p>
+
+    <!-- We have some relevant nevergrad <=> drake (e.g. mathematicalprogram)
+        code in anzu. -->
   
   </section>
 
   <section><h1>Policy-gradient methods</h1>
+
+    <!-- Note: I have code for the plate pickup in
+    Dropbox/notebooks/low_dof_plate_pick_experimentation and in Google
+    Drive/Colab notebook/Plate pickup.ipynb -->
 
     <subsection><h1>Black-box optimization</h1>
 

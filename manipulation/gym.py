@@ -10,13 +10,12 @@ from pydrake.systems.framework import (
     Context,
     InputPort,
     InputPortIndex,
-    EventStatus,
     OutputPort,
     OutputPortIndex,
     PortDataType,
     System,
 )
-from pydrake.systems.analysis import Simulator
+from pydrake.systems.analysis import Simulator, SimulatorStatus
 
 
 class DrakeGymEnv(gym.Env):
@@ -106,8 +105,8 @@ class DrakeGymEnv(gym.Env):
             raise ValueError("Invalid reward argument")
 
         if action_port_id:
-            assert isinstance(action_port, (InputPortIndex, str))
-            self.action_port_id = action_port
+            assert isinstance(action_port_id, (InputPortIndex, str))
+            self.action_port_id = action_port_id
         else:
             self.action_port_id = InputPortIndex(0)
 
@@ -187,16 +186,12 @@ class DrakeGymEnv(gym.Env):
         time = context.get_time()
 
         self.action_port.FixValue(context, action)
-        self.simulator.AdvanceTo(time + self.time_step)
+        status = self.simulator.AdvanceTo(time + self.time_step)
 
         observation = self.observation_port.Eval(context)
         reward = self.reward(self.simulator.get_system(), context)
-        done = False
-        monitor = self.simulator.get_monitor()
-        if monitor:
-            status = monitor(context)
-            done = status == EventStatus.kReachedTermination or \
-                status == EventStatus.kFailed
+        done = status.reason() == \
+            SimulatorStatus.ReturnReason.kReachedTerminationCondition
         info = dict()
 
         return observation, reward, done, info
@@ -212,6 +207,7 @@ class DrakeGymEnv(gym.Env):
             self._setup()
 
         context = self.simulator.get_mutable_context()
+        context.SetTime(0)
         self.simulator.get_system().SetRandomContext(context, self.generator)
         self.simulator.Initialize()
         # Note: The output port will be evaluated without fixing the input port.
@@ -233,7 +229,7 @@ class DrakeGymEnv(gym.Env):
         assert self.simulator, "You must call reset() first"
 
         if mode == 'human':
-            system.Publish(self.simulator.get_context())
+            self.simulator.get_system().Publish(self.simulator.get_context())
             return
         elif mode == 'ansi':
             return __repr__(self.simulator.get_context())
