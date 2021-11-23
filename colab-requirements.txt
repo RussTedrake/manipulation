@@ -4,25 +4,42 @@
 #
 #    pip-compile colab-requirements.in
 #
+absl-py==0.12.0
+    # via
+    #   -c htmlbook/colab-constraints-colab.txt
+    #   tensorboard
 altair==4.1.0
     # via
     #   -c htmlbook/colab-constraints-colab.txt
     #   -r bionic-shared-requirements.in
 bayesian-optimization==1.2.0
     # via nevergrad
-bleach==3.3.0
+bleach==4.1.0
     # via
     #   -c htmlbook/colab-constraints-colab.txt
     #   -r bionic-shared-requirements.in
     #   nbconvert
-cloudpickle==1.3.0
+cachetools==4.2.4
     # via
     #   -c htmlbook/colab-constraints-colab.txt
+    #   google-auth
+certifi==2021.10.8
+    # via
+    #   -c htmlbook/colab-constraints-colab.txt
+    #   requests
+chardet==3.0.4
+    # via
+    #   -c htmlbook/colab-constraints-colab.txt
+    #   requests
+cloudpickle==1.6.0
+    # via
+    #   -c htmlbook/colab-constraints-colab.txt
+    #   -r bionic-shared-requirements.in
     #   gym
     #   stable-baselines3
 cma==3.1.0
     # via nevergrad
-cycler==0.10.0
+cycler==0.11.0
     # via
     #   -c htmlbook/colab-constraints-colab.txt
     #   matplotlib
@@ -30,7 +47,6 @@ decorator==4.4.2
     # via
     #   -c htmlbook/colab-constraints-colab.txt
     #   ipython
-    #   networkx
 defusedxml==0.7.1
     # via
     #   -c htmlbook/colab-constraints-colab.txt
@@ -46,18 +62,39 @@ future==0.16.0
     # via
     #   -c htmlbook/colab-constraints-colab.txt
     #   pyglet
+google-auth-oauthlib==0.4.6
+    # via
+    #   -c htmlbook/colab-constraints-colab.txt
+    #   tensorboard
+google-auth==1.35.0
+    # via
+    #   -c htmlbook/colab-constraints-colab.txt
+    #   google-auth-oauthlib
+    #   tensorboard
 gradescope-utils==0.4.0
     # via -r bionic-shared-requirements.in
+grpcio==1.42.0
+    # via
+    #   -c htmlbook/colab-constraints-colab.txt
+    #   tensorboard
 gym==0.17.3
     # via
     #   -c htmlbook/colab-constraints-colab.txt
     #   stable-baselines3
+idna==2.10
+    # via
+    #   -c htmlbook/colab-constraints-colab.txt
+    #   requests
 imageio==2.4.1
     # via
     #   -c htmlbook/colab-constraints-colab.txt
     #   scikit-image
 imgaug==0.2.6
     # via -r colab-requirements.in
+importlib-metadata==4.8.2
+    # via
+    #   -c htmlbook/colab-constraints-colab.txt
+    #   markdown
 ipykernel==4.10.1
     # via
     #   -c htmlbook/colab-constraints-colab.txt
@@ -66,15 +103,15 @@ ipykernel==4.10.1
 ipython-genutils==0.2.0
     # via
     #   -c htmlbook/colab-constraints-colab.txt
+    #   ipywidgets
     #   nbformat
     #   notebook
-    #   traitlets
 ipython==5.5.0
     # via
     #   -c htmlbook/colab-constraints-colab.txt
     #   ipykernel
     #   ipywidgets
-ipywidgets==7.6.3
+ipywidgets==7.6.5
     # via
     #   -c htmlbook/colab-constraints-colab.txt
     #   open3d
@@ -85,7 +122,7 @@ jinja2==2.11.3
     #   mpld3
     #   nbconvert
     #   notebook
-joblib==1.0.1
+joblib==1.1.0
     # via
     #   -c htmlbook/colab-constraints-colab.txt
     #   scikit-learn
@@ -99,21 +136,25 @@ jupyter-client==5.3.5
     #   -c htmlbook/colab-constraints-colab.txt
     #   ipykernel
     #   notebook
-jupyter-core==4.7.1
+jupyter-core==4.9.1
     # via
     #   -c htmlbook/colab-constraints-colab.txt
     #   jupyter-client
     #   nbconvert
     #   nbformat
     #   notebook
-jupyterlab-widgets==1.0.0
+jupyterlab-widgets==1.0.2
     # via
     #   -c htmlbook/colab-constraints-colab.txt
     #   ipywidgets
-kiwisolver==1.3.1
+kiwisolver==1.3.2
     # via
     #   -c htmlbook/colab-constraints-colab.txt
     #   matplotlib
+markdown==3.3.6
+    # via
+    #   -c htmlbook/colab-constraints-colab.txt
+    #   tensorboard
 markupsafe==2.0.1
     # via
     #   -c htmlbook/colab-constraints-colab.txt
@@ -141,7 +182,7 @@ nbformat==5.1.3
     #   ipywidgets
     #   nbconvert
     #   notebook
-networkx==2.5.1
+networkx==2.6.3
     # via
     #   -c htmlbook/colab-constraints-colab.txt
     #   scikit-image
@@ -165,13 +206,20 @@ numpy==1.19.5
     #   open3d
     #   pandas
     #   pywavelets
+    #   scikit-image
     #   scikit-learn
     #   scipy
     #   stable-baselines3
+    #   tensorboard
+    #   tifffile
     #   torch
+oauthlib==3.1.1
+    # via
+    #   -c htmlbook/colab-constraints-colab.txt
+    #   requests-oauthlib
 open3d==0.10.0.0
     # via -r bionic-shared-requirements.in
-packaging==20.9
+packaging==21.3
     # via
     #   -c htmlbook/colab-constraints-colab.txt
     #   bleach
@@ -180,7 +228,7 @@ pandas==1.1.5
     #   -c htmlbook/colab-constraints-colab.txt
     #   altair
     #   stable-baselines3
-pandocfilters==1.4.3
+pandocfilters==1.5.0
     # via
     #   -c htmlbook/colab-constraints-colab.txt
     #   nbconvert
@@ -205,11 +253,24 @@ prompt-toolkit==1.0.18
     # via
     #   -c htmlbook/colab-constraints-colab.txt
     #   ipython
+protobuf==3.17.3
+    # via
+    #   -c htmlbook/colab-constraints-colab.txt
+    #   tensorboard
 ptyprocess==0.7.0
     # via
     #   -c htmlbook/colab-constraints-colab.txt
     #   pexpect
     #   terminado
+pyasn1-modules==0.2.8
+    # via
+    #   -c htmlbook/colab-constraints-colab.txt
+    #   google-auth
+pyasn1==0.4.8
+    # via
+    #   -c htmlbook/colab-constraints-colab.txt
+    #   pyasn1-modules
+    #   rsa
 pyglet==1.5.0
     # via
     #   -c htmlbook/colab-constraints-colab.txt
@@ -223,12 +284,12 @@ pymcubes==0.1.2
     # via -r bionic-shared-requirements.in
 pyngrok==5.0.2
     # via -r colab-requirements.in
-pyparsing==2.4.7
+pyparsing==3.0.6
     # via
     #   -c htmlbook/colab-constraints-colab.txt
     #   matplotlib
     #   packaging
-python-dateutil==2.8.1
+python-dateutil==2.8.2
     # via
     #   -c htmlbook/colab-constraints-colab.txt
     #   jupyter-client
@@ -240,7 +301,7 @@ pytz==2018.9
     #   pandas
 pyvirtualdisplay==1.3.2
     # via -r colab-requirements.in
-pywavelets==1.1.1
+pywavelets==1.2.0
     # via
     #   -c htmlbook/colab-constraints-colab.txt
     #   scikit-image
@@ -248,19 +309,32 @@ pyyaml==3.13
     # via
     #   -c htmlbook/colab-constraints-colab.txt
     #   pyngrok
-pyzmq==22.0.3
+pyzmq==22.3.0
     # via
     #   -c htmlbook/colab-constraints-colab.txt
     #   jupyter-client
+requests-oauthlib==1.3.0
+    # via
+    #   -c htmlbook/colab-constraints-colab.txt
+    #   google-auth-oauthlib
+requests==2.23.0
+    # via
+    #   -c htmlbook/colab-constraints-colab.txt
+    #   requests-oauthlib
+    #   tensorboard
 retrying==1.3.3
     # via
     #   -c htmlbook/colab-constraints-colab.txt
     #   plotly
-scikit-image==0.16.2
+rsa==4.7.2
+    # via
+    #   -c htmlbook/colab-constraints-colab.txt
+    #   google-auth
+scikit-image==0.18.3
     # via
     #   -c htmlbook/colab-constraints-colab.txt
     #   imgaug
-scikit-learn==0.22.2.post1
+scikit-learn==1.0.1
     # via
     #   -c htmlbook/colab-constraints-colab.txt
     #   bayesian-optimization
@@ -273,7 +347,7 @@ scipy==1.5.3
     #   imgaug
     #   scikit-image
     #   scikit-learn
-send2trash==1.5.0
+send2trash==1.8.0
     # via
     #   -c htmlbook/colab-constraints-colab.txt
     #   notebook
@@ -284,16 +358,31 @@ simplegeneric==0.8.1
 six==1.15.0
     # via
     #   -c htmlbook/colab-constraints-colab.txt
+    #   absl-py
     #   bleach
-    #   cycler
+    #   google-auth
+    #   grpcio
     #   imgaug
     #   plotly
     #   prompt-toolkit
+    #   protobuf
     #   python-dateutil
     #   retrying
 stable-baselines3==1.3.0
     # via -r bionic-shared-requirements.in
-terminado==0.10.0
+tensorboard-data-server==0.6.1
+    # via
+    #   -c htmlbook/colab-constraints-colab.txt
+    #   tensorboard
+tensorboard-plugin-wit==1.8.0
+    # via
+    #   -c htmlbook/colab-constraints-colab.txt
+    #   tensorboard
+tensorboard==2.7.0
+    # via
+    #   -c htmlbook/colab-constraints-colab.txt
+    #   -r bionic-shared-requirements.in
+terminado==0.12.1
     # via
     #   -c htmlbook/colab-constraints-colab.txt
     #   notebook
@@ -301,16 +390,22 @@ testpath==0.5.0
     # via
     #   -c htmlbook/colab-constraints-colab.txt
     #   nbconvert
+threadpoolctl==3.0.0
+    # via
+    #   -c htmlbook/colab-constraints-colab.txt
+    #   scikit-learn
+tifffile==2021.11.2
+    # via
+    #   -c htmlbook/colab-constraints-colab.txt
+    #   scikit-image
 timeout-decorator==0.5.0
     # via -r bionic-shared-requirements.in
-toolz==0.11.1
+toolz==0.11.2
     # via
     #   -c htmlbook/colab-constraints-colab.txt
     #   altair
 torch==1.8.1
-    # via
-    #   -c htmlbook/colab-constraints-colab.txt
-    #   stable-baselines3
+    # via stable-baselines3
 tornado==5.1.1
     # via
     #   -c htmlbook/colab-constraints-colab.txt
@@ -318,7 +413,7 @@ tornado==5.1.1
     #   jupyter-client
     #   notebook
     #   terminado
-traitlets==5.0.5
+traitlets==5.1.1
     # via
     #   -c htmlbook/colab-constraints-colab.txt
     #   ipykernel
@@ -329,11 +424,16 @@ traitlets==5.0.5
     #   nbconvert
     #   nbformat
     #   notebook
-typing-extensions==3.7.4.3
+typing-extensions==3.10.0.2
     # via
     #   -c htmlbook/colab-constraints-colab.txt
+    #   importlib-metadata
     #   nevergrad
     #   torch
+urllib3==1.24.3
+    # via
+    #   -c htmlbook/colab-constraints-colab.txt
+    #   requests
 wcwidth==0.2.5
     # via
     #   -c htmlbook/colab-constraints-colab.txt
@@ -342,11 +442,21 @@ webencodings==0.5.1
     # via
     #   -c htmlbook/colab-constraints-colab.txt
     #   bleach
-widgetsnbextension==3.5.1
+werkzeug==1.0.1
+    # via
+    #   -c htmlbook/colab-constraints-colab.txt
+    #   tensorboard
+wheel==0.37.0
+    # via tensorboard
+widgetsnbextension==3.5.2
     # via
     #   -c htmlbook/colab-constraints-colab.txt
     #   ipywidgets
     #   open3d
+zipp==3.6.0
+    # via
+    #   -c htmlbook/colab-constraints-colab.txt
+    #   importlib-metadata
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools

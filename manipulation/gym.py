@@ -3,6 +3,7 @@
 import gym
 import numpy as np
 from typing import Callable, Union
+import warnings
 
 from pydrake.common import RandomGenerator
 from pydrake.systems.sensors import ImageRgba8U
@@ -186,11 +187,20 @@ class DrakeGymEnv(gym.Env):
         time = context.get_time()
 
         self.action_port.FixValue(context, action)
-        status = self.simulator.AdvanceTo(time + self.time_step)
+        catch = False
+        try:
+            status = self.simulator.AdvanceTo(time + self.time_step)
+        except RuntimeError as e:
+            if "MultibodyPlant's discrete update solver failed to converge" \
+                    not in e.args[0]:
+                raise
+            warnings.warn("Calling Done after catching RuntimeError:")
+            warnings.warn(e.args[0])
+            catch = True
 
         observation = self.observation_port.Eval(context)
         reward = self.reward(self.simulator.get_system(), context)
-        done = status.reason() == \
+        done = catch or status.reason() == \
             SimulatorStatus.ReturnReason.kReachedTerminationCondition
         info = dict()
 
@@ -203,7 +213,7 @@ class DrakeGymEnv(gym.Env):
         `simulator` and its Context.
         """
         if self.make_simulator:
-            self.simulator = self.make_simulator(generator)
+            self.simulator = self.make_simulator(self.generator)
             self._setup()
 
         context = self.simulator.get_mutable_context()
@@ -211,7 +221,8 @@ class DrakeGymEnv(gym.Env):
         self.simulator.get_system().SetRandomContext(context, self.generator)
         self.simulator.Initialize()
         # Note: The output port will be evaluated without fixing the input port.
-        return self.observation_port.Eval(context)
+        observations = self.observation_port.Eval(context)
+        return observations
 
     def render(self, mode='human'):
         """

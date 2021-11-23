@@ -20,7 +20,7 @@ certifi==2020.12.5
     # via requests
 chardet==4.0.0
     # via requests
-cloudpickle==1.6.0
+cloudpickle>=1.6.0
     # via
     #   gym
     #   stable-baselines3
