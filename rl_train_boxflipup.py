@@ -15,6 +15,7 @@ parser.add_argument('--test', action='store_true')
 args = parser.parse_args()
 
 observations = "state"
+time_limit = 10 if not args.test else 0.5
 zip = "data/box_flipup_ppo_{observations}.zip"
 log = "/tmp/ppo_box_flipup/"
 
@@ -24,17 +25,22 @@ if __name__ == '__main__':
                        n_envs=num_cpu,
                        seed=0,
                        vec_env_cls=SubprocVecEnv,
-                       env_kwargs={'observations': observations})
+                       env_kwargs={
+                           'observations': observations,
+                           'time_limit': time_limit,
+                       })
     #    env = "BoxFlipUp-v0"
 
-    if os.path.exists(zip) and not args.test:
+    if args.test:
+        model = PPO('MlpPolicy', env, n_steps=4, n_epochs=2, batch_size=8)
+    elif os.path.exists(zip):
         model = PPO.load(zip, env, verbose=1, tensorboard_log=log)
     else:
         model = PPO('MlpPolicy', env, verbose=1, tensorboard_log=log)
 
     new_log = True
     while True:
-        model.learn(total_timesteps=100000 if not args.test else 10,
+        model.learn(total_timesteps=100000 if not args.test else 4,
                     reset_num_timesteps=new_log)
         if args.test:
             break

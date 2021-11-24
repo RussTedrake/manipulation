@@ -90,7 +90,10 @@ def AddPointFinger(plant):
     return finger
 
 
-def make_box_flipup(generator, observations="state", meshcat=None):
+def make_box_flipup(generator,
+                    observations="state",
+                    meshcat=None,
+                    time_limit=10):
     builder = DiagramBuilder()
     plant, scene_graph = AddMultibodyPlantSceneGraph(builder, time_step=0.001)
     # TODO(russt): randomize parameters.
@@ -180,8 +183,9 @@ def make_box_flipup(generator, observations="state", meshcat=None):
             cost += 0.1 * effort.dot(effort)  # effort
             # finger velocity
             cost += 0.1 * finger_state[2:].dot(finger_state[2:])
-            output[
-                0] = 10 - cost  # Add 10 to avoid rewarding simulator crashes.
+            # Add 10 to make rewards positive (to avoid rewarding simulator
+            # crashes).
+            output[0] = 10 - cost
 
     reward = builder.AddSystem(RewardSystem())
     builder.Connect(plant.get_state_output_port(box), reward.get_input_port(0))
@@ -202,7 +206,7 @@ def make_box_flipup(generator, observations="state", meshcat=None):
 
     # Termination conditions:
     def monitor(context):
-        if context.get_time() > 10:
+        if context.get_time() > time_limit:
             return EventStatus.ReachedTermination(diagram, "time limit")
         return EventStatus.Succeeded()
 
@@ -210,10 +214,11 @@ def make_box_flipup(generator, observations="state", meshcat=None):
     return simulator
 
 
-def BoxFlipUpEnv(observations="state", meshcat=None):
+def BoxFlipUpEnv(observations="state", meshcat=None, time_limit=10):
     simulator = make_box_flipup(RandomGenerator(),
                                 observations,
-                                meshcat=meshcat)
+                                meshcat=meshcat,
+                                time_limit=time_limit)
     action_space = gym.spaces.Box(low=np.array([-.5, -0.1], dtype="float32"),
                                   high=np.array([.5, 0.6], dtype="float32"))
 
