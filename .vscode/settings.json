@@ -4,11 +4,16 @@
   "python.linting.enabled": true,
   "jupyter.jupyterServerType": "local",
   "search.exclude": {
-    "exercises/**": true
+    "exercises/**": true,
+    "bazel-*/**": true
   },
   "files.watcherExclude": {
     "**/Mathjax/**": true,
     "bazel-*/**": true,
     "data/**": true
   }
+  "files.exclude": {
+    "**/.history": true,
+    "**/bazel-*": true
+  },
 }
