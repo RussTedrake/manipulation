@@ -30,6 +30,7 @@ rt_py_library(
     imports = [".."],
     visibility = ["//visibility:public"],
     deps = [
+      "open3d_utils",
       "scenarios",
     ],
 )
@@ -43,6 +44,7 @@ rt_py_library(
 
 rt_py_library(
     name = "scenarios",
+    data = ["//manipulation/models"],
     srcs = ["scenarios.py"],
     imports = [".."],
     visibility = ["//visibility:public"],
@@ -89,6 +91,16 @@ rt_py_test(
         "manipulation",
         "mustard_depth_camera_example",
         "open3d_utils",
+    ],
+)
+
+rt_py_test(
+    name = "test_utils",
+    srcs = ["test/test_utils.py"],
+    imports = [".."],
+    deps = [
+      "manipulation",
+      "mustard_depth_camera_example",
     ],
 )
 

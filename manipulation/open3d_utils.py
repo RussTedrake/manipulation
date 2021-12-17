@@ -1,6 +1,8 @@
 import numpy as np
 import open3d as o3d
 
+from pydrake.all import BaseField, Fields, PointCloud
+
 
 def create_open3d_point_cloud(point_cloud):
     indices = np.all(np.isfinite(point_cloud.xyzs()), axis=0)
@@ -20,6 +22,24 @@ def create_open3d_point_cloud(point_cloud):
 #            point_cloud.normals()[:, indices].T)
 
     return pcd
+
+
+def drake_cloud_to_open3d(cloud):
+    return create_open3d_point_cloud(cloud)
+
+
+def open3d_cloud_to_drake(cloud):
+    fields = BaseField.kXYZs
+    if cloud.has_colors():
+        fields |= BaseField.kRGBs
+
+    drake_cloud = PointCloud(new_size=len(cloud.points), fields=Fields(fields))
+    drake_cloud.mutable_xyzs()[:] = np.asarray(cloud.points).T
+
+    if cloud.has_colors():
+        drake_cloud.mutable_rgbs()[:] = np.asarray(cloud.colors).T
+
+    return drake_cloud
 
 
 def create_open3d_rgbd_image(color_image, depth_image):

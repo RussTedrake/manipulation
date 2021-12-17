@@ -154,3 +154,33 @@ def MakeNamedViewState(mbp, view_name):
     pview = MakeNamedViewPositions(mbp, f"{view_name}_pos")
     vview = MakeNamedViewVelocities(mbp, f"{view_name}_vel")
     return namedview(view_name, pview.get_fields() + vview.get_fields())
+
+
+# Adapted from Drake's system_doxygen.py.  Just make an html rendering of the
+# system block with its name and input/output ports (even if it is a Diagram).
+def SystemHtml(system):
+    input_port_html = ""
+    for p in range(system.num_input_ports()):
+        input_port_html += (
+            f'<tr><td align=right style=\"padding:5px 0px 5px 0px\">'
+            f'{system.get_input_port(p).get_name()} &rarr;</td></tr>')
+    output_port_html = ""
+    for p in range(system.num_output_ports()):
+        output_port_html += (
+            '<tr><td align=left style=\"padding:5px 0px 5px 0px\">'
+            f'&rarr; {system.get_output_port(p).get_name()}</td></tr>')
+    # Note: keeping this on a single line avoids having to handle comment line
+    # markers (e.g. * or ///)
+    html = (
+        f'<table align=center cellpadding=0 cellspacing=0><tr align=center>'
+        f'<td style=\"vertical-align:middle\">'
+        f'<table cellspacing=0 cellpadding=0>{input_port_html}</table>'
+        f'</td>'
+        f'<td align=center style=\"border:2px solid black;padding-left:20px;'
+        f'padding-right:20px;vertical-align:middle\" bgcolor=#F0F0F0>'
+        f'{system.get_name()}</td>'
+        f'<td style=\"vertical-align:middle\">'
+        f'<table cellspacing=0 cellpadding=0>{output_port_html}</table>'
+        f'</td></tr></table>')
+
+    return html

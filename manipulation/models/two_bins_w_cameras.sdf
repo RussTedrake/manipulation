@@ -1,0 +1,85 @@
+<?xml version="1.0"?>
+<sdf version="1.9">
+  <model name="TwoBinsWCameras">
+    <include>
+      <pose degrees="true">-0.05, -0.5, -0.015, 0, 0, 90</pose>
+      <uri>package://drake/examples/manipulation_station/models/bin.sdf</uri>
+      <name>bin0</name>
+    </include>
+    <joint name="weld0" type="fixed">
+      <parent>world</parent>
+      <child>bin0</child>
+    </joint>
+    <include>
+      <pose degrees="true">0.5, 0.05, -0.015, 0, 0, 180</pose>
+      <uri>package://drake/examples/manipulation_station/models/bin.sdf</uri>
+      <name>bin1</name>
+    </include>
+    <joint name="weld1" type="fixed">
+      <parent>world</parent>
+      <child>bin1</child>
+    </joint>
+    
+    
+    <include>
+      <pose degrees="true">.25, -.5, .4, -130.0, 0, 90.0</pose>
+      <uri>package://manipulation/camera_box.sdf</uri>
+      <name>camera0</name>
+    </include>
+    <joint name="camera0_weld" type="fixed">
+      <parent>world</parent>
+      <child>camera0</child>
+    </joint>
+
+    <include>
+      <pose degrees="true">-0.05, -.7, .5, -150., 0, 0.0</pose>
+      <uri>package://manipulation/camera_box.sdf</uri>
+      <name>camera1</name>
+    </include>
+    <joint name="camera1_weld" type="fixed">
+      <parent>world</parent>
+      <child>camera1</child>
+    </joint>
+
+    <include>
+      <pose degrees="true">-.35, -.25, .45, -140., 0, -120.0</pose>
+      <uri>package://manipulation/camera_box.sdf</uri>
+      <name>camera2</name>
+    </include>
+    <joint name="camera2_weld" type="fixed">
+      <parent>world</parent>
+      <child>camera2</child>
+    </joint>
+
+    <include>
+      <pose degrees="true">.5, -.3, .4, -130.0, 0, 0.0</pose>
+      <uri>package://manipulation/camera_box.sdf</uri>
+      <name>camera3</name>
+    </include>
+    <joint name="camera3_weld" type="fixed">
+      <parent>world</parent>
+      <child>camera3</child>
+    </joint>
+
+    <include>
+      <pose degrees="true">.7, 0.05, .5, -150., 0, 90.0</pose>
+      <uri>package://manipulation/camera_box.sdf</uri>
+      <name>camera4</name>
+    </include>
+    <joint name="camera4_weld" type="fixed">
+      <parent>world</parent>
+      <child>camera4</child>
+    </joint>
+
+    <include>
+      <pose degrees="true">.25, .35, .45, -140., 0, -150.0</pose>
+      <uri>package://manipulation/camera_box.sdf</uri>
+      <name>camera5</name>
+    </include>
+    <joint name="camera5_weld" type="fixed">
+      <parent>world</parent>
+      <child>camera5</child>
+    </joint>
+
+  </model>
+</sdf>

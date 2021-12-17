@@ -7,16 +7,17 @@ import os
 import sys
 import warnings
 
-import pydrake.all
-from pydrake.all import (AbstractValue, BaseField, ModelInstanceIndex,
-                         DepthRenderCamera, RenderCameraCore, RgbdSensor,
-                         CameraInfo, ClippingRange, DepthRange,
-                         DepthImageToPointCloud, LeafSystem,
-                         MakeRenderEngineVtk, RenderEngineVtkParams,
-                         PrismaticJoint, BallRpyJoint, SpatialInertia)
-from pydrake.geometry import (Cylinder, GeometryInstance,
-                              MakePhongIllustrationProperties)
-from pydrake.math import RigidTransform, RollPitchYaw, RotationMatrix
+from pydrake.all import (
+    AbstractValue, Adder, AddMultibodyPlantSceneGraph, BallRpyJoint, BaseField,
+    Box, CameraInfo, ClippingRange, CoulombFriction, Cylinder, Demultiplexer,
+    DiagramBuilder, DepthRange, DepthImageToPointCloud, DepthRenderCamera,
+    FindResourceOrThrow, GeometryInstance, InverseDynamicsController,
+    LeafSystem, MakeMultibodyStateToWsgStateSystem,
+    MakePhongIllustrationProperties, MakeRenderEngineVtk, ModelInstanceIndex,
+    MultibodyPlant, Parser, PassThrough, PrismaticJoint, RenderCameraCore,
+    RenderEngineVtkParams, RevoluteJoint, Rgba, RigidTransform, RollPitchYaw,
+    RotationMatrix, RgbdSensor, SchunkWsgPositionController, SpatialInertia,
+    Sphere, StateInterpolatorWithDiscreteDerivative, UnitInertia)
 from manipulation.utils import FindResource
 
 ycb = [
@@ -26,11 +27,11 @@ ycb = [
 
 
 def AddIiwa(plant, collision_model="no_collision"):
-    sdf_path = pydrake.common.FindResourceOrThrow(
+    sdf_path = FindResourceOrThrow(
         "drake/manipulation/models/iiwa_description/iiwa7/"
         f"iiwa7_{collision_model}.sdf")
 
-    parser = pydrake.multibody.parsing.Parser(plant)
+    parser = Parser(plant)
     iiwa = parser.AddModelFromFile(sdf_path)
     plant.WeldFrames(plant.world_frame(), plant.GetFrameByName("iiwa_link_0"))
 
@@ -39,7 +40,7 @@ def AddIiwa(plant, collision_model="no_collision"):
     index = 0
     for joint_index in plant.GetJointIndices(iiwa):
         joint = plant.get_mutable_joint(joint_index)
-        if isinstance(joint, pydrake.multibody.tree.RevoluteJoint):
+        if isinstance(joint, RevoluteJoint):
             joint.set_default_angle(q0[index])
             index += 1
 
@@ -47,11 +48,11 @@ def AddIiwa(plant, collision_model="no_collision"):
 
 
 def AddPlanarIiwa(plant):
-    urdf = pydrake.common.FindResourceOrThrow(
+    urdf = FindResourceOrThrow(
         "drake/manipulation/models/iiwa_description/urdf/"
         "planar_iiwa14_spheres_dense_elbow_collision.urdf")
 
-    parser = pydrake.multibody.parsing.Parser(plant)
+    parser = Parser(plant)
     iiwa = parser.AddModelFromFile(urdf)
     plant.WeldFrames(plant.world_frame(), plant.GetFrameByName("iiwa_link_0"))
 
@@ -60,7 +61,7 @@ def AddPlanarIiwa(plant):
     index = 0
     for joint_index in plant.GetJointIndices(iiwa):
         joint = plant.get_mutable_joint(joint_index)
-        if isinstance(joint, pydrake.multibody.tree.RevoluteJoint):
+        if isinstance(joint, RevoluteJoint):
             joint.set_default_angle(q0[index])
             index += 1
 
@@ -70,11 +71,11 @@ def AddPlanarIiwa(plant):
 def AddTwoLinkIiwa(plant, q0=[0.1, -1.2]):
     urdf = FindResource("models/two_link_iiwa14.urdf")
 
-    parser = pydrake.multibody.parsing.Parser(plant)
+    parser = Parser(plant)
     parser.package_map().Add(
         "iiwa_description",
         os.path.dirname(
-            pydrake.common.FindResourceOrThrow(
+            FindResourceOrThrow(
                 "drake/manipulation/models/iiwa_description/package.xml")))
     iiwa = parser.AddModelFromFile(urdf)
     plant.WeldFrames(plant.world_frame(), plant.GetFrameByName("iiwa_link_0"))
@@ -83,7 +84,7 @@ def AddTwoLinkIiwa(plant, q0=[0.1, -1.2]):
     index = 0
     for joint_index in plant.GetJointIndices(iiwa):
         joint = plant.get_mutable_joint(joint_index)
-        if isinstance(joint, pydrake.multibody.tree.RevoluteJoint):
+        if isinstance(joint, RevoluteJoint):
             joint.set_default_angle(q0[index])
             index += 1
 
@@ -92,19 +93,19 @@ def AddTwoLinkIiwa(plant, q0=[0.1, -1.2]):
 
 # TODO: take argument for whether we want the welded fingers version or not
 def AddWsg(plant, iiwa_model_instance, roll=np.pi / 2.0, welded=False):
-    parser = pydrake.multibody.parsing.Parser(plant)
+    parser = Parser(plant)
     if welded:
         parser.package_map().Add(
             "wsg_50_description",
             os.path.dirname(
-                pydrake.common.FindResourceOrThrow(
+                FindResourceOrThrow(
                     "drake/manipulation/models/wsg_50_description/package.xml"))
         )
         gripper = parser.AddModelFromFile(
             FindResource("models/schunk_wsg_50_welded_fingers.sdf"), "gripper")
     else:
         gripper = parser.AddModelFromFile(
-            pydrake.common.FindResourceOrThrow(
+            FindResourceOrThrow(
                 "drake/manipulation/models/"
                 "wsg_50_description/sdf/schunk_wsg_50_no_tip.sdf"))
 
@@ -115,7 +116,7 @@ def AddWsg(plant, iiwa_model_instance, roll=np.pi / 2.0, welded=False):
 
 
 def AddFloatingRpyJoint(plant, frame, instance):
-    inertia = pydrake.multibody.tree.UnitInertia.SolidSphere(1.0)
+    inertia = UnitInertia.SolidSphere(1.0)
     x_body = plant.AddRigidBody(
         "x", instance,
         SpatialInertia(mass=0, p_PScm_E=[0., 0., 0.], G_SP_E=inertia))
@@ -141,14 +142,13 @@ def AddShape(plant, shape, name, mass=1, mu=1, color=[.5, .5, .9, 1.0]):
     instance = plant.AddModelInstance(name)
     # TODO: Add a method to UnitInertia that accepts a geometry shape (unless
     # that dependency is somehow gross) and does this.
-    if isinstance(shape, pydrake.geometry.Box):
-        inertia = pydrake.multibody.tree.UnitInertia.SolidBox(
-            shape.width(), shape.depth(), shape.height())
-    elif isinstance(shape, pydrake.geometry.Cylinder):
-        inertia = pydrake.multibody.tree.UnitInertia.SolidCylinder(
-            shape.radius(), shape.length())
-    elif isinstance(shape, pydrake.geometry.Sphere):
-        inertia = pydrake.multibody.tree.UnitInertia.SolidSphere(shape.radius())
+    if isinstance(shape, Box):
+        inertia = UnitInertia.SolidBox(shape.width(), shape.depth(),
+                                       shape.height())
+    elif isinstance(shape, Cylinder):
+        inertia = UnitInertia.SolidCylinder(shape.radius(), shape.length())
+    elif isinstance(shape, Sphere):
+        inertia = UnitInertia.SolidSphere(shape.radius())
     else:
         raise RunTimeError(
             f"need to write the unit inertia for shapes of type {shape}")
@@ -158,31 +158,39 @@ def AddShape(plant, shape, name, mass=1, mu=1, color=[.5, .5, .9, 1.0]):
                        p_PScm_E=np.array([0., 0., 0.]),
                        G_SP_E=inertia))
     if plant.geometry_source_is_registered():
-        if isinstance(shape, pydrake.geometry.Box):
+        if isinstance(shape, Box):
             plant.RegisterCollisionGeometry(
                 body, RigidTransform(),
-                pydrake.geometry.Box(shape.width() - 0.001,
-                                     shape.depth() - 0.001,
-                                     shape.height() - 0.001), name,
-                pydrake.multibody.plant.CoulombFriction(mu, mu))
+                Box(shape.width() - 0.001,
+                    shape.depth() - 0.001,
+                    shape.height() - 0.001), name, CoulombFriction(mu, mu))
             i = 0
             for x in [-shape.width() / 2.0, shape.width() / 2.0]:
                 for y in [-shape.depth() / 2.0, shape.depth() / 2.0]:
                     for z in [-shape.height() / 2.0, shape.height() / 2.0]:
                         plant.RegisterCollisionGeometry(
                             body, RigidTransform([x, y, z]),
-                            pydrake.geometry.Sphere(radius=1e-7),
-                            f"contact_sphere{i}",
-                            pydrake.multibody.plant.CoulombFriction(mu, mu))
+                            Sphere(radius=1e-7), f"contact_sphere{i}",
+                            CoulombFriction(mu, mu))
                         i += 1
         else:
-            plant.RegisterCollisionGeometry(
-                body, RigidTransform(), shape, name,
-                pydrake.multibody.plant.CoulombFriction(mu, mu))
+            plant.RegisterCollisionGeometry(body, RigidTransform(), shape, name,
+                                            CoulombFriction(mu, mu))
 
         plant.RegisterVisualGeometry(body, RigidTransform(), shape, name, color)
 
     return instance
+
+
+# Add the camera_box.sdf.
+def AddCameraBox(plant, X_WC, name="camera0", parent_frame=None):
+    # TODO(russt): could be smarter and increment the default camera name (by
+    # checking with the plant).
+    if not parent_frame:
+        parent_frame = plant.world_frame()
+    camera = Parser(plant).AddModelFromFile(
+        FindResource("models/camera_box.sdf"), name)
+    plant.WeldFrames(parent_frame, plant.GetFrameByName("base", camera), X_WC)
 
 
 def AddCamera(builder, scene_graph, X_WC, depth_camera=None, renderer=None):
@@ -347,7 +355,7 @@ def SetTransparency(scene_graph, alpha, source_id, geometry_ids=None):
         if props is None or not props.HasProperty("phong", "diffuse"):
             continue
         c = props.GetProperty("phong", "diffuse")
-        new_color = pydrake.geometry.Rgba(c.r(), c.g(), c.b(), alpha)
+        new_color = Rgba(c.r(), c.g(), c.b(), alpha)
         props.UpdateProperty("phong", "diffuse", new_color)
 
 
@@ -363,8 +371,7 @@ def SetColor(scene_graph, color, source_id, geometry_ids=None):
         props = inspector.GetIllustrationProperties(gid)
         if props is None or not props.HasProperty("phong", "diffuse"):
             continue
-        new_color = pydrake.geometry.Rgba(color[0], color[1], color[2],
-                                          color[3])
+        new_color = Rgba(color[0], color[1], color[2], color[3])
         props.UpdateProperty("phong", "diffuse", new_color)
 
 
@@ -423,3 +430,138 @@ def AddMultibodyTriad(frame, scene_graph, length=.25, radius=0.01, opacity=1.):
     AddTriad(plant.get_source_id(),
              plant.GetBodyFrameIdOrThrow(frame.body().index()), scene_graph,
              length, radius, opacity, frame.GetFixedPoseInBodyFrame())
+
+
+def MakeManipulationStation(time_step=0.002,
+                            plant_setup_callback=None,
+                            camera_prefix="camera"):
+    """
+    Sets up a manipulation station with the iiwa + wsg + controllers [+
+    cameras].  Cameras will be added to each body with a name starting with
+    "camera".
+
+    Args:
+        time_step: the standard MultibodyPlant time step.
+
+        plant_setup_callback: should be a python callable that takes one
+        argument: `plant_setup_callback(plant)`.  It will be called after the
+        iiwa and WSG are added to the plant, but before the plant is
+        finalized.  Use this to add additional geometry.
+
+        camera_prefix: Any bodies in the plant (created during the
+        plant_setup_callback) starting with this prefix will get a camera
+        attached.
+    """
+    builder = DiagramBuilder()
+
+    # Add (only) the iiwa, WSG, and cameras to the scene.
+    plant, scene_graph = AddMultibodyPlantSceneGraph(builder,
+                                                     time_step=time_step)
+    iiwa = AddIiwa(plant)
+    wsg = AddWsg(plant, iiwa)
+    if plant_setup_callback:
+        plant_setup_callback(plant)
+    plant.Finalize()
+
+    num_iiwa_positions = plant.num_positions(iiwa)
+
+    # I need a PassThrough system so that I can export the input port.
+    iiwa_position = builder.AddSystem(PassThrough(num_iiwa_positions))
+    builder.ExportInput(iiwa_position.get_input_port(), "iiwa_position")
+    builder.ExportOutput(iiwa_position.get_output_port(),
+                         "iiwa_position_command")
+
+    # Export the iiwa "state" outputs.
+    demux = builder.AddSystem(
+        Demultiplexer(2 * num_iiwa_positions, num_iiwa_positions))
+    builder.Connect(plant.get_state_output_port(iiwa), demux.get_input_port())
+    builder.ExportOutput(demux.get_output_port(0), "iiwa_position_measured")
+    builder.ExportOutput(demux.get_output_port(1), "iiwa_velocity_estimated")
+    builder.ExportOutput(plant.get_state_output_port(iiwa),
+                         "iiwa_state_estimated")
+
+    # Make the plant for the iiwa controller to use.
+    controller_plant = MultibodyPlant(time_step=time_step)
+    controller_iiwa = AddIiwa(controller_plant)
+    AddWsg(controller_plant, controller_iiwa, welded=True)
+    controller_plant.Finalize()
+
+    # Add the iiwa controller
+    iiwa_controller = builder.AddSystem(
+        InverseDynamicsController(controller_plant,
+                                  kp=[100] * num_iiwa_positions,
+                                  ki=[1] * num_iiwa_positions,
+                                  kd=[20] * num_iiwa_positions,
+                                  has_reference_acceleration=False))
+    iiwa_controller.set_name("iiwa_controller")
+    builder.Connect(plant.get_state_output_port(iiwa),
+                    iiwa_controller.get_input_port_estimated_state())
+
+    # Add in the feed-forward torque
+    adder = builder.AddSystem(Adder(2, num_iiwa_positions))
+    builder.Connect(iiwa_controller.get_output_port_control(),
+                    adder.get_input_port(0))
+    # Use a PassThrough to make the port optional (it will provide zero values
+    # if not connected).
+    torque_passthrough = builder.AddSystem(PassThrough([0]
+                                                       * num_iiwa_positions))
+    builder.Connect(torque_passthrough.get_output_port(),
+                    adder.get_input_port(1))
+    builder.ExportInput(torque_passthrough.get_input_port(),
+                        "iiwa_feedforward_torque")
+    builder.Connect(adder.get_output_port(),
+                    plant.get_actuation_input_port(iiwa))
+
+    # Add discrete derivative to command velocities.
+    desired_state_from_position = builder.AddSystem(
+        StateInterpolatorWithDiscreteDerivative(
+            num_iiwa_positions, time_step, suppress_initial_transient=True))
+    desired_state_from_position.set_name("desired_state_from_position")
+    builder.Connect(desired_state_from_position.get_output_port(),
+                    iiwa_controller.get_input_port_desired_state())
+    builder.Connect(iiwa_position.get_output_port(),
+                    desired_state_from_position.get_input_port())
+
+    # Export commanded torques.
+    builder.ExportOutput(adder.get_output_port(), "iiwa_torque_commanded")
+    builder.ExportOutput(adder.get_output_port(), "iiwa_torque_measured")
+
+    builder.ExportOutput(plant.get_generalized_contact_forces_output_port(iiwa),
+                         "iiwa_torque_external")
+
+    # Wsg controller.
+    wsg_controller = builder.AddSystem(SchunkWsgPositionController())
+    wsg_controller.set_name("wsg_controller")
+    builder.Connect(wsg_controller.get_generalized_force_output_port(),
+                    plant.get_actuation_input_port(wsg))
+    builder.Connect(plant.get_state_output_port(wsg),
+                    wsg_controller.get_state_input_port())
+    builder.ExportInput(wsg_controller.get_desired_position_input_port(),
+                        "wsg_position")
+    builder.ExportInput(wsg_controller.get_force_limit_input_port(),
+                        "wsg_force_limit")
+    wsg_mbp_state_to_wsg_state = builder.AddSystem(
+        MakeMultibodyStateToWsgStateSystem())
+    builder.Connect(plant.get_state_output_port(wsg),
+                    wsg_mbp_state_to_wsg_state.get_input_port())
+    builder.ExportOutput(wsg_mbp_state_to_wsg_state.get_output_port(),
+                         "wsg_state_measured")
+    builder.ExportOutput(wsg_controller.get_grip_force_output_port(),
+                         "wsg_force_measured")
+
+    # Cameras.
+    AddRgbdSensors(builder,
+                   plant,
+                   scene_graph,
+                   model_instance_prefix=camera_prefix)
+
+    # Export "cheat" ports.
+    builder.ExportOutput(scene_graph.get_query_output_port(), "geometry_query")
+    builder.ExportOutput(plant.get_contact_results_output_port(),
+                         "contact_results")
+    builder.ExportOutput(plant.get_state_output_port(),
+                         "plant_continuous_state")
+
+    diagram = builder.Build()
+    diagram.set_name("ManipulationStation")
+    return diagram
