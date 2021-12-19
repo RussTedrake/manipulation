@@ -107,7 +107,7 @@ def AddWsg(plant, iiwa_model_instance, roll=np.pi / 2.0, welded=False):
         gripper = parser.AddModelFromFile(
             FindResourceOrThrow(
                 "drake/manipulation/models/"
-                "wsg_50_description/sdf/schunk_wsg_50_no_tip.sdf"))
+                "wsg_50_description/sdf/schunk_wsg_50_with_tip.sdf"))
 
     X_7G = RigidTransform(RollPitchYaw(np.pi / 2.0, 0, roll), [0, 0, 0.114])
     plant.WeldFrames(plant.GetFrameByName("iiwa_link_7", iiwa_model_instance),
@@ -561,6 +561,7 @@ def MakeManipulationStation(time_step=0.002,
                          "contact_results")
     builder.ExportOutput(plant.get_state_output_port(),
                          "plant_continuous_state")
+    builder.ExportOutput(plant.get_body_poses_output_port(), "body_poses")
 
     diagram = builder.Build()
     diagram.set_name("ManipulationStation")

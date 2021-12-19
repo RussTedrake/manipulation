@@ -294,6 +294,11 @@ class MeshcatJointSliders(LeafSystem):
         name: JointSliders
         output_ports:
         - positions
+
+    In addition to being used inside a Diagram that is being simulated with
+    Simulator, this class also offers a `Run` method that runs its own simple
+    event loop, querying the slider values and calling `Publish`.  It does not
+    simulate any state dynamics.
     """
 
     def __init__(self,
@@ -304,10 +309,7 @@ class MeshcatJointSliders(LeafSystem):
                  upper_limit=10.,
                  resolution=0.01):
         """
-        Creates an meshcat slider for each joint in the plant.  Unlike the
-        JointSliders System, we do not expect this to be used in a Simulator.
-        It simply updates the context and calls Publish directly from the
-        slider callback.
+        Creates an meshcat slider for each joint in the plant.
 
         Args:
             meshcat:      A Meshcat instance.
@@ -346,8 +348,8 @@ class MeshcatJointSliders(LeafSystem):
         plant_context = plant.GetMyContextFromRoot(root_context) if \
             root_context else plant.CreateDefaultContext()
 
-        self._sliders = []
-        positions = plant.GetPositions(plant_context)
+        self._sliders = {}
+        self._positions = plant.GetPositions(plant_context)
         slider_num = 0
         for i in range(plant.num_joints()):
             joint = plant.get_joint(JointIndex(i))
@@ -357,21 +359,22 @@ class MeshcatJointSliders(LeafSystem):
                 index = joint.position_start() + j
                 description = joint.name()
                 if joint.num_positions() > 1:
-                    description += f"[{j}]"
-                meshcat.AddSlider(value=positions[index],
+                    description += '_' + joint.position_suffix(j)
+                meshcat.AddSlider(value=self._positions[index],
                                   min=max(low[j], lower_limit[slider_num]),
                                   max=min(upp[j], upper_limit[slider_num]),
                                   step=resolution[slider_num],
                                   name=description)
-                self._sliders.append(description)
+                self._sliders[index] = description
                 slider_num += 1
 
-        port = self.DeclareVectorOutputPort("positions", slider_num,
+        port = self.DeclareVectorOutputPort("positions", plant.num_positions(),
                                             self.DoCalcOutput)
         port.disable_caching_by_default()
 
     def DoCalcOutput(self, context, output):
-        for i, s in enumerate(self._sliders):
+        output.SetFromVector(self._positions)
+        for i, s in self._sliders.items():
             output[i] = self._meshcat.GetSliderValue(s)
 
     def Run(self, publishing_system, root_context, callback=None):
@@ -394,10 +397,11 @@ class MeshcatJointSliders(LeafSystem):
         publishing_context = publishing_system.GetMyContextFromRoot(
             root_context)
 
+        publishing_system.Publish(publishing_context)
         while self._meshcat.GetButtonClicks("Stop JointSliders") < 1:
             old_positions = self._plant.GetPositions(plant_context)
-            positions = np.zeros((len(self._sliders), 1))
-            for i, s in enumerate(self._sliders):
+            positions = self._positions
+            for i, s in self._sliders.items():
                 positions[i] = self._meshcat.GetSliderValue(s)
             if not np.array_equal(positions, old_positions):
                 self._plant.SetPositions(plant_context, positions)
