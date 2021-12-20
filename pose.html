@@ -759,6 +759,43 @@ output_ports:
       for large point clouds, conservative approximations may be used
       instead.</p>
 
+      <example><h1>Maximum cliques in correspondence graphs</h1>
+
+        <p>Here is a simple example of the maximum-clique idea from
+        <elib>Yang20a</elib> that I worked through with the author, Hank, to
+        make sure I understood his idea.</p>
+
+        <figure><img width="80%"
+        src="figures/max-clique-example-points.svg"/></figure>
+        <!-- original figures in
+        Dropbox/from-collaborators/hank-yang/max-clique-example.key -->
+        
+        <p>The model (on the left) is a simple triangle with vertex points
+        labeled [$A$, $B$, $C$].  The scene (on the right) has the same
+        triangle, with points labeled [$a$, $b$, $c$] which will have exactly
+        three pairwise distances.  But it also has a pyramid that will create a
+        total of six pairwise distance matches (three of length 3 and three of
+        length 4). Will the spurious correspondences on the pyramid cause a
+        larger clique that the ground truth correspondences [$A-a$, $B-b$,
+        $C-c$] triangle?</p>
+
+        <p>Let's construct the pairwise distance graph using all-to-all
+        correspondences as the initial guess.  We'll get a node in that graph
+        for every possible correspondence, e.g. I've used the label $A-e$ to
+        denote a possible correspondence of model point $A$ with scene point
+        $e$. Then we make an edge in the graph between $(A-e)$ and $(B-f)$ iff
+        the distance between $A$ and $B$ equals the distance between $e$ and
+        $f$.</p>
+
+        <figure><img width="80%" src="figures/max-clique-example-graph.svg"/></figure>
+
+        <p>Now the value of checking for a clique becomes clear.  The largest
+        clique involving correspondences with the pyramid is only size 2, but
+        the largest clique for the scene triangle is size 3 (I've colored it
+        red).  So for this example, the maximum clique <i>does</i>, in fact,
+        recover the ground-truth correspondences.</p>
+      </example>
+
     </subsection>
 
     <subsection><h1>Point cloud segmentation</h1>
