@@ -16,7 +16,7 @@ from pydrake.all import (
 )
 from pydrake.examples.pendulum import PendulumPlant, PendulumGeometry
 
-from manipulation.gym import DrakeGymEnv
+from manipulation.drake_gym import DrakeGymEnv
 from manipulation.scenarios import AddRgbdSensor
 
 meshcat = Meshcat()

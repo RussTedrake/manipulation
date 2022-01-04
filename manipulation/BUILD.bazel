@@ -18,8 +18,8 @@ rt_py_library(
 )
 
 rt_py_library(
-    name = "gym",
-    srcs = ["gym.py"],
+    name = "drake_gym",
+    srcs = ["drake_gym.py"],
     imports = [".."],
     visibility = ["//visibility:public"],
 )
@@ -55,7 +55,7 @@ rt_py_test(
     srcs = ["test/test_gym.py"],
     imports = [".."],
     deps = [
-      "gym",
+      "drake_gym",
       "manipulation",
       "scenarios",
     ],

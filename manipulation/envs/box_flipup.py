@@ -33,7 +33,7 @@ from pydrake.all import (
     Variable,
 )
 
-from manipulation.gym import DrakeGymEnv
+from manipulation.drake_gym import DrakeGymEnv
 from manipulation.scenarios import AddShape, SetColor, SetTransparency
 from manipulation.utils import FindResource
 
