@@ -32,8 +32,6 @@ COPY *.ipynb /root/manipulation/
 COPY manipulation/ /opt/manipulation/manipulation/
 COPY exercises/ /root/manipulation/exercises/
 COPY requirements.txt /tmp/requirements.txt
-## Delete torch requirement until I figure out how to enable it.
-RUN sed -i '/torch/d' /tmp/requirements.txt
 COPY setup/docker/pip.conf /root/.config/pip/pip.conf
 COPY setup/ubuntu/20.04/install_prereqs.sh /tmp/
 RUN /tmp/install_prereqs.sh

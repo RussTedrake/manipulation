@@ -69,25 +69,7 @@ jupyter-nbconvert
 jupyter-notebook
 locales
 python3
-python3-bs4
-python3-dev
-python3-entrypoints
-python3-future
-python3-ipywidgets
-python3-jinja2
-python3-jsonschema
-python3-numpy
-python3-pandas
 python3-pip
-python3-requests
-python3-retrying
-python3-setuptools
-python3-six
-python3-snowballstemmer
-python3-toolz
-python3-tqdm
-python3-wheel
-python3-widgetsnbextension
 tidy
 wget
 EOF
@@ -95,7 +77,8 @@ EOF
 
 locale-gen en_US.UTF-8
 
-jupyter nbextension enable --system --py widgetsnbextension
+# Note: I've purged widgets for now...
+#jupyter nbextension enable --system --py widgetsnbextension
 
 if [[ -z "${LANG:-}" && -z "${LC_ALL:-}" ]]; then
   echo 'WARNING: LANG and LC_ALL environment variables are NOT set. Please export LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8.' >&2
