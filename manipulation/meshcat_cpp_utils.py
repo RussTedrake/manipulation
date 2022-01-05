@@ -7,7 +7,7 @@ from IPython.display import display, HTML, Javascript
 import numpy as np
 
 from pydrake.common import set_log_level
-from pydrake.geometry import Meshcat, Cylinder, Rgba, Sphere
+from pydrake.geometry import Meshcat, Cylinder, Rgba, Sphere, StartMeshcat
 from pydrake.perception import PointCloud, Fields, BaseField
 from pydrake.solvers.mathematicalprogram import BoundingBoxConstraint
 
@@ -22,56 +22,6 @@ from pydrake.multibody.tree import JointIndex
 from pydrake.systems.framework import PublishEvent, VectorSystem
 
 from manipulation import running_as_notebook
-
-
-def StartMeshcat(open_window=False):
-    """
-    A wrapper around the Meshcat constructor that supports Deepnote and Google
-    Colab via ngrok when necessary.
-    """
-    prev_log_level = set_log_level("warn")
-    use_ngrok = False
-    if ("DEEPNOTE_PROJECT_ID" in os.environ):
-        # Deepnote exposes port 8080 (only).  If we need multiple meshcats,
-        # then we fall back to ngrok.
-        try:
-            meshcat = Meshcat(8080)
-        except RuntimeError:
-            use_ngrok = True
-        else:
-            set_log_level(prev_log_level)
-            web_url = f"https://{os.environ['DEEPNOTE_PROJECT_ID']}.deepnoteproject.com"  # noqa
-            display(
-                HTML('Meshcat is now available at '
-                     f'<a href="{web_url}">{web_url}</a>'))
-            if open_window:
-                display(Javascript(f'window.open("{web_url}");'))
-            return meshcat
-
-    if 'google.colab' in sys.modules:
-        use_ngrok = True
-
-    meshcat = Meshcat()
-    web_url = meshcat.web_url()
-    if use_ngrok:
-        from pyngrok import ngrok
-        http_tunnel = ngrok.connect(meshcat.port(), bind_tls=False)
-        web_url = http_tunnel.public_url
-
-    set_log_level(prev_log_level)
-    display(
-        HTML('Meshcat is now available at '
-             f'<a href="{web_url}">{web_url}</a>'))
-
-    if open_window:
-        if 'google.colab' in sys.modules:
-            from google.colab import output
-            output.eval_js(f'window.open("{web_url}");', ignore_result=True)
-        else:
-            display(Javascript(f'window.open("{web_url}");'))
-
-    return meshcat
-
 
 # Some GUI code that will be moved into Drake.
 

@@ -1,18 +1,5 @@
-import importlib
-import os
 import subprocess
 import sys
-from urllib.request import urlretrieve
-
-import importlib
-import json
-import os
-import shutil
-import subprocess
-import sys
-import warnings
-from urllib.request import urlretrieve
-
 
 def run(cmd, **kwargs):
     cp = subprocess.run(cmd,
@@ -32,10 +19,10 @@ def setup_drake(*, version, build='nightly'):
         "'Restart runtime' from the menu to restart with a clean environment.")
 
     print(
-        f"setup_drake() is deprecated and will be removed after 2022-03-01.  Use `pip3 install drake` instead."
+        f"setup_drake() is deprecated and will be removed after 2022-03-01.  Use `pip install drake` instead."
     )
 
-    run(['pip3', 'install', 'drake'])
+    run(['pip', 'install', 'drake'])
 
 
 def setup_manipulation(*, manipulation_sha, drake_version, drake_build):
@@ -43,7 +30,7 @@ def setup_manipulation(*, manipulation_sha, drake_version, drake_build):
         "This script is intended for use on Google Colab only.")
 
     print(
-        f"setup_manipulation() is deprecated and will be removed after 2022-03-01.  Use `pip3 install manipulation` instead."
+        f"setup_manipulation() is deprecated and will be removed after 2022-03-01.  Use `pip install manipulation` instead."
     )
 
-    run(['pip3', 'install', 'manipulation'])
+    run(['pip', 'install', 'manipulation'])
