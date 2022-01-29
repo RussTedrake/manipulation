@@ -5,8 +5,8 @@ from pydrake.all import (
     AddMultibodyPlantSceneGraph,
     Box,
     ConstantVectorSource,
-    ContactResultsToMeshcat,
-    ContactResultsToMeshcatParams,
+    ContactVisualizer,
+    ContactVisualizerParams,
     DiagramBuilder,
     EventStatus,
     FixedOffsetFrame,
@@ -108,9 +108,9 @@ def make_box_flipup(generator,
     if meshcat:
         MeshcatVisualizerCpp.AddToBuilder(builder, scene_graph, meshcat)
         meshcat.Set2dRenderMode(xmin=-.35, xmax=.35, ymin=-0.1, ymax=0.3)
-        ContactResultsToMeshcat.AddToBuilder(
+        ContactVisualizer.AddToBuilder(
             builder, plant, meshcat,
-            ContactResultsToMeshcatParams(radius=0.005, newtons_per_meter=40.0))
+            ContactVisualizerParams(radius=0.005, newtons_per_meter=40.0))
 
         # Use the controller plant to visualize the set point geometry.
         controller_scene_graph = builder.AddSystem(SceneGraph())
