@@ -15,6 +15,13 @@ from pydrake.common.containers import namedview
 running_as_notebook = "COLAB_TESTING" not in os.environ and get_ipython(
 ) and hasattr(get_ipython(), 'kernel')
 
+running_as_test = False
+
+
+def set_running_as_test(value):
+    global running_as_test
+    running_as_test = value
+
 
 def pyplot_is_interactive():
     # import needs to happen after the backend is set.
