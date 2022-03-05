@@ -72,11 +72,6 @@ def AddTwoLinkIiwa(plant, q0=[0.1, -1.2]):
     urdf = FindResource("models/two_link_iiwa14.urdf")
 
     parser = Parser(plant)
-    parser.package_map().Add(
-        "iiwa_description",
-        os.path.dirname(
-            FindResourceOrThrow(
-                "drake/manipulation/models/iiwa_description/package.xml")))
     iiwa = parser.AddModelFromFile(urdf)
     plant.WeldFrames(plant.world_frame(), plant.GetFrameByName("iiwa_link_0"))
 
@@ -95,12 +90,6 @@ def AddTwoLinkIiwa(plant, q0=[0.1, -1.2]):
 def AddWsg(plant, iiwa_model_instance, roll=np.pi / 2.0, welded=False):
     parser = Parser(plant)
     if welded:
-        parser.package_map().Add(
-            "wsg_50_description",
-            os.path.dirname(
-                FindResourceOrThrow(
-                    "drake/manipulation/models/wsg_50_description/package.xml"))
-        )
         gripper = parser.AddModelFromFile(
             FindResource("models/schunk_wsg_50_welded_fingers.sdf"), "gripper")
     else:
