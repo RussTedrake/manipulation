@@ -143,9 +143,6 @@
             <size>0.074 0.049 0.049</size>
           </box>
         </geometry>
-        <material>
-          <diffuse>0 1 0 1.0</diffuse>
-        </material>
       </collision>
       <collision name="point_collision1">
         <pose>0.0375 0.025 0 0 0 0</pose>
@@ -194,9 +191,6 @@
             <radius>1e-7</radius>
           </sphere>
         </geometry>
-        <material>
-          <diffuse>.9 .2 .2 1.0</diffuse>
-        </material>
       </collision>
       <collision name="point_collision7">
         <pose>-0.0375 0.025 0.05 0 0 0</pose>
@@ -205,9 +199,6 @@
             <radius>1e-7</radius>
           </sphere>
         </geometry>
-        <material>
-          <diffuse>.9 .2 .2 1.0</diffuse>
-        </material>
       </collision>
       <collision name="point_collision8">
         <pose>-0.0375 -0.025 0.05 0 0 0</pose>
