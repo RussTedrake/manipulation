@@ -3,7 +3,6 @@ import os
 import pydrake.multibody.parsing
 import pydrake.multibody.plant
 import pydrake.systems.framework
-import pydrake.systems.meshcat_visualizer
 
 import manipulation.utils
 
@@ -19,10 +18,5 @@ pydrake.multibody.parsing.ProcessModelDirectives(
 
 plant.Finalize()
 
-meshcat = pydrake.systems.meshcat_visualizer.ConnectMeshcatVisualizer(
-    builder, scene_graph, zmq_url="new", open_browser=False)
 diagram = builder.Build()
 context = diagram.CreateDefaultContext()
-
-meshcat.load()
-diagram.Publish(context)

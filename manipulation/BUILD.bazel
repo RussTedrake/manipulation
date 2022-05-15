@@ -45,6 +45,7 @@ rt_py_library(
 rt_py_library(
     name = "scenarios",
     data = ["//manipulation/models"],
+    deps = ["//manipulation"],
     srcs = ["scenarios.py"],
     imports = [".."],
     visibility = ["//visibility:public"],

@@ -10,6 +10,7 @@ load("//htmlbook/tools/python:defs.bzl", "rt_py_test")
 rt_ipynb_test(
     name = "grasp_frames",
     srcs = ["grasp_frames.ipynb"],
+    deps = ["//manipulation:scenarios"],
 )
 
 rt_ipynb_test(
