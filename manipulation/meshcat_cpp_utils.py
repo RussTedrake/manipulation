@@ -7,7 +7,7 @@ from IPython.display import display, HTML, Javascript
 import numpy as np
 
 from pydrake.common import set_log_level
-from pydrake.geometry import Meshcat, Cylinder, Rgba, Sphere, StartMeshcat
+from pydrake.geometry import Cylinder, Rgba, Sphere
 from pydrake.perception import PointCloud, Fields, BaseField
 from pydrake.solvers.mathematicalprogram import BoundingBoxConstraint
 
