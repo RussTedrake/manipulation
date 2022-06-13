@@ -12,7 +12,7 @@ from pydrake.all import (
     FixedOffsetFrame,
     InverseDynamicsController,
     LeafSystem,
-    MeshcatVisualizerCpp,
+    MeshcatVisualizer,
     MeshcatVisualizerParams,
     MultibodyPlant,
     MultibodyPositionToGeometryPose,
@@ -106,7 +106,7 @@ def make_box_flipup(generator,
     AddPointFinger(controller_plant)
 
     if meshcat:
-        MeshcatVisualizerCpp.AddToBuilder(builder, scene_graph, meshcat)
+        MeshcatVisualizer.AddToBuilder(builder, scene_graph, meshcat)
         meshcat.Set2dRenderMode(xmin=-.35, xmax=.35, ymin=-0.1, ymax=0.3)
         ContactVisualizer.AddToBuilder(
             builder, plant, meshcat,
@@ -118,7 +118,7 @@ def make_box_flipup(generator,
         SetColor(controller_scene_graph,
                  color=[1.0, 165.0 / 255, 0.0, 1.0],
                  source_id=controller_plant.get_source_id())
-        controller_vis = MeshcatVisualizerCpp.AddToBuilder(
+        controller_vis = MeshcatVisualizer.AddToBuilder(
             builder, controller_scene_graph, meshcat,
             MeshcatVisualizerParams(prefix="controller"))
         controller_vis.set_name("controller meshcat")

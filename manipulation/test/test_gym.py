@@ -6,7 +6,7 @@ from stable_baselines3.common.env_checker import check_env
 from pydrake.all import (
     DiagramBuilder,
     Meshcat,
-    MeshcatVisualizerCpp,
+    MeshcatVisualizer,
     MeshcatVisualizerParams,
     RigidTransform,
     RotationMatrix,
@@ -30,7 +30,7 @@ def PendulumExample():
     scene_graph = builder.AddSystem(SceneGraph())
     PendulumGeometry.AddToBuilder(builder, plant.get_state_output_port(),
                                   scene_graph)
-    MeshcatVisualizerCpp.AddToBuilder(
+    MeshcatVisualizer.AddToBuilder(
         builder, scene_graph, meshcat,
         MeshcatVisualizerParams(publish_period=np.inf))
 
