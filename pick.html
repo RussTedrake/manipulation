@@ -1104,14 +1104,14 @@ plant.num_velocities() = 6</pre></code></p>
   
       <p>Our Jacobian is $6 \times 7$, so we actually have more degrees of
       freedom than end-effector goals. This is not only an opportunity, but a
-      responsibility. When the column rank of $J^G$ exceeds the row rank, then
-      we have specified an optimization problem that has an infinite number of
-      solutions; and we've left it up to the solver to choose one. Typically a
-      convex optimization solver does choose something reasonable, like taking
-      the "analytic center" of the constraints, or a minimum-norm solution for
-      an unconstrained problem. But why leave this to chance? It's much better
-      for us to completely specify the problem so that there is a unique global
-      optima.</p>
+      responsibility. When the rank of $J^G$ is less than the number of columns
+      / number of degrees of freedom, then we have specified an optimization
+      problem that has an infinite number of solutions; and we've left it up to
+      the solver to choose one. Typically a convex optimization solver does
+      choose something reasonable, like taking the "analytic center" of the
+      constraints, or a minimum-norm solution for an unconstrained problem. But
+      why leave this to chance? It's much better for us to completely specify
+      the problem so that there is a unique global optima.</p>
 
       <p>In the rich history of Jacobian-based control for robotics, there is a
       very elegant idea of implementing a "secondary" control, guaranteed (in
