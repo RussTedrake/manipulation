@@ -1,0 +1,10 @@
+{
+  "intro": "6e32ce10-e406-4026-abfb-00be78c478cb",
+  "robot": "8f86172b-b597-4ceb-9bad-92d11ac7a6cc",
+  "pick": "65aad364-ef1c-45f5-a796-fac7c122e274",
+  "pose": "cc6340f5-374e-449a-a195-839a3cedec4a",
+  "clutter": "8e10b301-2776-448f-be43-c7f6fb54fa1f",
+  "force": "87d8044f-3eb2-4f25-b52f-f51a5eca68b7",
+  "trajectories": "0762b167-402a-4362-9702-7d559f0e73bb",
+  "manipulation_station": "a794b6e2-86ff-40f8-a978-0466e91906a9"
+}
