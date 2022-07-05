@@ -8,6 +8,7 @@
     <link rel="canonical" href="http://manipulation.csail.mit.edu/pose.html" />
 
     <script src="https://hypothes.is/embed.js" async></script>
+    <script type="text/javascript" src="chapters.js"></script>
     <script type="text/javascript" src="htmlbook/book.js"></script>
 
     <script src="htmlbook/mathjax-config.js" defer></script> 
@@ -52,13 +53,10 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
   <td style="width:33%;text-align:right;"><a class="next_chapter" href=clutter.html>Next Chapter</a></td>
 </tr></table>
 
-
+<script type="text/javascript">document.write(notebook_header('pose'))
+</script>
 <!-- EVERYTHING ABOVE THIS LINE IS OVERWRITTEN BY THE INSTALL SCRIPT -->
 <chapter style="counter-reset: chapter 3"><h1>Geometric Pose Estimation</h1>
-  <a href="https://deepnote.com/project/Ch-4-Geometric-Pose-Estimation-zGNA9TdORJqhlYOaPO3sSg/%2Fpose.ipynb" style="float:right; margin-top:-70px;background:white;border:0;" target="pose">
-    <img src="https://deepnote.com/buttons/launch-in-deepnote-white.svg"></a>
-    <div style="clear:right;"></div>
-
 
   <p>In the last chapter, we developed an initial solution to moving objects
   around, but we made one major assumption that would prevent us from using it
@@ -117,7 +115,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
     
       <p>Primarily RGB-D (ToF vs projected texture stereo vs ...) cameras and Lidar</p>
 
-      <p>The cameras we are using in this course are <a href="https://software.intel.com/en-us/realsense/d400">Intel RealSense D415</a>....</p>
+      <p>The cameras we are using in this course are <a href="https://www.intelrealsense.com/depth-camera-d415/">Intel RealSense D415</a>....</p>
 
       <p>Monocular depth.</p>
 
@@ -168,11 +166,7 @@ output_ports:
 
       <example class="drake"><h1>Simulating an RGB-D camera</h1>
 
-        <p><a
-        href="https://deepnote.com/project/Ch-4-Geometric-Pose-Estimation-zGNA9TdORJqhlYOaPO3sSg/%2Fpose.ipynb"
-        style="background:none; border:none;" target="pose">
-        <img
-        src="https://deepnote.com/buttons/launch-in-deepnote-white.svg"></a></p>
+        <script>document.write(notebook_link('pose'))</script>
 
         <p>As a simple example of depth cameras in drake, I've constructed a
         scene with a single object (the mustard bottle from the <a
@@ -569,11 +563,7 @@ output_ports:
       world frame.  As expected, the algorithm perfectly recovers the ground
       truth transformation.</p>
 
-      <p><a
-        href="https://deepnote.com/project/Ch-4-Geometric-Pose-Estimation-zGNA9TdORJqhlYOaPO3sSg/%2Fpose.ipynb"
-        style="background:none; border:none;" target="pose">
-        <img
-        src="https://deepnote.com/buttons/launch-in-deepnote-white.svg"></a></p>
+      <script>document.write(notebook_link('pose'))</script>
 
     </example>
 
@@ -639,11 +629,7 @@ output_ports:
       will recover the exact solution.  So every one of those steps before
       convergence has at least a few bad correspondences.  Look closely!</p>
   
-      <p><a
-        href="https://deepnote.com/project/Ch-4-Geometric-Pose-Estimation-zGNA9TdORJqhlYOaPO3sSg/%2Fpose.ipynb"
-        style="background:none; border:none;" target="pose">
-        <img
-        src="https://deepnote.com/buttons/launch-in-deepnote-white.svg"></a></p>
+      <script>document.write(notebook_link('pose'))</script>
   
     </example>      
       
@@ -683,11 +669,7 @@ output_ports:
       point), to add noise, and/or to restrict the points to a partial view.
       Please try them by themselves and in combination.</p>
 
-      <p><a
-        href="https://deepnote.com/project/Ch-4-Geometric-Pose-Estimation-zGNA9TdORJqhlYOaPO3sSg/%2Fpose.ipynb"
-        style="background:none; border:none;" target="pose">
-        <img
-        src="https://deepnote.com/buttons/launch-in-deepnote-white.svg"></a></p>
+      <script>document.write(notebook_link('pose'))</script>
   
       <figure style="margin-top:-40px;">
         <iframe style="border:0;height:300px;width:400px;" src="data/icp_outliers.html?height=240px" pdf="no"></iframe>
@@ -1133,11 +1115,7 @@ output_ports:
       <code>AddConstraint</code> methods. I've provided an implementation in
       this notebook: </p>
   
-      <p><a
-        href="https://deepnote.com/project/Ch-4-Geometric-Pose-Estimation-zGNA9TdORJqhlYOaPO3sSg/%2Fpose.ipynb"
-        style="background:none; border:none;" target="pose">
-        <img
-        src="https://deepnote.com/buttons/launch-in-deepnote-white.svg"></a></p>
+      <script>document.write(notebook_link('pose'))</script>
         
       <figure style="margin-top:-20px"><img style="width:70%"
       src="data/constrained_nonlinear_pose.svg"/><figcaption>The solution to
@@ -1175,11 +1153,7 @@ output_ports:
       (SOCP), though we need to use a slack variable to put it into the standard
       form with a linear objective.</p>
 
-      <p><a
-        href="https://deepnote.com/project/Ch-4-Geometric-Pose-Estimation-zGNA9TdORJqhlYOaPO3sSg/%2Fpose.ipynb"
-        style="background:none; border:none;" target="pose">
-        <img
-        src="https://deepnote.com/buttons/launch-in-deepnote-white.svg"></a></p>
+      <script>document.write(notebook_link('pose'))</script>
       
       <p>Please be careful.  Now that we have a constraint that depends on $p$,
       our original approach to solving for $R$ independently is no longer valid
@@ -1256,11 +1230,7 @@ output_ports:
     last chapter to pick it up and place it in the second bin.  Finally, I use
     differential inverse kinematics to execute it.  Very satisfying!</p>
 
-    <p><a
-      href="https://deepnote.com/project/Ch-4-Geometric-Pose-Estimation-zGNA9TdORJqhlYOaPO3sSg/%2Fpose.ipynb"
-      style="background:none; border:none;" target="pose">
-      <img
-      src="https://deepnote.com/buttons/launch-in-deepnote-white.svg"></a></p>
+    <script>document.write(notebook_link('pose'))</script>
 
   </section>
   
@@ -1456,9 +1426,7 @@ output_ports:
 
     <exercise><h1>Bunny ICP</h1>
       <p>For this exercise, you will implement the ICP algorithm to match
-      pointclouds of two Stanford bunnies. You will work exclusively in <a
-      href="https://deepnote.com/project/Exercise-46-Bunny-ICP-XaYFpC7xQDWvERElvNys4w/%2Fbunny_icp.ipynb"
-      target="_blank">this notebook</a>. You will be asked to complete the
+      pointclouds of two Stanford bunnies. You will work exclusively in <script>document.write(notebook_link('bunny_icp', deepnote['exercises/pose'], link_text='this notebook'))</script>. You will be asked to complete the
       following steps:</p>
       <ol type="a">
         <li> Implement a method to compute the least-squares transform given
@@ -1471,9 +1439,7 @@ output_ports:
     <exercise><h1>RANSAC</h1>
       <p>For this exercise, you will remove the environmental background from
       the Stanford bunny pointcloud using the RANSAC algorithm. You will work
-      exclusively in <a
-      href="https://deepnote.com/project/Exercise-47-RANSAC-kwPstoNITdaRQhUszC40ZQ/%2Fransac.ipynb"
-      target="_blank">this notebook</a>. You will be asked to complete the
+      exclusively in <script>document.write(notebook_link('ransac', deepnote['exercises/pose'], link_text='this notebook'))</script>. You will be asked to complete the
       following steps:</p>
       <ol type="a">
         <li> Implement the RANSAC algorithm. </li>

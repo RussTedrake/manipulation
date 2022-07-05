@@ -8,6 +8,7 @@
     <link rel="canonical" href="http://manipulation.csail.mit.edu/rl.html" />
 
     <script src="https://hypothes.is/embed.js" async></script>
+    <script type="text/javascript" src="chapters.js"></script>
     <script type="text/javascript" src="htmlbook/book.js"></script>
 
     <script src="htmlbook/mathjax-config.js" defer></script> 
@@ -52,7 +53,8 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
   <td style="width:33%;text-align:right;"><a class="next_chapter" href=drake.html>Next Chapter</a></td>
 </tr></table>
 
-
+<script type="text/javascript">document.write(notebook_header('rl'))
+</script>
 <!-- EVERYTHING ABOVE THIS LINE IS OVERWRITTEN BY THE INSTALL SCRIPT -->
 <chapter style="counter-reset: chapter 8"><h1>Reinforcement Learning</h1>
   <div style="clear:right;"></div>
@@ -220,7 +222,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
 
   <section><h1>Exercises</h1>
     <exercise><h1>Stochastic Optimization</h1>
-      <p> For this exercise, you will implement a stochastic optimization scheme that does not require exact analytical gradients. You will work exclusively in <a href="https://deepnote.com/project/91-Stochastic-Optimization-isfJAHDSSvGDxjQaZPsOFA/%2Fstochastic_optimization.ipynb" target="_blank">this notebook</a>. You will be asked to complete the following steps: </p>
+      <p> For this exercise, you will implement a stochastic optimization scheme that does not require exact analytical gradients. You will work exclusively in <script>document.write(notebook_link('stochastic_optimization', deepnote['exercises/rl'], link_text='this notebook'))</script>. You will be asked to complete the following steps: </p>
       <ol type="a">
         <li> Implement gradient descent with exact analytical gradients.
         </li>
@@ -232,7 +234,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
     </exercise>    
 
     <exercise><h1>REINFORCE</h1>
-      <p> For this exercise, you will implement the vanilla REINFORCE algorithm on a box pushing task. You will work exclusively in <a href="https://deepnote.com/project/92-REINFORCE-bDmDCq5VTsOisOTYr65teA/%2Fpolicy_gradient.ipynb" target="_blank">this notebook</a>. You will be asked to complete the following steps: </p>
+      <p> For this exercise, you will implement the vanilla REINFORCE algorithm on a box pushing task. You will work exclusively in <script>document.write(notebook_link('policy_gradient', deepnote['exercises/rl'], link_text='this notebook'))</script>. You will be asked to complete the following steps: </p>
       <ol type="a">
         <li> Implement the policy loss function. </li>
         <li> Implement the value loss function. </li>

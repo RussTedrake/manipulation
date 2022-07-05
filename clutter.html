@@ -8,6 +8,7 @@
     <link rel="canonical" href="http://manipulation.csail.mit.edu/clutter.html" />
 
     <script src="https://hypothes.is/embed.js" async></script>
+    <script type="text/javascript" src="chapters.js"></script>
     <script type="text/javascript" src="htmlbook/book.js"></script>
 
     <script src="htmlbook/mathjax-config.js" defer></script> 
@@ -52,12 +53,10 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
   <td style="width:33%;text-align:right;"><a class="next_chapter" href=segmentation.html>Next Chapter</a></td>
 </tr></table>
 
-
+<script type="text/javascript">document.write(notebook_header('clutter'))
+</script>
 <!-- EVERYTHING ABOVE THIS LINE IS OVERWRITTEN BY THE INSTALL SCRIPT -->
 <chapter style="counter-reset: chapter 4"><h1>Bin Picking</h1>
-  <a href="https://deepnote.com/project/Ch-5-Bin-Picking-jhCzASd2RI--Q8f2-1T6Hw/%2Fclutter.ipynb" style="float:right; margin-top:-70px;background:white;border:0;" target="clutter">
-  <img src="https://deepnote.com/buttons/launch-in-deepnote-white.svg"></a>
-  <div style="clear:right;"></div>
 
   <todo>Consider moving / teaching this BEFORE geometric pose estimation.  It could actually be nice to introduce cameras / point clouds with this material instead of with pose estimation.</todo>
 
@@ -138,12 +137,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
         have to simulate for a little more than a second for the bricks to come
         to rest and give us our intended "initial conditions".</p>
 
-        <p><a
-        href="https://deepnote.com/project/Ch-5-Bin-Picking-jhCzASd2RI--Q8f2-1T6Hw/%2Fclutter.ipynb"
-        style="background:none; border:none;" class="deepnote"
-        target="clutter">
-        <img
-        src="https://deepnote.com/buttons/launch-in-deepnote-white.svg"></a></p>
+        <script>document.write(notebook_link('clutter'))</script>
   
         <figure>
           <iframe style="border:0;height:300px;width:540px;" src="data/falling_bricks_2d.html?height=240px" pdf="no"></iframe>
@@ -172,12 +166,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
         the method <code>UniformlyRandomRotationMatrix</code> (and also one for
         quaternions and roll-pitch-yaw) to do that work for us.</p>
 
-        <p><a
-          href="https://deepnote.com/project/Ch-5-Bin-Picking-jhCzASd2RI--Q8f2-1T6Hw/%2Fclutter.ipynb"
-          style="background:none; border:none;" class="deepnote"
-          target="clutter">
-          <img
-          src="https://deepnote.com/buttons/launch-in-deepnote-white.svg"></a></p>
+        <script>document.write(notebook_link('clutter'))</script>
   
         <p>I had to decide how to visualize the results of this one for you.
         The mesh and texture map files for the YCB objects are very large, so
@@ -490,12 +479,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       and the information provided in the textbox display.
       </p>
 
-      <p><a
-        href="https://deepnote.com/project/Ch-5-Bin-Picking-jhCzASd2RI--Q8f2-1T6Hw/%2Fclutter.ipynb"
-        style="background:none; border:none;" class="deepnote"
-        target="clutter">
-        <img
-        src="https://deepnote.com/buttons/launch-in-deepnote-white.svg"></a></p>
+      <script>document.write(notebook_link('clutter'))</script>
 
     </example>
 
@@ -601,12 +585,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
         <figure><img style="width:60%"
           src="data/mustard_normals.png"></figure>
 
-        <p><a
-          href="https://deepnote.com/project/Ch-5-Bin-Picking-jhCzASd2RI--Q8f2-1T6Hw/%2Fclutter.ipynb"
-          style="background:none; border:none;" class="deepnote"
-          target="clutter">
-          <img
-          src="https://deepnote.com/buttons/launch-in-deepnote-white.svg"></a></p>
+        <script>document.write(notebook_link('clutter'))</script>
       
         <p>I've produced a scene with three cameras looking at our favorite YCB
         mustard bottle.  I've taken the individual point clouds (already
@@ -685,12 +664,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
         <figure><img style="width:60%"
         src="data/mustard_surface_estimation.png"></figure>
 
-        <p><a
-          href="https://deepnote.com/project/Ch-5-Bin-Picking-jhCzASd2RI--Q8f2-1T6Hw/%2Fclutter.ipynb"
-          style="background:none; border:none;" class="deepnote"
-          target="clutter">
-          <img
-          src="https://deepnote.com/buttons/launch-in-deepnote-white.svg"></a></p>
+        <script>document.write(notebook_link('clutter'))</script>
   
         <p>I've coded up the basic least-squares surface estimation algorithm,
         with the query point in green, the nearest neighbors in blue, and the
@@ -788,12 +762,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
         terms in the notebook, and given you a sliders to move the hand around
         and see how the cost changes.</p>
 
-        <p><a
-          href="https://deepnote.com/project/Ch-5-Bin-Picking-jhCzASd2RI--Q8f2-1T6Hw/%2Fclutter.ipynb"
-          style="background:none; border:none;" class="deepnote"
-          target="clutter">
-          <img
-          src="https://deepnote.com/buttons/launch-in-deepnote-white.svg"></a></p>
+        <script>document.write(notebook_link('clutter'))</script>
     
       </example>
 
@@ -865,12 +834,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
         <figure><img style="width:80%"
             src="data/grasp_candidates.png"></figure>
   
-        <p><a
-          href="https://deepnote.com/project/Ch-5-Bin-Picking-jhCzASd2RI--Q8f2-1T6Hw/%2Fclutter.ipynb"
-          style="background:none; border:none;" class="deepnote"
-          target="clutter">
-          <img
-          src="https://deepnote.com/buttons/launch-in-deepnote-white.svg"></a></p>
+        <script>document.write(notebook_link('clutter'))</script>
         
       </example>
 
@@ -954,9 +918,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
         why or why not. Remember that both torques and forces need to be
         balanced for all bodies to be in equilibrium.</p>
 
-        <p>To help you solve these problems, we have <a
-        href="https://deepnote.com/project/Exercise-51-Assessing-static-equilibrium-2I5TX7SESPGgkr533KhVgw/%2Fstatic_equilibrium.ipynb">a
-        notebook</a> to help you build intuition and test your answers. It lets
+        <p>To help you solve these problems, we have <script>document.write(notebook_link('static_equilibrium', deepnote['exercises/clutter'], link_text='a notebook'))</script> to help you build intuition and test your answers. It lets
         you specify the configuration of the spheres and then uses the <a
         href="https://drake.mit.edu/doxygen_cxx/classdrake_1_1multibody_1_1_static_equilibrium_problem.html">StaticEquilbriumProblem</a>
         class to solve for static equilibrium. Use this notebook to help
@@ -996,7 +958,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       </exercise>
 
     <exercise><h1>Normal Estimation from Depth</h1>
-      <p>For this exercise, you will investigate a slightly different approach to normal vector estimation. In particular, we can exploit the spatial structure that is already in a depth image to avoid computing nearest neighbors. You will work exclusively in <a href="https://deepnote.com/project/52-Normal-Estimation-from-Depth-plsl4e2hTd63nWEgo9khBw/%2Fnormal_estimation_depth.ipynb" target="_blank">this notebook</a>. You will be asked to complete the following steps:</p>
+      <p>For this exercise, you will investigate a slightly different approach to normal vector estimation. In particular, we can exploit the spatial structure that is already in a depth image to avoid computing nearest neighbors. You will work exclusively in <script>document.write(notebook_link('normal_estimation_depth', deepnote['exercises/clutter'], link_text='this notebook'))</script>. You will be asked to complete the following steps:</p>
       <ol type="a">
         <li> Implement a method to estimate normal vectors from a depth image, without computing nearest neighbors. </li>
         <li> Reason about a scenario where the depth image-based solution will not be as performant as computing nearest-neighbors.</li>
@@ -1004,7 +966,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
     </exercise>
 
     <exercise><h1>Analytic Antipodal Grasping</h1>
-      <p>So far, we have used sampling-based methods to find antipodal grasps - but can we have find one analytically if we knew the equation of the object shape? For this exercise, you will analyze and implement a correct-by-construction method to find antipodal points using symbolic differentiation and MathematicalProgram. You will work exclusively in <a href="https://deepnote.com/project/53-Analytic-Antipodal-Grasping-ukPUQmOZShSgyP8TvAG3lw/%2Fanalytic_antipodal_grasps.ipynb" target="_blank">this notebook</a>. You will be asked to complete the following steps:</p>
+      <p>So far, we have used sampling-based methods to find antipodal grasps - but can we have find one analytically if we knew the equation of the object shape? For this exercise, you will analyze and implement a correct-by-construction method to find antipodal points using symbolic differentiation and MathematicalProgram. You will work exclusively in <script>document.write(notebook_link('analytic_antipodal_grasps', deepnote['exercises/clutter'], link_text='this notebook'))</script>. You will be asked to complete the following steps:</p>
       <ol type="a">
         <li> Prove that antipodal points are critical points of an energy function defined on the shape. </li>
         <li> Prove the converse does not hold.</li>
@@ -1019,9 +981,8 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       antipodal heuristic.  In this exercise, we will investigate an alternative
       method for generating grasp candidates based on local curvature, similar
       to the one proposed in <elib>tenPas17</elib>. This exercise is
-      implementation-heavy, and you will work exclusively in <a
-      href="https://deepnote.com/project/54-Grasp-Candidate-Generation-AjoJNLmcT-qvywcR7WiUlg/%2Fgrasp_candidate.ipynb"
-      target="_blank">this notebook</a>.</p>
+      implementation-heavy, and you will work exclusively in <script>document.write(notebook_link('grasp_candidate', deepnote['exercises/clutter'], link_text='this notebook'))</script>.</p>
+      
     </exercise>    
 
     <exercise id="behaviorTrees"><h1>Behavior Trees</h1>

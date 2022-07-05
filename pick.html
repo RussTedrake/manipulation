@@ -8,6 +8,7 @@
     <link rel="canonical" href="http://manipulation.csail.mit.edu/pick.html" />
 
     <script src="https://hypothes.is/embed.js" async></script>
+    <script type="text/javascript" src="chapters.js"></script>
     <script type="text/javascript" src="htmlbook/book.js"></script>
 
     <script src="htmlbook/mathjax-config.js" defer></script> 
@@ -52,12 +53,10 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
   <td style="width:33%;text-align:right;"><a class="next_chapter" href=pose.html>Next Chapter</a></td>
 </tr></table>
 
-
+<script type="text/javascript">document.write(notebook_header('pick'))
+</script>
 <!-- EVERYTHING ABOVE THIS LINE IS OVERWRITTEN BY THE INSTALL SCRIPT -->
 <chapter style="counter-reset: chapter 2"><h1>Basic Pick and Place</h1>
-  <a href="https://deepnote.com/project/Ch-3-Basic-Pick-and-Place-ZarTZO8cRfWnlvrHwSLidA/%2Fpick.ipynb" style="float:right; margin-top:-70px;background:white;border:0;" target="pick">
-    <img src="https://deepnote.com/buttons/launch-in-deepnote-white.svg"></a>
-    <div style="clear:right;"></div>
 
   <figure>
     <img src="figures/pick.png" style="width:70%"/>
@@ -345,7 +344,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
         example, too, so that you can see that a "free" body is just another
         branch off the world root node.</p>
 
-        <p><a href="https://deepnote.com/project/Ch-3-Basic-Pick-and-Place-ZarTZO8cRfWnlvrHwSLidA/%2Fpick.ipynb" style="background:none; border:none;" target="pick">  <img src="https://deepnote.com/buttons/launch-in-deepnote-white.svg"></a></p>
+        <script>document.write(notebook_link('pick'))</script>
     
         <todo>Insert topology visualization here (once it is better)</todo>
       </example>
@@ -402,7 +401,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
         just a part of the total state of the <code>MultibodyPlant</code>.  The
         following example shows you how it works.</p>
 
-        <p><a href="https://deepnote.com/project/Ch-3-Basic-Pick-and-Place-ZarTZO8cRfWnlvrHwSLidA/%2Fpick.ipynb" style="background:none; border:none;" target="pick">  <img src="https://deepnote.com/buttons/launch-in-deepnote-white.svg"></a></p>
+        <script>document.write(notebook_link('pick'))</script>
 
         <p>The key lines are 
           <code class="language-python"><pre>
@@ -557,7 +556,7 @@ pose = plant.EvalBodyPoseInWorld(context, gripper)</pre></code>
       <code>MultibodyPlant</code>, and then prints its
       <code>Context</code>.</p>
 
-      <p><a href="https://deepnote.com/project/Ch-3-Basic-Pick-and-Place-ZarTZO8cRfWnlvrHwSLidA/%2Fpick.ipynb" style="background:none; border:none;" target="pick">  <img src="https://deepnote.com/buttons/launch-in-deepnote-white.svg"></a></p>
+      <script>document.write(notebook_link('pick'))</script>
 
       <p>The output looks like this:
       <code><pre>Context
@@ -603,7 +602,7 @@ plant.num_velocities() = 6</pre></code></p>
     
       <p>Let's repeat the setup from above, but we'll print out the Jacobian of the gripper frame, relative to the world frame, expressed in the world frame.</p>
 
-      <p><a href="https://deepnote.com/project/Ch-3-Basic-Pick-and-Place-ZarTZO8cRfWnlvrHwSLidA/%2Fpick.ipynb" style="background:none; border:none;" target="pick">  <img src="https://deepnote.com/buttons/launch-in-deepnote-white.svg"></a></p>
+      <script>document.write(notebook_link('pick'))</script>
 
     </example>
 
@@ -678,7 +677,7 @@ plant.num_velocities() = 6</pre></code></p>
         worth finding the important lines and making sure you can change them
         and see what happens!</p>
 
-        <p><a href="https://deepnote.com/project/Ch-3-Basic-Pick-and-Place-ZarTZO8cRfWnlvrHwSLidA/%2Fpick.ipynb" style="background:none; border:none;" target="pick">  <img src="https://deepnote.com/buttons/launch-in-deepnote-white.svg"></a></p>
+        <script>document.write(notebook_link('pick'))</script>
   
         <p>Congratulations!  Things are really moving now.</p>
 
@@ -707,7 +706,7 @@ plant.num_velocities() = 6</pre></code></p>
         See if you can find configurations where the smallest singular value
         gets close to zero.</p>
 
-        <p><a href="https://deepnote.com/project/Ch-3-Basic-Pick-and-Place-ZarTZO8cRfWnlvrHwSLidA/%2Fpick.ipynb" style="background:none; border:none;" target="pick">  <img src="https://deepnote.com/buttons/launch-in-deepnote-white.svg"></a></p>
+        <script>document.write(notebook_link('pick'))</script>
 
         <p>Here's a hint: try some configurations where the arm is very
         straight, (e.g. driving joint 2 and 4 close to zero).</p>
@@ -840,7 +839,7 @@ plant.num_velocities() = 6</pre></code></p>
       transformation clearly), and rendering the hand relative to the
       object.</p>
 
-      <p><a href="https://deepnote.com/project/Ch-3-Basic-Pick-and-Place-ZarTZO8cRfWnlvrHwSLidA/%2Fpick.ipynb" style="background:none; border:none;" target="pick">  <img src="https://deepnote.com/buttons/launch-in-deepnote-white.svg"></a></p>
+      <script>document.write(notebook_link('pick'))</script>
 
       <p>I hope you can see the value of having good notation at work here.  My
       right hand was in the air when I was deciding what a suitable relative
@@ -866,7 +865,7 @@ plant.num_velocities() = 6</pre></code></p>
 
     <example><h1>A plan "sketch"</h1>
 
-      <p><a href="https://deepnote.com/project/Ch-3-Basic-Pick-and-Place-ZarTZO8cRfWnlvrHwSLidA/%2Fpick.ipynb" style="background:none; border:none;" target="pick">  <img src="https://deepnote.com/buttons/launch-in-deepnote-white.svg"></a></p>
+      <script>document.write(notebook_link('pick'))</script>
 
       <figure>
         <img style="width:70%" src="figures/pick_sketch.png"/>
@@ -918,7 +917,7 @@ plant.num_velocities() = 6</pre></code></p>
       connected to 3D.  I've plotted the <i>position</i> trajectory as a
       function of time below.<p>  
 
-      <p><a href="https://deepnote.com/project/Ch-3-Basic-Pick-and-Place-ZarTZO8cRfWnlvrHwSLidA/%2Fpick.ipynb" style="background:none; border:none;" target="pick">  <img src="https://deepnote.com/buttons/launch-in-deepnote-white.svg"></a></p>
+      <script>document.write(notebook_link('pick'))</script>
 
       <figure>
         <img width="60%" src="data/gripper_position_trajectory.svg"/>
@@ -976,7 +975,7 @@ plant.num_velocities() = 6</pre></code></p>
       result.  <a href="data/pick.html">Click here to watch it without doing the
       work</a>.</p>
 
-      <p><a href="https://deepnote.com/project/Ch-3-Basic-Pick-and-Place-ZarTZO8cRfWnlvrHwSLidA/%2Fpick.ipynb" style="background:none; border:none;" target="pick">  <img src="https://deepnote.com/buttons/launch-in-deepnote-white.svg"></a></p>
+      <script>document.write(notebook_link('pick'))</script>
 
       <figure>
         <img width="100%" src="data/pick_diagram.svg"/>
@@ -1298,7 +1297,7 @@ plant.num_velocities() = 6</pre></code></p>
   </exercise>
 
   <exercise id="planar_manipulator"><h1>Planar Manipulator</h1>
-      <p> For this exercise you will derive the translational forward kinematics ${^A}p{^C}=f(q)$ and the translational Jacobian $J(q)$ of a planar two-link manipulator. You will work exclusively in <a href="https://deepnote.com/project/Exercise-35-Planar-Manipulator-AqcZAJjkSBelVJgWvOT9wQ/%2Fplanar_manipulator.ipynb" target="_blank">this notebook</a>. You will be asked to complete the following steps: </p>
+      <p> For this exercise you will derive the translational forward kinematics ${^A}p{^C}=f(q)$ and the translational Jacobian $J(q)$ of a planar two-link manipulator. You will work exclusively in <script>document.write(notebook_link('planar_manipulator', deepnote['exercises/pick'], link_text='this notebook'))</script>. You will be asked to complete the following steps: </p>
 
       <ol type="a">
         <li> Derive the forward kinematics of the manipulator. </li>
@@ -1349,7 +1348,7 @@ plant.num_velocities() = 6</pre></code></p>
   </exercise>
 
   <exercise id="spatial_transforms"><h1>Spatial Transforms and Grasp Pose</h1>
-      <p> For this exercise you will apply your knowledge on spatial algebra to write poses of frames in different reference frames, and design a grasp pose yourself. You will work exclusively in <a href="https://deepnote.com/project/Exercise-37-Spatial-Transforms-and-Grasp-Pose-8zhcFrbnT1q70GUM4EneEA/%2Frigid_transforms.ipynb" target="_blank">this notebook</a>. You will be asked to complete the following steps: </p>
+      <p> For this exercise you will apply your knowledge on spatial algebra to write poses of frames in different reference frames, and design a grasp pose yourself. You will work exclusively in <script>document.write(notebook_link('rigid_transforms', deepnote['exercises/pick'], link_text='this notebook'))</script>. You will be asked to complete the following steps: </p>
 
       <ol type="a">
         <li> Express poses of frames in different reference frames using spatial algebra. </li>
@@ -1358,7 +1357,7 @@ plant.num_velocities() = 6</pre></code></p>
   </exercise>
 
   <exercise id="robot_painter"><h1>The Robot Painter</h1>
-      <p> For this exercise you will design interesting trajectories for the robot to follow, and observe the robot virtually painting in the air! You will work exclusively in <a href="https://deepnote.com/project/Exercise-38-The-Robot-Painter-GLoEgX4wRrqeffezRQDW3A/%2Frobot_painter.ipynb" target="_blank">this notebook</a>. You will be asked to complete the following steps: </p>
+      <p> For this exercise you will design interesting trajectories for the robot to follow, and observe the robot virtually painting in the air! You will work exclusively in <script>document.write(notebook_link('robot_painter', deepnote['exercises/pick'], link_text='this notebook'))</script>. You will be asked to complete the following steps: </p>
 
       <ol type="a">
         <li> Design and compute the poses of key frames of a designated trajectory. </li>
@@ -1367,11 +1366,11 @@ plant.num_velocities() = 6</pre></code></p>
   </exercise>  
 
   <exercise id="intro_to_qp"><h1>Introduction to QPs</h1>
-      <p> For this exercise you will practice the syntax of solving Quadratic Programs (QPs) via Drake's MathematicalProgram interface. You will work exclusively in <a href="https://deepnote.com/project/Exercise-39-Introduction-to-QPs-Xs_H3zw7TGCAhB6biSKdLw/%2Fintro_to_qp.ipynb" target="_blank">this notebook</a>.</p> 
+      <p> For this exercise you will practice the syntax of solving Quadratic Programs (QPs) via Drake's MathematicalProgram interface. You will work exclusively in <script>document.write(notebook_link('intro_to_qp', deepnote['exercises/pick'], link_text='this notebook'))</script>.</p> 
   </exercise>  
 
   <exercise id="virtual_wall"><h1>Virtual Wall</h1>
-      <p> For this exercise you will implement a virtual wall for a robot manipulator, using an optimization-based approach to differential inverse kinematics. You will work exclusively in <a href="https://deepnote.com/project/Exercise-310-Virtual-Wall-mPBzIDuiTxerW2E7cnDKbA/%2Fdifferential_ik_optimization.ipynb" target="_blank">this notebook</a>. You will be asked to complete the following steps: </p>
+      <p> For this exercise you will implement a virtual wall for a robot manipulator, using an optimization-based approach to differential inverse kinematics. You will work exclusively in <script>document.write(notebook_link('differential_ik_optimization', deepnote['exercises/pick'], link_text='this notebook'))</script>. You will be asked to complete the following steps: </p>
 
       <ol type="a">
         <li> Implement a optimization-based differential IK controller with joint velocity limits. </li>

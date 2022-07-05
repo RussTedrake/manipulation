@@ -10,6 +10,7 @@ segmentation" content="text/html; charset=utf-8;" />
     <link rel="canonical" href="http://manipulation.csail.mit.edu/segmentation.html" />
 
     <script src="https://hypothes.is/embed.js" async></script>
+    <script type="text/javascript" src="chapters.js"></script>
     <script type="text/javascript" src="htmlbook/book.js"></script>
 
     <script src="htmlbook/mathjax-config.js" defer></script> 
@@ -54,7 +55,8 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
   <td style="width:33%;text-align:right;"><a class="next_chapter" href=force.html>Next Chapter</a></td>
 </tr></table>
 
-
+<script type="text/javascript">document.write(notebook_header('segmentation'))
+</script>
 <!-- EVERYTHING ABOVE THIS LINE IS OVERWRITTEN BY THE INSTALL SCRIPT -->
 <chapter style="counter-reset: chapter 5"><h1>Object detection and
 segmentation</h1>
@@ -389,7 +391,7 @@ segmentation</h1>
 
     <exercise><h1>Label Generation</h1>
 
-      <p> For this exericse, you will look into a simple trick to automatically generate training data for Mask-RCNN. You will work exclusively in <a href="https://deepnote.com/project/61-Label-Generation-yRBDseApSxaZJJ96ynWgEA/%2Flabel_generation.ipynb" target="_blank">this notebook</a>. You will be asked to complete the following steps: </p>
+      <p> For this exericse, you will look into a simple trick to automatically generate training data for Mask-RCNN. You will work exclusively in <script>document.write(notebook_link('label_generation', deepnote['exercises/segmentation'], link_text='this notebook'))</script>. You will be asked to complete the following steps: </p>
 
       <ol type="a">
         <li> Automatically generate mask labels from pre-processed point clouds.
@@ -404,9 +406,7 @@ segmentation</h1>
 
       <p> For this exercise, you will use Mask-RCNN and our previously
       developed antipodal grasp strategy to select a grasp given a point cloud.
-      You will work exclusively in <a
-      href="https://deepnote.com/project/62-Segmentation-Antipodal-Grasping-fYNgzQrKTW63BKOn2bd2FQ/%2Fsegmentation_and_grasp.ipynb"
-      target="_blank">this notebook</a>. You will be asked to complete the
+      You will work exclusively in <script>document.write(notebook_link('segmentation_and_grasp', deepnote['exercises/segmentation'], link_text='this notebook'))</script>. You will be asked to complete the
       following steps: </p>
 
       <ol type="a">

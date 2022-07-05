@@ -8,6 +8,7 @@
     <link rel="canonical" href="http://manipulation.csail.mit.edu/trajectories.html" />
 
     <script src="https://hypothes.is/embed.js" async></script>
+    <script type="text/javascript" src="chapters.js"></script>
     <script type="text/javascript" src="htmlbook/book.js"></script>
 
     <script src="htmlbook/mathjax-config.js" defer></script> 
@@ -52,14 +53,10 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
   <td style="width:33%;text-align:right;"><a class="next_chapter" href=rl.html>Next Chapter</a></td>
 </tr></table>
 
-
+<script type="text/javascript">document.write(notebook_header('trajectories'))
+</script>
 <!-- EVERYTHING ABOVE THIS LINE IS OVERWRITTEN BY THE INSTALL SCRIPT -->
 <chapter style="counter-reset: chapter 7"><h1>Motion Planning</h1>
-    <a href="https://deepnote.com/project/Ch-8-Motion-Planning-B2KxZ0AqQ2KXAn1Vnw5zuw/%2Ftrajectories.ipynb" style="float:right; margin-top:-70px;background:white;border:0;" target="trajectories">
-        <img src="https://deepnote.com/buttons/launch-in-deepnote-white.svg"></a>
-        <div style="clear:right;"></div>
-    
-  
 
   <p>There are a few more essential skills that we need in our toolbox.  In this
   chapter, we will explore some of the powerful methods of kinematic trajectory
@@ -257,7 +254,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
         interactive rates.  I've assembled a few examples of this in the
         chapter notebook:</p>
 
-        <p><a href="https://deepnote.com/project/Ch-8-Motion-Planning-B2KxZ0AqQ2KXAn1Vnw5zuw/%2Ftrajectories.ipynb" style="background:none; border:none;" target="trajectories">  <img src="https://deepnote.com/buttons/launch-in-deepnote-white.svg"></a></p>
+        <script>document.write(notebook_link('trajectories'))</script>
 
         <p>In the first version, I've added sliders to let you control the
         desired pose of the end-effector.  This is the simple version of the IK
@@ -345,7 +342,7 @@ ik.AddPositionConstraint(
         axis as unconstrained, and capture the cylinder position constraints
         all quite nicely.</p>
 
-        <p><a href="https://deepnote.com/project/Ch-8-Motion-Planning-B2KxZ0AqQ2KXAn1Vnw5zuw/%2Ftrajectories.ipynb" style="background:none; border:none;" target="trajectories">  <img src="https://deepnote.com/buttons/launch-in-deepnote-white.svg"></a></p>
+        <script>document.write(notebook_link('trajectories'))</script>
 
       </example>
 
@@ -385,11 +382,7 @@ ik.AddPositionConstraint(
         <a href="data/iiwa_shelves_configuration_space.html">3D
         visualization</a> so you can navigate around it yourself.  Scary!</p>
 
-        <p><a
-        href="https://deepnote.com/project/Ch-8-Motion-Planning-B2KxZ0AqQ2KXAn1Vnw5zuw/%2Ftrajectories.ipynb"
-        style="background:none; border:none;" class="deepnote"
-        target="trajectories">  <img
-        src="https://deepnote.com/buttons/launch-in-deepnote-white.svg"></a></p>
+        <script>document.write(notebook_link('trajectories'))</script>
 
       </example>
 
@@ -399,11 +392,7 @@ ik.AddPositionConstraint(
         href="data/shelf_ik_prog.html">The global optimization problem.</a>
         Nonlinear optimizers like SNOPT can be pretty amazing sometimes!</p>
       
-        <p><a
-        href="https://deepnote.com/project/Ch-8-Motion-Planning-B2KxZ0AqQ2KXAn1Vnw5zuw/%2Ftrajectories.ipynb"
-        style="background:none; border:none;" class="deepnote"
-        target="trajectories">  <img
-        src="https://deepnote.com/buttons/launch-in-deepnote-white.svg"></a></p>
+        <script>document.write(notebook_link('trajectories'))</script>
 
     </example>
 
@@ -470,23 +459,15 @@ ik.AddPositionConstraint(
     
       <example><h1>The basic RRT</h1>
     
-        <p><a
-        href="https://deepnote.com/project/Ch-8-Motion-Planning-B2KxZ0AqQ2KXAn1Vnw5zuw/%2Ftrajectories.ipynb"
-        style="background:none; border:none;" class="deepnote"
-        target="trajectories">  <img
-        src="https://deepnote.com/buttons/launch-in-deepnote-white.svg"></a></p>
+        <script>document.write(notebook_link('trajectories'))</script>
       </example>
     
     </subsection>
 
     <example><h1>The RRT "Bug Trap"</h1>
     
-        <p><a
-        href="https://deepnote.com/project/Ch-8-Motion-Planning-B2KxZ0AqQ2KXAn1Vnw5zuw/%2Ftrajectories.ipynb"
-        style="background:none; border:none;" class="deepnote"
-        target="trajectories"> <img
-        src="https://deepnote.com/buttons/launch-in-deepnote-white.svg"></a></p>
-      </example>
+      <script>document.write(notebook_link('trajectories'))</script>
+    </example>
     
     </subsection>
 
@@ -516,7 +497,7 @@ ik.AddPositionConstraint(
 
   <section><h1>Exercises</h1>
     <exercise><h1>Door Opening</h1>
-      <p> For this exercise, you will implement a optimization-based inverse kinematics solver to open a cupboard door. You will work exclusively in <a href="https://deepnote.com/project/81-Door-Opening-ZlPcs741QfuSbgWO0ptEYQ/%2Fdoor_opening.ipynb" target="_blank">this notebook</a>. You will be asked to complete the following steps: </p>
+      <p> For this exercise, you will implement a optimization-based inverse kinematics solver to open a cupboard door. You will work exclusively in <script>document.write(notebook_link('door_opening', deepnote['exercises/trajectories'], link_text='this notebook'))</script>. You will be asked to complete the following steps: </p>
       <ol type="a">
         <li> Write down the constraints on the IK problem of grabbing a cupboard handle.
         </li>
@@ -526,7 +507,7 @@ ik.AddPositionConstraint(
     </exercise>    
 
     <exercise id="rrtExercise"><h1>RRT Motion Planning</h1>
-      <p> For this exercise, you will implement and analyze the RRT algorithm introduced in class. You will work exclusively in <a href="https://deepnote.com/project/82-RRT-Motion-Planning-Q5JO4yZpSpayP1fpqP2pbw/%2Frrt_planning.ipynb" target="_blank">this notebook</a>. You will be asked to complete the following steps: </p>
+      <p> For this exercise, you will implement and analyze the RRT algorithm introduced in class. You will work exclusively in <script>document.write(notebook_link('rrt_planning', deepnote['exercises/trajectories'], link_text='this notebook'))</script>. You will be asked to complete the following steps: </p>
       <ol type="a">
         <li> Implement the RRT algorithm for the Kuka arm.
         </li>
