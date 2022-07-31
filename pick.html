@@ -784,12 +784,21 @@ plant.num_velocities() = 6</pre></code></p>
       an end-effector trajectory using the pseudo-inverse controller that moves
       along a closed-path in the task space, coming back to the original
       end-effector pose at time one: $X^G(1) = X^G(0)$. Unfortunately, there is
+<<<<<<< HEAD
       no guarantee that $q(1) = q(0)$; this is not simply due to numerical
       errors in our numerical implementation, it is well known that the
       pseudo-inverse does not in general produce an integrable function.
       <elib>Mussa-Ivaldi91</elib> discusses this thoroughly, and proposed a
       weighted pseudo-inverse that can restore the integrability conditions by
       means of a virtual "compliance function".</p>
+=======
+      no guarantee that $q(1) = q(0)$; this is not only due to numerical errors
+      in our numerical implementation, but a simple property of the
+      under-determined pseudo-inverse. <elib>Mussa-Ivaldi91</elib> discusses
+      this thoroughly, and proposed a weighted pseudo-inverse that can restore
+      the integrability conditions by means of a virtual "compliance
+      function".</p>
+>>>>>>> 2b41d66 (add note on integrability of the pseudo-inverse controller)
 
     </subsection>
 
