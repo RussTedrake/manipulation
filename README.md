@@ -10,4 +10,4 @@ http://manipulation.mit.edu/
 To cite this software (or the corresponding textbook), please use:
 
 Russ Tedrake. _Robot Manipulation: Perception, Planning, and Control (Course
-Notes for MIT 6.800/6.843)._ Downloaded on [date] from <http://manipulation.mit.edu/>.
+Notes for MIT 6.4210/6.4212)._ Downloaded on [date] from <http://manipulation.mit.edu/>.
