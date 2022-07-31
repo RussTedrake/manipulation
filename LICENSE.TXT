@@ -1,5 +1,5 @@
-Copyright (c) 2020-2021, Massachusetts Institute of Technology.
-Copyright (c) 2020-2021, Russ Tedrake.
+Copyright (c) 2020-2022, Massachusetts Institute of Technology.
+Copyright (c) 2020-2022, Russ Tedrake.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
