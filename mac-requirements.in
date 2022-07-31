@@ -6,6 +6,7 @@ mpld3>=0.5.6 # for matplotlib>=3.5.0
 #nevergrad>=0.4.3; platform_machine == 'x86_64'
 pymcubes>=0.1
 requests>=2.25
+scipy
 stable-baselines3>=1.4.0
 tensorboard>=2.5.0
 timeout-decorator>=0.5
