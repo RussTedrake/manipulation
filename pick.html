@@ -761,18 +761,35 @@ plant.num_velocities() = 6</pre></code></p>
         <p>There are a few things to understand.  At the singularity, there is
         nothing that the robot can do to move its gripper farther in positive
         $x$ -- that singularity is real.  But it is also true that there is no
-        way for the robot to move instantaneously back in the direction of $-x.$
-        The Jacobian analysis is not an approximation, it is a perfect
+        way for the robot to move instantaneously back in the direction of
+        $-x.$ The Jacobian analysis is not an approximation, it is a perfect
         description of the relationship between joint velocities and gripper
         velocities.  However, just because you cannot achieve an instantaneous
         velocity in the backwards direction, it does not mean you cannot get
-        there!  At $t=1$, even though the joint velocities are constant, and the
-        translational Jacobian is singular, the robot is <i>accelerating</i> in $-x$,
-        $\ddot{p}^G_{W_x}(t) = -2\cos(1-t).$</p>
+        there!  At $t=1$, even though the joint velocities are constant, and
+        the translational Jacobian is singular, the robot is
+        <i>accelerating</i> in $-x$, $\ddot{p}^G_{W_x}(t) = -2\cos(1-t).$</p>
 
-        <todo>Update this to use the two-link iiwa (like i've done in the qp_diff_ik notebook).  The link lengths aren't *quite* one to one, but it's close.  could have a point on the second link that is the right distance away, or just add the ratio logic here.</todo>
+        <todo>Update this to use the two-link iiwa (like i've done in the
+        qp_diff_ik notebook).  The link lengths aren't *quite* one to one, but
+        it's close.  could have a point on the second link that is the right
+        distance away, or just add the ratio logic here.</todo>
 
       </example>
+
+      <p>For the cases when the Jacobian does not have a unique inverse, there
+      is an interesting subtlety to be aware of regarding <i>integrability</i>.
+      Let's start our robot in at time zero in a joint configuration, $q(0)$
+      with a corresponding in an end-effector pose $X^G(0)$. Now let us execute
+      an end-effector trajectory using the pseudo-inverse controller that moves
+      along a closed-path in the task space, coming back to the original
+      end-effector pose at time one: $X^G(1) = X^G(0)$. Unfortunately, there is
+      no guarantee that $q(1) = q(0)$; this is not simply due to numerical
+      errors in our numerical implementation, it is well known that the
+      pseudo-inverse does not in general produce an integrable function.
+      <elib>Mussa-Ivaldi91</elib> discusses this thoroughly, and proposed a
+      weighted pseudo-inverse that can restore the integrability conditions by
+      means of a virtual "compliance function".</p>
 
     </subsection>
 
@@ -1442,6 +1459,12 @@ plant.num_velocities() = 6</pre></code></p>
 <span class="author">John Stillwell</span>, 
 <span class="title">"Naive {L}ie theory"</span>, Springer Science \& Business Media
 , <span class="year">2008</span>.
+
+</li><br>
+<li id=Mussa-Ivaldi91>
+<span class="author">Ferdinando A. Mussa-Ivaldi and Neville Hogan</span>, 
+<span class="title">"Integrable Solutions of Kinematic Redundancy via Impedance Control"</span>, 
+<span class="publisher">The International Journal of Robotics Research</span>, vol. 10, no. 5, pp. 481-491, <span class="year">1991</span>.
 
 </li><br>
 <li id=Boyd04a>
