@@ -4,3 +4,4 @@
 brew "bazel"
 brew "python@3.9"
 brew "tidy-html5"
+brew "scipy"  # https://github.com/RussTedrake/manipulation/issues/189
