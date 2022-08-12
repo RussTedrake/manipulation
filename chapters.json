@@ -14,12 +14,12 @@
     "misc"
   ],
   "other_potential_chapters": [ 
-    "(learned) visual representations (dense descriptors, etc)",
+    "(learned) visual representations (autoencoders, dense descriptors, tcc, etc)",
     "visuomotor / imitation learning / behavior cloning",
     "task (behavior trees, tamp)",
     "underactuated (maybe dexterous?)",
     "belief-space planning",
-    "tactile (estimation, tracking, slip detection, etc)?"
+    "tactile (estimation, tracking, slip detection, etc)?",
     "tracking",
     "dense reconstruction.  NeRF, kinect fusion, elastic fusion, surfelwarp",
     "mobile (octrees, estimation, etc)",
