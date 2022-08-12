@@ -14,19 +14,18 @@
     "misc"
   ],
   "other_potential_chapters": [ 
-    "trajectories (time-optimal rescaling e.g. TOPPRA)",
-    "category",
-    "task (behavior trees, tamp)",
-    "belief-space planning",
-    "tracking",
-    "dense reconstruction.  kinect fusion, elastic fusion, surfelwarp",
-    "mobile (octrees, estimation, etc)",
-    "underactuated (maybe dexterous?)",
-    "teleop (keyboard + mouse, HTC Vive, data gloves, haptic feedback)",
+    "(learned) visual representations (dense descriptors, etc)",
     "visuomotor / imitation learning / behavior cloning",
-    "system id / intuitive physics",
+    "task (behavior trees, tamp)",
+    "underactuated (maybe dexterous?)",
+    "belief-space planning",
+    "tactile (estimation, tracking, slip detection, etc)?"
+    "tracking",
+    "dense reconstruction.  NeRF, kinect fusion, elastic fusion, surfelwarp",
+    "mobile (octrees, estimation, etc)",
+    "teleop (keyboard + mouse, HTC Vive, data gloves, haptic feedback)",
+    "system id / intuitive physics / real 2 sim",
     "verification and/or distributions over the world (scene grammars)",
-    "tactile feedback (estimation, tracking, slip detection, etc)?"
   ],
   "parts_format": "dict(first chapter id, name of the part)",
   "parts" : {
