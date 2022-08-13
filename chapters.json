@@ -25,7 +25,7 @@
     "mobile (octrees, estimation, etc)",
     "teleop (keyboard + mouse, HTC Vive, data gloves, haptic feedback)",
     "system id / intuitive physics / real 2 sim",
-    "verification and/or distributions over the world (scene grammars)",
+    "verification and/or distributions over the world (scene grammars)"
   ],
   "parts_format": "dict(first chapter id, name of the part)",
   "parts" : {
