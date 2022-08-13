@@ -2,5 +2,5 @@
 # vi: set ft=ruby :
 
 brew "bazel"
-brew "python@3.9"
+brew "python@3.10"
 brew "tidy-html5"
