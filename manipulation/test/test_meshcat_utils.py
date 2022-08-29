@@ -1,4 +1,4 @@
-import manipulation.meshcat_cpp_utils as dut
+import manipulation.meshcat_utils as dut
 
 import numpy as np
 from pydrake.all import MathematicalProgram, Solve, Meshcat
