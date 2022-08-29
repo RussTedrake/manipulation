@@ -211,15 +211,15 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
     manipulation research.  Our software tools have (very recently) gotten much
     better!</p>
       
-    <p>It was only about four years ago that I remember talking to my students,
-    who were all quite adept at using simulation for developing control systems
-    for walking robots, about using simulation for manipulation.  "You can't
-    work on manipulation in simulation" was their refrain, and for good reason.
-    The complexity of the contact mechanics in manipulation has traditionally
-    been much harder to simulate than a walking robot that only interacts with
-    the ground and through a minimal set of contact points.  Looming even
-    larger, though, was the centrality of perception for manipulation; it was
-    generally accepted that one could not simulate a camera well enough to be
+    <p>I remember a just few years ago (~2015) talking to my PhD students, who
+    were all quite adept at using simulation for developing control systems for
+    walking robots, about using simulation for manipulation.  "You can't work
+    on manipulation in simulation" was their refrain, and for good reason. The
+    complexity of the contact mechanics in manipulation has traditionally been
+    much harder to simulate than a walking robot that only interacts with the
+    ground and through a minimal set of contact points.  Looming even larger,
+    though, was the centrality of perception for manipulation; it was generally
+    accepted that one could not simulate a camera well enough to be
     meaningful.</p>
       
     <p>How quickly things can change!  The last few years has seen a rapid
@@ -248,23 +248,23 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
     online interactive compute, I am trying to make these notes more than what
     you would find in a traditional text.  Each chapter will have working code
     examples, which you can run immediately (no installation required) on <a
-    href="https://deepnote.com">Deepnote</a>, or
-    download/install and run on your local machine (see the <a
-    href="drake.html">appendix</a> for more details).  It uses an open-source
-    library called <drake></drake> which has been a labor of love for me over
-    the last 8 years or so.  Because all of the code is open source, it is
-    entirely up to you how deep into the rabbit hole you choose to go.</p>
+    href="https://deepnote.com">Deepnote</a>, or download/install and run on
+    your local machine (see the <a href="drake.html">appendix</a> for more
+    details).  It uses an open-source library called <drake></drake> which has
+    been a labor of love for me since around 2013 when I started taking our
+    research code and making it more broadly available. Because all of the code
+    is open source, it is entirely up to you how deep into the rabbit hole you
+    choose to go.</p>
     
     <p>Mortimer Adler famously said "Reading a [great] book should be a
     conversation between you and the author." In addition to the interactive
     graphics/code, I've added the ability to highlight/comment/ask questions
     directly on these notes (go ahead and try it; but please read my note on <a
     href="misc.html#annotation">annotation etiquette</a>).  Adler's suggestion
-    was that
-    <i>great</i> writing can turn static text into a dialogue, transcending
-    distance and time; perhaps I'm cheating, but technology can help me
-    communicate with you even if my writing isn't as strong as Adler would have
-    liked!</p>
+    was that <i>great</i> writing can turn static text into a dialogue,
+    transcending distance and time; perhaps I'm cheating, but technology can
+    help me communicate with you even if my writing isn't as strong as Adler
+    would have liked!</p>
       
     <p>I have organized the software examples into notebooks by chapter.  There
     is an "Launch in Deepnote" button at the top of each chapter; I'd encourage
@@ -300,22 +300,22 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
   <section><h1>Model-based design and analysis</h1>
     
     <p>Thanks to progress in simulation, it is now possible to pursue a
-    meaningful study of manipulation without needing a physical robot.  But
-    simulation (of our robot dynamics, sensors, actuators and its environment)
-    is not enough.  Another major challenge in manipulation is the potential
-    number and complexity of autonomy components (perception, planning, and
-    control) that we need to assemble in order to do the tasks.  A major goal
-    of these notes is to attempt to bridle this complexity, to the extent
-    possible.</p>
+    meaningful study of manipulation without needing a physical robot.  But the
+    software advances in simulation (of our robot dynamics, sensors, actuators
+    and its environment) are not enough to support all of the topics in these
+    note.  Manipulation research today leverages a myriad of advanced
+    algorithms in perception, planning, and control. In addition to providing
+    those individual algorithms, a major goal of these notes is to attempt to
+    bridle the complexity of using them together in a systematic way.</p>
       
-    <p>Many of you will be familiar with <a href="http://ros.org">ROS (the Robot
-    Operating System)</a>.  I believe that ROS was one of the best things to
-    happen to robotics in the last decade.  It meant that experts from different
-    subdisciplines could easily share their expertise in the form of modular
-    components.  Components (as ROS packages) simply agree on the messages that
-    they will send and receive on the network; packages can inter-operate even
-    if they are written in different programming languages or even on different
-    operating systems.</p>
+    <p>Many of you will be familiar with <a href="http://ros.org">ROS (the
+    Robot Operating System)</a>.  I believe that ROS was one of the best things
+    to happen to robotics in the last decades.  It meant that experts from
+    different subdisciplines could easily share their expertise in the form of
+    modular components.  Components (as ROS packages) simply agree on the
+    messages that they will send and receive on the network; packages can
+    inter-operate even if they are written in different programming languages
+    or even on different operating systems.</p>
 
     <p>Although ROS makes it relatively easy to get started with manipulation,
     it doesn't serve my pedagogical goal of thinking clearly about
@@ -361,13 +361,14 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
     </example>
 
     <p>Let me be transparent: not everybody likes this systems framework for
-    manipulation.  Some people are just trying to move fast, and don't see the
-    benefits of slowing down to declare their state variables, etc.  It will
-    likely feel like a burden to you the first time you go to write a new
-    system.  But it's precisely <i>because</i> we're trying to build complex
-    systems quickly that I advocate this more rigorous approach.  I believe
-    that getting to the next level of maturity in our open-world manipulation
-    system requires more maturity from our building blocks.</p>
+    manipulation.  Some people are just trying to write code as fast as
+    possible, and don't see the benefits of slowing down to declare their state
+    variables, etc.  It will likely feel like a burden to you the first time
+    you go to write a new system.  But it's precisely <i>because</i> we're
+    trying to build complex systems quickly that I advocate this more rigorous
+    approach.  I believe that getting to the next level of maturity in our
+    open-world manipulation systems requires more maturity from our building
+    blocks.</p>
         
   </section> 
   
@@ -411,8 +412,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       described <a
       href="https://medium.com/toyotaresearch/drake-model-based-design-in-the-age-of-robotics-and-machine-learning-59938c985515">in
       this blog post</a>.  It is extensively documented, but you have to know
-      where to look for it.  (As of this writing the discoverability of that
-      documentation is a known area for improvement!)</p>
+      where to look for it.</p>
 
       <ol>
         <li>Check out the growing list of <drake></drake> <a
@@ -459,7 +459,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
 
         <p>We are going to model manipulation components using state-space models; here is a simple practice problem to get you thinking. Consider the system: $$y[n] = u[n-3],$$ where $y$ is the output of the system that you're interested in and $u$ is the input which you control, both of which are scalars. In this problem, you'll consider how to choose a state vector $x$ which allows you to model the output trajectory $y$ as $u$ changes.</p>
 
-        <p>Specifically: you will choose a state vector $x$ such that $x[n+1]=Ax[n]+Bu[n]$ and $y[n]=Cx[n]$, where $A$, $B$, and $C$ are all matrices of appropriate size.</p>
+        <p>Specifically: you will choose a state vector $x$ such that $x[n+1]=Ax[n]+Bu[n]$ and $y[n]=Cx[n],$ where $A$, $B$, and $C$ are all matrices of appropriate size.</p>
 
         <ol type="a">
             <li>
