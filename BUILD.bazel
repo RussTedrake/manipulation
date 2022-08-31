@@ -41,7 +41,10 @@ rt_html_test(
 rt_ipynb_test(
     name = "intro",
     srcs = ["intro.ipynb"],
-    deps = ["//manipulation"],
+    deps = [
+      "//manipulation",
+      "//manipulation:scenarios",
+    ],
 )
 
 rt_html_test(
@@ -198,16 +201,6 @@ rt_html_test(
 
 rt_html_test(
     srcs = ["station.html"],
-)
-
-rt_ipynb_test(
-    name = "manipulation_station",
-    srcs = ["manipulation_station.ipynb"],
-    data = ["//manipulation/models"],
-    deps = [
-      "//manipulation",
-      "//manipulation:scenarios",
-    ],
 )
 
 filegroup(

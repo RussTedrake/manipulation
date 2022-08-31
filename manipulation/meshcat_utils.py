@@ -397,10 +397,13 @@ def draw_open3d_point_cloud(meshcat,
                             normals_scale=0.0,
                             point_size=0.001):
     pts = np.asarray(pcd.points)
-    assert (pcd.has_colors())  # TODO(russt): handle this case better
-    cloud = PointCloud(pts.shape[0], Fields(BaseField.kXYZs | BaseField.kRGBs))
+    if pcd.has_colors():
+        cloud = PointCloud(pts.shape[0],
+                           Fields(BaseField.kXYZs | BaseField.kRGBs))
+        cloud.mutable_rgbs()[:] = 255 * np.asarray(pcd.colors).T
+    else:
+        cloud = PointCloud(pts.shape[0], Fields(BaseField.kXYZs))
     cloud.mutable_xyzs()[:] = pts.T
-    cloud.mutable_rgbs()[:] = 255 * np.asarray(pcd.colors).T
     meshcat.SetObject(path, cloud, point_size=point_size)
     if pcd.has_normals() and normals_scale > 0.0:
         assert ('need to implement LineSegments in meshcat c++')
