@@ -1,25 +1,18 @@
-from functools import partial
 import os
 import sys
 import time
-
-from IPython.display import display, HTML, Javascript
-import numpy as np
-
-from pydrake.common import set_log_level
-from pydrake.geometry import Cylinder, Rgba, Sphere
-from pydrake.perception import PointCloud, Fields, BaseField
-from pydrake.solvers.mathematicalprogram import BoundingBoxConstraint
-
-# imports for the pose sliders
 from collections import namedtuple
-from pydrake.common.value import AbstractValue
-from pydrake.math import RollPitchYaw, RigidTransform, RotationMatrix
-from pydrake.systems.framework import LeafSystem, PublishEvent
+from functools import partial
 
-# imports for the joint sliders
+import numpy as np
+from IPython.display import HTML, Javascript, display
+from pydrake.common.value import AbstractValue
+from pydrake.geometry import Cylinder, Rgba, Sphere
+from pydrake.math import RigidTransform, RollPitchYaw, RotationMatrix
 from pydrake.multibody.tree import JointIndex
-from pydrake.systems.framework import PublishEvent, VectorSystem
+from pydrake.perception import BaseField, Fields, PointCloud
+from pydrake.solvers.mathematicalprogram import BoundingBoxConstraint
+from pydrake.systems.framework import LeafSystem, PublishEvent, VectorSystem
 
 from manipulation import running_as_notebook
 
