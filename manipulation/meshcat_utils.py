@@ -9,10 +9,11 @@ from IPython.display import HTML, Javascript, display
 from pydrake.common.value import AbstractValue
 from pydrake.geometry import Cylinder, Rgba, Sphere
 from pydrake.math import RigidTransform, RollPitchYaw, RotationMatrix
-from pydrake.multibody.tree import JointIndex
+from pydrake.multibody.tree import BodyIndex, JointIndex
 from pydrake.perception import BaseField, Fields, PointCloud
 from pydrake.solvers.mathematicalprogram import BoundingBoxConstraint
-from pydrake.systems.framework import LeafSystem, PublishEvent, VectorSystem
+from pydrake.systems.framework import (EventStatus, LeafSystem, PublishEvent,
+                                       VectorSystem)
 
 from manipulation import running_as_notebook
 
@@ -65,8 +66,14 @@ class MeshcatPoseSliders(LeafSystem):
     .. pydrake_system::
 
         name: PoseSliders
+        input_ports:
+        - pose (optional)
         output_ports:
         - pose
+
+    The optional `pose` input port is used ONLY at initialization; it can be
+    used to set the initial pose e.g. from the current pose of a MultibodyPlant
+    frame.
     """
     # TODO(russt): Use namedtuple defaults parameter once we are Python >= 3.7.
     Visible = namedtuple("Visible", ("roll", "pitch", "yaw", "x", "y", "z"))
@@ -83,7 +90,8 @@ class MeshcatPoseSliders(LeafSystem):
                  visible=Visible(),
                  min_range=MinRange(),
                  max_range=MaxRange(),
-                 value=Value()):
+                 value=Value(),
+                 body_index=None):
         """
         Args:
             meshcat: A Meshcat instance.
@@ -94,11 +102,18 @@ class MeshcatPoseSliders(LeafSystem):
                       'pitch', 'yaw', 'x', 'y', 'z'; the intention is for the
                       caller to use the PoseSliders.MinRange, MaxRange, and
                       Value namedtuples.  See those tuples for default values.
+            body_index: if the body_poses input port is connected, then this
+                        index determine which pose is used to set the initial
+                        slider positions during the Initialization event.
         """
         LeafSystem.__init__(self)
         port = self.DeclareAbstractOutputPort(
             "pose", lambda: AbstractValue.Make(RigidTransform()),
             self.DoCalcOutput)
+
+        self.DeclareAbstractInputPort("body_poses",
+                                      AbstractValue.Make([RigidTransform()]))
+        self.DeclareInitializationDiscreteUpdateEvent(self.Initialize)
 
         # The widgets themselves have undeclared state.  For now, we accept it,
         # and simply disable caching on the output port.
@@ -109,6 +124,7 @@ class MeshcatPoseSliders(LeafSystem):
         self._meshcat = meshcat
         self._visible = visible
         self._value = list(value)
+        self._body_index = body_index
 
         for i in range(6):
             if visible[i]:
@@ -182,6 +198,16 @@ class MeshcatPoseSliders(LeafSystem):
         """Constructs the output values from the sliders."""
         self._update_values()
         output.set_value(self._get_transform())
+
+    def Initialize(self, context, discrete_state):
+        if self.get_input_port().HasValue(context):
+            if self._body_index is None:
+                raise RuntimeError(
+                    "If the `body_poses` input port is connected, then you "
+                    "must also pass a `body_index` to the constructor.")
+            self.SetPose(self.get_input_port().Eval(context)[self._body_index])
+            return EventStatus.Succeeded()
+        return EventStatus.DidNothing()
 
     def Run(self, publishing_system, root_context, callback):
         # Calls callback(root_context, pose), then publishing_system.Publish()
