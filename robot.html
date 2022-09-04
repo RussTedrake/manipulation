@@ -286,12 +286,16 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
         the multi-link case, we will see that $I_{arm}$ is a <a
         href="http://underactuated.mit.edu/multibody.html"
         target="underactuated">state-dependent function that captures the
-        inertial coupling of the other joints in the manipulator</a>.
-        $I_{motor}$, on the other hand, is constant.  For large gear ratios,
-        this means the dynamics of the joint are not so dependent on the
-        nonlinear effects of joint position and velocity, making it relatively
-        easy to tune constant feedback gains that perform well in all
-        configurations.</p>
+        inertia of the actuated link and also the inertial coupling of the
+        other joints in the manipulator</a>. $I_{motor}$, on the other hand, is
+        constant and only effects the local joint. For large gear ratios, the
+        $I_{motor}$ terms dominate the other terms, which has two important
+        effects: 1) it effectively diagonalizes the manipulator equations (the
+        inertial coupling terms are relatively small), and 2) the dynamics are
+        relatively constant throughout the workspace (the state-dependent terms
+        are relatively small). These effects make it relatively easy to tune
+        constant feedback gains for each joint individually that perform well
+        in all configurations.</p>
         
       </subsubsection>
 
