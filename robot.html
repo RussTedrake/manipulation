@@ -65,13 +65,36 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
   with an understanding of how we simulate the robot and what commands you
   can send to the robot interface.</p>
     
-  <p>Although we are going to focus on one particular set of hardware for these
-  notes, one of the great things about modern robotics is that many of the tools
-  we will develop over the course of these notes are quite general, and can be
-  transferred from one robot to another easily.  I could imagine a future
-  version of these notes where you really do get to build out your robot in
-  this chapter, and use your customized robot for the remaining chapters!</p>
+  <section><h1>Robot description files</h1>
+  
+    <p>Although we are going to focus primarily on one particular set of
+    hardware for the remainder of these notes, in this chapter I'll provide
+    software examples with a number of different robots. One of the great
+    things about modern robotics is that many of the tools we will develop over
+    the course of these notes are quite general, and can be transferred from
+    one robot to another easily. I could imagine a future version of these
+    notes where you really do get to build out your robot in this chapter, and
+    use your customized robot for the remaining chapters!</p>
     
+    <p>The ability to easily simulate/control a variety of robots is made
+    possible in part by the proliferation of common file formats for describing
+    our robots.  Unfortunately, the field has not converged on a single
+    preferred format (yet), and each of them have their quirks. Drake currently
+    loads <a href="http://wiki.ros.org/urdf">Universal Robot Description
+    Format</a> (URDF), <a href="http://sdformat.org/">Simulation Description
+    Format</a> (SDF), and has limited support for the <a
+    href="https://mujoco.readthedocs.io/en/latest/XMLreference.html">MuJoCo
+    format</a> (MJCF). The Drake developers have been trying to upstream
+    improvements to SDF rather than start yet another format, but we do have a
+    very simple YAML specification called <a
+    href="https://drake.mit.edu/doxygen_cxx/structdrake_1_1multibody_1_1parsing_1_1_model_directives.html">Drake
+    Model Directives</a> which makes it very quick and easy to load multiple
+    robots/objects from these different file formats into one simulation; you
+    saw an example of this in the
+    <script>document.write(notebook_link('force', deepnote, "introduction chapter notebook"))</script>.</p>
+
+  </section>
+
   <section><h1>Arms</h1>
 
     <p>There appear to be a lot of robotics arms available on the market.  So
@@ -83,41 +106,30 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
     <example><h1>Robot arms</h1>
     
       <p>I've put together a simple example to let you explore some of the
-      various robot arms that are popular today.</p>
-      
-      <p>This is made possible by the proliferation of some common file formats
-      for describing our robots.  Unfortunately, the field has not converged on
-      a single preferred format (yet), and each of them have their quirks. Drake
-      currently loads <a href="http://wiki.ros.org/urdf">Universal Robot
-      Description Format</a> (URDF) and <a
-      href="http://sdformat.org/">Simulation Description Format</a> (SDF); the
-      Drake developers have been trying to upstream improvements to SDF rather
-      than start yet another format.</p>
-        
-      <p>Let me know if your favorite arm isn't on the list yet!</p>
+      various robot arms that are popular today.Let me know if your favorite arm isn't on the list yet!</p>
       
       <script>document.write(notebook_link('robot'))</script>
 
     </example>
-    
+
     <p>There is one particular requirement which, if we want our robot to meet,
     quickly winnows the field to only a few viable platforms: that requirement
-    is joint-torque sensing and control.  It's not absolutely clear that this
-    feature is required, even for very advanced applications, but as a
-    researcher who cares a great deal about the contact interactions between my
-    robots and the world, I prefer to have the capability and explore whether I
-    need it rather than wonder what life might have been like.</p>
+    is joint-torque sensing and control.  Out of the torque-controlled robots
+    on the market, I've chosen to use the Kuka LBR iiwa robot to use throughout
+    these notes (I will try to use the lower case "iiwa" to be <a
+    href="https://www.kuka.com/en-us/products/robotics-systems/industrial-robots/lbr-iiwa">consistent
+    with the manufacturer</a>, but it looks wrong to me every time!).  </p>
     
     <figure>
       <img width="60%" src="https://www.robots.com/images/robots/KUKA/Collaborative/KUKA_LBR_IIWA_7_0001.png"/>
       <figcaption><a href="https://www.kuka.com/en-us/products/robotics-systems/industrial-robots/lbr-iiwa">Kuka LBR iiwa robot</a>.  This one has a 7kg payload.</figcaption>
     </figure>
 
-    <p>Out of the torque-controlled robots on the market, I've chosen to use the
-    Kuka LBR iiwa robot to use throughout these notes (I will try to use the
-    lower case "iiwa" to be <a
-    href="https://www.kuka.com/en-us/products/robotics-systems/industrial-robots/lbr-iiwa">consistent
-    with the manufacturer</a>, but it looks wrong to me every time!).  To better
+    <p>It's not absolutely clear that the joint-torque sensing and control
+    feature is required, even for very advanced applications, but as a
+    researcher who cares a great deal about the contact interactions between my
+    robots and the world, I prefer to have the capability and explore whether I
+    need it rather than wonder what life might have been like. To better
     understand why, let us start by understanding the difference between most
     robots, which are position-controlled, and the handful of robots that have
     accepted the additional cost and complexity to provide torque sensing and
@@ -164,17 +176,17 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       <subsubsection><h1>Position Control.</h1>
 
         <p>How can we overcome this challenge of not having a good model of the
-        transmission dynamics?  Regulating the current or speed of the motor
-        only requires sensors on the motor side of the transmission; if we add
-        more sensors on the output side of the transmission, then we can use
-        high-gain feedback to try to directly regulate the joint, instead of the
-        motor.  Importantly, although the torques due to the transmission are
-        not known precisely, they are also not arbitrary -- for instance they
-        will never add energy into the system.  Most importantly, we can be
-        confident that there is a <i>monotonically increasing</i> relationship
-        between the current that we put into the motor and the torque at the
-        joint, and ultimately the acceleration of the joint.  Note that I chose
-        the term monotonic carefully, meaning "non-decreasing" but <i>not</i>
+        transmission dynamics?  Regulating the current or speed <i>of the
+        motor</i> only requires sensors on the motor side of the transmission.
+        To accurately regulate the joint, we typically need add more sensors on
+        the output side of the transmission. Importantly, although the torques
+        due to the transmission are not known precisely, they are also not
+        arbitrary -- for instance they will never add energy into the system.
+        Most importantly, we can be confident that there is a <i>monotonically
+        increasing</i> relationship between the current that we put into the
+        motor and the torque at the joint, and ultimately the acceleration of
+        the joint.  Note that I chose the term monotonic carefully, meaning
+        "non-decreasing" but <i>not</i>
         implying "strictly increasing", because, for instance, when a joint is
         starting from rest, static friction will resist small torques without
         having any acceleration at the output.</p>
@@ -183,27 +195,38 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
         typically an encoder or potentiometer -- these are inexpensive,
         accurate, and robust.  In practice, we think of these as providing
         (after some signal filtering/conditioning) accurate measurements of the
-        joint position and joint velocity via differentiation -- joint
-        accelerations can also be obtained via differentiating twice but are
-        generally considered more noisy and less suitable for use in tight
-        feedback loops.  This is sufficient for accurately tracking desired
-        position trajectories of the arm.  For each joint, if we are given a
-        desired trajectory $q^d(t)$, then I can track this using <a
+        joint position and joint velocity -- joint accelerations can also be
+        obtained via differentiating twice but are generally considered more
+        noisy and less suitable for use in tight feedback loops.  Position
+        sensors are sufficient for accurately tracking desired position
+        trajectories of the arm.  For each joint, if we denote the joint
+        position as $q$ and we are given a desired trajectory $q^d(t)$, then I
+        can track this using <a
         href="https://en.wikipedia.org/wiki/PID_controller">proportional-integral-derivative
         (PID) control</a>: $$\tau = k_p (q^d - q) + k_d (\dot{q}^d - \dot{q}) +
         k_i \int (q^d - q) dt,$$ with $k_p$, $k_d$, and $k_i$ being the
         position, velocity, and integral gains.  PID control has a rich theory,
-        and a trove of knowledge about how to choose the gains, which I will not
-        reproduce here.  I will note, however, that when we simulate
-        position-controlled robots we use the equation above, commanding a
-        torque directly, but on hardware our PID controller typically outputs
-        voltage commands (via <a
+        and a trove of knowledge about how to choose the gains, which I will
+        not reproduce here.  I will note, however, that when we simulate
+        position-controlled robots we often need to use different gains for the
+        physical robot as we do in simulation. This is due to the transmission
+        dynamics, but also the fact that PID controllers in hardware typically
+        output voltage commands (via <a
         href="https://en.wikipedia.org/wiki/Pulse-width_modulation">pulse-width
-        modulation</a>).  Closing this modeling gap has traditionally not been a
-        priority for robot simulation, but does mean that we often have one list
-        of gains for the physical robot and a separate list for the
-        simulation.</p>
+        modulation</a>) instead of current commands. Closing this modeling gap
+        has traditionally not been a priority for robot simulation -- there are
+        enough other details to get right which dominate the "sim-to-real" gap
+        -- but I suspect that as the field matures the mainstream robotics
+        simulators will eventually capture this, too.</p>
         
+        <p>Some of you are thinking, "I can train a neural network to model
+        <i>anything</i>, I'm not afraid of difficult-to-model transmissions!" I
+        do think there is reason to be optimistic about this approach; there
+        are a number of initial demonstrations in this direction (e.g.
+        <elib>Hwangbo19</elib>). This is not quite as useful as if we can have
+        a first-principles model that can generalize to new actuators from a
+        few parameters in a description file, but could be very productive.</p>
+
         <todo>Think through the implications of the PWM voltage command instead
         of direct motor current.</todo>
 
@@ -253,21 +276,21 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
           
         <p>It's interesting to note that, even though the mass of the motors
         might make up only a small fraction of the total mass of the robot, for
-        highly geared robots they can play a significant role in the dynamics of
-        the joints. We use the term <i>reflected inertia</i> to denote the
+        highly geared robots they can play a significant role in the dynamics
+        of the joints. We use the term <i>reflected inertia</i> to denote the
         inertial load that is felt on the opposite side of a transmission, due
         to the scaling effect of the transmission. The "reflected inertia" of
         the arm at the motor is cut by the square of the gear ratio; or the
         "reflected inertia" of the motor at the arm is multiplied by the square
         of the gear ratio.  This has interesting consequences -- as we move to
-        the multi-link case, we will see that the inertia of the arm is a <a
+        the multi-link case, we will see that $I_{arm}$ is a <a
         href="http://underactuated.mit.edu/multibody.html"
         target="underactuated">state-dependent function that captures the
-        inertial coupling of the other joints in the manipulator</a>.  The motor
-        inertia, on the other hand, is constant.  For large gear ratios, this
-        means the dynamics of the joint are less dependent on the nonlinear
-        effects of joint position and velocity, making it relatively easy to
-        tune constant feedback gains that perform well in all
+        inertial coupling of the other joints in the manipulator</a>.
+        $I_{motor}$, on the other hand, is constant.  For large gear ratios,
+        this means the dynamics of the joint are not so dependent on the
+        nonlinear effects of joint position and velocity, making it relatively
+        easy to tune constant feedback gains that perform well in all
         configurations.</p>
         
       </subsubsection>
@@ -320,24 +343,27 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       motor and joint sides of the transmission to estimate the applied torques
       <elib>Pratt95b</elib>.  For example, the <a
       href="https://en.wikipedia.org/wiki/Baxter_(robot)">Baxter</a> and Sawyer
-      robots from Rethink use series elastic actuators; I don't think they've
-      published the spring stiffness values but similarly-motivated
+      robots from Rethink used series elastic actuators; I don't think they
+      ever published the spring stiffness values but similarly-motivated
       series-elastic actuators from <a
       href=http://docs.hebi.us/hardware.html>HEBI robotics are closer to 100
       Nm/rad</a>.  Even for the iiwa actuators, the joint elasticity is
       significant enough that the low-level controllers go to great length to
       take it into account explicitly in order to achieve high-performance
       control of the joints<elib>Albu-Schaffer07</elib>.  We will discuss these
-      details when we get to the chapter covering <a
-      href="force.html">force control</a>.</p>
+      details when we get to the chapter covering <a href="force.html">force
+      control</a>.</p>
 
     </subsection>
     
     <subsection><h1>A proliferation of hardware</h1>
     
-      <p>The low-cost torque-controlled arms that I mentioned above are just the
-      beginnings in what promises to be a massive proliferation of robotic arms.
-      As demand increases, costs will continue to come down.</p>
+      <p>The low-cost torque-controlled arms that I mentioned above are just
+      the beginnings in what promises to be a massive proliferation of robotic
+      arms. During the pandemic, I saw a number of people using inexpensive
+      robots like the <a
+      href="https://www.ufactory.cc/xarm-collaborative-robot">xArm</a>
+      at home. As demand increases, costs will continue to come down.</p>
       
       <p>Let me just say that, compared to working on legged robots, where for
       decades we did our research on laboratory prototypes built by graduate
@@ -358,7 +384,8 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
     <subsection><h1>Simulating the Kuka iiwa</h1>
     
       <p>It's time to simulate our chosen robotic arm.  The first step is to
-      obtain a robot description file (URDF or SDF).  For convenience, we <a
+      obtain a robot description file (typically URDF or SDF). For convenience,
+      we <a
       href="https://github.com/RobotLocomotion/drake/tree/e3beced2025277411b456e11450316d07a146f5a/manipulation/models">ship</a>
       the models for a few robots, including iiwa, with Drake.  If you're
       interested in simulating a different robot, you can find either a URDF or
@@ -367,25 +394,38 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       surprising errors in even the kinematics (link lengths, geometries, etc),
       but the dynamics properties (inertia, friction, etc) in particular are
       often not accurate at all. Sometimes they are not even mathematically
-      consistent (e.g. it is possible to specify an inertial matrix which is not
-      physically realizable by any rigid body).  Drake will complain if you ask
-      it to load a file with this sort of violation; we would rather alert you
-      early than start generating bogus simulations. There is also increasingly
-      good support for exporting to a robot format directly from CAD software
-      like <a href="http://wiki.ros.org/sw_urdf_exporter">Solidworks</a>.</p>
+      consistent (e.g. it is possible to specify an inertial matrix in URDF/SDF
+      which is not physically realizable by any rigid body).  Drake will
+      complain if you ask it to load a file with this sort of violation; we
+      would rather alert you early than start generating bogus simulations.
+      There is also increasingly good support for exporting to a robot format
+      directly from CAD software like <a
+      href="http://wiki.ros.org/sw_urdf_exporter">Solidworks</a>.</p>
       
       <p>Now we have to import this robot description file into our physics
       engine.  In Drake, the physics engine is called
-      <code>MultibodyPlant</code>.  The term "plant" may seem odd -- it is the
-      word used in the controls literature to represent the physical system,
-      with origins in the control of chemical plants -- but it is pervasive.
-      This connection is also important to me; not many physics engines in the
-      world go to the lengths that Drake does to make the physics engine
-      compatible with system-theoretic design and analysis.  You can access the
-      methods of <code>MultibodyPlant</code> through its class methods, e.g. for
-      use in designing a model-based controller.  But in order to work with our
-      model-based design philosophy, <code>MultibodyPlant</code> also provides
-      an interface as a <code>System</code>, with input and output ports.</p>
+      <code>MultibodyPlant</code>.  The term "plant" may seem odd but it is
+      pervasive; it is the word used in the controls literature to represent a
+      physical system to be controlled, which originated in the control of
+      chemical plants. This connection to control theory is very important to
+      me. Not many physics engines in the world go to the lengths that Drake
+      does to make the physics engine compatible with control-theoretic design
+      and analysis.</p>
+      
+      <p>The <a
+      href="https://drake.mit.edu/doxygen_cxx/classdrake_1_1multibody_1_1_multibody_plant.html"><code>MultibodyPlant</code></a>
+      has a class interface with a rich library of methods to work with the
+      kinematics and dynamics of the robot. If you need to compute the location
+      of the center of mass, or a kinematic Jacobian, or any similar queries,
+      then you'll be using this class interface. A 
+      <code>MultibodyPlant</code> also implements the interface to be used as a
+      <code>System</code>, with input and output ports, in Drake's <a
+      href="https://medium.com/toyotaresearch/drake-model-based-design-in-the-age-of-robotics-and-machine-learning-59938c985515">systems
+      framework</a>. In order to simulate, or analyze, the combination of a
+      <code>MulitbodyPlant</code> with other systems like our perception, planning, and
+      control systems, we will be assembling <a
+      href="https://en.wikibooks.org/wiki/Control_Systems/Block_Diagrams">block
+      diagrams</a>.</p>
       
       <div>
         <script src="htmlbook/js-yaml.min.js"></script>
@@ -490,11 +530,11 @@ output_ports:
       mechanics.</p>
       
       <p>As a result, the simplest reasonable simulation we can provide of the
-      iiwa must include a simulation of their low-level controller.  We will use
-      the iiwa's "joint impedance control" mode, and will describe the details
-      of that once they become important for getting the robot to perform
-      better.  For now, we can treat it as given, and produce our simplest
-      reasonable iiwa simulation.</p>
+      iiwa must include a simulation of Kuka's low-level controller.  We will
+      use the iiwa's "joint impedance control" mode, and will describe the
+      details of that once they become important for getting the robot to
+      perform better.  For now, we can treat it as given, and produce our
+      simplest reasonable iiwa simulation.</p>
       
       <example><h1>Adding the iiwa low-level controller</h1>
 
@@ -602,26 +642,85 @@ output_ports:
     <subsection><h1>Soft/underactuated hands</h1></subsection>
 
       <p>Finally, the third and newest camp is promoting clever mechanical
-      designs for hands, which we'll call "underactuated hands", that can
-      achieve some of the advantages of a human hand based on mechanics alone.
-      But often these hands are amazingly good at some range of tasks (most
-      often "enveloping grasps"), but not as general purpose.  It would be very
-      hard to use one of these to, for instance, button my shirt.</p>
+      designs for hands, which are often called "underactuated hands". The
+      basic idea is that, for many tasks, you might not need as many actuators
+      in your hand has you have joints. Many underactuated hands use a
+      cable-drive mechanism to close the fingers, where a single tendon can
+      cause multiple joints in the finger to bend. When designed correctly,
+      these mechanisms can allow the finger to <a
+      href="https://www.youtube.com/watch?v=C340gbK3sZc">conform passively to
+      the shape of an object being grasped</a> with no change in the actuator
+      command (c.f. <elib>Odhner14</elib>).  Cables are not required for this
+      concept to work; qualitatively similar behavoir can be achieved using
+      clever rigid mechanical linkages, as well.</p>
+      
+      <figure>
+        <table><tr><td>
+        <img style="height:250px" src="figures/RHR_Reflex_s.png"/>
+        </td><td style="width:50px"></td><td>
+        <img style="height:250px" src="figures/robotiq-3-finger-gripper.jpeg"/>
+        </td></tr>
+        </table>
+        <figcaption>Underactuated hands.  Left: the RightHand Robotics Reflex2 is a descendant of the i-HY hand<elib>Odhner14</elib>.  Right: the Robotiq 3-fingered gripper.</figcaption>
+      </figure>
+      
+      <figure>
+        <img width="560" src="figures/robotiq_3_finger_mechanism.jpeg">
+        <figcaption>A <a
+          href="https://blog.robotiq.com/3-finger-adaptive-gripper-simulation-data">clever mechanical linkage</a> allows the underactuated Robotiq 3-fingered gripper to comply to an object being grasped.</figcaption>
+      </figure>
 
-      <p><i>TODO: finish this section.</i></p>
+      <p>Taking the idea of underactuation and passive compliance to an
+      extreme, recent years have also seen a number of hands (or at least
+      fingers) that are completely soft. The <a
+      href="https://softroboticsconference.org/">soft robotics community</a> is
+      rapidly changing the state of the art in terms of robot fabrication, with
+      appendages, actuators, sensors, and even power sources that can be
+      completely soft. These technologies promise to improve durability,
+      decrease cost, and potentially be more safe for operating around
+      people.</p>
+
+      <figure>
+        <table><tr><td>
+          <img style="width:250px" src="figures/truby_soft_hand.jpeg"/>
+        </td><td style="width:50px"></td><td>
+          <img style="height:200px" src="figures/rbohand_disney.png"/>
+        </td></tr>
+        </table>
+        <figcaption>Underactuated hands.  Left: A <a href="https://doi.org/10.1038/d41586-018-02778-5">3D-printed soft hand from Harvard</a> (Image credit: Ryan Truby).  Right: The <a href="https://www.robotics.tu-berlin.de/menue/research/soft_hands/">RBO Hand 2</a> (Image credit: Disney Research Zurich).</figcaption>
+      </figure>
+
+      <p>Underactuated hands can be excellent examples of mechanical design
+      reducing the burden on the actuators / control system. Often these hands
+      are amazingly good at some range of tasks (most often "enveloping
+      grasps"), but not as general purpose.  It would be very hard to use one
+      of these to, for instance, button my shirt. They are, however, becoming more and more dexterous; check out the video below!</p>
+
+      <figure>
+        <iframe width="560" height="315" src="https://www.youtube.com/embed/Z6ECG3KHibI" frameborder="0"
+          allow="accelerometer; encrypted-media; gyroscope; picture-in-picture" allowfullscreen pdf="no"></iframe>
+          <p pdf="only"><a href="https://www.youtube.com/embed/Z6ECG3KHibI">Click here to watch the video.</a></p>
+        </figure>
+  
 
     <subsection><h1>Other end effectors</h1>
     
-      <p>Suction, jamming grippers, tool-changers...`</p>
+      <p>Suction, jamming grippers, rolling fingers...`</p>
 
       <p><i>TODO: finish this section.</i></p>
 
-      <p>I particularly liked the response that Matt Mason, one of the main
-      advocates for simple grippers throughout the years, gave to <a
-      href="https://youtu.be/LfWiBdOc2FI?t=4025">a question at the end of one of
-      our robotics seminars</a>: he argued that useful robots in e.g. the
-      kitchen will probably have special purpose tools that can be changed
-      quickly.</p>
+      <p>Another argument against dexterous hands is that even humans often do
+      some of their most interesting manipulation not with the hand directly,
+      but through tools. I particularly liked the response that Matt Mason, one
+      of the main advocates for simple grippers throughout the years, gave to
+      <a href="https://youtu.be/LfWiBdOc2FI?t=4025">a question at the end of
+      one of our robotics seminars</a>: he argued that useful robots in e.g.
+      the kitchen will probably have special purpose tools that can be changed
+      quickly. In applications where the primary job of the dexterous hand is
+      to change tools, we might skip the complexity by mounting a <a
+      href="https://blog.robotiq.com/bid/72926/Top-Manufacturers-of-Robotic-Tool-Changers">"tool
+      changer"</a>
+      directly to the robot and using tool-changer-compatible tools.</p>
 
     </subsection>
 
@@ -799,6 +898,12 @@ output_ports:
 <div id="references"><section><h1>References</h1>
 <ol>
 
+<li id=Hwangbo19>
+<span class="author">Jemin Hwangbo and Joonho Lee and Alexey Dosovitskiy and Dario Bellicoso and Vassilios Tsounis and Vladlen Koltun and Marco Hutter</span>, 
+<span class="title">"Learning agile and dynamic motor skills for legged robots"</span>, 
+<span class="publisher">Science Robotics</span>, vol. 4, no. 26, pp. eaau5872, <span class="year">2019</span>.
+
+</li><br>
 <li id=Asada87>
 <span class="author">Haruhiko Asada and Kamal Youcef-Toumi</span>, 
 <span class="title">"Direct-Drive Robots - Theory and Practice"</span>, The MIT Press
@@ -846,6 +951,12 @@ output_ports:
 <span class="author">Yong-Jae Kim and Junsuk Yoon and Young-Woo Sim</span>, 
 <span class="title">"Fluid Lubricated Dexterous Finger Mechanism for Human-Like Impact Absorbing Capability"</span>, 
 <span class="publisher">IEEE Robotics and Automation Letters</span>, vol. 4, no. 4, pp. 3971--3978, <span class="year">2019</span>.
+
+</li><br>
+<li id=Odhner14>
+<span class="author">Lael U. Odhner and Leif P. Jentoft and Mark R. Claffee and Nicholas Corson and Yaroslav Tenzer and Raymond R. Ma and Martin Buehler and Robert Kohout and Robert D. Howe and Aaron M. Dollar</span>, 
+<span class="title">"A Compliant, Underactuated Hand for Robust Manipulation"</span>, 
+<span class="publisher">International Journal of Robotics Research (IJRR)</span>, vol. 33, no. 5, pp. 736-752, <span class="year">2014</span>.
 
 </li><br>
 </ol>
