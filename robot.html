@@ -705,14 +705,34 @@ output_ports:
 
     <subsection><h1>Other end effectors</h1>
     
-      <p>Suction, jamming grippers, rolling fingers...`</p>
+      <p>Not all end effectors need to operate like dexterous or simplified
+      human hands. Many industrial applications these days are doing a form of
+      pick and place manipulation using vacuum grippers (also known as
+      suction-cup grippers). Suction cups work extremely well on many but not all objects. Some objects are too soft or porous to be suctioned effectively. Some objects are too fragile or heavy to be lifted from a vacuum at the top of the object, and must be supported from below. Some hands have suction in the palms to achieve an initial pick, but still use more traditional fingers to stabilize a grasp.</p>
 
-      <p><i>TODO: finish this section.</i></p>
+      <p>There are numerous other clever gripper technologies. One of my
+      favorites is the <a
+      href="https://www.creativemachineslab.com/jamming-gripper.html">jamming
+      gripper</a>.  These grippers are made of a balloon filled with coffee
+      grounds, or some other granular media; pushing down the balloon around an
+      object allows the granular media to flow around the object, but then
+      applying a vacuum to the balloon causes the granular media to "jam",
+      quickly hardening around the object to make a stable grasp
+      <elib>Brown10</elib>. </p>
 
-      <p>Another argument against dexterous hands is that even humans often do
-      some of their most interesting manipulation not with the hand directly,
-      but through tools. I particularly liked the response that Matt Mason, one
-      of the main advocates for simple grippers throughout the years, gave to
+      <figure>
+        <iframe width="420" height="315" src="https://www.youtube.com/embed/bFW7VQpY-Ik" frameborder="0"
+          allow="accelerometer; encrypted-media; gyroscope; picture-in-picture" allowfullscreen pdf="no"></iframe>
+          <p pdf="only"><a href="https://www.youtube.com/embed/-KxjVlaLBmk">Click here to watch the video.</a></p>
+      </figure>
+  
+      <p><a href="https://www.youtube.com/watch?v=r_HaJfANyT8">Here</a> is another clever design with actuated rollers at the finger tips to help with in-hand reorientation.</p>
+
+      <p>Finally, a reasonable argument against dexterous hands is that even
+      humans often do some of their most interesting manipulation not with the
+      hand directly, but through tools. I particularly liked the response that
+      Matt Mason, one of the main advocates for simple grippers throughout the
+      years, gave to
       <a href="https://youtu.be/LfWiBdOc2FI?t=4025">a question at the end of
       one of our robotics seminars</a>: he argued that useful robots in e.g.
       the kitchen will probably have special purpose tools that can be changed
@@ -770,9 +790,7 @@ output_ports:
     power of abstraction and encapsulation.  We can assemble a
     <code>Diagram</code> that contains all of the components necessary to
     simulate our hardware platform and its environment, which we will refer to
-    affectionately as the "Manipulation Station".  This diagram itself can then
-    be used as a <code>System</code> in additional diagrams, which can include
-    our perception, planning, and, higher-level control systems.  All together,
+    affectionately as the "Manipulation Station".  All together,
     the <code>ManipulationStation</code> system looks like this:</p>
     
     <div>
@@ -804,13 +822,16 @@ output_ports:
 - <b style="color:orange">query_object</b>
 - <b style="color:orange">contact_results</b>
 - <b style="color:orange">plant_continuous_state</b>
-- <b style="color:orange">geometry_poses</b>`);
-      document.write(system_html(sys, "https://drake.mit.edu/doxygen_cxx/classdrake_1_1examples_1_1manipulation__station_1_1_manipulation_station.html"));
+- <b style="color:orange">body_poses</b>`);
+      document.write(system_html(sys, "https://github.com/RussTedrake/manipulation/blob/ceb817b527cbf1826c5b9a573ffbef415cb0f013/manipulation/scenarios.py#L453"));
       </script>
     </div>
 
-    <p>This model also defines the abstraction between the simulation and the
-    real hardware.  We offer an almost identical system, the
+    <p>This diagram itself can then be used as a <code>System</code> in
+    additional diagrams, which can include our perception, planning, and,
+    higher-level control systems.  This model also defines the abstraction
+    between the simulation and the real hardware.  We offer an almost identical
+    system, the
     <code>ManipulationStationHardwareInterface</code>.  If you replace this
     directly in place of the <code>ManipulationStation</code>, then the same
     code you've developed in simulation can be run directly on the real robot.
@@ -853,11 +874,7 @@ output_ports:
   the covers, you will see that we use <a
   href="https://lcm-proj.github.io/">LCM</a> for this instead of ROS messages,
   precisely because LCM is a lighter-weight dependency for our public
-  repository.  But many Drake developers/users use Drake in a ROS ecosystem; we
-  have examples/coverage ensuring that our build systems remain compatible <a
-  href="https://github.com/RobotLocomotion/drake-external-examples">here</a>,
-  and are working on curating well-maintained tutorials for users who want that
-  workflow.</p>
+  repository.  But many Drake developers/users use <a href="https://github.com/RobotLocomotion/drake-ros">Drake in a ROS/ROS2 ecosystem</a>.</p>
     
   <p>If you do have your own similar robot hardware available, and want to run
   the hardware interface on your machines, I've started putting together a list
@@ -957,6 +974,12 @@ output_ports:
 <span class="author">Lael U. Odhner and Leif P. Jentoft and Mark R. Claffee and Nicholas Corson and Yaroslav Tenzer and Raymond R. Ma and Martin Buehler and Robert Kohout and Robert D. Howe and Aaron M. Dollar</span>, 
 <span class="title">"A Compliant, Underactuated Hand for Robust Manipulation"</span>, 
 <span class="publisher">International Journal of Robotics Research (IJRR)</span>, vol. 33, no. 5, pp. 736-752, <span class="year">2014</span>.
+
+</li><br>
+<li id=Brown10>
+<span class="author">Eric Brown and Nicholas Rodenberg and John Amend and Annan Mozeika and Erik Steltz and Mitchell R Zakin and Hod Lipson and Heinrich M Jaeger</span>, 
+<span class="title">"Universal robotic gripper based on the jamming of granular material"</span>, 
+<span class="publisher">Proceedings of the National Academy of Sciences</span>, vol. 107, no. 44, pp. 18809–18814, <span class="year">2010</span>.
 
 </li><br>
 </ol>
