@@ -228,9 +228,10 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       <li>move the gripper+object to the desired pose, $X^O = X^{O_d}$.</li>
       <li>open the gripper, and retract the hand.</li>
       </ul>
-    To simplify the problem of approaching the object (without colliding with
-    it) and retracting from the object, we will insert a "pregrasp pose",
-    $^OX^{G_{pregrasp}}$, above the object as an intermediate step.
+    There is just one more important detail: to approach the object without
+    colliding with it, we will insert a "pregrasp pose", $^OX^{G_{pregrasp}}$,
+    above the object as an intermediate step.  We'll use the same transform to
+    retract away from the object when we set it down.
     </div>
 
     <p>Clearly, programming this strategy requires good tools for working with
@@ -396,16 +397,17 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
 
       <example><h1>Forward kinematics for the gripper frame</h1>
       
-        <p>Let's evaluate the pose of the gripper in the world frame: $X^G$.  We
-        know that it will be a function of configuration of the robot, which is
-        just a part of the total state of the <code>MultibodyPlant</code>.  The
-        following example shows you how it works.</p>
+        <p>Let's evaluate the pose of the gripper in the world frame: $X^G$.
+        We know that it will be a function of configuration of the robot, which
+        is just a part of the total state of the <code>MultibodyPlant</code>
+        (and so is stored in the <code>Context</code>).  The following example
+        shows you how it works.</p>
 
         <script>document.write(notebook_link('pick'))</script>
 
         <p>The key lines are 
           <code class="language-python"><pre>
-gripper = plant.GetBodyByName("body")
+gripper = plant.GetBodyByName("body", wsg)
 pose = plant.EvalBodyPoseInWorld(context, gripper)</pre></code>
         Behind the scenes, the <code>MultibodyPlant</code> is doing all of the
         spatial algebra we described above to return the pose (and also some
@@ -471,17 +473,18 @@ pose = plant.EvalBodyPoseInWorld(context, gripper)</pre></code>
     representations that we have for 3D rotations (rotation matrix, unit
     quaternions, ...).  While there is no one best representation for 3D
     rotations, it <i>is</i> possible to have one canonical representation for
-    differential rotations.  Therefore, without any loss of generality, we can
-    represent the rate of change in pose using a six-component vector for <a
+    <i>differential</i> rotations.  Without any concern for singularities nor
+    loss of generality, we can represent the rate of change in pose using a
+    six-component vector for <a
     href="https://drake.mit.edu/doxygen_cxx/group__multibody__spatial__vectors.html"><i>spatial
-    velocity</i></a>: \begin{equation}{}^AV^B_C = \begin{bmatrix} {}^A\omega^B_C
-    \\ {}^A\text{v}^B_C \end{bmatrix}.\end{equation} ${}^AV^B_C$ is the spatial
-    velocity of frame $B$ relative to frame $A$ expressed in frame $C$,
-    ${}^A\omega^B_C \in \Re^3$ is the <i>angular velocity</i> (of frame $B$
-    relative frame $A$ expressed in frame $C$), and ${}^A\text{v}^B_C \in \Re^3$
-    is the <i>translational velocity</i> (along with the same shorthands as for
-    positions).  Translational and rotational velocities are simply vectors, so
-    they can be operated on just like positions:<ul>
+    velocity</i></a>: \begin{equation}{}^AV^B_C = \begin{bmatrix}
+    {}^A\omega^B_C \\ {}^A\text{v}^B_C \end{bmatrix}.\end{equation} ${}^AV^B_C$
+    is the spatial velocity of frame $B$ relative to frame $A$ expressed in
+    frame $C$, ${}^A\omega^B_C \in \Re^3$ is the <i>angular velocity</i> (of
+    frame $B$ relative frame $A$ expressed in frame $C$), and ${}^A\text{v}^B_C
+    \in \Re^3$ is the <i>translational velocity</i> (along with the same
+    shorthands as for positions).  Translational and rotational velocities are
+    simply vectors, so they can be operated on just like positions:<ul>
       <li>Spatial velocities add (when the frames match): \begin{equation}
       {}^A\text{v}^B_F + {}^B\text{v}^C_F = {}^A\text{v}^C_F, \qquad
       {}^A\omega^B_F + {}^B\omega^C_F = {}^A\omega^C_F,\end{equation} and have

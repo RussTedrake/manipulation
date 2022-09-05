@@ -12,7 +12,7 @@ from pydrake.all import (
     Box, CameraInfo, ClippingRange, CoulombFriction, Cylinder, Demultiplexer,
     DepthImageToPointCloud, DepthRange, DepthRenderCamera, DiagramBuilder,
     FindResourceOrThrow, GeometryInstance, InverseDynamicsController,
-    LeafSystem, LoadModelDirectivesFromString,
+    LeafSystem, LoadModelDirectives, LoadModelDirectivesFromString,
     MakeMultibodyStateToWsgStateSystem, MakePhongIllustrationProperties,
     MakeRenderEngineVtk, ModelInstanceIndex, MultibodyPlant, Parser,
     PassThrough, PrismaticJoint, ProcessModelDirectives, RenderCameraCore,
