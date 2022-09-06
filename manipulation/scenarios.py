@@ -248,10 +248,11 @@ def AddRgbdSensors(builder,
                    depth_camera=None,
                    renderer=None):
     """
-    Adds a RgbdSensor to every body in the plant with a name starting with
-    body_prefix.  If depth_camera is None, then a default camera info will be
-    used.  If renderer is None, then we will assume the name 'my_renderer', and
-    create a VTK renderer if a renderer of that name doesn't exist.
+    Adds a RgbdSensor to the first body in the plant for every model instance
+    with a name starting with model_instance_prefix.  If depth_camera is None,
+    then a default camera info will be used.  If renderer is None, then we will
+    assume the name 'my_renderer', and create a VTK renderer if a renderer of
+    that name doesn't exist.
     """
     if sys.platform == "linux" and os.getenv("DISPLAY") is None:
         from pyvirtualdisplay import Display
@@ -514,7 +515,7 @@ def MakeManipulationStation(model_directives=None,
             builder.ExportInput(iiwa_position.get_input_port(),
                                 model_instance_name + "_position")
             builder.ExportOutput(iiwa_position.get_output_port(),
-                                 model_instance_name + "_position_command")
+                                 model_instance_name + "_position_commanded")
 
             # Export the iiwa "state" outputs.
             demux = builder.AddSystem(
