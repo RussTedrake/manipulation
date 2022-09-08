@@ -19,6 +19,12 @@ rt_py_library(
 )
 
 rt_py_library(
+    name = "test_direct_joint_control",
+    srcs = ["test_direct_joint_control.py"],
+    visibility = ["//visibility:public"],
+)
+
+rt_py_library(
     name = "test_survey",
     srcs = ["test_survey.py"],
     visibility = ["//visibility:public"],
