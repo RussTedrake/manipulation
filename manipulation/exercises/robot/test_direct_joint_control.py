@@ -21,8 +21,8 @@ class TestDirectJointControl(unittest.TestCase):
         self.assertIsNotNone(context, 'Incorrect context')
 
         station_context = station.GetMyContextFromRoot(context)
-        measured_pos = station.GetOutputPort("iiwa_position_measured").Eval(
+        commanded_pos = station.GetOutputPort("iiwa_position_commanded").Eval(
             station_context)
 
-        self.assertLessEqual(np.linalg.norm(measured_pos - q_cmd), 1e-3,
-                             'measured/commanded mismatch')
+        self.assertLessEqual(np.linalg.norm(commanded_pos - q_cmd), 1e-3,
+                             'wrong commanded position')
