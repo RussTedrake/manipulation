@@ -7,6 +7,17 @@
 load("//htmlbook/tools/jupyter:defs.bzl", "rt_ipynb_test")
 
 rt_ipynb_test(
+    name = "direct_joint_control",
+    srcs = ["direct_joint_control.ipynb"],
+    deps = [
+        "//manipulation",
+        "//manipulation/exercises:grader",
+        "//manipulation/exercises/robot:test_direct_joint_control",
+        "//manipulation:scenarios",
+    ],
+)
+
+rt_ipynb_test(
     name = "manipulation_station_io",
     srcs = ["manipulation_station_io.ipynb"],
     deps = [

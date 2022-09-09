@@ -17,11 +17,14 @@ class TestManipulationIO(unittest.TestCase):
         f = self.notebook_locals['get_velocity']
         station = self.notebook_locals['station']
         station_context = self.notebook_locals['station_context']
+        plant = self.notebook_locals['plant']
+        plant_context = self.notebook_locals['plant_context']
+        iiwa = plant.GetModelInstanceByName("iiwa")
 
         np.random.seed(7)
         for i in range(10):
             test_vel = np.random.rand(7)  # draw 7 random numbers
-            station.SetIiwaVelocity(station_context, test_vel)
+            plant.SetVelocities(plant_context, iiwa, test_vel)
             eval_vel = f(station, station_context)
             self.assertLessEqual(np.linalg.norm(test_vel - eval_vel), 1e-6,
                                  'get_velocity implementation is not correct!')
