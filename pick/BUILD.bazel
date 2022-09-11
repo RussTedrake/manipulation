@@ -34,3 +34,20 @@ rt_ipynb_test(
     srcs = ["qdot_vs_v.ipynb"],
 )
 
+rt_ipynb_test(
+    name = "jacobian",
+    srcs = ["jacobian.ipynb"],
+    deps = [
+      "//manipulation",
+      "//manipulation:scenarios",
+    ],
+)
+
+rt_ipynb_test(
+    name = "grasp",
+    srcs = ["grasp.ipynb"],
+    deps = [
+      "//manipulation",
+      "//manipulation:scenarios",
+    ],
+)
