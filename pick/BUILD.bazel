@@ -15,3 +15,22 @@ rt_ipynb_test(
     ],
 )
 
+rt_ipynb_test(
+    name = "kinematic_tree",
+    srcs = ["kinematic_tree.ipynb"],
+)
+
+rt_ipynb_test(
+    name = "forward_kinematics",
+    srcs = ["forward_kinematics.ipynb"],
+    deps = [
+      "//manipulation",
+      "//manipulation:scenarios",
+    ],
+)
+
+rt_ipynb_test(
+    name = "qdot_vs_v",
+    srcs = ["qdot_vs_v.ipynb"],
+)
+

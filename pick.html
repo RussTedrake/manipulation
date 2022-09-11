@@ -345,7 +345,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
         example, too, so that you can see that a "free" body is just another
         branch off the world root node.</p>
 
-        <script>document.write(notebook_link('pick'))</script>
+        <script>document.write(notebook_link('pick', d=deepnote, link_text="", notebook="kinematic_tree"))</script>
     
         <todo>Insert topology visualization here (once it is better)</todo>
       </example>
@@ -361,9 +361,9 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       between any one body and its parent, $${}^PX^C(q) = {}^PX^{J_P}
       {}^{J_P}X^{J_C}(q) {}^{J_C}X^C.$$</p>
 
-      <example><h1>Specifying the kinematic tree in URDF</h1></example>
-
-      <example><h1>Specifying the kinematic tree in SDF</h1></example>
+      <todo>
+        Examples or links to specifying the kinematic tree in URDF, SDF, etc...
+      </todo>
 
       <p>You might be tempted to think that every time you add a joint to the
       <code>MultibodyPlant</code>, you are adding a degree of freedom.  But it
@@ -403,7 +403,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
         (and so is stored in the <code>Context</code>).  The following example
         shows you how it works.</p>
 
-        <script>document.write(notebook_link('pick'))</script>
+        <script>document.write(notebook_link('pick', d=deepnote, link_text="", notebook="forward_kinematics"))</script>
 
         <p>The key lines are 
           <code class="language-python"><pre>
@@ -559,7 +559,7 @@ pose = plant.EvalBodyPoseInWorld(context, gripper)</pre></code>
       <code>MultibodyPlant</code>, and then prints its
       <code>Context</code>.</p>
 
-      <script>document.write(notebook_link('pick'))</script>
+      <script>document.write(notebook_link('pick', d=deepnote, link_text="", notebook="qdot_vs_v"))</script>
 
       <p>The output looks like this:
       <code><pre>Context
