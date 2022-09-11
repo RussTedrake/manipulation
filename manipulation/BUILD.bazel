@@ -10,9 +10,15 @@ rt_py_library(
     name = "manipulation",
     srcs = [
         "__init__.py",
-        "meshcat_utils.py",
         "utils.py",
     ],
+    imports = [".."],
+    visibility = ["//visibility:public"],
+)
+
+rt_py_library(
+    name = "meshcat_utils",
+    srcs = ["meshcat_utils.py"],
     imports = [".."],
     visibility = ["//visibility:public"],
 )
@@ -67,7 +73,10 @@ rt_py_test(
     srcs = ["test/test_meshcat_utils.py"],
     tags = ["requires-network"], # For gurobi
     imports = [".."],
-    deps = ["manipulation"],
+    deps = [
+      "manipulation",
+      "//manipulation:meshcat_utils",
+    ],
 )
 
 rt_py_test(
@@ -90,6 +99,7 @@ rt_py_test(
     ],
     deps = [
         "manipulation",
+        "meshcat_utils",
         "mustard_depth_camera_example",
         "open3d_utils",
     ],

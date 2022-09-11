@@ -43,6 +43,7 @@ rt_ipynb_test(
     srcs = ["intro.ipynb"],
     deps = [
       "//manipulation",
+      "//manipulation:meshcat_utils",
       "//manipulation:scenarios",
     ],
 )
@@ -53,15 +54,6 @@ rt_html_test(
 
 rt_html_test(
     srcs = ["pick.html"],
-)
-
-rt_ipynb_test(
-    name = "pick",
-    srcs = ["pick.ipynb"],
-    deps = [
-      "//manipulation",
-      "//manipulation:scenarios",
-    ],
 )
 
 rt_html_test(
@@ -81,6 +73,7 @@ rt_ipynb_test(
     deps = [
       "//manipulation",
       "//manipulation:mustard_depth_camera_example",
+      "//manipulation:meshcat_utils",
       "//manipulation:scenarios",
     ],
 )
@@ -103,6 +96,7 @@ rt_ipynb_test(
     deps = [
         "//manipulation",
         "//manipulation:mustard_depth_camera_example",
+        "//manipulation:meshcat_utils",
         "//manipulation:scenarios",
         "//manipulation:open3d_utils",
     ],
@@ -143,6 +137,7 @@ rt_ipynb_test(
     data = ["//manipulation/models"],
     deps = [
       "//manipulation",
+      "//manipulation:meshcat_utils",
       "//manipulation:scenarios",
     ],
 )
@@ -157,6 +152,7 @@ rt_ipynb_test(
     data = ["//manipulation/models"],
     deps = [
       "//manipulation",
+      "//manipulation:meshcat_utils",
       "//manipulation:scenarios",
     ],
 )
@@ -171,6 +167,7 @@ rt_ipynb_test(
     data = ["//data:box_flipup_ppo_state_3.zip"],
     deps = [
       "//manipulation",
+      "//manipulation:meshcat_utils",
       "//manipulation/envs:box_flipup",
     ],
 )

@@ -24,6 +24,7 @@ rt_ipynb_test(
     data = ["//manipulation/models:two_link_iiwa14.urdf"],
     deps = [
       "//manipulation",
+      "//manipulation:meshcat_utils",
       "//manipulation:scenarios",
     ],
 )

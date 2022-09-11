@@ -7,16 +7,11 @@
 load("//htmlbook/tools/jupyter:defs.bzl", "rt_ipynb_test")
 
 rt_ipynb_test(
-    name = "inspector",
-    srcs = ["inspector.ipynb"],
+    name = "pick",
+    srcs = ["pick.ipynb"],
     deps = [
       "//manipulation",
-      "//manipulation:meshcat_utils",
+      "//manipulation:scenarios",
     ],
 )
 
-rt_ipynb_test(
-    name = "simulation",
-    srcs = ["simulation.ipynb"],
-    deps = ["//manipulation"],
-)
