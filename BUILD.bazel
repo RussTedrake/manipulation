@@ -51,18 +51,6 @@ rt_html_test(
     srcs = ["robot.html"],
 )
 
-rt_ipynb_test(
-    name = "robot",
-    srcs = ["robot.ipynb"],
-    deps = ["//manipulation"],
-)
-
-rt_ipynb_test(
-    name = "robot_simulation",
-    srcs = ["robot_simulation.ipynb"],
-    deps = ["//manipulation"],
-)
-
 rt_html_test(
     srcs = ["pick.html"],
 )
