@@ -51,3 +51,12 @@ rt_ipynb_test(
       "//manipulation:scenarios",
     ],
 )
+
+rt_ipynb_test(
+    name = "pseudoinverse",
+    srcs = ["pseudoinverse.ipynb"],
+    deps = [
+      "//manipulation",
+      "//manipulation:scenarios",
+    ],
+)
