@@ -7,6 +7,24 @@
 load("//htmlbook/tools/jupyter:defs.bzl", "rt_ipynb_test")
 
 rt_ipynb_test(
+    name = "pose",
+    srcs = ["pose.ipynb"],
+    data = ["//manipulation/models"],
+    tags = ["no-sandbox"],  # from vtk-test-tags() in drake
+    # Open3D 0.10 is not compatible with Python 3.9.
+    target_compatible_with = [
+        "@platforms//cpu:x86_64",
+        "@platforms//os:linux",
+    ],
+    deps = [
+      "//manipulation",
+      "//manipulation:mustard_depth_camera_example",
+      "//manipulation:meshcat_utils",
+      "//manipulation:scenarios",
+    ],
+)
+
+rt_ipynb_test(
     name = "messy_icp",
     srcs = ["messy_icp.ipynb"],
     # Open3D 0.10 is not compatible with Python 3.9.
@@ -15,16 +33,4 @@ rt_ipynb_test(
         "@platforms//os:linux",
     ],
     deps = ["//manipulation"],
-)
-
-rt_ipynb_test(
-    name = "qp_diff_ik",
-    srcs = ["qp_diff_ik.ipynb"],
-    tags = ["requires-network"], # For gurobi
-    data = ["//manipulation/models:two_link_iiwa14.urdf"],
-    deps = [
-      "//manipulation",
-      "//manipulation:meshcat_utils",
-      "//manipulation:scenarios",
-    ],
 )

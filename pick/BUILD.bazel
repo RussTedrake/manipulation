@@ -60,3 +60,15 @@ rt_ipynb_test(
       "//manipulation:scenarios",
     ],
 )
+
+rt_ipynb_test(
+    name = "qp_diff_ik",
+    srcs = ["qp_diff_ik.ipynb"],
+    tags = ["requires-network"], # For gurobi
+    data = ["//manipulation/models:two_link_iiwa14.urdf"],
+    deps = [
+      "//manipulation",
+      "//manipulation:meshcat_utils",
+      "//manipulation:scenarios",
+    ],
+)
