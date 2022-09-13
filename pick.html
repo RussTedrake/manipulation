@@ -626,14 +626,14 @@ plant.num_velocities() = 6</pre></code></p>
       <p>Any time you write a matrix inverse, it's important to check that the
       matrix is actually invertible.  As a first sanity check: what are the
       dimensions of $J^G(q)$?  We know the spatial velocity has six components.
-      Our gripper frame is welded directly on the last link of the iiwa, and the
-      iiwa has seven positions, so we have $J^G(q_{iiwa}) \in \Re^{6x7}.$  The
-      matrix is not square, so does not have an inverse.  But having <i>more</i>
-      degrees of freedom than the desired spatial velocity requires (more
-      columns than rows) is actually the good case, in the sense that we might
-      have many solutions for $v$ that can achieve a desired spatial velocity.
-      To choose one of them (the minimum-norm solution), we can consider using
-      the <a
+      Our gripper frame is welded directly on the last link of the iiwa, and
+      the iiwa has seven positions, so we have $J^G(q_{iiwa}) \in \Re^{6 \times
+      7}.$  The matrix is not square, so does not have an inverse.  But having
+      <i>more</i> degrees of freedom than the desired spatial velocity requires
+      (more columns than rows) is actually the good case, in the sense that we
+      might have many solutions for $v$ that can achieve a desired spatial
+      velocity. To choose one of them (the minimum-norm solution), we can
+      consider using the <a
       href="https://en.wikipedia.org/wiki/Moore%E2%80%93Penrose_inverse">Moore-Penrose
       pseudo-inverse</a>, $J^+$, instead: \begin{equation}v =
       [J^G(q)]^+V^{G_d}.\end{equation}</p>
