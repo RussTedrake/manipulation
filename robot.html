@@ -106,17 +106,18 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
     <example><h1>Robot arms</h1>
     
       <p>I've put together a simple example to let you explore some of the
-      various robot arms that are popular today.Let me know if your favorite arm isn't on the list yet!</p>
+      various robot arms that are popular today. Let me know if your favorite arm isn't on the list yet!</p>
       
-      <script>document.write(notebook_link('robot'))</script>
+      <script>document.write(notebook_link('robot', d=deepnote, link_text="", notebook='inspector'))</script>
 
     </example>
 
-    <p>There is one particular requirement which, if we want our robot to meet,
-    quickly winnows the field to only a few viable platforms: that requirement
-    is joint-torque sensing and control.  Out of the torque-controlled robots
-    on the market, I've chosen to use the Kuka LBR iiwa robot to use throughout
-    these notes (I will try to use the lower case "iiwa" to be <a
+    <p>There is one particular requirement which, if we want our robot to
+    satisfy, quickly winnows the field to only a few viable platforms: that
+    requirement is joint-torque sensing and control.  Out of the
+    torque-controlled robots on the market, I've chosen to use the Kuka LBR
+    iiwa robot to use throughout these notes (I will try to use the lower case
+    "iiwa" to be <a
     href="https://www.kuka.com/en-us/products/robotics-systems/industrial-robots/lbr-iiwa">consistent
     with the manufacturer</a>, but it looks wrong to me every time!).  </p>
     
@@ -209,7 +210,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
         and a trove of knowledge about how to choose the gains, which I will
         not reproduce here.  I will note, however, that when we simulate
         position-controlled robots we often need to use different gains for the
-        physical robot as we do in simulation. This is due to the transmission
+        physical robot and for our simulations. This is due to the transmission
         dynamics, but also the fact that PID controllers in hardware typically
         output voltage commands (via <a
         href="https://en.wikipedia.org/wiki/Pulse-width_modulation">pulse-width
@@ -296,7 +297,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
         are relatively small). These effects make it relatively easy to tune
         constant feedback gains for each joint individually that perform well
         in all configurations.</p>
-        
+
       </subsubsection>
 
     </subsection>
@@ -347,7 +348,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       motor and joint sides of the transmission to estimate the applied torques
       <elib>Pratt95b</elib>.  For example, the <a
       href="https://en.wikipedia.org/wiki/Baxter_(robot)">Baxter</a> and Sawyer
-      robots from Rethink used series elastic actuators; I don't think they
+      robots from Rethink used series-elastic actuators; I don't think they
       ever published the spring stiffness values but similarly-motivated
       series-elastic actuators from <a
       href=http://docs.hebi.us/hardware.html>HEBI robotics are closer to 100
@@ -374,7 +375,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       students (and occasionally professors!) in the machine shop down the hall,
       the availability of professionally engineered, high-quality, high-uptime
       hardware is an absolute treat.  This also means that we can test
-      algorithms in one lab and have another lab perhaps at another univeristy
+      algorithms in one lab and have another lab perhaps at another university
       testing algorithms on almost identical hardware; this facilitates levels
       of repeatability and sharing that were impossible before. The fact that
       the prices are coming down, which will mean many more similar robots in
@@ -390,7 +391,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       <p>It's time to simulate our chosen robotic arm.  The first step is to
       obtain a robot description file (typically URDF or SDF). For convenience,
       we <a
-      href="https://github.com/RobotLocomotion/drake/tree/e3beced2025277411b456e11450316d07a146f5a/manipulation/models">ship</a>
+      href="https://github.com/RobotLocomotion/drake/tree/master/manipulation/models">ship</a>
       the models for a few robots, including iiwa, with Drake.  If you're
       interested in simulating a different robot, you can find either a URDF or
       SDF describing most commercial robots somewhere online.  But a word of
@@ -469,7 +470,7 @@ output_ports:
         help you understand not only the physics engine, but some of the basic
         mechanics of working with simulations in Drake.</p>
 
-        <script>document.write(notebook_link('robot'))</script>
+        <script>document.write(notebook_link('robot', d=deepnote, link_text="",notebook='simulation'))</script>
     
       </example>
       
@@ -499,19 +500,21 @@ output_ports:
       
         <p>This example is far more interesting to watch.  Now we have the 3D visualization!</p>
 
-        <script>document.write(notebook_link('robot'))</script>
+        <script>document.write(notebook_link('robot', d=deepnote, link_text="",notebook='simulation'))</script>
 
       </example>
       
       <p>You might wonder why <code>MultibodyPlant</code> doesn't handle the
-      geometry of the scene as well.  Well, there are many application where
-      we'd like to render complex scenes, and use complex sensors, but supply
-      custom dynamics instead of the default physics engine.  Autonomous driving
-      is a great example; in that case we want to populate a
+      geometry of the scene as well.  Well, there are many applications in
+      which we'd like to render complex scenes, and use complex sensors, but
+      supply custom dynamics instead of using the default physics engine.
+      Autonomous driving is a great example; in that case we want to populate a
       <code>SceneGraph</code> with all of the geometry of the vehicles and
       environment, but we often want to simulate the vehicles with very simple
       vehicle models that stop well short of adding tire mechanics into our
-      physics engine.</p>
+      physics engine. We also have a number of examples of this workflow in my
+      <a href="http://underactuated.mit.edu">Underactuated Robotics</a> course,
+      where we make extensive use of "simple models".</p>
       
       <p>We now have a basic simulation of the iiwa, but already some subtleties
       emerge.  The physics engine needs to be told what torques to apply at the
@@ -544,7 +547,7 @@ output_ports:
 
         <p>This example adds the iiwa controller and sets the desired <i>positions</i> (no longer the desired torques) to be the current state of the robot.  It's a more faithful simulation of the real robot.  I'm sorry that it is boring once again!</p>
 
-        <script>document.write(notebook_link('robot'))</script>
+        <script>document.write(notebook_link('robot', d=deepnote, link_text="",notebook='simulation'))</script>
         
       </example>
       
@@ -578,7 +581,7 @@ output_ports:
       interface we used for the arms, though I don't have as many hand models
       here yet.  Let me know if your favorite hand isn't on the list!</p>
       
-      <script>document.write(notebook_link('robot'))</script>
+      <script>document.write(notebook_link('robot', d=deepnote, link_text="",notebook='inspector'))</script>
 
     </example>    
 
@@ -955,7 +958,7 @@ output_ports:
 
 </li><br>
 <li id=Wedler12>
-<span class="author">Armin Wedler and Maxime Chalon and Klaus Landzettel and Martin G{\"o}rner and Erich Kr{\"a}mer and Robin Gruber and Alexander Beyer and Hans-J{\"u}rgen Sedlmayr and Bertram Willberg and Wieland Bertleff and Josef Reill and Markus Schedl and Alin Albu-Schaffer and Gerd Hirzinger</span>, 
+<span class="author">A Wedler and M Chalon and K Landzettel and M G{\"o}rner and E Kr{\"a}mer and R Gruber and A Beyer and HJ Sedlmayr and B Willberg and W Bertleff and others</span>, 
 <span class="title">"DLRs dynamic actuator modules for robotic space applications"</span>, 
 <span class="publisher">Proceedings of the 41st Aerospace Mechanisms Symposium</span> , May 16-18, <span class="year">2012</span>.
 

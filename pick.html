@@ -68,9 +68,9 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
   <p>The stage is set.  You have your robot.  I have a little red foam brick.
   I'm going to put it on the table in front of your robot, and your goal is to
   move it to a desired position/orientation on the table.  I want to defer the
-  <i>perception</i> problem for one chapter, and will let you assume that you
-  have access to a perfect measurement of the current position/orientation of
-  the brick.  Even without perception, completing this task requires us to
+  <i>perception</i> problem for one more chapter, and will let you assume that
+  you have access to a perfect measurement of the current position/orientation
+  of the brick.  Even without perception, completing this task requires us to
   build up a basic toolkit for geometry and kinematics; it's a natural place to
   start.</p>
 
@@ -345,7 +345,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
         example, too, so that you can see that a "free" body is just another
         branch off the world root node.</p>
 
-        <script>document.write(notebook_link('pick'))</script>
+        <script>document.write(notebook_link('pick', d=deepnote, link_text="", notebook="kinematic_tree"))</script>
     
         <todo>Insert topology visualization here (once it is better)</todo>
       </example>
@@ -361,9 +361,9 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       between any one body and its parent, $${}^PX^C(q) = {}^PX^{J_P}
       {}^{J_P}X^{J_C}(q) {}^{J_C}X^C.$$</p>
 
-      <example><h1>Specifying the kinematic tree in URDF</h1></example>
-
-      <example><h1>Specifying the kinematic tree in SDF</h1></example>
+      <todo>
+        Examples or links to specifying the kinematic tree in URDF, SDF, etc...
+      </todo>
 
       <p>You might be tempted to think that every time you add a joint to the
       <code>MultibodyPlant</code>, you are adding a degree of freedom.  But it
@@ -403,7 +403,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
         (and so is stored in the <code>Context</code>).  The following example
         shows you how it works.</p>
 
-        <script>document.write(notebook_link('pick'))</script>
+        <script>document.write(notebook_link('pick', d=deepnote, link_text="", notebook="forward_kinematics"))</script>
 
         <p>The key lines are 
           <code class="language-python"><pre>
@@ -559,7 +559,7 @@ pose = plant.EvalBodyPoseInWorld(context, gripper)</pre></code>
       <code>MultibodyPlant</code>, and then prints its
       <code>Context</code>.</p>
 
-      <script>document.write(notebook_link('pick'))</script>
+      <script>document.write(notebook_link('pick', d=deepnote, link_text="", notebook="qdot_vs_v"))</script>
 
       <p>The output looks like this:
       <code><pre>Context
@@ -605,7 +605,7 @@ plant.num_velocities() = 6</pre></code></p>
     
       <p>Let's repeat the setup from above, but we'll print out the Jacobian of the gripper frame, relative to the world frame, expressed in the world frame.</p>
 
-      <script>document.write(notebook_link('pick'))</script>
+      <script>document.write(notebook_link('pick', d=deepnote, link_text="", notebook="jacobian"))</script>
 
     </example>
 
@@ -626,14 +626,14 @@ plant.num_velocities() = 6</pre></code></p>
       <p>Any time you write a matrix inverse, it's important to check that the
       matrix is actually invertible.  As a first sanity check: what are the
       dimensions of $J^G(q)$?  We know the spatial velocity has six components.
-      Our gripper frame is welded directly on the last link of the iiwa, and the
-      iiwa has seven positions, so we have $J^G(q_{iiwa}) \in \Re^{6x7}.$  The
-      matrix is not square, so does not have an inverse.  But having <i>more</i>
-      degrees of freedom than the desired spatial velocity requires (more
-      columns than rows) is actually the good case, in the sense that we might
-      have many solutions for $v$ that can achieve a desired spatial velocity.
-      To choose one of them (the minimum-norm solution), we can consider using
-      the <a
+      Our gripper frame is welded directly on the last link of the iiwa, and
+      the iiwa has seven positions, so we have $J^G(q_{iiwa}) \in \Re^{6 \times
+      7}.$  The matrix is not square, so does not have an inverse.  But having
+      <i>more</i> degrees of freedom than the desired spatial velocity requires
+      (more columns than rows) is actually the good case, in the sense that we
+      might have many solutions for $v$ that can achieve a desired spatial
+      velocity. To choose one of them (the minimum-norm solution), we can
+      consider using the <a
       href="https://en.wikipedia.org/wiki/Moore%E2%80%93Penrose_inverse">Moore-Penrose
       pseudo-inverse</a>, $J^+$, instead: \begin{equation}v =
       [J^G(q)]^+V^{G_d}.\end{equation}</p>
@@ -680,7 +680,7 @@ plant.num_velocities() = 6</pre></code></p>
         worth finding the important lines and making sure you can change them
         and see what happens!</p>
 
-        <script>document.write(notebook_link('pick'))</script>
+        <script>document.write(notebook_link('pick', d=deepnote, link_text="", notebook="pseudoinverse"))</script>
   
         <p>Congratulations!  Things are really moving now.</p>
 
@@ -709,7 +709,7 @@ plant.num_velocities() = 6</pre></code></p>
         See if you can find configurations where the smallest singular value
         gets close to zero.</p>
 
-        <script>document.write(notebook_link('pick'))</script>
+        <script>document.write(notebook_link('pick', d=deepnote, link_text="", notebook="jacobian"))</script>
 
         <p>Here's a hint: try some configurations where the arm is very
         straight, (e.g. driving joint 2 and 4 close to zero).</p>
@@ -859,7 +859,7 @@ plant.num_velocities() = 6</pre></code></p>
       transformation clearly), and rendering the hand relative to the
       object.</p>
 
-      <script>document.write(notebook_link('pick'))</script>
+      <script>document.write(notebook_link('pick', d=deepnote, link_text="", notebook="grasp"))</script>
 
       <p>I hope you can see the value of having good notation at work here.  My
       right hand was in the air when I was deciding what a suitable relative
@@ -1092,7 +1092,17 @@ plant.num_velocities() = 6</pre></code></p>
       class of optimization problems where we have very strong numerical
       tools.</p>
 
-      <example><h1>Jacobian-based control with velocity constraints</h1></example>
+      <example><h1>Jacobian-based control with velocity constraints</h1>
+      
+        <p>To help think about the differential inverse kinematics problem as
+        an optimization, I've put together a visualization of the optimization
+        landscape of the quadratic program.  In the notebook below, you will
+        see the constraints visualized as in red, and the objective function
+        visualized as a function in green.</p>
+
+        <script>document.write(notebook_link('pick', d=deepnote, link_text="", notebook="qp_diff_ik"))</script>
+
+      </example>
     
     </subsection>
 

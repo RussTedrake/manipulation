@@ -7,13 +7,17 @@ from functools import partial
 import numpy as np
 from IPython.display import HTML, Javascript, display
 from pydrake.common.value import AbstractValue
-from pydrake.geometry import Cylinder, Rgba, Sphere
+from pydrake.geometry import (Cylinder, MeshcatVisualizer,
+                              MeshcatVisualizerParams, Rgba, Role, Sphere)
 from pydrake.math import RigidTransform, RollPitchYaw, RotationMatrix
+from pydrake.multibody.meshcat import JointSliders
+from pydrake.multibody.parsing import Parser
+from pydrake.multibody.plant import AddMultibodyPlantSceneGraph
 from pydrake.multibody.tree import BodyIndex, JointIndex
 from pydrake.perception import BaseField, Fields, PointCloud
 from pydrake.solvers.mathematicalprogram import BoundingBoxConstraint
-from pydrake.systems.framework import (EventStatus, LeafSystem, PublishEvent,
-                                       VectorSystem)
+from pydrake.systems.framework import (DiagramBuilder, EventStatus, LeafSystem,
+                                       PublishEvent, VectorSystem)
 
 from manipulation import running_as_notebook
 
@@ -416,3 +420,36 @@ def plot_mathematical_program(meshcat,
             RigidTransform(
                 [x_solution[0], x_solution[1],
                  result.get_optimal_cost()]))
+
+
+# TODO(russt): Use the one true Drake version once this lands:
+# https://github.com/RobotLocomotion/drake/issues/17689
+def model_inspector(meshcat, filename):
+    builder = DiagramBuilder()
+
+    # Note: the time_step here is chosen arbitrarily.
+    plant, scene_graph = AddMultibodyPlantSceneGraph(builder, time_step=0.001)
+
+    # Load the file into the plant/scene_graph.
+    parser = Parser(plant)
+    parser.AddModelFromFile(filename)
+    plant.Finalize()
+
+    # Add two visualizers, one to publish the "visual" geometry, and one to
+    # publish the "collision" geometry.
+    visual = MeshcatVisualizer.AddToBuilder(
+        builder, scene_graph, meshcat,
+        MeshcatVisualizerParams(role=Role.kPerception, prefix="visual"))
+    collision = MeshcatVisualizer.AddToBuilder(
+        builder, scene_graph, meshcat,
+        MeshcatVisualizerParams(role=Role.kProximity, prefix="collision"))
+    # Disable the collision geometry at the start; it can be enabled by the
+    # checkbox in the meshcat controls.
+    meshcat.SetProperty("collision", "visible", False)
+
+    # Set the timeout to a small number in test mode. Otherwise, JointSliders
+    # will run until "Stop JointSliders" button is clicked.
+    default_interactive_timeout = None if running_as_notebook else 1.0
+    sliders = builder.AddSystem(JointSliders(meshcat, plant))
+    diagram = builder.Build()
+    sliders.Run(diagram, default_interactive_timeout)

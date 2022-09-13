@@ -1,0 +1,36 @@
+# -*- mode: python -*-
+# vi: set ft=python :
+
+# Copyright 2020-2022 Massachusetts Institute of Technology.
+# Licensed under the BSD 3-Clause License. See LICENSE.TXT for details.
+
+load("//htmlbook/tools/jupyter:defs.bzl", "rt_ipynb_test")
+
+rt_ipynb_test(
+    name = "pose",
+    srcs = ["pose.ipynb"],
+    data = ["//manipulation/models"],
+    tags = ["no-sandbox"],  # from vtk-test-tags() in drake
+    # Open3D 0.10 is not compatible with Python 3.9.
+    target_compatible_with = [
+        "@platforms//cpu:x86_64",
+        "@platforms//os:linux",
+    ],
+    deps = [
+      "//manipulation",
+      "//manipulation:mustard_depth_camera_example",
+      "//manipulation:meshcat_utils",
+      "//manipulation:scenarios",
+    ],
+)
+
+rt_ipynb_test(
+    name = "messy_icp",
+    srcs = ["messy_icp.ipynb"],
+    # Open3D 0.10 is not compatible with Python 3.9.
+    target_compatible_with = [
+        "@platforms//cpu:x86_64",
+        "@platforms//os:linux",
+    ],
+    deps = ["//manipulation"],
+)

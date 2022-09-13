@@ -27,6 +27,7 @@ rt_ipynb_test(
     deps = [
         "//manipulation",
         "//manipulation:open3d_utils",
+        "//manipulation:meshcat_utils",
         "//manipulation:scenarios",
         "//manipulation:mustard_depth_camera_example",
         "//manipulation/exercises:grader",
@@ -58,6 +59,7 @@ rt_ipynb_test(
     ],
     deps = [
         "//manipulation",
+        "//manipulation:meshcat_utils",
         "//manipulation:scenarios",
         "//manipulation/exercises:grader",
         "//manipulation/exercises/clutter:test_grasp_candidate",
