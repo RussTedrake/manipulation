@@ -291,8 +291,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
 
       <p>Imagine that I have a depth camera mounted in a fixed pose in my
       workspace.  Let's call the camera frame $C$ and denote its pose in the
-      world with ${}^WX^C$.  This pose is often called the camera
-      "extrinsics".</p>
+      world with ${}^WX^C$.</p>
 
       <p>A depth camera returns points in the camera frame.  Therefore,
       we'll write this position of point $P_i$ with ${}^Cp^{P_i}$.  If we want
@@ -301,7 +300,9 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
 
       <p>This is a work-horse operation for us.  We often aim to merge points
       from multiple cameras (typically in the world frame), and always need to
-      somehow relate the frames of the camera with the frames of the robot.</p>
+      somehow relate the frames of the camera with the frames of the robot. The
+      inverse transform, ${}^CX^W$, which projects world coordinates into the
+      camera frame, is often called the camera "extrinsics".</p>
     
     </example>
 
