@@ -42,6 +42,13 @@ rt_py_library(
 )
 
 rt_py_library(
+    name = "icp",
+    srcs = ["icp.py"],
+    imports = [".."],
+    visibility = ["//visibility:public"],
+)
+
+rt_py_library(
     name = "open3d_utils",
     srcs = ["open3d_utils.py"],
     imports = [".."],

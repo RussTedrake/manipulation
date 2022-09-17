@@ -7,6 +7,30 @@
 load("//htmlbook/tools/jupyter:defs.bzl", "rt_ipynb_test")
 
 rt_ipynb_test(
+    name = "camera_sim",
+    srcs = ["camera_sim.ipynb"],
+    data = ["//manipulation/models"],
+    tags = ["no-sandbox"],  # from vtk-test-tags() in drake
+    deps = [
+      "//manipulation",
+      "//manipulation:scenarios",
+    ],
+)
+
+rt_ipynb_test(
+    name = "icp",
+    srcs = ["icp.ipynb"],
+    # Open3D 0.10 is not compatible with Python 3.9.
+    target_compatible_with = [
+        "@platforms//cpu:x86_64",
+        "@platforms//os:linux",
+    ],
+    deps = [
+      "//manipulation",
+    ],
+)
+
+rt_ipynb_test(
     name = "pose",
     srcs = ["pose.ipynb"],
     data = ["//manipulation/models"],
@@ -18,19 +42,9 @@ rt_ipynb_test(
     ],
     deps = [
       "//manipulation",
+      "//manipulation:icp",
       "//manipulation:mustard_depth_camera_example",
       "//manipulation:meshcat_utils",
       "//manipulation:scenarios",
     ],
-)
-
-rt_ipynb_test(
-    name = "messy_icp",
-    srcs = ["messy_icp.ipynb"],
-    # Open3D 0.10 is not compatible with Python 3.9.
-    target_compatible_with = [
-        "@platforms//cpu:x86_64",
-        "@platforms//os:linux",
-    ],
-    deps = ["//manipulation"],
 )

@@ -1,5 +1,8 @@
 {
-  "python.linting.pylintEnabled": false,
+  "python.linting.pylintEnabled": true,
+  "python.linting.pylintArgs": [
+      "--enable=W0614"
+  ],
   "python.linting.pycodestyleEnabled": true,
   "python.linting.enabled": true,
   "jupyter.jupyterServerType": "local",
