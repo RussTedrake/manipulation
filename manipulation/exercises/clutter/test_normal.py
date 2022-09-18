@@ -2,7 +2,7 @@ import unittest
 import timeout_decorator
 from gradescope_utils.autograder_utils.decorators import weight
 import numpy as np
-from manipulation import FindResource
+from manipulation.utils import FindResource
 
 
 class TestNormal(unittest.TestCase):
@@ -25,7 +25,7 @@ class TestNormal(unittest.TestCase):
 
         self.assertTrue(
             len(student_sol) == len(reference_sol),
-            'the number of the normals is incorrent')
+            'the number of the normals is incorrect')
 
         for X, X_sol in zip(student_sol, reference_sol):
             # check only points within the bounding box

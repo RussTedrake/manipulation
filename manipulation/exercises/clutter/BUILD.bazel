@@ -20,6 +20,7 @@ rt_py_library(
 
 rt_py_library(
     name = "test_normal",
+    data = ["normal_solution.npy"],
     srcs = ["test_normal.py"],
     visibility = ["//visibility:public"],
 )
