@@ -59,6 +59,7 @@ rt_ipynb_test(
     deps = [
         "//manipulation",
         "//manipulation:meshcat_utils",
+        "//manipulation:open3d_utils",
         "//manipulation:scenarios",
         "//manipulation/exercises:grader",
         "//manipulation/exercises/clutter:test_grasp_candidate",

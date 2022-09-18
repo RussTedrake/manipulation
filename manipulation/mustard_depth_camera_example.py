@@ -1,13 +1,11 @@
 import numpy as np
-import open3d as o3d
 
 from pydrake.multibody.parsing import (Parser, ProcessModelDirectives,
                                        LoadModelDirectives)
 from pydrake.multibody.plant import AddMultibodyPlantSceneGraph
+from pydrake.perception import Concatenate
 from pydrake.systems.framework import DiagramBuilder
 
-from manipulation.open3d_utils import (create_open3d_point_cloud,
-                                       open3d_cloud_to_drake)
 from manipulation.scenarios import AddRgbdSensors
 from manipulation.utils import FindResource, AddPackagePaths
 
@@ -44,18 +42,14 @@ def MustardPointCloud():
     context = system.CreateDefaultContext()
     pcd = []
     for i in range(3):
-        point_cloud = system.GetOutputPort(f"camera{i}_point_cloud").Eval(
-            context)
+        cloud = system.GetOutputPort(f"camera{i}_point_cloud").Eval(context)
 
-        cloud = create_open3d_point_cloud(point_cloud)
         # Crop to region of interest.
-        pcd.append(
-            cloud.crop(
-                o3d.geometry.AxisAlignedBoundingBox(min_bound=[-.3, -.3, -.3],
-                                                    max_bound=[.3, .3, .3])))
+        pcd.append(cloud.Crop(lower_xyz=[-.3, -.3, -.3], upper_xyz=[.3, .3,
+                                                                    .3]))
     # Merge point clouds.
-    merged_pcd = pcd[0] + pcd[1] + pcd[2]
+    merged_pcd = Concatenate(pcd)
     # Voxelize down-sample.
-    down_sampled_pcd = merged_pcd.voxel_down_sample(voxel_size=0.005)
+    down_sampled_pcd = merged_pcd.VoxelizedDownSample(voxel_size=0.005)
 
-    return open3d_cloud_to_drake(down_sampled_pcd)
+    return down_sampled_pcd

@@ -9,7 +9,6 @@ import open3d as o3d
 
 from pydrake.all import Meshcat
 from manipulation.mustard_depth_camera_example import MustardExampleSystem
-from manipulation.meshcat_utils import draw_open3d_point_cloud
 from manipulation.open3d_utils import *
 
 system = MustardExampleSystem()

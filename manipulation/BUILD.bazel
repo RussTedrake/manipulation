@@ -36,7 +36,6 @@ rt_py_library(
     imports = [".."],
     visibility = ["//visibility:public"],
     deps = [
-      "open3d_utils",
       "scenarios",
     ],
 )
