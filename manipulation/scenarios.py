@@ -427,7 +427,7 @@ def AddMultibodyTriad(frame, scene_graph, length=.25, radius=0.01, opacity=1.):
              length, radius, opacity, frame.GetFixedPoseInBodyFrame())
 
 
-def AddIiwaDifferentialIK(builder, plant):
+def AddIiwaDifferentialIK(builder, plant, frame=None):
     params = DifferentialInverseKinematicsParameters(plant.num_positions(),
                                                      plant.num_velocities())
     time_step = plant.time_step()
@@ -445,9 +445,11 @@ def AddIiwaDifferentialIK(builder, plant):
         params.set_joint_velocity_limits(
             (-iiwa14_velocity_limits, iiwa14_velocity_limits))
         params.set_end_effector_velocity_gain([.1] * 6)
+    if frame is None:
+        frame = plant.GetFrameByName("body")
     differential_ik = builder.AddSystem(
-        DifferentialInverseKinematicsIntegrator(
-            plant, plant.GetFrameByName("iiwa_link_7"), time_step, params))
+        DifferentialInverseKinematicsIntegrator(plant, frame, time_step,
+                                                params))
     return differential_ik
 
 
