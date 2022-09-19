@@ -1,5 +1,3 @@
-import numpy as np
-
 from pydrake.multibody.parsing import (Parser, ProcessModelDirectives,
                                        LoadModelDirectives)
 from pydrake.multibody.plant import AddMultibodyPlantSceneGraph
@@ -47,9 +45,9 @@ def MustardPointCloud():
         # Crop to region of interest.
         pcd.append(cloud.Crop(lower_xyz=[-.3, -.3, -.3], upper_xyz=[.3, .3,
                                                                     .3]))
+
     # Merge point clouds.
     merged_pcd = Concatenate(pcd)
-    # Voxelize down-sample.
+    # Down sample.
     down_sampled_pcd = merged_pcd.VoxelizedDownSample(voxel_size=0.005)
-
     return down_sampled_pcd

@@ -288,9 +288,10 @@ output_ports:
     <p>As depth sensors have become so pervasive the field has built up
     libraries of tools for performing basic geometric operations on point
     clouds, and that can be used to transform back and forth between
-    representations.  We can implement many of of the basic operations directly
-    in Drake, but we will use the <a href="http://www.open3d.org/">Open3D</a>
-    library if we need more.  Many older projects used the <a
+    representations.  We implement many of of the basic operations directly in
+    Drake.  There are also open-source tools like the <a
+    href="http://www.open3d.org/">Open3D</a> library that are available if you
+    need more. Many older projects used the <a
     href="http://pointclouds.org/">Point Cloud Library (PCL)</a>, which is now
     defunct but still has some very useful documentation.</p>
 
@@ -333,8 +334,6 @@ output_ports:
     <p>You can infer from the optional input ports on this system that point cloud representations can potentially include color values for each of the Cartesian points.  The following example will get us a few point clouds to work with.</p>
 
     <todo>Combine all point clouds via https://drake.mit.edu/pydrake/pydrake.systems.perception.html?highlight=pointcloud#pydrake.systems.perception.PointCloudConcatenation</todo>
-
-    <todo>Show the point cloud in Open3D's visualizer</todo>
 
     There are a number of basic operations that one can do on point clouds.  I'll give just a few examples here.  
 
@@ -787,7 +786,7 @@ output_ports:
       case, our object of interest will be resting on a table or in a bin.  If
       we know the geometry of the table/bin a priori, then we can subtract away
       points from that region.  Alternatively, we can <a
-      href="http://www.open3d.org/docs/release/tutorial/geometry/pointcloud.html#Crop-point-cloud">crop</a>
+      href="https://drake.mit.edu/doxygen_cxx/classdrake_1_1perception_1_1_point_cloud.html#aa3e3e56ca9276b5caf4c6422154616ca"><code>Crop</code></a>
       the point cloud to a region of interest.  This can be sufficient for very
       simple or uncluttered scenes, and will be just enough for us to accomplish
       our goal for this chapter.</p>

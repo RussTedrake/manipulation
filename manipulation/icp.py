@@ -1,6 +1,6 @@
 import numpy as np
-import open3d as o3d
 from pydrake.all import RigidTransform, RotationMatrix
+from scipy.spatial import KDTree
 
 
 def PoseEstimationGivenCorrespondences(p_Om, p_s, chat):
@@ -43,12 +43,9 @@ def FindClosestPoints(point_cloud_A, point_cloud_B):
     """
     indices = np.empty(point_cloud_A.shape[1], dtype=int)
 
-    # TODO(russt): Replace this with a direct call to flann
-    # https://pypi.org/project/flann/
-    kdtree = o3d.geometry.KDTreeFlann(point_cloud_B)
+    kdtree = KDTree(point_cloud_B.T, copy_data=True)
     for i in range(point_cloud_A.shape[1]):
-        nn = kdtree.search_knn_vector_3d(point_cloud_A[:, i], 1)
-        indices[i] = nn[1][0]
+        distance, indices[i] = kdtree.query(point_cloud_A[:, i], k=1)
 
     return indices
 

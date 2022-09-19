@@ -590,11 +590,10 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
         <p>I've produced a scene with three cameras looking at our favorite YCB
         mustard bottle.  I've taken the individual point clouds (already
         converted to the world frame by the
-        <code>DepthImageToPointCloud</code> system), converted them into
-        Open3D's point cloud format, cropped the point clouds (to get rid of the
-        geometry from the other cameras), estimated their normals, merged the
-        point clouds, then down-sampled the point clouds.  The order is
-        important!</p>
+        <code>DepthImageToPointCloud</code> system), cropped the point clouds
+        (to get rid of the geometry from the other cameras), estimated their
+        normals, merged the point clouds, then down-sampled the point clouds.
+        The order is important!</p>
 
         <p>I've pushed all of the point clouds to meshcat, but with many of them
         set to not be visible by default.  Use the drop-down menu to turn them
@@ -809,12 +808,12 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
 
       <example><h1>Generating grasp candidates</h1>
 
-        <p>Open3D doesn't implement ray casting (yet), so I've implemented an
-        even simpler heuristic in my code example: I simply choose a point at
-        random, and start sampling grasps in orientation (starting from
-        vertical) that align the $x$-axis of the gripper with the normal of that
-        point.  Then I mostly just rely on the antipodal term in my scoring
-        function to allow me to find good grasps.</p>
+        <p>As an alternative to ray casting, I've implemented an even simpler
+        heuristic in my code example: I simply choose a point at random, and
+        start sampling grasps in orientation (starting from vertical) that
+        align the $x$-axis of the gripper with the normal of that point.  Then
+        I mostly just rely on the antipodal term in my scoring function to
+        allow me to find good grasps.</p>
 
         <figure><img style="width:60%"
           src="data/candidate_grasp_mustard.png"></figure>
