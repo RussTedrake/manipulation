@@ -496,6 +496,7 @@ def MakeManipulationStation(model_directives=None,
     plant, scene_graph = AddMultibodyPlantSceneGraph(builder,
                                                      time_step=time_step)
     parser = Parser(plant)
+    parser.package_map().PopulateFromFolder(".")
     AddPackagePaths(parser)
     if model_directives:
         directives = LoadModelDirectivesFromString(model_directives)
