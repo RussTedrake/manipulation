@@ -8,10 +8,10 @@ from pydrake.all import (RigidTransform, RotationMatrix, RandomGenerator,
 
 def least_squares_transform(scene, model):
     X_BA = RigidTransform()
-    mu_m = np.mean(model, axis=0)
-    mu_s = np.mean(scene, axis=0)
+    mu_m = np.mean(model, axis=1)
+    mu_s = np.mean(scene, axis=1)
 
-    W = (scene - mu_s).T.dot(model - mu_m)
+    W = (scene.T - mu_s).T @ (model.T - mu_m)
     U, Sigma, Vh = np.linalg.svd(W)
     R_star = U.dot(Vh)
 
@@ -54,11 +54,12 @@ class TestICP(unittest.TestCase):
         # include an impropoer rotation case.
         for i in range(10):
             X_BA = generate_random_transform(i)
-            self.scene = X_BA.multiply(self.model.T).T
+            self.scene = X_BA.multiply(self.model)
             distances, indices = nearest_neighbors(self.scene, self.model)
 
-            X_BA_test = f(self.scene, self.model[indices])
-            X_BA_true = least_squares_transform(self.scene, self.model[indices])
+            X_BA_test = f(self.scene, self.model[:, indices])
+            X_BA_true = least_squares_transform(self.scene, self.model[:,
+                                                                       indices])
 
             # check answer
             result = X_BA_true.inverse().multiply(X_BA_test)
@@ -75,7 +76,7 @@ class TestICP(unittest.TestCase):
 
         # It should be sufficient to test only one for ICP.
         X_BA = generate_random_transform(7)
-        self.scene = X_BA.multiply(self.model.T).T
+        self.scene = X_BA.multiply(self.model)
         X_BA_test, mean_error_test, num_iters_test = f(self.scene, self.model)
         num_iters = 0
         mean_error = 0.0
@@ -86,10 +87,9 @@ class TestICP(unittest.TestCase):
 
         while True:
             num_iters += 1
-            distances, indices = nearest_neighbors(
-                self.scene,
-                X_BA.multiply(self.model.T).T)
-            X_BA = least_squares_transform(self.scene, self.model[indices])
+            distances, indices = nearest_neighbors(self.scene,
+                                                   X_BA.multiply(self.model))
+            X_BA = least_squares_transform(self.scene, self.model[:, indices])
             mean_error = np.mean(distances)
             if abs(mean_error
                    - prev_error) < tolerance or num_iters >= max_iterations:

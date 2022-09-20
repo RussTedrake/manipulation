@@ -1,5 +1,17 @@
 
-This README (starting below the line) and the .ply file were downloaded from http://graphics.stanford.edu/pub/3Dscanrep/bunny.tar.gz
+This README (starting below the line) and the .ply file were downloaded from http://graphics.stanford.edu/pub/3Dscanrep/bunny.tar.gz .
+
+The ply file was converted to a numpy array via 
+```
+import numpy as np
+import open3d as o3d
+xyzs = np.asarray(o3d.io.read_point_cloud(
+    FindResource("models/bunny/bun_zipper_res2.ply")).points).T
+# Center and rotate the raw points.
+X_WFile = RigidTransform(RotationMatrix.MakeZRotation(np.pi/2), [0, 0, 0]) @ RigidTransform(RotationMatrix.MakeXRotation(np.pi/2), [0, 0, -0.05])
+xyzs = X_WFile.multiply(xyzs)
+np.save(FindResource('models/bunny/bunny.npy'), xyzs)
+```
 
 ---------------
 
