@@ -306,6 +306,53 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
     
     </example>
 
+    <subsection id="3D_rotation"><h1>Representations for 3D rotation</h1>
+    
+      <p>In the spatial algebra above, I've written the rules for rotations
+      using an abstract notion of rotation.  But in order to implement this
+      algebra in code, we need to decide how we are going to represent those
+      representations with a small number of real values.  There are many
+      possible representations of 3D rotations, they are each good for
+      different operations, and unfortunately, there is no one representation
+      to rule them all. (This is one of the many reasons why everything is
+      better in 2D!) Common representations include <ul><li><a
+      href="https://drake.mit.edu/doxygen_cxx/classdrake_1_1math_1_1_rotation_matrix.html">3$\times$3
+      rotation matrices</a>,</li>
+      <li><a
+      href="https://drake.mit.edu/doxygen_cxx/classdrake_1_1math_1_1_roll_pitch_yaw.html">Euler
+      angles (e.g. roll-pitch-yaw)</a>,</li><li><a
+      href="https://eigen.tuxfamily.org/dox/classEigen_1_1AngleAxis.html">axis
+      angle</a>, and </li><li><a
+      href="https://eigen.tuxfamily.org/dox/classEigen_1_1Quaternion.html">unit
+      quaternions</a>.</li></ul> In Drake, we provide all of these
+      representations, and make it easy to convert back and forth between
+      them.</p>
+      
+      <p>A 3$\times$3 <a
+      href="https://drake.mit.edu/doxygen_cxx/group__multibody__spatial__pose.html#orientation_discussion">rotation
+      matrix</a> is an orthonormal matrix with columns formed by the $x-$,
+      $y-$, and $z-$axes. Specifically, the first column of the transform
+      ${}^GR^F$ has the $x-$axis of frame $F$ expressed in $G$ in the first
+      column, etc.</p>
+
+      <p><a href="https://en.wikipedia.org/wiki/Euler_angles">Euler angles</a>
+      specify a 3D rotation by a series of rotations around the $x$, $y$, and
+      $z$ axes. The order of these rotations matters; and many combinations can be used to describe any 3D rotation. This is why we use
+      <code>RollPitchYaw</code> in the code (preferring it over the more
+      general term "Euler angle") and <a
+      href="https://drake.mit.edu/doxygen_cxx/classdrake_1_1math_1_1_roll_pitch_yaw.html">document
+      it carefully</a>. Roll is a rotation around the $x$-axis, pitch is a
+      rotation around the $y$-axis, and yaw is a rotation around the $z$-axis;
+      this is also known as "extrinsic X-Y-Z" Euler angles.</p>
+      
+      <p>Axis angles describe a 3D rotation by a scalar rotation around an
+      arbitrary vector axis. You can think of unit quaternions as a form of
+      axis angles that have been carefully normalized to be unit length and
+      have magical properties. My favorite careful description of quaternions
+      is probably chapter 1 of <elib>Stillwell08</elib>.</p>
+    
+    </subsection>
+
   </section>
 
   <section id="kinematics"><h1>Forward kinematics</h1>
@@ -429,21 +476,7 @@ pose = plant.EvalBodyPoseInWorld(context, gripper)</pre></code>
         function?</p>
 
         <p>This gets into the subtle points of how we represent transforms, and
-        how we represent rotations in particular.  There are many possible
-        representations of 3D rotations, they are good for different things, and
-        unfortunately, there is no one representation to rule them all. (This is
-        one of the many reasons why everything is better in 2D!)  Common
-        representations include 3x3 rotation matrices, Euler angles (e.g.
-        Roll-Pitch-Yaw), axis angle, and unit quaternions. In Drake, we provide
-        all of these representations, and make it easy to convert back and forth
-        between them.  In order to make the spatial algebra efficient, we use
-        rotation matrices in our <code>RigidTransform</code>, but in order to
-        have a more compact representation of configuration we use unit
-        quaternions in our configuration vector, $q$.  You can think of unit
-        quaternions as a form of axis angles that have been carefully normalized
-        to be unit length and have magical properties. My favorite careful
-        description of quaternions is probably chapter 1 of
-        <elib>Stillwell08</elib>.</p>
+        <a href="#3D_rotation">how we represent 3D rotations</a> in particular.  Although we use rotation matrices in our <code>RigidTransform</code> class, in order to make the spatial algebra efficient, we actually use unit quaternions in the <code>Context</code> in order to have a more compact vector representation.</p>
 
         <p>As a result, for this example, the software implementation of the
         function $f_{kin}^B$ is precisely the function that converts the
