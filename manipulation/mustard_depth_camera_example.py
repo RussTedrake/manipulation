@@ -35,9 +35,12 @@ def MustardExampleSystem():
     return diagram
 
 
-def MustardPointCloud():
+def MustardPointCloud(normals=False, down_sample=True):
     system = MustardExampleSystem()
     context = system.CreateDefaultContext()
+    plant = system.GetSubsystemByName("plant")
+    plant_context = plant.GetMyMutableContextFromRoot(context)
+
     pcd = []
     for i in range(3):
         cloud = system.GetOutputPort(f"camera{i}_point_cloud").Eval(context)
@@ -46,8 +49,18 @@ def MustardPointCloud():
         pcd.append(cloud.Crop(lower_xyz=[-.3, -.3, -.3], upper_xyz=[.3, .3,
                                                                     .3]))
 
+        if normals:
+            pcd[i].EstimateNormals(radius=0.1, num_closest=30)
+
+            camera = plant.GetModelInstanceByName(f"camera{i}")
+            body = plant.GetBodyByName("base", camera)
+            X_C = plant.EvalBodyPoseInWorld(plant_context, body)
+            pcd[i].FlipNormalsTowardPoint(X_C.translation())
+
     # Merge point clouds.
     merged_pcd = Concatenate(pcd)
+    if not down_sample:
+        return merged_pcd
     # Down sample.
     down_sampled_pcd = merged_pcd.VoxelizedDownSample(voxel_size=0.005)
     return down_sampled_pcd
