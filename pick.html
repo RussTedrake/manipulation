@@ -517,7 +517,14 @@ pose = plant.EvalBodyPoseInWorld(context, gripper)</pre></code>
     frame $C$, ${}^A\omega^B_C \in \Re^3$ is the <i>angular velocity</i> (of
     frame $B$ relative frame $A$ expressed in frame $C$), and ${}^A\text{v}^B_C
     \in \Re^3$ is the <i>translational velocity</i> (along with the same
-    shorthands as for positions).  Translational and rotational velocities are
+    shorthands as for positions).  The angular velocity is a 3D vector (with
+    $w_x$, $w_y$, $w_z$ components); the magnitude of this vector represents
+    the angular velocity about and the direction represents the (instantaneous)
+    axis of rotation. It's tempting to think of it as the time derivatives of
+    roll, pitch, and yaw, but that's not true; it can easily be converted into
+    that representation through a <a
+    href="https://drake.mit.edu/doxygen_cxx/classdrake_1_1multibody_1_1_multibody_plant.html#a7bb24fed19f16a76450eece1857b92dc">nonlinear
+    change of coordinates</a>. Translational and rotational velocities are
     simply vectors, so they can be operated on just like positions:<ul>
       <li>Spatial velocities add (when the frames match): \begin{equation}
       {}^A\text{v}^B_F + {}^B\text{v}^C_F = {}^A\text{v}^C_F, \qquad
@@ -768,20 +775,20 @@ plant.num_velocities() = 6</pre></code></p>
       base to a fixed location in the world.  Mobile bases add complexity, but
       they are wonderful for improving the kinematic workspace of a robot.</p>
 
-      <example><h1>Are kinematic singularities real?</h1>
+      <example id="singularities"><h1>Are kinematic singularities real?</h1>
 
         <p>A natural question when discussing singularities is whether they are
         somehow real, or whether they are somehow an artifact of the analysis.
         Perhaps it is useful to look at an extremely simple case.</p>
 
         <p>Imagine a two-link arm, where each link has length one.  Then the
-        kinematics reduce to $$p^G = \begin{bmatrix} c_0 + c_{0+1} \\ s_0 + s_{0
-        + 1} \end{bmatrix},$$  where I've used the (very common) shorthard $s_0$
-        for $\sin(q_0)$ and $s_{0+1}$ for $\sin(q_0+q_1)$, etc. The <i>translational</i> Jacobian is
-        $$J^G(q) = \begin{bmatrix} -s_0 - s_{0+1} & -s_{0 + 1} \\ c_0 + c_{0 +
-        1} & c_{0 + 1} \end{bmatrix},$$ and as expected, it loses rank when the
-        arm is at full extension (e.g. when $q_0 = q_1 = 0$ which implies the
-        first row is zero).</p>
+        kinematics reduce to $$p^G = \begin{bmatrix} c_0 + c_{0+1} \\ s_0 +
+        s_{0 + 1} \end{bmatrix},$$  where I've used the (very common) shorthard
+        $s_0$ for $\sin(q_0)$ and $s_{0+1}$ for $\sin(q_0+q_1)$, etc. The
+        <i>translational</i> Jacobian is $$J^G(q) = \begin{bmatrix} -s_0 -
+        s_{0+1} & -s_{0 + 1} \\ c_0 + c_{0 + 1} & c_{0 + 1} \end{bmatrix},$$
+        and as expected, it loses rank when the arm is at full extension (e.g.
+        when $q_0 = q_1 = 0$ which implies the first row is zero).</p>
 
         <figure>
           <iframe style="border:0;height:300px;width:400px;" src="data/two_link_singularities.html" pdf="no"></iframe>
