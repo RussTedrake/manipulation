@@ -88,6 +88,14 @@ class MeshcatPoseSliders(LeafSystem):
     MaxRange.__new__.__defaults__ = (np.pi, np.pi, np.pi, 1.0, 1.0, 1.0)
     Value = namedtuple("Value", ("roll", "pitch", "yaw", "x", "y", "z"))
     Value.__new__.__defaults__ = (0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
+    DecrementKey = namedtuple("DecrementKey",
+                              ("roll", "pitch", "yaw", "x", "y", "z"))
+    DecrementKey.__new__.__defaults__ = ("KeyQ", "KeyW", "KeyA", "KeyJ", "KeyI",
+                                         "KeyO")
+    IncrementKey = namedtuple("IncrementKey",
+                              ("roll", "pitch", "yaw", "x", "y", "z"))
+    IncrementKey.__new__.__defaults__ = ("KeyE", "KeyS", "KeyD", "KeyL", "KeyK",
+                                         "KeyU")
 
     def __init__(self,
                  meshcat,
@@ -95,6 +103,8 @@ class MeshcatPoseSliders(LeafSystem):
                  min_range=MinRange(),
                  max_range=MaxRange(),
                  value=Value(),
+                 decrement_keycode=DecrementKey(),
+                 increment_keycode=IncrementKey(),
                  body_index=None):
         """
         Args:
@@ -130,13 +140,19 @@ class MeshcatPoseSliders(LeafSystem):
         self._value = list(value)
         self._body_index = body_index
 
+        print("Keyboard Controls:")
         for i in range(6):
             if visible[i]:
                 meshcat.AddSlider(min=min_range[i],
                                   max=max_range[i],
                                   value=value[i],
-                                  step=0.01,
-                                  name=value._fields[i])
+                                  step=0.02,
+                                  name=value._fields[i],
+                                  decrement_keycode=decrement_keycode[i],
+                                  increment_keycode=increment_keycode[i])
+                print(
+                    f"{value._fields[i]} : {decrement_keycode[i]} / {increment_keycode[i]}"  # noqa
+                )
 
     def __del__(self):
         for s in ['roll', 'pitch', 'yaw', 'x', 'y', 'z']:
@@ -242,7 +258,8 @@ class WsgButton(LeafSystem):
         port.disable_caching_by_default()
         self._meshcat = meshcat
         self._button = "Open/Close Gripper"
-        meshcat.AddButton(self._button)
+        meshcat.AddButton(self._button, "Space")
+        print("Press Space to open/close the gripper")
 
     def __del__(self):
         self._meshcat.DeleteButton(self._button)
