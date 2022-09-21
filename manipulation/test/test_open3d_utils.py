@@ -32,7 +32,7 @@ for i in range(3):
     plt.title('Depth image')
 
     point_cloud = system.GetOutputPort(f"camera{i}_point_cloud").Eval(context)
-    pcd = create_open3d_point_cloud(point_cloud)
+    pcd = drake_cloud_to_open3d(point_cloud)
     draw_open3d_point_cloud(meshcat, f"camera{i}_point_cloud", pcd)
 
 plt.show()

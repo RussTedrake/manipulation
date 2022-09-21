@@ -4,7 +4,7 @@ import open3d as o3d
 from pydrake.all import BaseField, Fields, PointCloud
 
 
-def create_open3d_point_cloud(point_cloud):
+def drake_cloud_to_open3d(point_cloud):
     indices = np.all(np.isfinite(point_cloud.xyzs()), axis=0)
 
     pcd = o3d.geometry.PointCloud()
@@ -22,10 +22,6 @@ def create_open3d_point_cloud(point_cloud):
 #            point_cloud.normals()[:, indices].T)
 
     return pcd
-
-
-def drake_cloud_to_open3d(cloud):
-    return create_open3d_point_cloud(cloud)
 
 
 def open3d_cloud_to_drake(cloud):
