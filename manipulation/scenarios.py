@@ -458,7 +458,8 @@ def MakeManipulationStation(model_directives=None,
                             time_step=0.002,
                             iiwa_prefix="iiwa",
                             wsg_prefix="wsg",
-                            camera_prefix="camera"):
+                            camera_prefix="camera",
+                            package_xmls=[]):
     """
     Creates a manipulation station system, which is a sub-diagram containing:
       - A MultibodyPlant with populated via the Parser from the
@@ -489,6 +490,10 @@ def MakeManipulationStation(model_directives=None,
         camera_prefix: Any bodies in the plant (created during the
         plant_setup_callback) starting with this prefix will get a camera
         attached.
+
+        package_xmls: A list of filenames to be passed to
+        PackageMap.AddPackageXml().  This is useful if you need to add more
+        models to your path (e.g. from your current working directory).
     """
     builder = DiagramBuilder()
 
@@ -496,7 +501,8 @@ def MakeManipulationStation(model_directives=None,
     plant, scene_graph = AddMultibodyPlantSceneGraph(builder,
                                                      time_step=time_step)
     parser = Parser(plant)
-    parser.package_map().PopulateFromFolder(".")
+    for p in package_xmls:
+        parser.package_map().AddPackageXml(p)
     AddPackagePaths(parser)
     if model_directives:
         directives = LoadModelDirectivesFromString(model_directives)
