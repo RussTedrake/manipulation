@@ -311,8 +311,9 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       <p>In the spatial algebra above, I've written the rules for rotations
       using an abstract notion of rotation.  But in order to implement this
       algebra in code, we need to decide how we are going to represent those
-      representations with a small number of real values.  There are many
-      possible representations of 3D rotations, they are each good for
+      representations with a small number of real values.  There are <a
+      href="https://en.wikipedia.org/wiki/Rotation_formalisms_in_three_dimensions">many
+      possible representations of 3D rotations</a>, they are each good for
       different operations, and unfortunately, there is no one representation
       to rule them all. (This is one of the many reasons why everything is
       better in 2D!) Common representations include <ul><li><a
@@ -346,10 +347,30 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       this is also known as "extrinsic X-Y-Z" Euler angles.</p>
       
       <p>Axis angles describe a 3D rotation by a scalar rotation around an
-      arbitrary vector axis. You can think of unit quaternions as a form of
-      axis angles that have been carefully normalized to be unit length and
-      have magical properties. My favorite careful description of quaternions
-      is probably chapter 1 of <elib>Stillwell08</elib>.</p>
+      arbitrary vector axis using three numbers: the direction of the vector is
+      the axis, and the magnitude of the vector is the angle. You can think of
+      unit quaternions as a form of axis angles that have been carefully
+      normalized to be unit length and have magical properties. My favorite
+      careful description of quaternions is probably chapter 1 of
+      <elib>Stillwell08</elib>.</p>
+
+      <p>Why all of the representations? Shouldn't "roll-pitch-yaw" be enough?
+      Unfortunately, no. The limitation is perhaps most easily seen by looking
+      at the coordinate changes from roll-pitch-yaw to/from a rotation matrix.
+      Any roll-pitch-yaw can be converted to a rotation matrix, but the inverse
+      map has a singularity. In particular, when the pitch angle is
+      $\frac{\pi}{2}$, then roll and yaw are now indistinguishable. This is
+      described very nicely, along with its physical manifestation in "gimbal
+      lock" in <a
+      href="https://robotacademy.net.au/lesson/singularity-in-3d-rotation-angle-sequences/">this
+      video</a>. Similarly, the direction of the vector in the axis-angle
+      representation in not uniquely defined when the rotation angle is zero.
+      These singularities become problematic when we start taking derivatives
+      of rotations, for instance when we write the equations of motion. It is
+      now well understood <elib>Stillwell08</elib> that it requires at least
+      four numbers to properly represent the group of 3D rotations; the unit
+      quaternion is the most common four-element representation.
+      </p>
     
     </subsection>
 
