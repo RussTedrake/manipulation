@@ -115,7 +115,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
     
       <p>Primarily RGB-D (ToF vs projected texture stereo vs ...) cameras and Lidar</p>
 
-      <p>The cameras we are using in this course are <a href="https://www.intelrealsense.com/depth-camera-d415/">Intel RealSense D415</a>....</p>
+      <p>The cameras we are using in this course are <a href="https://www.intelrealsense.com/depth-camera-d415/">Intel RealSense D415</a>.</p>
 
       <p>Monocular depth.</p>
 
@@ -252,7 +252,15 @@ output_ports:
 
   <section><h1>Representations for geometry</h1>
 
-    <p>Depth image, point cloud, triangulated mesh, signed distance functions, (+ surfels, occupancy maps, ...)</p>
+    <p>There are many different representations for 3D geometry, each of which
+    can be more or less suitable for different computations. Often we can
+    convert between these representations; though sometimes that conversion can
+    be lossy. Examples include triangulated surface meshes and tetrahedral
+    volumetric meshes, voxel/occupancy grids, and implicit representations of
+    geometry like the signed distance fields, which have become very popular
+    again recently as representations in deep learning for 3D
+    vision<elib>Park19+Mildenhall21</elib>. But the representations that we
+    will start with here are <i>depth images</i> and <i>point clouds</i>.</p>
 
     <p>The data returned by a depth camera takes the form of an image, where
     each pixel value is a single number that represents the distance between the
@@ -260,11 +268,11 @@ output_ports:
     If we combine this with the basic information about the camera's intrinsic
     parameters (e.g. lens parameters, stored in the <a
     href="https://drake.mit.edu/doxygen_cxx/classdrake_1_1systems_1_1sensors_1_1_camera_info.html"><code>CameraInfo</code></a>
-    class in Drake) then we can transform this <i>depth image representation</i>
+    class in Drake) then we can transform this depth image representation
     into a collection of 3D points, $s_i$.  I use $s$ here because they are
     commonly referred to as the "scene points" in the algorithms we will present
     below.  These points have a pose and (optionally) a color value or other
-    information attached.  This is known as a <i>point cloud representation</i>.
+    information attached; this is the <i>point cloud</i> representation.
     By default, their pose is described in the camera frame, $^CX^{s_i}$, but
     the <code>DepthImageToPointCloud</code> system in Drake also accepts $^PX^C$
     to make it easy to transform them into another frame (such as the world
@@ -403,14 +411,17 @@ output_ports:
     of your registration in the robot's frame instead of the world frame.</p>
 
     <p>The second <b>major assumption</b> that we will make in this section is
-    "known correspondences".  This is <i>not</i> a reasonable assumption in
-    practice, but it helps us get started.  The assumption is that we know which
-    scene point corresponds with which model point.  I'll use a correspondence
-    vector $c \in [1,N_m]^{N_s}$, where $c_i = j$ denotes that scene point $s_i$
-    corresponds with model point $m_j$.  Note that we do not assume that these
-    correspondences are one-to-one.  Every scene point corresponds to some model
-    point, but the converse is not true, and multiple scene points may
-    correspond to the same model point.</p>
+    "known correspondences". When I say "correspondence" here, I mean here that
+    for each point in the scene point cloud, we can identify it with a specific
+    point in the model point cloud; for instance, this might be the case if
+    each point had a unique color that we could perceive reliable through the
+    camera. This is <i>not</i> a reasonable assumption in practice, but it
+    helps us get started.  To represent this mapping in our equations, I'll use
+    a correspondence vector $c \in [1,N_m]^{N_s}$, where $c_i = j$ denotes that
+    scene point $s_i$ corresponds with model point $m_j$.  Note that we do not
+    assume that these correspondences are one-to-one.  Every scene point
+    corresponds to some model point, but the converse is not true, and multiple
+    scene points may correspond to the same model point.</p>
 
     <p>As a result, the point cloud registration problem is simply an (inverse)
     kinematics problem.  We can write the model points and the scene points in a
