@@ -1483,6 +1483,20 @@ plant.num_velocities() = 6</pre></code></p>
 
   </exercise>
 
+  <exercise id="spatial_velocity_moving"><h1>Spatial Velocity for Moving Frame</h1>
+    <figure>
+      <img style="width:80%", src="figures/exercises/spatial_velocity_moving_frame.png"/>
+      <figcaption> A manipulator with one moving joint. Frame A is the robot base while frame B is on the end-effector.</figcaption>
+    </figure>
+    <p>A manipulator with one joint is shown above. The joint is rotating over time, with its angle as a function of time $\theta(t)$. For this exercise, we will explore the spatial velocity of the end-effector.</p>
+
+    <ol type="a">
+      <li> For this manipulator, derive 3x3 rotation matrix ${^A}R{^B}(t)$ and translation vector ${^A}p{^B}(t)$, both as a function of $t$. Your solution should involve $l_0, l_1, l_2, t, \theta(t)$. Hint: a point C attached to the end-effector will have ${^A}p^C_A(t)={^A}R{^B}(t) {^B}p^C_B+{^A}p{^B} (t)$.</li>
+      <li> Prove that for any rotation matrix $R(t)$, $\widehat{\omega}(t)=\dot{R}(t)R^{-1}(t)$ satisfies $\widehat{\omega}(t)=-\widehat{\omega}^\top(t)$. Plug in $R(t)={^A}R{^B}(t)$ to verify your proof.</li>
+      <li> You may have noticed that when $R(t)={^A}R{^B}(t)$, the matrix $\widehat{\omega}(t)$ is in the form \begin{align*}\begin{bmatrix}0 & -w_z(t) & w_y(t)\\ w_z(t) & 0 & -w_x(t) \\ -w_y(t) & w_x(t) & 0\end{bmatrix}\end{align*} Let angular velocity ${^A}\omega{^B}(t)=[w_x(t), w_y(t), w_z(t)]^\top$ and translation velocity ${^A}v{^B}(t)=-\widehat{\omega}(t){^A}p{^B}(t)+{^A}\dot{p}{^B}(t)$. Then the spatial velocity ${^A}V{^B}(t)=\begin{bmatrix}{^A}\omega{^B}(t) \\ {^A}v{^B}(t)\end{bmatrix}$. Calculate ${^A}V{^B}(t)$ for the manipulator.</li>
+    </ol>
+  </exercise>
+
   </section>
 
 </chapter>
