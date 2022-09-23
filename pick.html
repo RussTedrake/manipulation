@@ -547,36 +547,33 @@ pose = plant.EvalBodyPoseInWorld(context, gripper)</pre></code>
     href="https://drake.mit.edu/doxygen_cxx/classdrake_1_1multibody_1_1_multibody_plant.html#a7bb24fed19f16a76450eece1857b92dc">nonlinear
     change of coordinates</a>. Translational and rotational velocities are
     simply vectors, so they can be operated on just like positions:<ul>
-      <li>Spatial velocities add (when the frames match): \begin{equation}
-      {}^A\text{v}^B_F + {}^B\text{v}^C_F = {}^A\text{v}^C_F, \qquad
+      <li>Angular velocities add (when the frames match): \begin{equation}
       {}^A\omega^B_F + {}^B\omega^C_F = {}^A\omega^C_F,\end{equation} and have
-      the additive inverse. For the translational velocity, the addition is
-      perhaps known from high-school physics; for the angular velocity I
-      consider it quite surprising, and it <a
-      href="#angular_velocity_addition">deserves to be verified</a>.</li>
+      the additive inverse. This <a href="#angular_velocity_addition">deserves
+      to be verified</a>.</li>
       <li>Rotation matrices can be used to change between the "expressed-in"
-      frames <b>when those frames are fixed</b>: \begin{equation}
-      {}^A\text{v}^B_G = {}^GR^F {}^A\text{v}^B_F, \qquad {}^A\omega^B_G =
-      {}^GR^F {}^A\omega^B_F, \qquad \text{when } {}^G\dot{R}^F=0.\end{equation}
-      </li>
-      <li><details><summary>If the relative pose between two frames is not
-      fixed, then we get slightly more complicated formulas involving vector
-      cross products; they are derived from the derivative of the transform
-      equation and the chain rule.  (Click the triangle to expand those details,
-      but consider skipping them for now!)</summary>  The angular velocity
-      vector is related to the time-derivative of a rotation matrix via the
-      skew-symmetric (as verified by differentiating $RR^T=I$) matrix:
-      \begin{equation} \widehat{\omega}=\dot{R}R^T = \dot{R}R^{-1} = \begin{bmatrix} 0 &
-      -\omega_z & \omega_y \\ \omega_z & 0 & -\omega_x \\ -\omega_y & \omega_x &
-      0 \end{bmatrix}.\end{equation} Multiplying a vector by this matrix can be
-      written as a vector-cross product: \begin{equation} \dot{R}R^T p =
-      \dot{R}R^{-1} p = \omega \times p.\end{equation}  Therefore,
-      differentiating $${}^Gp^A = {}^GX^F {}^Fp^A = {}^Gp^F + {}^GR^F
-      {}^Fp^A,$$ yields \begin{align} {}^G\text{v}^A =& {}^G\text{v}^F +
-      {}^G\dot{R}^F {}^Fp^A + {}^GR^F {}^F\text{v}^A \nonumber \\ =&
-      {}^G\text{v}^F + {}^G\omega^F \times {}^GR^F {}^Fp^A + {}^GR^F
-      {}^F\text{v}^A.\end{align}  <!--Similarly, differentiating ${}^AR^C =
-      {}^AR^B {}^BR^C$ yields--></details></li>
+      frames: \begin{equation} {}^A\text{v}^B_G = {}^GR^F {}^A\text{v}^B_F,
+      \qquad {}^A\omega^B_G = {}^GR^F {}^A\omega^B_F.\end{equation}
+        </li>
+        <li>Translational velocities compose across frames with:
+      $${}^A\text{v}^C_F = {}^A\text{v}^B_F + {}^B\text{v}^C_F + {}^A\omega^B_F
+      \times {}^Bp^C_F.$$ 
+      <details><summary>This can be derived in a few steps (click the triangle
+      to expand)</summary><p>Differentiating $${}^Ap^C = {}^AX^B {}^Bp^C =
+      {}^Ap^B + {}^AR^B {}^Bp^C,$$ yields \begin{align} {}^A\text{v}^C =&
+      {}^A\text{v}^B + {}^A\dot{R}^B {}^Bp^C + {}^AR^B {}^B\text{v}^C \nonumber
+      \\ =& {}^A\text{v}^B_A + {}^A\dot{R}^B {}^BR^A {}^Bp^C_A +
+      {}^B\text{v}^C_A.\end{align} Allow me to write $RR^{-1}$ for
+      ${}^A\dot{R}^B {}^BR^A$ (dropping the frames for a moment). It turns out
+      that $\dot{R}R^{-1}$, is always a skew-symmetric matrix.  To see this,
+      differentiate $RR^T = I$ to get $$\dot{R}R^T + R\dot{R}^T = 0 \Rightarrow
+      \dot{R}R^T = - R\dot{R}^T \Rightarrow \dot{R} R^T = - (\dot{R} R^T)^T,$$
+      which is the definition of a skew-symmetric matrix. Any 3$\times$3
+      skew-symmetric matrix can be parameterized by three numbers (we'll use
+      the three-element vector $\omega$), and can be written as a cross
+      product, so $\dot{R}R^Tp = \omega \times p.$</p>  <p>Multiply the right
+      and left sides by ${}^FR^A$ to change the expressed-in frame, and we have
+      our result.</p></details></li>
     </ul>
     </div>
 
@@ -1509,13 +1506,19 @@ plant.num_velocities() = 6</pre></code></p>
       <img style="width:80%", src="figures/exercises/spatial_velocity_moving_frame.png"/>
       <figcaption> A manipulator with one moving joint. Frame A is the robot base while frame B is on the end-effector.</figcaption>
     </figure>
-    <p>A manipulator with one joint is shown above. The joint is rotating over time, with its angle as a function of time $\theta=\theta_1(t)$ for some $\theta_1(0)=0$. When $t=0$, the link(arm) is aligned with y-axis of frame A and that of frame B. For this exercise, we will explore the spatial velocity of the end-effector.</p>
+    <p>A manipulator with one joint is shown above. The joint is rotating over time, with its angle as a function of time, $\theta(t)$. When $\theta=0$, the link(arm) is aligned with y-axis of frame A and that of frame B. For this exercise, we will explore the spatial velocity of the end-effector.</p>
 
     <ol type="a">
-      <li> From previous homeworks, you may have noticed that a rigid body transformation is linear under vector-matrix representation. For this manipulator, transform $[1, 0, 0]^\top$ in frame B into its coordinate in frame A. What about $[0, 1, 0]^\top$ and $[0, 0, 1]^\top$?. For a point C, derive 3x3 rotation matrix ${^A}R{^B}(t)$ and translation vector ${^A}p{^B}(t)$, such that ${^A}p^C_A(t)={^A}R{^B}(t) {^B}p^C_B+{^A}p{^B} (t)$. Your solutions should involve $l_0, l_1, l_2, t, \theta_1(t)$. </li>
-      <li> Prove that for any rotation matrix $R(t)$, $\widehat{\omega}(t)=\dot{R}(t)R^{-1}(t)$ satisfies $\widehat{\omega}(t)=-\widehat{\omega}^\top(t)$. Plug in $R(t)={^A}R{^B}(t)$ to verify your proof.</li>
-      <li> You may have noticed that when $R(t)={^A}R{^B}(t)$, the matrix $\widehat{\omega}(t)$ is in the form \begin{align*}\begin{bmatrix}0 & -w_z(t) & w_y(t)\\ w_z(t) & 0 & -w_x(t) \\ -w_y(t) & w_x(t) & 0\end{bmatrix}\end{align*} Let angular velocity ${^A}\omega{^B}(t)=[w_x(t), w_y(t), w_z(t)]^\top$ and translation velocity ${^A}v{^B}(t)=-\widehat{\omega}(t){^A}p{^B}(t)+{^A}\dot{p}{^B}(t)$. Then the spatial velocity ${^A}V{^B}(t)=\begin{bmatrix}{^A}\omega{^B}(t) \\ {^A}v{^B}(t)\end{bmatrix}$. Calculate ${^A}V{^B}(t)$ for the manipulator.</li>
-      <li> Instead of having $\theta=\theta_1(t)$ we now scale the speed of rotation by a factor of k. That is, $\theta=\theta_2(t)$ for some $\dot{\theta}_2(t)=k \dot{\theta}_1(t)$ and $\theta_2(0)=0$. Show that the angular velocity ${^A}\omega{^B}$ for this new system is $k$ times that of old angular velocity. This verifies the fact that you can meaningfully scale angular velocity vectors.</li>
+      <li> For this manipulator, given ${}^Bp^C(0) = [1, 0, 0]^T$ , write
+      ${}^Ap^C(0)$. For a generic point C, derive 3x3 rotation matrix
+      ${^A}R{^B}(t)$ and translation vector ${^A}p{^B}(t)$, such that
+      ${^A}p^C_A(t)={^A}R{^B}(t) {^B}p^C_B+{^A}p{^B} (t)$. Your solutions
+      should involve $l_0, l_1, l_2,$ and $\theta(t)$. </li>
+      <li> Prove that for any rotation matrix $R$, $\widehat{\omega} \equiv
+      \dot{R}R^{-1}$ satisfies $\widehat{\omega} = -\widehat{\omega}^T$. Plug
+      in $R={^A}R{^B}(t)$ to verify your proof.</li>
+      <li> Solve for ${^A}V{^B}(t)$ for the manipulator, as a function of $l_0,
+      l_1, l_2, \theta(t)$ and $\dot\theta(t)$. </li>
     </ol>
   </exercise>
 
