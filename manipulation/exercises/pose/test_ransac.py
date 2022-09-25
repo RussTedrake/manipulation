@@ -64,7 +64,7 @@ class TestRANSAC(unittest.TestCase):
                         "ransac implementation incorrect")
 
     @weight(2)
-    @timeout_decorator.timeout(2.0)
+    @timeout_decorator.timeout(4.0)
     def test_outlier_removal(self):
         """Test outlier removal"""
         # check whether outlier is in student's answer

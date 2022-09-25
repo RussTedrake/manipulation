@@ -42,7 +42,6 @@ class TestGraspCandidate(unittest.TestCase):
 
         X_lst_eval = []
 
-        np.random.seed(11)
         for i in range(4):
             index = test_indices[i]
             RT = f(index, pcd, kdtree)
@@ -50,7 +49,7 @@ class TestGraspCandidate(unittest.TestCase):
 
         X_lst_eval = np.asarray(X_lst_eval)
 
-        self.assertLessEqual(np.linalg.norm(X_lst_target - X_lst_eval), 1e-4,
+        self.assertLessEqual(np.linalg.norm(X_lst_target - X_lst_eval), 0.02,
                              "The Darboux frame is not correct")
 
         index = 5
@@ -132,31 +131,26 @@ class TestGraspCandidate(unittest.TestCase):
     def test_candidate_grasps(self):
         """Test compute_candidate_grasps"""
         pcd = self.notebook_locals["pcd_downsampled"]
-        f = self.notebook_locals["compute_candidate_grasps"]
+        compute_candidate_grasps = self.notebook_locals[
+            "compute_candidate_grasps"]
+        find_minimum_distance = self.notebook_locals["find_minimum_distance"]
+        check_collision = self.notebook_locals["check_collision"]
+        check_nonempty = self.notebook_locals["check_nonempty"]
 
-        # yapf: disable
-        X_lst_target = np.array([  # noqa
-            [[+0.00385728, -0.99714784, -0.07537471, +0.06982844],
-             [+0.99269683, -0.00527015, +0.12052071, -0.00385548],
-             [-0.12057423, -0.07528912, +0.98984516, +0.02492355]],
-            [[-0.82320983, +0.55645203, +0.11263515, -0.05386203],
-             [+0.55569232, +0.74907938, +0.36067459, -0.05987444],
-             [+0.11632545, +0.35950136, -0.92586565, -0.01982360]],
-            [[-0.37491799, +0.92414904, +0.07338335, -0.07043153],
-             [-0.85535209, -0.37535911, +0.35704106, +0.03011875],
-             [+0.35750425, +0.07109251, +0.93120170, +0.05676402]]])
-        # yapf: enable
-
-        grasp_candidates = f(pcd, candidate_num=3, random_seed=5)
+        grasp_candidates = compute_candidate_grasps(pcd,
+                                                    candidate_num=3,
+                                                    random_seed=5)
 
         self.assertTrue(
             len(grasp_candidates) == 3,
             "Length of returned array is not correct.")
 
-        X_lst_eval = []
-        for i in range(len(grasp_candidates)):
-            X_lst_eval.append(grasp_candidates[i].GetAsMatrix34())
-        X_lst_eval = np.array(X_lst_eval)
-
-        self.assertLessEqual(np.linalg.norm(X_lst_target - X_lst_eval), 1e-4,
-                             "The returned grasp candidates are not correct.")
+        for X_WP in grasp_candidates:
+            distance, X_WP_new = find_minimum_distance(pcd, X_WP)
+            self.assertLessEqual(
+                distance,
+                1e-2), "The returned grasp candidates are not minimum distance"
+            self.assertTrue(check_collision(
+                pcd, X_WP)), "The returned grasp candidates have collisions"
+            self.assertTrue(check_nonempty(
+                pcd, X_WP)), "The returned grasp candidates are not empty"

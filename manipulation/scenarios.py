@@ -431,7 +431,6 @@ def AddIiwaDifferentialIK(builder, plant, frame=None):
     params = DifferentialInverseKinematicsParameters(plant.num_positions(),
                                                      plant.num_velocities())
     time_step = plant.time_step()
-    params.set_timestep(time_step)  # Not actually required.
     q0 = plant.GetPositions(plant.CreateDefaultContext())
     params.set_nominal_joint_position(q0)
     if plant.num_positions() == 3:  # planar iiwa
@@ -448,8 +447,12 @@ def AddIiwaDifferentialIK(builder, plant, frame=None):
     if frame is None:
         frame = plant.GetFrameByName("body")
     differential_ik = builder.AddSystem(
-        DifferentialInverseKinematicsIntegrator(plant, frame, time_step,
-                                                params))
+        DifferentialInverseKinematicsIntegrator(
+            plant,
+            frame,
+            time_step,
+            params,
+            log_only_when_result_state_changes=True))
     return differential_ik
 
 

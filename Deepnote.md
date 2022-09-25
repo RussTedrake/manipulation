@@ -21,6 +21,7 @@ docker push russtedrake/manipulation:$(git rev-parse --short HEAD)
 echo russtedrake/manipulation:$(git rev-parse --short HEAD)
 python3 htmlbook/publish_to_deepnote.py $(git rev-parse --short HEAD)
 echo "Remember to log on to deepnote and build the dockerfile in any one of the notebooks"
+echo "Consider updating the pip wheels (see Developers.md)"
 ```
   - I am working on adding github integration for the docker.  See [#147](https://github.com/RussTedrake/manipulation/issues/147).
 - Open the deepnote project, and

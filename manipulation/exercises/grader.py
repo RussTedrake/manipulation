@@ -117,9 +117,6 @@ class Grader:
         max_score = sum(test['max_score'] for test in result['tests'])
         print('Total score is {}/{}.'.format(int(result['score']), max_score))
 
-        if grader_throws and int(result['score']) != max_score:
-            raise RuntimeError("Grader did not award full points.")
-
         # print partial scores
         for test in result['tests']:
             print('\nScore for {} is {}/{}.'.format(test['name'],
@@ -129,3 +126,6 @@ class Grader:
             # print error message if any
             if 'output' in test:
                 print('- ' + test['output'])
+
+        if grader_throws and int(result['score']) != max_score:
+            raise RuntimeError("Grader did not award full points.")

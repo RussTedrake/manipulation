@@ -20,6 +20,7 @@ the `DRAKE_INSTALL_DIR` environment variable. Otherwise it will look in
 Update the version number in `setup.py`, then from the root directory, run:
 ```
 python3 -m pip install --upgrade build twine
+rm -rf dist/*
 python3 -m build
 python3 -m twine upload dist/* -u __token__
 ```
