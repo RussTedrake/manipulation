@@ -68,7 +68,7 @@ class TestICP(unittest.TestCase):
                             'least square transform is incorrect')
 
     @weight(3)
-    @timeout_decorator.timeout(5.)
+    @timeout_decorator.timeout(10.)
     def test_icp(self):
         """Test icp implementation"""
         f = self.notebook_locals["icp"]
