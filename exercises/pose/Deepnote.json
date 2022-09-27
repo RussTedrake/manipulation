@@ -1,4 +1,5 @@
 {
   "bunny_icp": "5da605a4-2ef1-4035-af11-1125bcdcace3",
-  "ransac": "9303ecb6-8348-4dd6-9142-152ccc2e3465"
+  "ransac": "9303ecb6-8348-4dd6-9142-152ccc2e3465",
+  "pose_estimation_icp": "9b841c1d-e365-4dd6-bac3-bf6fc0cf9ed9"
 }
