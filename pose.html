@@ -1104,16 +1104,18 @@ output_ports:
 
   <section><h1>Non-penetration and "free-space" constraints</h1>
   
-    <p>We've explored two main lineages of algorithms for the pose estimation --
-    one based on the beautiful SVD solutions and the other based on nonlinear
-    optimization.  As we will see, non-penetration and free-space constraints
-    are, in most cases, non-convex constraints, so are a better match for the
-    nonlinear optimization approach.  But there are some examples of convex
-    non-penetration constraints (e.g., when points must not penetrate a
-    half-plane) and it <i>is</i> possible to include these in our convex
-    optimization approach.  I'll illustrate both versions here with a simple example.</p>
+    <p>We've explored two main lineages of algorithms for the pose estimation
+    -- one based on the beautiful SVD solutions and the other based on
+    nonlinear optimization.  As we will see, non-penetration and free-space
+    constraints are, in most cases, non-convex constraints, so are a better
+    match for the nonlinear optimization approach.  But there are some examples
+    of convex non-penetration constraints (e.g., when points must not penetrate
+    a half-plane) and it <i>is</i> possible to include these in our convex
+    optimization approach.  I'll illustrate both versions here with a simple
+    example.</p>
 
-    <example><h1>Non-penetration via nonlinear optimization</h1>
+    <example id="nonpenetration_nonconvex"><h1>Non-penetration via nonlinear
+    optimization</h1>
 
       <p>For simplicity, I will restrict this example to 2D, where we can
       parameterize the rotation matrices: $$R(\theta) = \begin{bmatrix}
