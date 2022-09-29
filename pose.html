@@ -166,7 +166,7 @@ output_ports:
 
       <example class="drake"><h1>Simulating an RGB-D camera</h1>
 
-        <script>document.write(notebook_link('pose'))</script>
+        <script>document.write(notebook_link('pose', d=deepnote, link_text="", notebook="camera_sim"))</script>
 
         <p>As a simple example of depth cameras in drake, I've constructed a
         scene with a single object (the mustard bottle from the <a
@@ -639,7 +639,7 @@ output_ports:
       will recover the exact solution.  So every one of those steps before
       convergence has at least a few bad correspondences.  Look closely!</p>
   
-      <script>document.write(notebook_link('pose'))</script>
+      <script>document.write(notebook_link('pose', d=deepnote, link_text="", notebook="icp"))</script>
   
     </example>      
       
@@ -679,7 +679,7 @@ output_ports:
       point), to add noise, and/or to restrict the points to a partial view.
       Please try them by themselves and in combination.</p>
 
-      <script>document.write(notebook_link('pose'))</script>
+      <script>document.write(notebook_link('pose', d=deepnote, link_text="", notebook="icp"))</script>
   
       <figure style="margin-top:-40px;">
         <iframe style="border:0;height:300px;width:400px;" src="data/icp_outliers.html?height=240px" pdf="no"></iframe>
@@ -1125,7 +1125,7 @@ output_ports:
       <code>AddConstraint</code> methods. I've provided an implementation in
       this notebook: </p>
   
-      <script>document.write(notebook_link('pose'))</script>
+      <script>document.write(notebook_link('pose', d=deepnote, link_text="", notebook="icp"))</script>
         
       <figure style="margin-top:-20px"><img style="width:70%"
       src="data/constrained_nonlinear_pose.svg"/><figcaption>The solution to
@@ -1163,7 +1163,7 @@ output_ports:
       (SOCP), though we need to use a slack variable to put it into the standard
       form with a linear objective.</p>
 
-      <script>document.write(notebook_link('pose'))</script>
+      <script>document.write(notebook_link('pose', d=deepnote, link_text="", notebook="icp"))</script>
       
       <p>Please be careful.  Now that we have a constraint that depends on $p$,
       our original approach to solving for $R$ independently is no longer valid
@@ -1240,7 +1240,7 @@ output_ports:
     last chapter to pick it up and place it in the second bin.  Finally, I use
     differential inverse kinematics to execute it.  Very satisfying!</p>
 
-    <script>document.write(notebook_link('pose'))</script>
+    <script>document.write(notebook_link('pose', d=deepnote, link_text="", notebook="pose"))</script>
 
   </section>
   
