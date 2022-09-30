@@ -4,22 +4,22 @@ import open3d as o3d
 from pydrake.all import BaseField, Fields, PointCloud
 
 
-def drake_cloud_to_open3d(point_cloud):
-    indices = np.all(np.isfinite(point_cloud.xyzs()), axis=0)
+def drake_cloud_to_open3d(cloud):
+    indices = np.all(np.isfinite(cloud.xyzs()), axis=0)
 
     pcd = o3d.geometry.PointCloud()
-    pcd.points = o3d.utility.Vector3dVector(point_cloud.xyzs()[:, indices].T)
+    pcd.points = o3d.utility.Vector3dVector(cloud.xyzs()[:, indices].T)
 
-    if point_cloud.has_rgbs():
-        pcd.colors = o3d.utility.Vector3dVector(point_cloud.rgbs()[:, indices].T
+    if cloud.has_rgbs():
+        pcd.colors = o3d.utility.Vector3dVector(cloud.rgbs()[:, indices].T
                                                 / 255.)
 
     # TODO(russt): add normals (and test) if needed
 
 
-#    if point_cloud.has_normals():
+#    if cloud.has_normals():
 #        pcd.normals = o3d.uility.Vector3dVector(
-#            point_cloud.normals()[:, indices].T)
+#            cloud.normals()[:, indices].T)
 
     return pcd
 
