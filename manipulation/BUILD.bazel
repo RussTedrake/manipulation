@@ -48,18 +48,6 @@ rt_py_library(
 )
 
 rt_py_library(
-    name = "open3d_utils",
-    srcs = ["open3d_utils.py"],
-    imports = [".."],
-    # Open3D 0.10 is not compatible with Python 3.9.
-    target_compatible_with = [
-        "@platforms//cpu:x86_64",
-        "@platforms//os:linux",
-    ],
-    visibility = ["//visibility:public"],
-)
-
-rt_py_library(
     name = "scenarios",
     data = ["//manipulation/models"],
     deps = ["//manipulation"],
@@ -96,19 +84,6 @@ rt_py_test(
     data = ["//manipulation:models"],
     imports = [".."],
     deps = ["manipulation"],
-)
-
-rt_py_test(
-    name = "test_open3d_utils",
-    srcs = ["test/test_open3d_utils.py"],
-    data = ["//manipulation:models"],
-    imports = [".."],
-    deps = [
-        "manipulation",
-        "meshcat_utils",
-        "mustard_depth_camera_example",
-        "open3d_utils",
-    ],
 )
 
 rt_py_test(
