@@ -162,3 +162,10 @@ filegroup(
     srcs = ["chapters.json"],
     visibility = ["//visibility:public"],
 )
+
+# Some methods look for this file to find the root directory.
+filegroup(
+    name = "workspace",
+    srcs = ["WORKSPACE.bazel"],
+    visibility = ["//visibility:public"],
+)

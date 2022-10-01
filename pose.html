@@ -374,7 +374,8 @@ output_ports:
   </section>
   -->
 
-  <section><h1>Point cloud registration with known correspondences</h1>
+  <section id="registration"><h1>Point cloud registration with known
+  correspondences</h1>
     
     <p>Let us begin to address the primary objective of the chapter -- we have a
     known object somewhere in the robot's workspace, we've obtained a point
@@ -589,7 +590,7 @@ output_ports:
 
   </section>
 
-  <section><h1>Iterative Closest Point (ICP)</h1>
+  <section id="icp"><h1>Iterative Closest Point (ICP)</h1>
 
     <p>So how do we get the correspondences?  In fact, if we were given the pose
     of the object, then figuring out the correspondences is actually easy: the
@@ -880,28 +881,32 @@ output_ports:
       <div>The probabilistic interpretation does give a natural mechanism for
       setting the correspondence weights on each iteration of the algorithm, by
       thinking of them as the probability of the scene points given the model
-      points: \begin{equation} C_{ij} = \frac{1}{a_i}
-      \exp^{-\frac{1}{2}\left\|\frac{X^O \: {}^Op^{m_j} - p^{s_i}}{\sigma^2}
-      \right\|^2},\end{equation} which is the standard density function for a
-      Gaussian, $\sigma$ is the standard deviation and $a_i$ is the proper
-      normalization constant to make the probabilities sum to one.  It is also
-      natural to encode the probability of an outlier in this formulation (it
-      simply modifies the normalization constant).  <details><summary>Click to
-      see the normalization constant, but it's really an implementation
-      detail.</summary> The normalization works out to be \begin{equation}a_i =
-      \sum_{j=1}^{N_m} \exp^{-\frac{1}{2}\left\|\frac{X^O \: {}^Op^{m_j} -
-      p^{s_i}}{\sigma^2} \right\|^2} + (2\pi\sigma^2)^\frac{3}{2}
-      \frac{w}{1-w}\frac{N_m}{N_s}, \end{equation} with $0 \le w \le 1$ the
-      probability of a sample point being an outlier
-      <elib>Myronenko10</elib>.</details></div>
+      points: \begin{equation} C_{ij} = \frac{1}{a_i} \exp^{\frac{-\left\|X^O
+      \: {}^Op^{m_j} - p^{s_i}\right\|^2}{2\sigma^2}},\end{equation} which is
+      the standard density function for a Gaussian, $\sigma$ is the standard
+      deviation and $a_i$ is the proper normalization constant to make the
+      probabilities sum to one.  It is also natural to encode the probability
+      of an outlier in this formulation (it simply modifies the normalization
+      constant).  <details><summary>Click to see the normalization constant,
+      but it's really an implementation detail.</summary> The normalization
+      works out to be \begin{equation}a_i = (2\pi \sigma^2)^\frac{D}{2} \left[
+      \sum_{j=1}^{N_m} \exp^{\frac{-\left\|X^O \: {}^Op^{m_j} -
+      p^{s_i}\right\|^2}{2\sigma^2}} + \frac{w}{1-w}\frac{N_m}{N_s} \right],
+      \end{equation} with $D=3$ being the dimension of the Euclidean space and
+      $0 \le w \le 1$ the probability of a sample point being an outlier
+      <elib>Myronenko10</elib>.
+      <todo>My coefficient is slightly different than the paper, which looks
+      wrong to me; I should verify it yet again (perhaps even with code).
+      Wei's derivation looks buggy to me, too.</todo>
+      </details></div>
 
       <p>The CPD algorithm is now very similar to ICP, alternating between
       assigning the correspondence weights and updating the pose estimate.  The
       pose estimation step is almost identical to the procedure above, with the
       "central" points now $${^Op^{\bar{m}}} = \frac{1}{N_C} \sum_{i,j} C_{ij}
-      \: {}^Op^{m_j}, \quad p^{\bar{s}} = \frac{1}{N_C} \sum_{i,j} C_{ij} p^{s_i},
-      \quad N_C = \sum_{i,j} C_{ij},$$ and the data matrix now: $$W = \sum_{i,j}
-      C_{ij} \left(p^{s_i} - p^{\bar{s}}\right) \left({}^Op^{m_j} -
+      \: {}^Op^{m_j}, \quad p^{\bar{s}} = \frac{1}{N_C} \sum_{i,j} C_{ij}
+      p^{s_i}, \quad N_C = \sum_{i,j} C_{ij},$$ and the data matrix now: $$W =
+      \sum_{i,j} C_{ij} \left(p^{s_i} - p^{\bar{s}}\right) \left({}^Op^{m_j} -
       {}^Op^{\bar{m}}\right)^T.$$  The rest of the updates, for extracting $R$
       using SVD and solving for $p$ given $R$, are the same.  You won't see the
       sums explicitly in the code, because each of those steps has a
@@ -919,13 +924,14 @@ output_ports:
 
       <p>The word on the street is the CPD is considerably more robust than ICP
       with its hard correspondences and quadratic objective; the Gaussian model
-      mitigates the effect of outliers by setting their correspondence weight to
-      nearly zero.  But it is also more expensive to compute all of the pairwise
-      distances for large point clouds.  In <elib>Gao18a</elib>, we point out
-      that a small reformulation (thinking of the scene points as inducing a
-      distribution over the model points, instead of vice versa) can get us back
-      to summing over the scene points only.  It enjoys many of the robustness
-      benefits of CPD, but also the performance of algorithms like ICP.</p>
+      mitigates the effect of outliers by setting their correspondence weight
+      to nearly zero.  But it is also more expensive to compute all of the
+      pairwise distances for large point clouds.  In <elib>Gao18a</elib>, we
+      point out that a small reformulation (thinking of the scene points as
+      being distributed via a Gaussian in space, instead of a Gaussian around
+      the model points) can get us back to summing over the scene points only.
+      It enjoys many of the robustness benefits of CPD, but also the
+      performance of algorithms like ICP.</p>
 
       <todo>Example with FilterReg</todo>
 
@@ -1098,16 +1104,18 @@ output_ports:
 
   <section><h1>Non-penetration and "free-space" constraints</h1>
   
-    <p>We've explored two main lineages of algorithms for the pose estimation --
-    one based on the beautiful SVD solutions and the other based on nonlinear
-    optimization.  As we will see, non-penetration and free-space constraints
-    are, in most cases, non-convex constraints, so are a better match for the
-    nonlinear optimization approach.  But there are some examples of convex
-    non-penetration constraints (e.g., when points must not penetrate a
-    half-plane) and it <i>is</i> possible to include these in our convex
-    optimization approach.  I'll illustrate both versions here with a simple example.</p>
+    <p>We've explored two main lineages of algorithms for the pose estimation
+    -- one based on the beautiful SVD solutions and the other based on
+    nonlinear optimization.  As we will see, non-penetration and free-space
+    constraints are, in most cases, non-convex constraints, so are a better
+    match for the nonlinear optimization approach.  But there are some examples
+    of convex non-penetration constraints (e.g., when points must not penetrate
+    a half-plane) and it <i>is</i> possible to include these in our convex
+    optimization approach.  I'll illustrate both versions here with a simple
+    example.</p>
 
-    <example><h1>Non-penetration via nonlinear optimization</h1>
+    <example id="nonpenetration_nonconvex"><h1>Non-penetration via nonlinear
+    optimization</h1>
 
       <p>For simplicity, I will restrict this example to 2D, where we can
       parameterize the rotation matrices: $$R(\theta) = \begin{bmatrix}
@@ -1532,8 +1540,8 @@ output_ports:
       <ol type="a">
         <li> Perform segmentation on the raw pointcloud to remove the
         background. </li>
-        <li> Tweak an existing ICP implementation to correctly estimate the
-        pose of the red foam brick.</li>
+        <li> Use our class ICP implementation to correctly estimate the pose of
+        the red foam brick.</li>
       </ol>    
     </exercise>
 

@@ -2,7 +2,6 @@
 -c htmlbook/mac-constraints.txt
 gradescope-utils>=0.4
 mpld3>=0.5.6 # for matplotlib>=3.5.0
-#open3d==0.10.0.0  # doesn't support python3.9
 #nevergrad>=0.4.3; platform_machine == 'x86_64'
 #pymcubes>=0.1  # was causing a numpy mismatch on python3.10 (forcing numpy 1.21.6 to be installed, somehow)
 requests>=2.25
