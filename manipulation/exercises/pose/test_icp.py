@@ -1,9 +1,10 @@
 import unittest
+
+import numpy as np
 import timeout_decorator
 from gradescope_utils.autograder_utils.decorators import weight
-import numpy as np
-from pydrake.all import (RigidTransform, RotationMatrix, RandomGenerator,
-                         UniformlyRandomRotationMatrix)
+from pydrake.all import (RandomGenerator, RigidTransform, RollPitchYaw,
+                         RotationMatrix, UniformlyRandomRotationMatrix)
 
 
 def least_squares_transform(scene, model):
@@ -27,10 +28,9 @@ def least_squares_transform(scene, model):
     return X_BA
 
 
-def generate_random_transform(seed_num):
-    generator = RandomGenerator(seed_num)
-    R_BA = UniformlyRandomRotationMatrix(generator)
-    p_BA = np.random.RandomState(generator()).rand(3)
+def generate_arbitrary_transform(seed):
+    R_BA = RollPitchYaw(seed * 7.363, seed * 1.35, seed * 5.47)
+    p_BA = np.mod([seed * 2.13, seed * 3.3, seed * 5.225], .1) - 0.05
     X_BA = RigidTransform(R_BA, p_BA)
     return X_BA
 
@@ -50,10 +50,11 @@ class TestICP(unittest.TestCase):
         f = self.notebook_locals["least_squares_transform"]
         nearest_neighbors = self.notebook_locals["nearest_neighbors"]
 
-        # Run a batter of tests determinisitcally, making sure the test cases
-        # include an impropoer rotation case.
+        # Run a battery of tests deterministically, making sure that the
+        # condition number of the data matrix (the singular values of W) are
+        # not too small.
         for i in range(10):
-            X_BA = generate_random_transform(i)
+            X_BA = generate_arbitrary_transform(i)
             self.scene = X_BA.multiply(self.model)
             distances, indices = nearest_neighbors(self.scene, self.model)
 
@@ -67,6 +68,11 @@ class TestICP(unittest.TestCase):
             self.assertTrue(np.allclose(result.GetAsMatrix4(), np.eye(4)),
                             'least square transform is incorrect')
 
+        # Test improper matrix
+        result = f(self.model, np.diag([1, 1, -1]) @ self.model)
+        self.assertTrue(result.rotation().IsValid(),
+                        "Your method returned an improper rotation matrix")
+
     @weight(3)
     @timeout_decorator.timeout(10.)
     def test_icp(self):
@@ -75,7 +81,7 @@ class TestICP(unittest.TestCase):
         nearest_neighbors = self.notebook_locals["nearest_neighbors"]
 
         # It should be sufficient to test only one for ICP.
-        X_BA = generate_random_transform(7)
+        X_BA = generate_arbitrary_transform(7)
         self.scene = X_BA.multiply(self.model)
         X_BA_test, mean_error_test, num_iters_test = f(self.scene, self.model)
         num_iters = 0
