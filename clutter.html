@@ -92,31 +92,31 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
     simulation by carefully setting the initial positions (in the Context) for
     each of the objects, but that approach won't scale.</p>
 
-    <p>The first change that you'll see in this chapter is that I will start
-    using Drake's "<a
-    href="https://github.com/RobotLocomotion/drake/blob/master/multibody/parsing/README_model_directives.md">Model
-    Directives</a>" for <a
-    href="https://drake.mit.edu/doxygen_cxx/namespacedrake_1_1multibody_1_1parsing.html#a57aafdf49e089598a1e344d8e7a74249">parsing</a>
-    more complex environments from yaml files.  That will help us set up the
-    bins, cameras, and the robot which can be welded in fixed positions.  But
-    generating the distributions over objects and object initial conditions is
-    more bespoke, and we need an algorithm for that.</p>
+    <p>So far we've used robot description files (e.g., URDF, SDF, MJCF, or
+    Model Directives) to parse into the MultibodyPlant; those were sufficient
+    for setting up the bins, cameras, and the robot which can be welded in
+    fixed positions.  But generating distributions over objects and object
+    initial conditions is more advanced, and we need an algorithm for that.</p>
 
     <subsection><h1>Falling things</h1>
 
       <p>In the real world, we would probably just dump the random objects into
       the bin.  That's a decent strategy for simulation, too.  We can roughly
-      expect our simulation to faithfully implement multibody physics as long as
-      our initial conditions (and time step) are reasonable; the physics isn't
-      well defined if we initialize the Context with multiple objects occupying
-      the same physical space.  The simplest and most common way to avoid this is
-      to generate a random number of objects in random poses, with their
-      vertical positions staggered so that they trivially start out of
-      penetration.</p>
+      expect our simulation to faithfully implement multibody physics as long
+      as our initial conditions (and time step) are reasonable; the physics
+      isn't well defined if we initialize the Context with multiple objects
+      occupying the same physical space.  The simplest and most common way to
+      avoid this is to generate a random number of objects in random poses,
+      with their vertical positions staggered so that they trivially start out
+      of penetration.</p>
 
       <p>If you look for them, you can find animations of large numbers of
-      falling objects in the demo reels for most advanced multibody
-      simulators.  But we're doing it for a purpose!</p>
+      falling objects in the demo reels for most advanced multibody simulators.
+      (These demos are actually a bit of a gimmick; the simulations may look
+      realistic to us, but they are often not very physically accurate.) For
+      our purposes the falling dynamics themselves are not the focus. We just
+      want the state of the objects where they are done falling as initial
+      conditions for our manipulation system.</p>
 
       <todo>maybe cite the falling things paper, but make it clear that the idea
       is not new?</todo></p>
@@ -148,9 +148,8 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
 
       <p>It's not really any different to do this with any random objects --
       here is what it looks like when I run the same code, but replace the
-      brick with a random draw from a few objects from the <a
-      href="https://www.ycbbenchmarks.com/">YCB dataset</a>.  It somehow amuses
-      me that we can see the <a
+      brick with a random draw from a few objects from the YCB dataset
+      <elib>Calli17</elib>.  It somehow amuses me that we can see the <a
       href="https://en.wikipedia.org/wiki/Central_limit_theorem">central limit
       theorem</a> hard at work, even when our objects are slightly
       ridiculous.</p>
@@ -168,17 +167,6 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
 
         <script>document.write(notebook_link('clutter'))</script>
   
-        <p>I had to decide how to visualize the results of this one for you.
-        The mesh and texture map files for the YCB objects are very large, so
-        downloading many of them to your browser from an online notebook felt a
-        bit too painful.  If you've decided to run the notebooks on your local
-        machine, then go ahead and run <code>drake_visualizer</code> before
-        running this test to see the live simulation (drake visualizer will
-        load the mesh files directly from your disk, so avoids the download).
-        For the cloud notebooks, I've decided to add a camera to the scene and
-        take a picture after simulating for a few seconds.  After all, that's
-        perhaps the data that we're actually looking for.</p>
-
         <figure>
           <img style="width:70%" src="data/ycb_clutter.png"/>
         </figure>
@@ -204,35 +192,36 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       not use those constraints again here?  Let's explore that idea a bit
       further.</p>
   
-      <p>I won't dive into a full discussion of multibody dynamics nor multibody
-      simulation, though I do have more notes <a
+      <p>I won't dive into a full discussion of multibody dynamics nor
+      multibody simulation, though I do have more notes <a
       href="http://underactuated.mit.edu/multibody.html">available here</a>.
       What is important to understand here is that the equations of motion of
       our multibody system are described by differential equations of the form:
-      $$M(q)\dot{v} + C(q,v)v = \tau_g(q) + \sum_i J^T_i(q)F^{c_i}.$$  The left
-      side of the equation is just a generalization of "mass times
-      acceleration", with the mass matrix, $M$, and the Coriolis terms $C$.  The
+      $$M(q)\dot{v} + C(q,v)v = \tau_g(q) + \sum_i J^T_i(q)f^{c_i}.$$  We
+      already understand the generalized positions, $q$, and velocities, $v$.
+      The left side of the equation is just a generalization of "mass times
+      acceleration", with the mass matrix, $M$, and the Coriolis terms $C$. The
       right hand side is the sum of the (generalized) forces, with $\tau_g(q)$
-      capturing the terms due to gravity, and $F^{c_i}$ is the <a
+      capturing the terms due to gravity, and $f^{c_i}$ is the <a
       href="https://drake.mit.edu/doxygen_cxx/group__multibody__spatial__vectors.html">spatial
       force</a> due to the $i$th contact.  $J_i(q)$ is the $i$th "contact
       Jacobian" -- it is the Jacobian that maps from the generalized velocities
       to the spatial velocity of the $i$th contact frame.</p>
 
       <p>Our interest here is in finding (stable) steady-state solutions to
-      these differential equations that can serve as good initial conditions for
-      our simulation.  At steady-state we have $v=\dot{v}=0$, and conveniently
-      all of the terms on the left-hand side of the equations are zero.  This
-      leaves us with just the force-balance equations $$\tau_g(q) = - \sum_i
-      J^T_i(q) F^{c_i}.$$  But we still need to understand where the contact
-      forces come from.</p>
+      these differential equations that can serve as good initial conditions
+      for our simulation.  At steady-state we have $v=\dot{v}=0$, and
+      conveniently all of the terms on the left-hand side of the equations are
+      zero.  This leaves us with just the force-balance equations $$\tau_g(q) =
+      - \sum_i J^T_i(q) f^{c_i}.$$  But we still need to understand where the
+      contact forces come from.</p>
 
       <subsubsection><h1>Collision geometry</h1>
 
       <p>Geometry engines for robotics, like <code>SceneGraph</code> in
       <drake></drake>, distinguish between a few different <a
-      href="https://drake.mit.edu/doxygen_cxx/group__geometry__roles.html"></a>roles
-      that geometry can play</a> in a simulation.  In <a
+      href="https://drake.mit.edu/doxygen_cxx/group__geometry__roles.html">roles</a>
+      that geometry can play in a simulation.  In <a
       href="http://sdformat.org/spec">robot description files</a>, we
       distinguish between <a
       href="http://sdformat.org/spec?ver=1.8&elem=link">visual</a>
@@ -264,9 +253,21 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
     
       <example><h1>Collision geometry inspector</h1>
       
-        <p>Coming soon: I'll provide a little notebook gui that lets you view
-        both the visual and collision geometry for your favorite URDF/SDF
-        files.</p>
+        <p>Drake's tutorial on "authoring a multibody simulation" has a very
+        useful <code>model_inspector</code> tool that publishes by the
+        illustration and collision geometry roles to Meshcat. This is very
+        useful for designing new models, but also for understanding the contact
+        geometry of existing models.</p>
+
+        <p><a
+        href="https://deepnote.com/workspace/Drake-0b3b2c53-a7ad-441b-80f8-bf8350752305/project/Tutorials-2b4fc509-aef2-417d-a40d-6071dfed9199/%2Fauthoring_multibody_simulation.ipynb#00005-d93fafb7-f99e-4989-a817-49ab668f44e0"
+        style="background:none; border:none;" target="${project}">  <img
+        src="https://deepnote.com/buttons/launch-in-deepnote-white.svg"></a></p>
+
+        <p>You might want to copy that snippet of code into your own notebook
+        to use it with your own model files.  (We'll be making this much easier
+        <a
+        href="https://github.com/RobotLocomotion/drake/issues/17689">soon</a>).</p>
 
       </example>
 
@@ -282,7 +283,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       default collision filter settings should work fine for most applications,
       but you can tweak them if you like.</p>
 
-      <p>So where do the contact forces, $F^{c_i}$, come from?  There is
+      <p>So where do the contact forces, $f^{c_i}$, come from?  There is
       potentially an equal and opposite contact force for every <i>pair</i> of
       collision geometries that are not filtered out by the collision filter.
       In <code>SceneGraph</code>, the <a
@@ -305,11 +306,14 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       convention will be to align the positive $z$ axis with the "contact
       normal", with positive forces resisting penetration. Defining this normal
       can be deceptively complicated.  For instance, what is the normal at the
-      corner of a box?  Taking the normal as the gradient of the
-      signed-distance function for the collision geometry provides a reliable
-      definition that will extend to the distance between two bodies and into
-      generalized coordinates. The $x$ and $y$ axes of the contact frame are
-      any orthogonal basis for the tangential coordinates.</p>
+      corner of a box?  Taking the normal as a (<a
+      href="https://en.wikipedia.org/wiki/Subderivative">sub-</a>)gradient of
+      the signed-distance function for the collision geometry provides a
+      reliable definition that will extend to the distance between two bodies
+      and into generalized coordinates. The $x$ and $y$ axes of the contact
+      frame are any orthogonal basis for the tangential coordinates.  You can
+      find additional figures and explanations <a
+      href="https://underactuated.csail.mit.edu/multibody.html#contact">here</a>.</p>
 
       <example><h1>Brick on a half-plane</h1>
 
@@ -334,7 +338,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
         <p>In order to achieve static equilibrium, we require that all of the
         forces and torques on the brick be in balance.  This is a simple
         manifestation of the equations $$\tau_g(q) = - \sum_i J^T_i(q)
-        F^{c_i},$$ because the configuration $q$ is the $x,z, \theta$ position
+        f^{c_i},$$ because the configuration $q$ is the $x,z, \theta$ position
         and orientation of the brick; we have three equations and three
         unknowns: \begin{gather*} 0 = \sum_i f^{c_i}_{C_{i,x}} \\ -mg = -\sum_i
         f^{c_i}_{C_{i,z}} \\ 0 = \sum_i \left[ \left[ p^{C_i} - p^{B_{cm}}
@@ -357,7 +361,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       <p>Now the rules governing contact forces can begin to take shape.  First
       and foremost, we demand that there is no force at a distance. Using
       $\phi_i(q)$ to denote the distance between two bodies in configuration
-      $q$, we have $$\phi(q) > 0 \Rightarrow F^{c_i} = 0.$$  Second, we demand
+      $q$, we have $$\phi(q) > 0 \Rightarrow f^{c_i} = 0.$$  Second, we demand
       that the normal force only resists penetration; bodies are never pulled
       into contact: $$f^{c_i}_{C_z} \ge 0.$$  In <i>rigid</i> contact models, we
       solve for the smallest normal force enforces the non-penetration
@@ -440,7 +444,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       href="https://drake.mit.edu/doxygen_cxx/classdrake_1_1multibody_1_1_static_equilibrium_problem.html"><code>StaticEquilbriumProblem</code></a>
       collects all of the constraints we enumerated above into an optimization
       problem: \begin{align*} \find_q \quad \subjto \quad& \tau_g(q) = - \sum_i
-      J^T_i(q) F^{c_i} & \\ & f^{c_i}_{C_z} \ge 0 & \forall i, \\ &
+      J^T_i(q) f^{c_i} & \\ & f^{c_i}_{C_z} \ge 0 & \forall i, \\ &
       |f^{c_i}_{C_{x,y}}|_2 \le \mu f^{c_i}_{C_z} & \forall i, \\ & \phi_i(q)
       \ge 0 & \forall i, \\ & \phi(q) = 0 \textbf{ or } f^{c_i}_{C_z} = 0
       &\forall i, \\ & \text{joint limits}.\end{align*} This is a nonlinear
@@ -1070,6 +1074,12 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
 <div id="references"><section><h1>References</h1>
 <ol>
 
+<li id=Calli17>
+<span class="author">Berk Calli and Arjun Singh and James Bruce and Aaron Walsman and Kurt Konolige and Siddhartha Srinivasa and Pieter Abbeel and Aaron M Dollar</span>, 
+<span class="title">"Yale-{CMU}-{B}erkeley dataset for robotic manipulation research"</span>, 
+<span class="publisher">The International Journal of Robotics Research</span>, vol. 36, no. 3, pp. 261--268, <span class="year">2017</span>.
+
+</li><br>
 <li id=Izatt20>
 <span class="author">Gregory Izatt and Russ Tedrake</span>, 
 <span class="title">"Generative Modeling of Environments with Scene Grammars and Variational Inference"</span>, 
