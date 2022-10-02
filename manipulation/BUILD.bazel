@@ -41,6 +41,14 @@ rt_py_library(
 )
 
 rt_py_library(
+    name = "pick",
+    srcs = ["pick.py"],
+    imports = [".."],
+    visibility = ["//visibility:public"],
+)
+
+# TODO(russt): Rename this to pose.py
+rt_py_library(
     name = "icp",
     srcs = ["icp.py"],
     imports = [".."],
