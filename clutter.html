@@ -612,23 +612,23 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
 
     <subsection><h1>Estimating normals and local curvature</h1>
     
-      <p>It's worth going through the basic estimation of the local geometry in
-      a point cloud.  You'll see it has a lot in common with the point cloud
-      registration we studied in the last chapter.  Let's think about the
-      problem of fitting a plane, in a least-squares sense, to a set of
-      points<elib>Shakarji98</elib>. We can describe a plane in 3D with a
-      position $p$ and a unit length normal vector, $n$.  The distance between a
-      point $p^i$ and a plane is simply given by the magnitude of the inner
-      product, $\left| (p^i - p)^T n \right|.$  So our least-squares
-      optimization becomes $$\min_{p, n} \quad \sum_{i=1}^N \left| (p^i - p)^T n
-      \right|^2, \quad \subjto \quad |n| = 1. $$  Taking the gradient of the
-      Lagrangian with respect to $p$ and setting it equal to zero gives us that
-      $$p^* = \frac{1}{N} \sum_{i=1}^N p^i.$$ Inserting this back into the
-      objective, we can write the problem as $$\min_n n^T W n, \quad \subjto
-      \quad |n|=1, \quad \text{where } W = \left[ \sum_i  (p^i - p^*) (p^i -
-      p^*)^T \right].$$  Geometrically, this objective is a quadratic bowl
-      centered at the origin, with a unit circle constraint.  So the optimal
-      solution is given by the (unit-length) eigenvector corresponding to the
+      <p>The grasp selection strategy that we will develop below will be based on the local geometry (normal direction and curvature) of the scene.  Understanding how to estimate those quantities from point clouds is an excellent exercise in point cloud processing, and is representative of other similar point cloud algorithms.</p>
+
+      <p>Let's think about the problem of fitting a plane, in a least-squares
+      sense, to a set of points<elib>Shakarji98</elib>. We can describe a plane
+      in 3D with a position $p$ and a unit length normal vector, $n$.  The
+      distance between a point $p^i$ and a plane is simply given by the
+      magnitude of the inner product, $\left| (p^i - p)^T n \right|.$  So our
+      least-squares optimization becomes $$\min_{p, n} \quad \sum_{i=1}^N
+      \left| (p^i - p)^T n \right|^2, \quad \subjto \quad |n| = 1. $$  Taking
+      the gradient of the Lagrangian with respect to $p$ and setting it equal
+      to zero gives us that $$p^* = \frac{1}{N} \sum_{i=1}^N p^i.$$ Inserting
+      this back into the objective, we can write the problem as $$\min_n n^T W
+      n, \quad \subjto \quad |n|=1, \quad \text{where } W = \left[ \sum_i  (p^i
+      - p^*) (p^i - p^*)^T \right].$$  Geometrically, this objective is a
+      quadratic bowl centered at the origin, with a unit circle constraint.  So
+      the optimal solution is given by the (unit-length) eigenvector
+      corresponding to the
       <i>smallest</i> eigenvalue of the data matrix, $W$. And for any optimal
       $n$, the "flipped" normal $-n$ is also optimal.  We can pick arbitrarily
       for now, and then flip the normals in a post-processing step (to make sure
