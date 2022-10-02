@@ -628,11 +628,11 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       - p^*) (p^i - p^*)^T \right].$$  Geometrically, this objective is a
       quadratic bowl centered at the origin, with a unit circle constraint.  So
       the optimal solution is given by the (unit-length) eigenvector
-      corresponding to the
-      <i>smallest</i> eigenvalue of the data matrix, $W$. And for any optimal
-      $n$, the "flipped" normal $-n$ is also optimal.  We can pick arbitrarily
-      for now, and then flip the normals in a post-processing step (to make sure
-      that the normals all point towards the camera origin).</p>
+      corresponding to the <i>smallest</i> eigenvalue of the data matrix, $W$.
+      And for any optimal $n$, the "flipped" normal $-n$ is also optimal.  We
+      can pick arbitrarily for now, and then flip the normals in a
+      post-processing step (to make sure that the normals all point towards the
+      camera origin).</p>
 
       <p>What is really interesting is that the second and third
       eigenvalues/eigenvectors also tell us something about the local geometry.
@@ -694,55 +694,53 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       simple ideas for trying to find grasps candidates that have a low
       cost.</p>
 
-      <p>There is a massive literature in robotics on "grasp metrics" and "grasp
-      analysis".  The Handbook of Robotics<elib>Siciliano16</elib> has an entire
-      chapter on grasping devoted to it (which I
-      recommend)<elib>Prattichizzo08</elib>.  For a course on manipulation
-      (especially from someone who cares a lot about dynamics) to spend so
-      little time on this topic is perhaps surprising, but a great deal of that
-      literature is focused on analyzing point contacts between a dexterous hand
-      and an object with known geometry.  That's simply not the situation we
-      find ourselves in for a lot of manipulation work today.  We have ourselves
-      a simple two fingered grippers with relatively a lot of grasping force (>
+      <p>There is a massive literature in robotics on "grasp metrics" and
+      "grasp analysis".  The Handbook of Robotics<elib>Siciliano16</elib> has
+      an entire chapter on grasping devoted to it (which I recommend)
+      <elib>Prattichizzo08</elib>.  For a course on manipulation (especially
+      from someone who cares a lot about dynamics) to spend so little time on
+      this topic is perhaps surprising, but a great deal of that literature is
+      focused on analyzing point contacts between a dexterous hand and an
+      object with known geometry.  That's simply not the situation we find
+      ourselves in for a lot of manipulation work today.  We have ourselves a
+      simple two fingered grippers with relatively a lot of grasping force (>
       80 N) and only local point clouds to represent our geometry.</p>
 
       <p>But there is one key idea that I do want to extract from that
       literature: the value of <b>antipodal grasps</b>.  Roughly speaking, once
-      we pick up an object -- or whatever happens to be between our fingers when
-      we squeeze -- then we will expect the contact forces between our fingers
-      to have to resist at least the <i>gravitational wrench</i> (the spatial
-      force due to gravity) of the object.  The closing force provided by our
-      gripper is in the gripper's $x$-axis, but if we want to be able to pick up
-      the object without it slipping from our hands, then we need forces inside
-      the friction cones of our contacts to be able to resist the gravitational
-      wrench.  Since we don't know what that wrench will be (and are somewhat
-      constrained by the geometry of our fingers from tilting our contact
-      normals into the vertical direction), a reasonable strategy is to look for
-      places on the point cloud where the normals will align with $x$-axis of
-      the gripper.  That means finding a pair of points on the point cloud with
-      normals that are collinear with the line connecting the points and are
-      pointing in opposite directions, these are
-      <i>antipodal points</i>.  In a real point cloud, we are unlikely to find
-      perfect antipodal pairs, but finding areas with normals pointing in nearly
-      opposite directions is a good strategy for grasping!</p>
-
+      we pick up an object -- or whatever happens to be between our fingers
+      when we squeeze -- then we will expect the contact forces between our
+      fingers to have to resist at least the <i>gravitational wrench</i> (the
+      spatial force due to gravity) of the object.  The closing force provided
+      by our gripper is in the gripper's $x$-axis, but if we want to be able to
+      pick up the object without it slipping from our hands, then we need
+      forces inside the friction cones of our contacts to be able to resist the
+      gravitational wrench.  Since we don't know what that wrench will be (and
+      are somewhat constrained by the geometry of our fingers), a reasonable
+      strategy is to look for places on the point cloud where the normals will
+      align with $x$-axis of the gripper. That means finding a pair of points
+      on the point cloud with normals that are collinear with the line
+      connecting the points and are pointing in opposite directions, these are
+      <i>antipodal point pairs</i>.  In a real point cloud, we are unlikely to
+      find perfect antipodal pairs, but finding areas with normals pointing in
+      nearly opposite directions is a good strategy for grasping!</p>
 
       <example><h1>Scoring grasp candidates</h1>
 
         <p>In practice, the contact between our fingers and the object(s) will
         be better described by a <i>patch contact</i> than by a point contact
         (due to the deflection of the rubber fingertips and any deflection of
-        the objects being picked).  So it makes sense to look for patches of
-        points with agreeable normals.  There are many ways one could write
-        this, I've done it here by transforming the processed point cloud of the
-        scene into the candidate frame of the gripper, and cropped away all of
-        the points except the ones that are inside a bounding box between the
-        finger tips (I've marked them in red in MeshCat).  The first term in my
-        grasping cost function is just reward for all of the points in the point
-        cloud, based on how aligned their normal is to the $x$-axis of the
-        gripper: $$\text{cost} = -\sum_i (n^i_{G_x})^2,$$ where $n^i_{G_x}$ is
-        the $x$ component of the $i$th point in the cropped point cloud
-        expressed in the gripper frame.</p>
+        the objects being picked). So it makes sense to look for patches of
+        points with agreeable normals. There are many ways one could write
+        this, I've done it here by transforming the processed point cloud of
+        the scene into the candidate frame of the gripper, and cropped away all
+        of the points except the ones that are inside a bounding box between
+        the finger tips (I've marked them in red in MeshCat).  The first term
+        in my grasping cost function is just reward for all of the points in
+        the point cloud, based on how aligned their normal is to the $x$-axis
+        of the gripper: $$\text{cost} = -\sum_i (n^i_{G_x})^2,$$ where
+        $n^i_{G_x}$ is the $x$ component of the $i$th point in the cropped
+        point cloud expressed in the gripper frame.</p>
 
         <figure><img style="width:80%"
           src="data/grasp_candidate_evaluation.png"></figure>
@@ -898,6 +896,8 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
     <subsection><h1>A simple state machine</h1></subsection>
   
   </section>
+
+  <todo>Maybe add a section here about monte-carlo testing?</todo>
 
   <section id="exercises"><h1>Exercises</h1>
 
