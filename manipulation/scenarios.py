@@ -433,17 +433,24 @@ def AddIiwaDifferentialIK(builder, plant, frame=None):
     time_step = plant.time_step()
     q0 = plant.GetPositions(plant.CreateDefaultContext())
     params.set_nominal_joint_position(q0)
+    # Waiting on drake #18021
+    # params.set_end_effector_angular_speed_limit(2)
+    # params.set_end_effector_translational_velocity_limits([-2, -2, -2],
+    #                                                       [2, 2, 2])
     if plant.num_positions() == 3:  # planar iiwa
         iiwa14_velocity_limits = np.array([1.4, 1.3, 2.3])
         params.set_joint_velocity_limits(
             (-iiwa14_velocity_limits, iiwa14_velocity_limits))
-        # These constants are in body frame.
-        params.set_end_effector_velocity_gain([.1, 0, 0, 0, .1, .1])
+        # These constants are in body frame
+        assert (
+            frame.name() == "iiwa_link_7"
+        ), "Still need to generalize the remaining planar diff IK params for different frames"  # noqa
+        params.set_end_effector_velocity_flag(
+            [True, False, False, True, False, True])
     else:
         iiwa14_velocity_limits = np.array([1.4, 1.4, 1.7, 1.3, 2.2, 2.3, 2.3])
         params.set_joint_velocity_limits(
             (-iiwa14_velocity_limits, iiwa14_velocity_limits))
-        params.set_end_effector_velocity_gain([.1] * 6)
     if frame is None:
         frame = plant.GetFrameByName("body")
     differential_ik = builder.AddSystem(
