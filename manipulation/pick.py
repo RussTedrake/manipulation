@@ -3,19 +3,16 @@ from pydrake.all import (AngleAxis, PiecewisePolynomial, PiecewisePose,
                          RigidTransform, RotationMatrix)
 
 
-def MakeGripperFrames(X_G, X_O, X_GgraspO):
+def MakeGripperFrames(X_G):
     """
-    Takes a partial specification with X_G["initial"] and X_O["initial"] and
-    X_0["goal"], and returns a X_G and times with all of the pick and place
+    Takes a partial specification with X_G["initial"], X_G["pick"], and
+    X_G["place"], and returns a X_G and times with all of the pick and place
     frames populated.
     """
-    X_OGgrasp = X_GgraspO.inverse()
     # pregrasp is negative y in the gripper frame (see the figure!).
     X_GgraspGpregrasp = RigidTransform([0, -0.08, 0])
 
-    X_G["pick"] = X_O["initial"] @ X_OGgrasp
     X_G["prepick"] = X_G["pick"] @ X_GgraspGpregrasp
-    X_G["place"] = X_O["goal"] @ X_OGgrasp
     X_G["preplace"] = X_G["place"] @ X_GgraspGpregrasp
 
     # I'll interpolate a halfway orientation by converting to axis angle and

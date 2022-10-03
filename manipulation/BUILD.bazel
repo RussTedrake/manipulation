@@ -41,6 +41,15 @@ rt_py_library(
 )
 
 rt_py_library(
+    name = "scenarios",
+    data = ["//manipulation/models"],
+    deps = ["//manipulation"],
+    srcs = ["scenarios.py"],
+    imports = [".."],
+    visibility = ["//visibility:public"],
+)
+
+rt_py_library(
     name = "pick",
     srcs = ["pick.py"],
     imports = [".."],
@@ -56,10 +65,8 @@ rt_py_library(
 )
 
 rt_py_library(
-    name = "scenarios",
-    data = ["//manipulation/models"],
-    deps = ["//manipulation"],
-    srcs = ["scenarios.py"],
+    name = "clutter",
+    srcs = ["clutter.py"],
     imports = [".."],
     visibility = ["//visibility:public"],
 )

@@ -60,3 +60,17 @@ rt_ipynb_test(
         "//manipulation:scenarios",
     ],
 )
+
+rt_ipynb_test(
+    name = "clutter_clearing",
+    srcs = ["clutter_clearing.ipynb"],
+    data = ["//manipulation/models"],
+    tags = ["no-sandbox"],  # from vtk-test-tags() in drake
+    deps = [
+      "//manipulation",
+      "//manipulation:clutter",
+      "//manipulation:meshcat_utils",
+      "//manipulation:pick",
+      "//manipulation:scenarios",
+    ],
+)
