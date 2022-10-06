@@ -35,6 +35,7 @@ rt_ipynb_test(
       "//manipulation:icp",
       "//manipulation:mustard_depth_camera_example",
       "//manipulation:meshcat_utils",
+      "//manipulation:pick",
       "//manipulation:scenarios",
     ],
 )
