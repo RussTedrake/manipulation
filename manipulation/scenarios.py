@@ -450,6 +450,7 @@ def AddIiwaDifferentialIK(builder, plant, frame=None):
         iiwa14_velocity_limits = np.array([1.4, 1.4, 1.7, 1.3, 2.2, 2.3, 2.3])
         params.set_joint_velocity_limits(
             (-iiwa14_velocity_limits, iiwa14_velocity_limits))
+        params.set_joint_centering_gain(10 * np.eye(7))
     if frame is None:
         frame = plant.GetFrameByName("body")
     differential_ik = builder.AddSystem(

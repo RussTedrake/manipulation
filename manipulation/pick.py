@@ -3,7 +3,7 @@ from pydrake.all import (AngleAxis, PiecewisePolynomial, PiecewisePose,
                          RigidTransform, RotationMatrix)
 
 
-def MakeGripperFrames(X_G):
+def MakeGripperFrames(X_G, t0=0):
     """
     Takes a partial specification with X_G["initial"], X_G["pick"], and
     X_G["place"], and returns a X_G and times with all of the pick and place
@@ -17,18 +17,31 @@ def MakeGripperFrames(X_G):
 
     # I'll interpolate a halfway orientation by converting to axis angle and
     # halving the angle.
+    X_GinitialGprepick = X_G["initial"].inverse() @ X_G["prepick"]
+    angle_axis = X_GinitialGprepick.rotation().ToAngleAxis()
+    X_GinitialGprepare = RigidTransform(
+        AngleAxis(angle=angle_axis.angle() / 2.0, axis=angle_axis.axis()),
+        X_GinitialGprepick.translation() / 2.0)
+    X_G["prepare"] = X_G["initial"] @ X_GinitialGprepare
+    p_G = np.array(X_G["prepare"].translation())
+    p_G[2] = 0.55
+    X_G["prepare"].set_translation(p_G)
+
     X_GprepickGpreplace = X_G["prepick"].inverse() @ X_G["preplace"]
     angle_axis = X_GprepickGpreplace.rotation().ToAngleAxis()
     X_GprepickGclearance = RigidTransform(
         AngleAxis(angle=angle_axis.angle() / 2.0, axis=angle_axis.axis()),
-        X_GprepickGpreplace.translation() / 2.0 + np.array([0, -0.3, 0]))
+        X_GprepickGpreplace.translation() / 2.0)
     X_G["clearance"] = X_G["prepick"] @ X_GprepickGclearance
+    p_G = np.array(X_G["clearance"].translation())
+    p_G[2] = 0.55
+    X_G["clearance"].set_translation(p_G)
 
     # Now let's set the timing
-    times = {"initial": 0}
-    X_GinitialGprepick = X_G["initial"].inverse() @ X_G["prepick"]
-    times["prepick"] = times["initial"] + 10.0 * np.linalg.norm(
-        X_GinitialGprepick.translation())
+    times = {"initial": t0}
+    prepare_time = 10.0 * np.linalg.norm(X_GinitialGprepare.translation())
+    times["prepare"] = times["initial"] + prepare_time
+    times["prepick"] = times["prepare"] + prepare_time
     # Allow some time for the gripper to close.
     times["pick_start"] = times["prepick"] + 2.0
     times["pick_end"] = times["pick_start"] + 2.0
@@ -55,8 +68,9 @@ def MakeGripperPoseTrajectory(X_G, times):
     sample_times = []
     poses = []
     for name in [
-            "initial", "prepick", "pick_start", "pick_end", "postpick",
-            "clearance", "preplace", "place_start", "place_end", "postplace"
+            "initial", "prepare", "prepick", "pick_start", "pick_end",
+            "postpick", "clearance", "preplace", "place_start", "place_end",
+            "postplace"
     ]:
         sample_times.append(times[name])
         poses.append(X_G[name])
