@@ -40,32 +40,26 @@ class TestGraspCandidate(unittest.TestCase):
         kdtree = KDTree(pcd.xyzs().T)
         f = self.notebook_locals["compute_darboux_frame"]
 
-        X_lst_eval = []
-
         for i in range(4):
             index = test_indices[i]
             RT = f(index, pcd, kdtree)
-            X_lst_eval.append(RT.GetAsMatrix34())
-
-        X_lst_eval = np.asarray(X_lst_eval)
-
-        self.assertLessEqual(np.linalg.norm(X_lst_target - X_lst_eval), 0.02,
-                             "The Darboux frame is not correct")
+            RT_desired = RigidTransform(X_lst_target[i])
+            self.assertTrue(
+                RT.IsNearlyEqualTo(RT_desired, 0.1),
+                "Your transform doesn't match the expected transform")
 
         index = 5
         RT = f(index, pcd, kdtree)
 
-        X_lst_order_eval = RT.GetAsMatrix34()
-
         # yapf: disable
-        X_lst_order_target = np.array([  # noqa
+        RT_desired = RigidTransform(np.array([  # noqa
             [+0.03674694, -0.88056642, -0.47249594, +0.00884530],
             [+0.93758428, +0.19399482, -0.28862041, -0.00240727],
-            [+0.34581122, -0.43239886, +0.83273393, +0.19118717]])
+            [+0.34581122, -0.43239886, +0.83273393, +0.19118717]]))
         # yapf: enable
 
-        self.assertLessEqual(
-            np.linalg.norm(X_lst_order_eval - X_lst_order_target), 1e-4,
+        self.assertTrue(
+            RT.IsNearlyEqualTo(RT_desired, 0.01),
             "Did you forget to sort the eigenvalues, "
             "or handle improper rotations?")
 
