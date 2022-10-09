@@ -325,7 +325,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       href="https://drake.mit.edu/doxygen_cxx/classdrake_1_1math_1_1_roll_pitch_yaw.html">Euler
       angles (e.g. roll-pitch-yaw)</a>,</li><li><a
       href="https://eigen.tuxfamily.org/dox/classEigen_1_1AngleAxis.html">axis
-      angle</a>, and </li><li><a
+      angle</a> (aka "exponential coordinates"), and </li><li><a
       href="https://eigen.tuxfamily.org/dox/classEigen_1_1Quaternion.html">unit
       quaternions</a>.</li></ul> In Drake, we provide all of these
       representations, and make it easy to convert back and forth between
@@ -536,36 +536,37 @@ pose = plant.EvalBodyPoseInWorld(context, gripper)</pre></code>
     href="https://drake.mit.edu/doxygen_cxx/group__multibody__spatial__vectors.html"><i>spatial
     velocity</i></a>: \begin{equation}{}^AV^B_C = \begin{bmatrix}
     {}^A\omega^B_C \\ {}^A\text{v}^B_C \end{bmatrix}.\end{equation} ${}^AV^B_C$
-    is the spatial velocity of frame $B$ relative to frame $A$ expressed in
-    frame $C$, ${}^A\omega^B_C \in \Re^3$ is the <i>angular velocity</i> (of
-    frame $B$ relative frame $A$ expressed in frame $C$), and ${}^A\text{v}^B_C
-    \in \Re^3$ is the <i>translational velocity</i> (along with the same
-    shorthands as for positions).  The angular velocity is a 3D vector (with
-    $w_x$, $w_y$, $w_z$ components); the magnitude of this vector represents
-    the angular speed and the direction represents the (instantaneous)
-    axis of rotation. It's tempting to think of it as the time derivatives of
-    roll, pitch, and yaw, but that's not true; it can easily be converted into
-    that representation through a <a
+    is the spatial velocity (also known as a "twist") of frame $B$ relative to
+    frame $A$ expressed in frame $C$, ${}^A\omega^B_C \in \Re^3$ is the
+    <i>angular velocity</i> (of frame $B$ relative frame $A$ expressed in frame
+    $C$), and ${}^A\text{v}^B_C \in \Re^3$ is the <i>translational velocity</i>
+    (along with the same shorthands as for positions).  The angular velocity is
+    a 3D vector (with $w_x$, $w_y$, $w_z$ components); the magnitude of this
+    vector represents the angular speed and the direction represents the
+    (instantaneous) axis of rotation. It's tempting to think of it as the time
+    derivatives of roll, pitch, and yaw, but that's not true; it can easily be
+    converted into that representation through a <a
     href="https://drake.mit.edu/doxygen_cxx/classdrake_1_1multibody_1_1_multibody_plant.html#a7bb24fed19f16a76450eece1857b92dc">nonlinear
-    change of coordinates</a>. Translational and rotational velocities are
-    simply vectors, so they can be operated on just like positions:<ul>
+    change of coordinates</a>.  Spatial velocities fit nicely into our spatial
+    algebra:<ul>
       <li>Angular velocities add (when the frames match): \begin{equation}
-      {}^A\omega^B_F + {}^B\omega^C_F = {}^A\omega^C_F,\end{equation} and have
-      the additive inverse. This <a href="#angular_velocity_addition">deserves
-      to be verified</a>.</li>
+      {}^A\omega^B_F + {}^B\omega^C_F = {}^A\omega^C_F,\end{equation} (this <a
+      href="#angular_velocity_addition">deserves to be verified</a>) and have
+      the additive inverse, ${}^A\omega^C_F = - {}^C\omega^A_F,$.</li>
       <li>Rotations can be used to change between the "expressed-in"
       frames: \begin{equation} {}^A\text{v}^B_G = {}^GR^F {}^A\text{v}^B_F,
       \qquad {}^A\omega^B_G = {}^GR^F {}^A\omega^B_F.\end{equation}
         </li>
-        <li>Translational velocities compose across frames with:
-        \begin{equation}{}^A\text{v}^C_F = {}^A\text{v}^B_F + {}^B\text{v}^C_F
-        + {}^A\omega^B_F \times {}^Bp^C_F.\end{equation} 
+        <li>Translational velocities have the additive inverse,
+        ${}^A\text{v}^C_F = - {}^C\text{v}^A_F,$ and compose across frames
+        with: \begin{equation}{}^A\text{v}^C_F = {}^A\text{v}^B_F +
+        {}^B\text{v}^C_F + {}^A\omega^B_F \times {}^Bp^C_F.\end{equation} 
       <details><summary>This can be derived in a few steps (click the triangle
       to expand)</summary><p>Differentiating $${}^Ap^C = {}^AX^B {}^Bp^C =
       {}^Ap^B + {}^AR^B {}^Bp^C,$$ yields \begin{align} {}^A\text{v}^C =&
       {}^A\text{v}^B + {}^A\dot{R}^B {}^Bp^C + {}^AR^B {}^B\text{v}^C \nonumber
       \\ =& {}^A\text{v}^B_A + {}^A\dot{R}^B {}^BR^A {}^Bp^C_A +
-      {}^B\text{v}^C_A.\end{align} Allow me to write $RR^{-1}$ for
+      {}^B\text{v}^C_A.\end{align} Allow me to write $\dot{R}R^{-1}$ for
       ${}^A\dot{R}^B {}^BR^A$ (dropping the frames for a moment). It turns out
       that $\dot{R}R^{-1}$, is always a skew-symmetric matrix.  To see this,
       differentiate $RR^T = I$ to get $$\dot{R}R^T + R\dot{R}^T = 0 \Rightarrow
@@ -579,6 +580,24 @@ pose = plant.EvalBodyPoseInWorld(context, gripper)</pre></code>
     </ul>
     </div>
 
+    <details><summary>If you're familiar with "screw theory" (as used in, e.g.
+      <elib>Murray94</elib> and <elib>Lynch17</elib>), click the triangle to
+      see how those conventions are related.</summary>
+    <ul><p>Screw theory (as used in, e.g.
+    <elib>Murray94</elib> and <elib>Lynch17</elib>) often uses a particular
+    form of our spatial velocity referred to as "spatial velocity in the space
+    frame" / "spatial twists" that can be useful in a number of computations.
+    This quantity is ${}^AV^{B_A}$, where $B_A$ is the frame rigidly attached
+    on body $B$ (so ${}^BV^{B_A} = 0$) that is instantaneously in the same pose
+    as $A$ (so ${}^Ap^{B_A} = 0$, ${}^AR^{B_A} = I$) <elib
+    part="3.3.2">Lynch17</elib>. These conditions reduce to
+    \begin{equation}{}^AV^{B_A} = \begin{bmatrix} {}^A\omega^{B_A} \\
+    {}^A\text{v}^{B_A} \end{bmatrix} = \begin{bmatrix} {}^A\omega^{B_A} +
+    {}^{B_A}\omega^B_{A} \\ {}^A\text{v}^B + {}^B\text{v}^{B_A}_A +
+    {}^A\omega^B \times {}^Bp^{B_A}_A \end{bmatrix} = \begin{bmatrix} {}^A
+    \omega^{B} \\ {}^A\text{v}^B - {}^A\omega^B \times {}^Ap^{B}
+    \end{bmatrix}.\end{equation}
+  </p></ul> </details>
 
     <!--
     <p>Why is it that we can get away with just three components for spatial
