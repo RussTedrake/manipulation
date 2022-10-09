@@ -1,0 +1,8 @@
+
+directives:
+- add_directives:
+    file: package://manipulation/two_bins_w_cameras.dmd.yaml
+
+- add_directives:
+    file: package://manipulation/schunk_wsg_50_welded_fingers.dmd.yaml
+
