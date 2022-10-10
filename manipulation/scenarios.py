@@ -12,7 +12,7 @@ from pydrake.all import (
     Box, CameraInfo, ClippingRange, CoulombFriction, Cylinder, Demultiplexer,
     DepthImageToPointCloud, DepthRange, DepthRenderCamera, DiagramBuilder,
     FindResourceOrThrow, GeometryInstance, InverseDynamicsController,
-    LeafSystem, LoadModelDirectives, LoadModelDirectivesFromString,
+    LeafSystem, LoadModelDirectivesFromString,
     MakeMultibodyStateToWsgStateSystem, MakePhongIllustrationProperties,
     MakeRenderEngineVtk, ModelInstanceIndex, MultibodyPlant, Parser,
     PassThrough, PrismaticJoint, ProcessModelDirectives, RenderCameraCore,
@@ -518,8 +518,7 @@ def MakeManipulationStation(model_directives=None,
         directives = LoadModelDirectivesFromString(model_directives)
         ProcessModelDirectives(directives, parser)
     if filename:
-        directives = LoadModelDirectives(filename)
-        ProcessModelDirectives(directives, parser)
+        parser.AddAllModelsFromFile(filename)
     plant.Finalize()
 
     for i in range(plant.num_model_instances()):

@@ -1,5 +1,4 @@
-from pydrake.multibody.parsing import (Parser, ProcessModelDirectives,
-                                       LoadModelDirectives)
+from pydrake.multibody.parsing import Parser
 from pydrake.multibody.plant import AddMultibodyPlantSceneGraph
 from pydrake.perception import Concatenate
 from pydrake.systems.framework import DiagramBuilder
@@ -15,10 +14,8 @@ def MustardExampleSystem():
     plant, scene_graph = AddMultibodyPlantSceneGraph(builder, time_step=0.0)
     parser = Parser(plant)
     AddPackagePaths(parser)
-    ProcessModelDirectives(
-        LoadModelDirectives(FindResource("models/mustard_w_cameras.yaml")),
-        plant, parser)
-
+    parser.AddAllModelsFromFile(
+        FindResource("models/mustard_w_cameras.dmd.yaml"))
     plant.Finalize()
 
     # Add a visualizer just to help us see the object.

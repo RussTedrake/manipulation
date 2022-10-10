@@ -126,6 +126,9 @@ def GenerateAntipodalGraspCandidate(diagram,
         wsg = plant.GetBodyByName("body")
         wsg_body_index = wsg.index()
 
+    if cloud.size() < 1:
+        return np.inf, None
+
     index = rng.integers(0, cloud.size() - 1)
 
     # Use S for sample point/frame.
