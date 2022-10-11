@@ -29,3 +29,13 @@ directives:
 - add_weld:
     parent: bin1_origin
     child: bin1::bin_base
+
+- add_model:
+    name: floor
+    file: package://manipulation/floor.sdf
+
+- add_weld:
+    parent: world
+    child: floor::box
+    X_PC:
+        translation: [0, 0, -.5]

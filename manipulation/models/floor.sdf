@@ -1,0 +1,61 @@
+<?xml version="1.0"?>
+<sdf version="1.7">
+  <model name="floor">
+    <!-- note that there is (intentionally) no visual geometry; only collision
+    geometry -->
+    <link name="box">
+      <inertial>
+        <mass>100.0</mass>
+        <inertia>
+          <ixx>10</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>10</iyy>
+          <iyz>0</iyz>
+          <izz>10</izz>
+        </inertia>
+      </inertial>
+      <collision name="bottom">
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>4 4 0.1</size>
+          </box>
+        </geometry>
+      </collision>
+      <collision name="front">
+        <pose>2 0 .15 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>.1 4 0.3</size>
+          </box>
+        </geometry>
+      </collision>
+      <collision name="back">
+        <pose>-2 0 .15 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>.1 4 0.3</size>
+          </box>
+        </geometry>
+      </collision>
+      <collision name="left">
+        <pose>0 2 .15 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>4 .1 0.3</size>
+          </box>
+        </geometry>
+      </collision>
+      <collision name="right">
+        <pose>0 -2 .15 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>4 .1 0.3</size>
+          </box>
+        </geometry>
+      </collision>
+
+    </link>
+  </model>
+</sdf>
