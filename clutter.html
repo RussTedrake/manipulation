@@ -533,18 +533,22 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       applied to a rigid body at some point.  More generally, we will define a
       six-component vector for <a
       href="https://drake.mit.edu/doxygen_cxx/group__multibody__spatial__vectors.html"><i>spatial
-      force</i></a>: \begin{equation}F^{B/p}_{{\text{name}},C} =
-      \begin{bmatrix} \tau^{B/p}_{\text{name},C} \\ f^{B/p}_{\text{name},C}
-      \end{bmatrix}.\end{equation} $F^{B/p}_{\text{name},C}$ is the named
-      spatial force applied to a body $B$ at the point (or frame) $p$,
-      expressed in frame $C$. The name is optional, and the expressed in frame,
-      if unspecified, is the world frame. In code, we write
-      <code>Fname_Bq_C</code>. Like spatial velocity, it has a rotational
-      component and a translational component; $\tau^{B/p}_C \in \Re^3$ is the
-      <i>torque</i>
-      (on body $B$ applied at point $p$ expressed in frame $C$), and
-      $f^{B/p}_C \in \Re^3$ is the translational or Cartesian
-      force. A spatial force is also commonly referred to as a <a
+      force</i></a>: \begin{equation}F^{B_p}_{{\text{name}},C} =
+      \begin{bmatrix} \tau^{B_p}_{\text{name},C} \\ f^{B_p}_{\text{name},C}
+      \end{bmatrix}.\end{equation} $F^{B_p}_{\text{name},C}$ is the named
+      spatial force applied to a point, or frame origin, $B_p$, expressed in
+      frame $C$. The name is optional, and the expressed in frame, if
+      unspecified, is the world frame. For forces in particular, it is
+      recommended that we include the body, $B$, that the force is being
+      applied to in the symbol for the point $B_p$, especially since we will
+      often have equal and opposite forces. In code, we write
+      <code>Fname_Bp_C</code>.</p>
+      
+      <p>Like spatial velocity, spatial forces have a rotational component and
+      a translational component; $\tau^{B_p}_C \in \Re^3$ is the <i>torque</i>
+      (on body $B$ applied at point $p$ expressed in frame $C$), and $f^{B_p}_C
+      \in \Re^3$ is the translational or Cartesian force. A spatial force is
+      also commonly referred to as a <a
       href="https://en.wikipedia.org/wiki/Screw_theory#Wrench">wrench</a>.  If
       you find it strange to think of forces as having a rotational component,
       then think of it this way: the world might only impart Cartesian forces
@@ -557,17 +561,16 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       <p>Spatial forces fit neatly into our spatial algebra:
       <ul>
         <li>Spatial forces add when they are applied to the same body in the
-        same frame, e.g.: \begin{equation}F^{B/p}_{\text{total},C}
-        = \sum_i F^{B/p}_{i,C} .\end{equation}</todo></li>
+        same frame, e.g.: \begin{equation}F^{B_p}_{\text{total},C}
+        = \sum_i F^{B_p}_{i,C} .\end{equation}</todo></li>
         <li>Shifting a spatial force from one application frame, $P$, to
-        another frame, $Q$, uses the cross product: \begin{equation}
-        f^{B/Q}_C = f^{B/P}_C, \qquad
-        \tau^{B/Q}_C = \tau^{B/P}_C + {}^Qp^P_C \times
-        f^{B/P}_C.\end{equation}</li>
+        another frame, $Q$, uses the cross product: \begin{equation} f^{B_Q}_C
+        = f^{B_P}_C, \qquad \tau^{B_Q}_C = \tau^{B_P}_C + {}^Qp^P_C \times
+        f^{B_P}_C.\end{equation}</li>
         <li>As with all spatial vectors, rotations can be used to change
-        between the "expressed-in" frames: \begin{equation} f^{B/p}_D = {}^DR^C
-        f^{B/p}_C, \qquad \tau^{B/p}_D = {}^DR^C
-        \tau^{B/p}_C.\end{equation}</li>
+        between the "expressed-in" frames: \begin{equation} f^{B_p}_D = {}^DR^C
+        f^{B_p}_C, \qquad \tau^{B_p}_D = {}^DR^C
+        \tau^{B_p}_C.\end{equation}</li>
       </ul>
       </p>
 
