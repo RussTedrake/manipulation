@@ -218,7 +218,7 @@ class TestSimulationTuning(unittest.TestCase):
 
         self.assertGreater(n_contacts, 2, 'Not enough contacts detected!')
 
-    @timeout_decorator.timeout(2.)
+    @timeout_decorator.timeout(5.)
     @weight(2)
     def test_minimal_rotation(self):
         """Test test_minimal_rotation"""
