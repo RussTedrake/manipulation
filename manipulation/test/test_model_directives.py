@@ -6,16 +6,14 @@ import pydrake.systems.framework
 
 import manipulation.utils
 
-filename = manipulation.utils.FindResource("models/two_bins_w_cameras.yaml")
+filename = manipulation.utils.FindResource("models/two_bins_w_cameras.dmd.yaml")
 
 builder = pydrake.systems.framework.DiagramBuilder()
 plant, scene_graph = pydrake.multibody.plant.AddMultibodyPlantSceneGraph(
     builder, time_step=0.001)
 parser = pydrake.multibody.parsing.Parser(plant)
 manipulation.utils.AddPackagePaths(parser)
-pydrake.multibody.parsing.ProcessModelDirectives(
-    pydrake.multibody.parsing.LoadModelDirectives(filename), plant, parser)
-
+parser.AddAllModelsFromFile(filename)
 plant.Finalize()
 
 diagram = builder.Build()

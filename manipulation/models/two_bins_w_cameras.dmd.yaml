@@ -1,7 +1,7 @@
 
 directives:
 - add_directives:
-    file: package://manipulation/two_bins.yaml
+    file: package://manipulation/two_bins.dmd.yaml
 
 - add_frame:
     name: camera0_origin

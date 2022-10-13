@@ -10,7 +10,7 @@ def MakeGripperFrames(X_G, t0=0):
     frames populated.
     """
     # pregrasp is negative y in the gripper frame (see the figure!).
-    X_GgraspGpregrasp = RigidTransform([0, -0.08, 0])
+    X_GgraspGpregrasp = RigidTransform([0, -0.2, 0])
 
     X_G["prepick"] = X_G["pick"] @ X_GgraspGpregrasp
     X_G["preplace"] = X_G["place"] @ X_GgraspGpregrasp
@@ -24,7 +24,11 @@ def MakeGripperFrames(X_G, t0=0):
         X_GinitialGprepick.translation() / 2.0)
     X_G["prepare"] = X_G["initial"] @ X_GinitialGprepare
     p_G = np.array(X_G["prepare"].translation())
-    p_G[2] = 0.55
+    p_G[2] = 0.5
+    # To avoid hitting the cameras, make sure the point satisfies x - y < .5
+    if p_G[0] - p_G[1] < .5:
+        scale = .5 / (p_G[0] - p_G[1])
+        p_G[:1] /= scale
     X_G["prepare"].set_translation(p_G)
 
     X_GprepickGpreplace = X_G["prepick"].inverse() @ X_G["preplace"]
@@ -34,7 +38,11 @@ def MakeGripperFrames(X_G, t0=0):
         X_GprepickGpreplace.translation() / 2.0)
     X_G["clearance"] = X_G["prepick"] @ X_GprepickGclearance
     p_G = np.array(X_G["clearance"].translation())
-    p_G[2] = 0.55
+    p_G[2] = 0.5
+    # To avoid hitting the cameras, make sure the point satisfies x - y < .5
+    if p_G[0] - p_G[1] < .5:
+        scale = .5 / (p_G[0] - p_G[1])
+        p_G[:1] /= scale
     X_G["clearance"].set_translation(p_G)
 
     # Now let's set the timing

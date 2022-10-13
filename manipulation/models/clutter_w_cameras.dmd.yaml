@@ -4,4 +4,4 @@ directives:
     file: package://manipulation/iiwa_and_wsg.dmd.yaml
 
 - add_directives:
-    file: package://manipulation/two_bins_w_cameras.yaml
+    file: package://manipulation/two_bins_w_cameras.dmd.yaml

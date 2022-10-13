@@ -294,9 +294,10 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
 
     <subsubsection><h1>The Contact Frame</h1>
 
-      <p>We still need to decide the magnitude of these spatial forces, and to
-      write down the magnitude, we need to specify the <i>contact frame</i> in
-      which the spatial force is to be applied.  For instance, we <a
+      <p>We still need to decide the magnitude and direction of these spatial
+      forces, and to do this we need to specify the
+      <i>contact frame</i> in which the spatial force is to be applied.  For
+      instance, we <a
       href="https://drake.mit.edu/doxygen_cxx/classdrake_1_1multibody_1_1_point_pair_contact_info.html">might
       use</a> $C_B$ to denote a contact frame on body $B$, with the forces
       applied at the origin of the frame.</p>
@@ -516,7 +517,96 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
 
   </section>
 
-  <section><h1>Grasp selection</h1>
+  <section><h1>Model-based grasp selection</h1>
+
+    <p>What makes a good grasp? This topic has been studied extensively for
+    decades in robotics, with an original focus on thinking of a (potentially
+    dexterous) hand interacting with a known object.
+    <elib>Prattichizzo08</elib> is an excellent survey of that literature; I
+    will summarize just a few of the key ideas here. To do it, let's start by
+    extended our spatial algebra to include forces.</p>
+
+    <subsection id="spatial_force"><h1>Spatial force</h1>
+
+      <p>In our discussion of contact forces above, we started by thinking of a
+      force as a three-element vector (with components for $x$, $y$, and $z$)
+      applied to a rigid body at some point.  More generally, we will define a
+      six-component vector for <a
+      href="https://drake.mit.edu/doxygen_cxx/group__multibody__spatial__vectors.html"><i>spatial
+      force</i></a>: \begin{equation}F^{B_p}_{{\text{name}},C} =
+      \begin{bmatrix} \tau^{B_p}_{\text{name},C} \\ f^{B_p}_{\text{name},C}
+      \end{bmatrix} \quad \text{ or } \quad
+      \left[F^{B_p}_{\text{name}}\right]_C = \begin{bmatrix}
+      \left[\tau^{B_p}_{\text{name}}\right]_C \\
+      \left[f^{B_p}_{\text{name}}\right]_C \end{bmatrix}.\end{equation}
+      $F^{B_p}_{\text{name},C}$ is the named spatial force applied to a point,
+      or frame origin, $B_p$, expressed in frame $C$. The form with the
+      parentheses is preferred in Drake, but is a verbose for my taste here in
+      the notes.  The name is optional, and the expressed in frame, if
+      unspecified, is the world frame. For forces in particular, it is
+      recommended that we include the body, $B$, that the force is being
+      applied to in the symbol for the point $B_p$, especially since we will
+      often have equal and opposite forces. In code, we write
+      <code>Fname_Bp_C</code>.</p>
+      
+      <p>Like spatial velocity, spatial forces have a rotational component and
+      a translational component; $\tau^{B_p}_C \in \Re^3$ is the <i>torque</i>
+      (on body $B$ applied at point $p$ expressed in frame $C$), and $f^{B_p}_C
+      \in \Re^3$ is the translational or Cartesian force. A spatial force is
+      also commonly referred to as a <a
+      href="https://en.wikipedia.org/wiki/Screw_theory#Wrench">wrench</a>.  If
+      you find it strange to think of forces as having a rotational component,
+      then think of it this way: the world might only impart Cartesian forces
+      at the points of contact, but we want to summarize the combined effect of
+      many Cartesian forces applied to different points into one common frame.
+      To do this, we represent the equivalent effect of each Cartesian force at
+      the point of application as a force + torque applied at a different point
+      on the body.</p>
+
+      <p>Spatial forces fit neatly into our spatial algebra:
+      <ul>
+        <li>Spatial forces add when they are applied to the same body in the
+        same frame, e.g.: \begin{equation}F^{B_p}_{\text{total},C}
+        = \sum_i F^{B_p}_{i,C} .\end{equation}</todo></li>
+        <li>Shifting a spatial force from one application frame, $P$, to
+        another frame, $Q$, uses the cross product: \begin{equation} f^{B_Q}_C
+        = f^{B_P}_C, \qquad \tau^{B_Q}_C = \tau^{B_P}_C + {}^{B_Q}p^{B_P}_C
+        \times f^{B_P}_C.\end{equation}</li>
+        <li>As with all spatial vectors, rotations can be used to change
+        between the "expressed-in" frames: \begin{equation} f^{B_p}_D = {}^DR^C
+        f^{B_p}_C, \qquad \tau^{B_p}_D = {}^DR^C
+        \tau^{B_p}_C.\end{equation}</li>
+      </ul>
+      </p>
+
+      <p>Now we are starting to have the vocabulary to provide one answer to
+      the question: what makes a good grasp?  If the goal of a grasp is to
+      stabilize an object in the hand, then a good grasp can be one that is
+      able to resist disturbances described as an "adversarial" wrench applied
+      to the body.</p>
+
+    </subsection>
+
+    <subsection><h1>The contact wrench cone</h1>
+
+      <todo>Animation of a single force / cone applied to a body, with the
+      contact wrench cone visualized in a different frame (e.g. the body
+      frame).  Then the combination of multiple cones (via the minkowski
+      sum).</todo>
+
+    </subsection>
+
+    <subsection><h1>Metrics for grasp stability</h1>
+    
+    </subsection>
+
+    <subsection><h1>Colinear antipodal grasps</h1>
+    
+    </subsection>
+
+  </section>
+
+  <section><h1>Grasp selection from point clouds</h1>
 
     <p>Now that we have that ability to populate our bins full of random
     clutter, we need to determine where we will grasp.  The pipeline that one
@@ -891,10 +981,63 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
 
   </section>
 
+  <section><h1>Programming the Task Level</h1>
+
+    <subsection><h1>A simple state machine</h1></subsection>
+
+
+  </section>
+
   <section><h1>Putting it all together</h1>
   
-    <subsection><h1>A simple state machine</h1></subsection>
-  
+    <p>First, we bundle up our grasp-selection algorithm into a system that reads the point clouds from 3 cameras, does the point cloud processing (including normal estimation), and the random sampling, and puts the grasp selection onto the output port:</p>
+    <p text-align="center">
+      <script src="htmlbook/js-yaml.min.js"></script>
+      <script type="text/javascript">
+      var sys = jsyaml.load(`
+name: GraspSelector
+input_ports:
+- cloud0_W
+- cloud1_W
+- cloud2_W
+- body_poses
+output_ports:
+- grasp_selection (cost, X_WG)`);
+      document.write(system_html(sys));
+      </script>
+    </p> 
+
+    <p>Note that we will instantiate this system twice -- once for the bin
+    located on the positive X axis and again for the system on the negative y
+    axis.  Thanks to the "pull-architecture" in Drake's systems framework, this
+    relatively expensive sampling procedure only gets called when the
+    downstream system evaluates the output port.</p>
+
+    <p>The work-horse system in this example is the <code>Planner</code> system which implements the basic state machine, calls the planning functions, stores the resulting plans in its <code>Context</code>, and evaluates the plans on the output port:</p>
+    <p text-align="center">
+      <script src="htmlbook/js-yaml.min.js"></script>
+      <script type="text/javascript">
+      var sys = jsyaml.load(`
+name: Planner
+input_ports:
+- body_poses
+- x_bin_grasp
+- y_bin_grasp
+- wsg_state
+output_ports:
+- X_WG
+- control_mode
+- reset_diff_ik
+- iiwa_position`);
+      document.write(system_html(sys));
+      </script>
+    </p> 
+    <p>This system needs enough input / output ports to get the relevant information into the planner, and to command the downstream controllers.</p>
+
+    <example><h1>Clutter clearing (complete demo)</h1>
+      <script>document.write(notebook_link('clutter', deepnote, '', 'clutter_clearing'))</script>
+    </example>
+
   </section>
 
   <todo>Maybe add a section here about monte-carlo testing?</todo>
@@ -1095,6 +1238,12 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
 , pp. 8238-8245, 11, <span class="year">2019</span>.
 
 </li><br>
+<li id=Prattichizzo08>
+<span class="author">Domenico Prattichizzo and Jeffrey C Trinkle</span>, 
+<span class="title">"Grasping"</span>, 
+<span class="publisher">Springer Handbook of Robotics</span> , pp. 671-700, <span class="year">2008</span>.
+
+</li><br>
 <li id=tenPas17>
 <span class="author">Andreas ten Pas and Marcus Gualtieri and Kate Saenko and Robert Platt</span>, 
 <span class="title">"Grasp pose detection in point clouds"</span>, 
@@ -1135,12 +1284,6 @@ PhD thesis, Institut für Informatik der Technischen Universität München, <spa
 <span class="author">Bruno Siciliano and Oussama Khatib</span>, 
 <span class="title">"Springer handbook of robotics"</span>, Springer
 , <span class="year">2016</span>.
-
-</li><br>
-<li id=Prattichizzo08>
-<span class="author">Domenico Prattichizzo and Jeffrey C Trinkle</span>, 
-<span class="title">"Grasping"</span>, 
-<span class="publisher">Springer Handbook of Robotics</span> , pp. 671-700, <span class="year">2008</span>.
 
 </li><br>
 <li id=Colledanchise18>
