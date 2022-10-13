@@ -27,7 +27,7 @@ class TestAnalyticGrasp(unittest.TestCase):
         for i in range(4):
             result, H_eig = f(shape)
             result_lst.append(result)
-            H_eig_lst.append(H_eig)
+            H_eig_lst.append(np.sort(H_eig)[::-1])
 
         result_lst_eval = np.array(result_lst)
         H_eig_lst_eval = np.array(H_eig_lst)
@@ -40,10 +40,10 @@ class TestAnalyticGrasp(unittest.TestCase):
             [3.223685, 0.710411]])
 
         H_eig_lst_target = np.array([  # noqa
-            [29612.82676, 35855.23483],
+            [35855.23483, 29612.82676],
             [-1025.65590, -1312.08498],
-            [-643.00117, 6819.32722],
-            [-1249.67350, 27654.86062]])
+            [6819.32722, -643.00117],
+            [27654.86062, -1249.67350]])
         # yapf: enable
 
         self.assertLessEqual(
