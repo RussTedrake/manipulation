@@ -2,5 +2,6 @@
   "analytic_antipodal_grasps": "ba43d442-6399-4a14-a0c8-ff13bc01b797",
   "grasp_candidate": "023a0934-b99c-4fea-afcb-0711ed689496",
   "normal_estimation_depth": "24697047-1aba-4de0-8139-2b986faa0897",
-  "static_equilibrium": "d88e535f-b484-48f1-a092-be77dca85583"
+  "static_equilibrium": "d88e535f-b484-48f1-a092-be77dca85583",
+  "simulation_tuning": "3ac7c471-008c-4512-a37c-8338b9790d6e"
 }
