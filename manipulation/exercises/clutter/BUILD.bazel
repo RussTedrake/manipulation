@@ -19,6 +19,12 @@ rt_py_library(
 )
 
 rt_py_library(
+    name = "test_simulation_tuning",
+    srcs = ["test_simulation_tuning.py"],
+    visibility = ["//visibility:public"],
+)
+
+rt_py_library(
     name = "test_normal",
     data = ["normal_solution.npy"],
     srcs = ["test_normal.py"],
