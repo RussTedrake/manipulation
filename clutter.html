@@ -1108,8 +1108,56 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
 
   <section><h1>Programming the Task Level</h1>
 
-    <subsection><h1>A simple state machine</h1></subsection>
+    <p>Most of us are used to writing code in a <a
+    href="https://hackr.io/blog/procedural-programming">procedural
+    programming</a>
+    paradigm; code executes from the top of the program through function calls,
+    branchs (like if/then statements), for/while loops, etc. It's tempting to
+    to to write our high-level robot programs like that, too.  For the clutter
+    task, I could write "while there is an object to pick up in the first bin,
+    pick it up and move it to the second bin; ...".  And that is certainly not
+    wrong! But to be a component in a robotics framework, this high-level
+    program must somehow communicate with the rest of the system at runtime,
+    including having interfaces to the low-level controllers that are running
+    at some regular frequency (say 100Hz or even 1kHz). So how do we author the
+    high-level behaviors (often called "task level") in a way that integrates
+    seamlessly with the high-rate low-level controls?</p>
 
+    <p>There are a few important programming paradigms here.  Broadly speaking, I would categorize them into three bins:
+      <ul>
+        <li>Procedural code (in a separate thread) passes messages/events to a
+        module that lives in the main robot/simulation thread.</li>
+        <li>Task-level "policies" can be authored directly as e.g. finite state
+        machines (FSMs) or "behavior trees", which get evaluated directly in
+        the robot/simulation loop.</li>
+        <li>Task-level "planners" can take rules for how task-level behaviors
+        can be chained together to achieve long-term goals:
+        <ul>
+          <li>In the simplest case, the planner outputs a plan that can be
+          executed during the robot/simulation loop, just like the trajectories
+          we've used to plan the motion of the gripper.</li>
+          <li>If the planner can be run online (e.g. constantly
+          adjusting/replanning given new sensor information), then it can be
+          used directly in the robot/simulation loop.</li>
+          <li> Alternatively, a few planners can actually "compile" their plans
+          directly into a policy (e.g. in the form of an FSM). <a
+          href="https://en.wikipedia.org/wiki/Linear_temporal_logic_to_B%C3%BCchi_automaton">Here
+          is one of the classic examples</a>.</li>
+        </ul>
+        </li>
+      </ul>
+    Each of these paradigms has its place, and some researchers heavily favor
+    one over the other. I'll always remember Rod Brooks writing papers like
+    <u>Elephants Don't Play Chess</u> to argue against task-level
+    planning<elib>Brooks90+Brooks91+Brooks91a</elib>; his "subsumption
+    architecture" was distinctly in the "task-level policies" category and can
+    be seen as a precursor to Behavior Trees and established its credibility by
+    having success on the early Roomba vacuum cleaners.
+    </p>
+
+    <example><h1>A simple state machine for "clutter clearing"</h1>
+    
+    </example>
 
   </section>
 
@@ -1416,6 +1464,24 @@ PhD thesis, Massachusetts Institute of Technology, <span class="year">2016</span
 <span class="author">Radu Bogdan Rusu</span>, 
 <span class="title">"Semantic 3D Object Maps for Everyday Manipulation in Human Living Environments"</span>, 
 PhD thesis, Institut für Informatik der Technischen Universität München, <span class="year">2010</span>.
+
+</li><br>
+<li id=Brooks90>
+<span class="author">R. A. Brooks</span>, 
+<span class="title">"Elephants Don't Play Chess"</span>, 
+<span class="publisher">Robotics and Autonomous Systems</span>, vol. 6, pp. 3--15,, <span class="year">1990</span>.
+
+</li><br>
+<li id=Brooks91>
+<span class="author">Rodney A. Brooks</span>, 
+<span class="title">"Intelligence Without Reason"</span>, 
+, no. 1293, April, <span class="year">1991</span>.
+
+</li><br>
+<li id=Brooks91a>
+<span class="author">Rodney A. Brooks</span>, 
+<span class="title">"Intelligence without representation"</span>, 
+<span class="publisher">Artificial Intelligence</span>, vol. 47, pp. 139-159, <span class="year">1991</span>.
 
 </li><br>
 <li id=Colledanchise18>
