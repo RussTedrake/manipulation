@@ -387,6 +387,23 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       contact forces.  It is famously known as the "friction cone", and we will
       refer to it often.</p>
 
+      <p>It's a bit strange for us to write that the forces are in some set.
+      Surely the world will pick just one force to apply? It can't apply all
+      forces in a set.  The friction cone specifies the range of possible
+      forces; under the Coulomb friction model we say that the one force that
+      will be picked is the force inside this set that will successfully resist
+      relative motion in the contact x-y frame. If no force inside the friction
+      cone can completely resist the motion, then we have sliding, and we say
+      that the force that the world will apply is the force inside the friction
+      cone of <i>maximal dissipation</i>. For the conic friction cone, this
+      will be pointed in the direction opposite of the sliding velocity. So
+      even though the world will indeed "pick" one force from the friction cone
+      to apply, it can still be meaningful to reason about the set of possible
+      forces that could be applied because those denote the set of possible
+      opposing forces that friction can perfectly resist. For instance, a brick
+      under gravity will not move if we can exactly oppose the force of gravity
+      with a force inside the friction cone.</p>
+
       <example><h1>Brick on an inclined half-plane</h1>
 
         <p>If we take our last example, but tilt the table to an angle relative
@@ -567,11 +584,11 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       <ul>
         <li>Spatial forces add when they are applied to the same body in the
         same frame, e.g.: \begin{equation}F^{B_p}_{\text{total},C}
-        = \sum_i F^{B_p}_{i,C} .\end{equation}</todo></li>
-        <li>Shifting a spatial force from one application frame, $P$, to
-        another frame, $Q$, uses the cross product: \begin{equation} f^{B_Q}_C
-        = f^{B_P}_C, \qquad \tau^{B_Q}_C = \tau^{B_P}_C + {}^{B_Q}p^{B_P}_C
-        \times f^{B_P}_C.\end{equation}</li>
+        = \sum_i F^{B_p}_{i,C} .\end{equation}</li>
+        <li>Shifting a spatial force from one application frame, $B_p$, to
+        another frame, $B_q$, uses the cross product: \begin{equation} f^{B_q}_C
+        = f^{B_p}_C, \qquad \tau^{B_q}_C = \tau^{B_p}_C + {}^{B_q}p^{B_p}_C
+        \times f^{B_p}_C.\label{eq:spatial_force_shift}\end{equation}</li>
         <li>As with all spatial vectors, rotations can be used to change
         between the "expressed-in" frames: \begin{equation} f^{B_p}_D = {}^DR^C
         f^{B_p}_C, \qquad \tau^{B_p}_D = {}^DR^C
@@ -589,36 +606,159 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
 
     <subsection><h1>The contact wrench cone</h1>
 
-      <todo>Animation of a single force / cone applied to a body, with the
-      contact wrench cone visualized in a different frame (e.g. the body
-      frame).  Then the combination of multiple cones (via the minkowski
-      sum).</todo>
+      <p>Above, we introduced the friction cone as the range of possible forces
+      that friction is able to produce in order to resist motion. For the
+      purposes of grasp planning, by applying the additive inverse to the
+      forces in the friction cone, we can obtain all of the "adversarial"
+      forces that can be resisted at the point of contact. And to understand
+      the total ability of all contact forces (applied at multiple points of
+      contact) to resist motion of the body, we want to somehow add all of
+      these forces together. Fortunately, the spatial algebra for spatial
+      forces can be readily extended from operating on spatial force vectors to
+      operating on entire sets of spatial forces.</p>
 
-    </subsection>
+      <p>Because our sets of interest here are convex cones, I will use the
+      relatively standard choice of $\mathcal{K}$ for the six-dimensional
+      <i>wrench cone</i>. Specifically, we have
+      $\mathcal{K}^{B_p}_{\text{name}, C}$ for the cone corresponding to
+      potential spatial forces for $F^{B_p}_{\text{name}, C}$. For instance,
+      our Coulomb friction cone for the point contact model (which, as we've
+      defined it, has no torsional friction) in the contact frame could be:
+      \begin{equation}\mathcal{K}^C_C = \left\{ \begin{bmatrix} 0 \\ 0 \\ 0 \\
+      f^{C}_{C_x} \\ f^C_{C_y} \\ f^C_{C_z} \end{bmatrix} : \sqrt{
+      \left(f^{C}_{C_x}\right)^2 + \left(f^{C}_{C_y}\right)^2 } \le \mu
+      f^C_{C_z} \right\}.\end{equation}</p>
 
-    <subsection><h1>Metrics for grasp stability</h1>
-    
+      <p>The spatial algebra for spatial forces can be applied directly to the
+      wrench cones:
+        <ul>
+          <li>For addition of wrenches applied at the same point and expressed
+          in the same frame, the interpretation we seek is that the cone formed
+          by the sum of wrench cones describes the set of wrenches that could
+          be obtained by choosing one element from each of the individual cones
+          and summing them up. This set operator is the <a
+          href="https://wiki.algo.is/Minkowski%20sum">Minkowski sum</a>, which
+          we denote with $\oplus$, e.g.:
+          \begin{equation}\mathcal{K}^{B_p}_{\text{total},C}=
+          \mathcal{K}^{B_p}_{0,C} \oplus \mathcal{K}^{B_p}_{1,C} \oplus
+          \cdots\end{equation}</li>
+          <li>Shifting a wrench cone from one application frame, $B_p$, to
+          another frame, $B_q$, is a linear operation on the cones; to
+          emphasize that I will write Eq $\ref{eq:spatial_force_shift}$ in
+          matrix form: \begin{equation} \mathcal{K}^{B_q}_C = \begin{bmatrix}
+          I_{3 \times 3} & \left[ {}^{B_q}p^{B_p}_C \right]_\times \\ 0_{3
+          \times 3} & I_{3 \times 3} \end{bmatrix}
+          \mathcal{K}^{B_p}_C,\end{equation} where the notation $[p]_{\times}$
+          is the skew-symmetric matrix corresponding to the cross product.</li>
+          <li>Rotations can be used to change between the "expressed-in"
+          frames: \begin{equation} \mathcal{K}^{B_p}_D = \begin{bmatrix} {}^DR^C
+          & 0_{3 \times 3} \\ 0_{3 \times 3} & {}^DR^C \end{bmatrix}
+          \mathcal{K}^{B_p}_C.\end{equation}</li>
+        </ul>
+      </p>
+
+      <example><h1>A contact wrench cone visualization</h1>
+
+        <p>I've made a simple interactive visualization for you to play with to
+        help your intuition about these wrench cones. I have a box that fixed
+        in space and only subjected to contact forces (no gravity is
+        illustrated here); I've drawn the friction cone at the point of contact
+        and at the center of the body.</p>
+        
+        <p>There is one major caveat: the wrench cone lines in $\Re^6$, but I
+        can only draw cones in $\Re^3$. So I've made the (standard) choice to
+        draw the projection of the 6d cone into 3d space with two cones: one
+        for the translational components (in green for the contact point and
+        again in red for the body frame) and another for the rotational
+        components (in blue for the body frame). This can be slightly
+        misleading because one cannot actually select independently from both
+        sets.</p>
+
+        <script>document.write(notebook_link('clutter', deepnote, '', 'contact_wrench'))</script>
+
+        <p>Here is the contact wrench cone for a single contact point, visualized for two different contact locations:</p>
+        <figure>
+          <img src="figures/contact_wrench_1.png" width="40%">
+          <img src="figures/contact_wrench_2.png" width="40%">
+        </figure>
+        <p>I hope that you immediately notice that the rotational component of
+        the wrench cone is low dimensional -- due to the cross product, all
+        vectors in that space must be orthogonal to the vector ${}^Bp^C$. Of
+        course it's way better to run the notebook yourself and get the 3d
+        interactive visualization.</p>
+
+        <p>Here is the contact wrench cone for a two contact points on that are
+        directly opposite from each other:</p>
+        <figure>
+          <img src="figures/contact_wrench_3.png" width="50%">
+        </figure>
+        <p>Notice that while each of the rotational cones are low dimensional,
+        they span different spaces. Together (as understood by the Minkowski
+        sum of these two sets) they can resist all pure torques applied at the
+        body frame. This intuition is largely correct, but this is also where
+        the projection of the 6d cone onto two 3d cones becomes a bit
+        misleading.there are some wrenches that cannot be resisted by this
+        grasp. Specifically, if I were to visualize the wrench cone at the
+        point directly between the two contact points, we would see that the
+        wrench cones <i>do not include</i> torques applied directly along the
+        axis between the two contacts. The two contact points alone, without
+        torsional friction, are unable to resist torques about that axis.</p>
+
+        <p>In practice, the gripper model that we use in our simulation
+        workflow has multiple contact points places along the round surface of
+        the gripper; even though each of them alone has no torsional friction
+        the net wrench from these multiple points of contact provides some
+        amount of wrench in the axis between the fingers. The exact amount one
+        gets will be proportional to how hard the gripper is squeezing the
+        object.</p>
+
+      </example>
+
+      <p>Now we can compute the cone of possible wrenches that any set of
+      contacts can apply on a body -- the contact wrench cone -- by putting all
+      of the individual contact wrench cones into a common frame and summing
+      them together. A classic metric for grasping would say that a good grasp
+      is one where the contact wrench cone is large (can resist many
+      adversarial wrench disturbances). If the contact wrench cone is all of
+      $\Re^6$, then we say the contacts have a achieved <i>force
+      closure</i><elib>Prattichizzo08</elib>.</p>
+
+      <p>It's worth mentioning that the elegant (linear) spatial algebra of the wrench cones also makes these quantities very suitable for use in optimization (e.g. <elib>Dai16</elib>).</p>
+
     </subsection>
 
     <subsection><h1>Colinear antipodal grasps</h1>
     
+      <p>The beauty of this wrench analysis originally inspires a very
+      model-based analysis of grasping, where one could try to optimize the
+      contact locations in order to maximize the contact wrench cone. But our
+      goals for this chapter are to assume very little about the object that we
+      are grasping, so we'll (for now) avoid optimizing over the surface of an
+      object model for the best grasp location. Nevertheless, our model-based
+      grasp analysis gives us a few very good heuristics for grasping even
+      unknown objects.</p>
+
+      <p>In particular, a good heuristic for a two fingered gripper to have a
+      large contact wrench cone is to find colinear "antipodal" grasp points.
+      Antipodal here means that the normal vectors of the contact (the $z$ axis
+      of the contact frames) are pointing in exactly opposite directions. And
+      "colinear" means that they are on the same line -- the line between the
+      two contact points. As you can see in the two-fingered contact wrench
+      visualization above, this is a reasonably strong heuristic for having a
+      large total contact wrench cone. As we will see next, we can apply this
+      heuristic even without knowing much of anything about the objects.</p>
+
     </subsection>
 
   </section>
 
   <section><h1>Grasp selection from point clouds</h1>
 
-    <p>Now that we have that ability to populate our bins full of random
-    clutter, we need to determine where we will grasp.  The pipeline that one
-    might expect, and indeed the pipeline that robotics was somewhat stuck on
-    for decades, is that the first step should be to write some form of
-    perception system to look into the bin and segment the point cloud into
-    individual objects.  These days that's not impossible, but it's still
-    hard!</p>
-
-    <p>The newer approach that has proven incredibly useful for bin picking is
-    to just look for graspable areas directly on the (unsegmented) point cloud.
-    Some of the most visible proponents of this approach are
+    <p>Rather than looking into the bin of objects, trying to recognize
+    specific objects and estimate their pose, the newer approach to grasp
+    selection that has proven incredibly useful for bin picking is to just look
+    for graspable areas directly on the (unsegmented) point cloud. Some of the
+    most visible proponents of this approach are
     <elib>tenPas17+Mahler17+Zeng18</elib>.  If you look at those references,
     you'll see that they all use learning to somehow decide where in the point
     cloud to grasp.  And I <b>do</b> think learning has a lot to offer in terms
@@ -784,20 +924,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       simple ideas for trying to find grasps candidates that have a low
       cost.</p>
 
-      <p>There is a massive literature in robotics on "grasp metrics" and
-      "grasp analysis".  The Handbook of Robotics<elib>Siciliano16</elib> has
-      an entire chapter on grasping devoted to it (which I recommend)
-      <elib>Prattichizzo08</elib>.  For a course on manipulation (especially
-      from someone who cares a lot about dynamics) to spend so little time on
-      this topic is perhaps surprising, but a great deal of that literature is
-      focused on analyzing point contacts between a dexterous hand and an
-      object with known geometry.  That's simply not the situation we find
-      ourselves in for a lot of manipulation work today.  We have ourselves a
-      simple two fingered grippers with relatively a lot of grasping force (>
-      80 N) and only local point clouds to represent our geometry.</p>
-
-      <p>But there is one key idea that I do want to extract from that
-      literature: the value of <b>antipodal grasps</b>.  Roughly speaking, once
+      <p>Following our discussion of "model-based" grasp selection above, once
       we pick up an object -- or whatever happens to be between our fingers
       when we squeeze -- then we will expect the contact forces between our
       fingers to have to resist at least the <i>gravitational wrench</i> (the
@@ -807,13 +934,11 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       forces inside the friction cones of our contacts to be able to resist the
       gravitational wrench.  Since we don't know what that wrench will be (and
       are somewhat constrained by the geometry of our fingers), a reasonable
-      strategy is to look for places on the point cloud where the normals will
-      align with $x$-axis of the gripper. That means finding a pair of points
-      on the point cloud with normals that are collinear with the line
-      connecting the points and are pointing in opposite directions, these are
-      <i>antipodal point pairs</i>.  In a real point cloud, we are unlikely to
-      find perfect antipodal pairs, but finding areas with normals pointing in
-      nearly opposite directions is a good strategy for grasping!</p>
+      strategy is to look the colinear antipodal points on the surface of the
+      point cloud which also align with $x$-axis of the gripper. In a real
+      point cloud, we are unlikely to find perfect antipodal pairs, but finding
+      areas with normals pointing in nearly opposite directions is a good
+      strategy for grasping!</p>
 
       <example><h1>Scoring grasp candidates</h1>
 
@@ -1245,6 +1370,13 @@ output_ports:
 <span class="publisher">Springer Handbook of Robotics</span> , pp. 671-700, <span class="year">2008</span>.
 
 </li><br>
+<li id=Dai16>
+<span class="author">Hongkai Dai</span>, 
+<span class="title">"Robust multi-contact dynamical motion planning using contact wrench set"</span>, 
+PhD thesis, Massachusetts Institute of Technology, <span class="year">2016</span>.
+[&nbsp;<a href="http://groups.csail.mit.edu/robotics-center/public_papers/Dai16.pdf">link</a>&nbsp;]
+
+</li><br>
 <li id=tenPas17>
 <span class="author">Andreas ten Pas and Marcus Gualtieri and Kate Saenko and Robert Platt</span>, 
 <span class="title">"Grasp pose detection in point clouds"</span>, 
@@ -1279,12 +1411,6 @@ output_ports:
 <span class="author">Radu Bogdan Rusu</span>, 
 <span class="title">"Semantic 3D Object Maps for Everyday Manipulation in Human Living Environments"</span>, 
 PhD thesis, Institut für Informatik der Technischen Universität München, <span class="year">2010</span>.
-
-</li><br>
-<li id=Siciliano16>
-<span class="author">Bruno Siciliano and Oussama Khatib</span>, 
-<span class="title">"Springer handbook of robotics"</span>, Springer
-, <span class="year">2016</span>.
 
 </li><br>
 <li id=Colledanchise18>

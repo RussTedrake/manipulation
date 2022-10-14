@@ -28,6 +28,15 @@ rt_ipynb_test(
 )
 
 rt_ipynb_test(
+    name = "contact_wrench",
+    srcs = ["contact_wrench.ipynb"],
+    deps = [
+        "//manipulation",
+        "//manipulation:scenarios",
+    ],
+)
+
+rt_ipynb_test(
     name = "point_cloud_processing",
     srcs = ["point_cloud_processing.ipynb"],
     tags = ["no-sandbox"],  # from vtk-test-tags() in drake
