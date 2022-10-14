@@ -585,8 +585,8 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
         <li>Spatial forces add when they are applied to the same body in the
         same frame, e.g.: \begin{equation}F^{B_p}_{\text{total},C}
         = \sum_i F^{B_p}_{i,C} .\end{equation}</li>
-        <li>Shifting a spatial force from one application frame, $B_p$, to
-        another frame, $B_q$, uses the cross product: \begin{equation} f^{B_q}_C
+        <li>Shifting a spatial force from one application point, $B_p$, to
+        another point, $B_q$, uses the cross product: \begin{equation} f^{B_q}_C
         = f^{B_p}_C, \qquad \tau^{B_q}_C = \tau^{B_p}_C + {}^{B_q}p^{B_p}_C
         \times f^{B_p}_C.\label{eq:spatial_force_shift}\end{equation}</li>
         <li>As with all spatial vectors, rotations can be used to change
@@ -1194,14 +1194,14 @@ output_ports:
 name: Planner
 input_ports:
 - body_poses
+- wsg_state
 - x_bin_grasp
 - y_bin_grasp
-- wsg_state
 output_ports:
-- X_WG
 - control_mode
-- reset_diff_ik
-- iiwa_position`);
+- X_WG
+- iiwa_position
+- reset_diff_ik`);
       document.write(system_html(sys));
       </script>
     </p> 
