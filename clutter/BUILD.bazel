@@ -61,6 +61,7 @@ rt_ipynb_test(
 rt_ipynb_test(
     name = "grasp_selection",
     srcs = ["grasp_selection.ipynb"],
+    flaky = True,  # occasionally mbp will crash.
     data = ["//manipulation/models"],
     tags = ["no-sandbox"],  # from vtk-test-tags() in drake
     deps = [
