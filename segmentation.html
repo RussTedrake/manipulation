@@ -3,10 +3,10 @@
 <html>
 
   <head>
-    <title>Ch. 6 - Object detection and
-segmentation</title>
-    <meta name="Ch. 6 - Object detection and
-segmentation" content="text/html; charset=utf-8;" />
+    <title>Ch. 6 - Object Detection and
+Segmentation</title>
+    <meta name="Ch. 6 - Object Detection and
+Segmentation" content="text/html; charset=utf-8;" />
     <link rel="canonical" href="http://manipulation.csail.mit.edu/segmentation.html" />
 
     <script src="https://hypothes.is/embed.js" async></script>
@@ -52,14 +52,14 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
 <table style="width:100%;" pdf="no"><tr style="width:100%">
   <td style="width:33%;text-align:left;"><a class="previous_chapter" href=clutter.html>Previous Chapter</a></td>
   <td style="width:33%;text-align:center;"><a href=index.html>Table of contents</a></td>
-  <td style="width:33%;text-align:right;"><a class="next_chapter" href=force.html>Next Chapter</a></td>
+  <td style="width:33%;text-align:right;"><a class="next_chapter" href=perception.html>Next Chapter</a></td>
 </tr></table>
 
 <script type="text/javascript">document.write(notebook_header('segmentation'))
 </script>
 <!-- EVERYTHING ABOVE THIS LINE IS OVERWRITTEN BY THE INSTALL SCRIPT -->
-<chapter style="counter-reset: chapter 5"><h1>Object detection and
-segmentation</h1>
+<chapter style="counter-reset: chapter 5"><h1>Object Detection and
+Segmentation</h1>
 
   <p>Our study of geometric perception gave us good tools for estimating the
   pose of a known object.  These algorithms can produce highly accurate
@@ -171,9 +171,9 @@ segmentation</h1>
     <subsection><h1>Annotation tools for manipulation</h1>
     
       <p>Just as projects like LabelMe helped to streamline the process of
-      providing pixel-wise annotations for images downloaded from the web, there
-      are a number of tools that have been developed to streamline the
-      annotation process for robotics.  Our group introduced a tool called
+      providing pixel-wise annotations for images downloaded from the web,
+      there are a number of tools that have been developed to streamline the
+      annotation process for robotics.  One of the earliest examples was
       <a href="http://labelfusion.csail.mit.edu/">LabelFusion</a>, which combines geometric perception of point clouds
       with a simple user interface to very rapidly label a large number of
       images<elib>Marion17</elib>.</p>
@@ -184,19 +184,21 @@ segmentation</h1>
         <elib>Marion17</elib>.  (Mouse over for animation)</figcaption>
       </figure>
       
-      <p>In LabelFusion, we provide multiple RGB-D images of a static scene
-      containing some objects of interest, and the CAD models for those
-      objects. First we use a dense reconstruction algorithm,
+      <p>In LabelFusion, the user provides multiple RGB-D images of a static
+      scene containing some objects of interest, and the CAD models for those
+      objects. LabelFusion uses a dense reconstruction algorithm,
       ElasticFusion<elib>Whelan16</elib>, to merge the point clouds from the
       individual images into a single dense reconstruction; this is just
       another instance of the point cloud registration problem.  The dense
       reconstruction algorithm also localizes the camera relative to the point
-      cloud.  Then we provide a simple gui that asks the user to click on three
-      points on the model and three points in the scene to establish the
-      "global" correspondence, and then we run ICP to snap refine the pose
-      estimate.  Finally, we render the pixels from the CAD model on top of all
-      of the images in the established pose giving beautiful pixel-wise
-      labels.</p>
+      cloud.  To localize a particlar object, like the drill in the image
+      above, LabelFusion provides a simple gui that asks the user to click on
+      three points on the model and three points in the scene to establish the
+      "global" correspondence, and then runs ICP to refine the pose estimate.
+      In addition to this one registration providing labeled poses in
+      <i>all</i> of the original images, the pixels from the CAD model can be
+      "rendered" on top of all of the images in the established pose giving
+      beautiful pixel-wise labels.</p>
 
       <p>Tools like LabelFusion can be use to label large numbers of images very
       quickly (three clicks from a user produces ground truth labels in many
@@ -224,6 +226,16 @@ segmentation</h1>
       managed to train with ImageNet.  But for many serious robotics groups,
       synthetic data generation pipelines have significantly augmented or even
       replaced real-world labeled data.</p>
+
+      <p>There is a subtle reason for this. Human annotations on real data,
+      although they can be quite good, are never perfect. Labeling errors can
+      put a ceiling on the total performance achievable by the learning
+      system<elib>Northcutt21</elib>. Even if we admit the gap between rendered
+      images and natural images, at some point the ability to generate
+      arbitrarily large datasets with perfect pixel-wise labels actually
+      enables training on synthetic datasets to be more surpass the performance
+      for training on real data even when evaluated on real-world test sets.
+      </p>
     
       <p>For the purposes of this chapter, I aim to train an instance-level
       segmentation system that will work well on our simulated images.  For
@@ -277,17 +289,6 @@ segmentation</h1>
 
       </example>
 
-
-    </subsection>
-
-    <subsection id="self-supervised"><h1>Self-supervised learning</h1>
-      
-        <!-- simclr https://arxiv.org/abs/2002.05709 -->
-        <!-- tcc https://arxiv.org/abs/1904.07846 -->
-        <!-- mention dense descriptors? -->
-        <!-- GPT-3 and DALL-E https://openai.com/blog/dall-e/ -->
-        <!-- clip https://openai.com/blog/clip/ out of the box detectors -->
-      
     </subsection>
 
   </section>
@@ -385,6 +386,47 @@ segmentation</h1>
     <p>We can use our Mask R-CNN inference in a manipulation to do selective
     picking from the bin...</p>
 
+    <!-- Segmentation + ICP; Segmentation => antipodal grasps -->
+
+  </section>
+
+  <section><h1>Variations and Extensions</h1>
+  
+    <subsection><h1>Pretraining wth self-supervised learning</h1>
+
+        <!-- autoencoders -->
+        <!-- simclr https://arxiv.org/abs/2002.05709 -->
+        <!-- byob -->
+        <!-- simsiam -->
+        <!-- tcc https://arxiv.org/abs/1904.07846 -->
+        <!-- mention dense descriptors? -->
+
+    </subsection>
+
+    <subsection><h1>Leveraging large-scale models</h1>
+
+      <p>One of the goals for these notes is to consider "open-world"
+      manipulation -- making a manipulation pipeline that can perform useful
+      tasks in previously unseen environments and with unseen models. How can
+      we possibly provide labeled instances of every object the robot will ever
+      have to manipulate?</p>
+
+      <p>The most dramatic examples of open-world reasoning have been coming
+      from the so-called "foundation models"<elib>Bommasani21</elib>.  The
+      foundation model that has been adopted most quickly into robotics
+      research is the large vision + text model, 
+      <a href="https://openai.com/blog/clip/">CLIP</a>
+      <elib>Radford21</elib>.</p>
+
+      <p>More coming soon...</p>
+
+      <!-- GPT-3 and DALL-E https://openai.com/blog/dall-e/ -->
+      <!-- CLIP; https://arxiv.org/pdf/2104.13921.pdf -->
+      <!-- kevin zakka's prototype of CLIP zero-shot object detector:
+      https://drakedevelopers.slack.com/archives/C013AP7F5M5/p1627446717032400
+      -->
+    </subsection>
+
   </section>
 
   <section><h1>Exercises</h1>
@@ -458,6 +500,12 @@ segmentation</h1>
 <span class="publisher">The International Journal of Robotics Research</span>, vol. 35, no. 14, pp. 1697--1716, <span class="year">2016</span>.
 
 </li><br>
+<li id=Northcutt21>
+<span class="author">Curtis G Northcutt and Anish Athalye and Jonas Mueller</span>, 
+<span class="title">"Pervasive label errors in test sets destabilize machine learning benchmarks"</span>, 
+<span class="publisher">arXiv preprint arXiv:2103.14749</span>, <span class="year">2021</span>.
+
+</li><br>
 <li id=Long15>
 <span class="author">Jonathan Long and Evan Shelhamer and Trevor Darrell</span>, 
 <span class="title">"Fully convolutional networks for semantic segmentation"</span>, 
@@ -488,6 +536,18 @@ segmentation</h1>
 <span class="publisher">Proceedings of the IEEE international conference on computer vision</span> , pp. 2961--2969, <span class="year">2017</span>.
 
 </li><br>
+<li id=Bommasani21>
+<span class="author">Rishi Bommasani and Drew A Hudson and Ehsan Adeli and Russ Altman and Simran Arora and Sydney von Arx and Michael S Bernstein and Jeannette Bohg and Antoine Bosselut and Emma Brunskill and others</span>, 
+<span class="title">"On the opportunities and risks of foundation models"</span>, 
+<span class="publisher">arXiv preprint arXiv:2108.07258</span>, <span class="year">2021</span>.
+
+</li><br>
+<li id=Radford21>
+<span class="author">Alec Radford and Jong Wook Kim and Chris Hallacy and Aditya Ramesh and Gabriel Goh and Sandhini Agarwal and Girish Sastry and Amanda Askell and Pamela Mishkin and Jack Clark and others</span>, 
+<span class="title">"Learning transferable visual models from natural language supervision"</span>, 
+<span class="publisher">International Conference on Machine Learning</span> , pp. 8748--8763, <span class="year">2021</span>.
+
+</li><br>
 </ol>
 </section><p/>
 </div>
@@ -495,7 +555,7 @@ segmentation</h1>
 <table style="width:100%;" pdf="no"><tr style="width:100%">
   <td style="width:33%;text-align:left;"><a class="previous_chapter" href=clutter.html>Previous Chapter</a></td>
   <td style="width:33%;text-align:center;"><a href=index.html>Table of contents</a></td>
-  <td style="width:33%;text-align:right;"><a class="next_chapter" href=force.html>Next Chapter</a></td>
+  <td style="width:33%;text-align:right;"><a class="next_chapter" href=perception.html>Next Chapter</a></td>
 </tr></table>
 
 <div id="footer" pdf="no">

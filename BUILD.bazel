@@ -68,6 +68,10 @@ rt_html_test(
     srcs = ["segmentation.html"],
 )
 
+rt_html_test(
+    srcs = ["perception.html"],
+)
+
 # torchvision is trying to write to a temp directory.
 #rt_ipynb_test(
 #    name = "segmentation_inference",
