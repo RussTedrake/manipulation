@@ -21,7 +21,7 @@
     "belief-space planning",
     "tactile (estimation, tracking, slip detection, etc)?",
     "tracking",
-    "dense reconstruction.  NeRF, kinect fusion, elastic fusion, surfelwarp",
+    "dense reconstruction (more merge with real2sim?).  NeRF, kinect fusion, elastic fusion, surfelwarp. ",
     "mobile (octrees, estimation, etc)",
     "teleop (keyboard + mouse, HTC Vive, data gloves, haptic feedback)",
     "system id / intuitive physics / real 2 sim",

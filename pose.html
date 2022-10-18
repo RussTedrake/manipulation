@@ -650,7 +650,9 @@ output_ports:
 
     <p>Intuition about these local minima has motivated a number of ICP
     variants, including point-to-plane ICP, normal ICP, ICP that use color
-    information, feature-based ICP, etc.</p>
+    information, feature-based ICP, etc.  A particular variant based on
+    "point-pair features" has been highly effective in a (nearly) annual
+    object pose estimation challenge<elib>Drost10+Hodan20</elib>.</p>
 
  <!---     
       <p>Maybe more fundamental, though, is the fact that I don't think the ICP objective, even if we could optimize it perfectly is quite right.  (TODO: add the example of a long thin book).  And there is information that we have, which should aid in estimating the pose, which is not present in the point cloud (like the location of the cameras).</p>
@@ -740,7 +742,7 @@ output_ports:
       <i>and</i> translation.  This has traditionally been used to separate the
       estimation of scale from the estimation of translation and rotation (I've
       decided to ignore scaling throughout this chapter, since it doesn't make
-      immediate sense for our proposed problem).  In <elib>Yang20a</elib> they
+      immediate sense for our proposed problem). In <elib>Yang20a</elib> they
       proposed that this can also be used to prune outliers even before we have
       an initial pose estimate.  If the distance between a <i>pair</i> of
       points in the scene is unlike any distance between any pair of points in
@@ -788,6 +790,12 @@ output_ports:
         red).  So for this example, the maximum clique <i>does</i>, in fact,
         recover the ground-truth correspondences.</p>
       </example>
+
+      <p>These are two examples of a zoo of algorithms / heuristics for
+      removing outliers. One more example to mention is <elib>Drost10</elib>,
+      which uses an optimized voting/clustering scheme based on the point-pair
+      features, which they have made highly efficient, and which has performed
+      very well for years in the online pose estimation benchmarks.</p>
 
     </subsection>
 
@@ -1277,16 +1285,24 @@ output_ports:
     different in different lighting conditions, and the color values of
     different objects can look very similar).  Advances in computer vision,
     especially those based on deep learning over the last few years, have
-    brought new life to this problem.  When I asked my students recently "If you
-    had to give up one of the channels, either depth or color, which would you
-    give up?" the answer was a resounding "I'd give up depth; don't take away my
-    color!"  That's a big change from just a few years ago.</p>
+    brought new life to this problem.  When I asked my students recently "If
+    you had to give up one of the channels, either depth or color, which would
+    you give up?" the answer was a resounding "I'd give up depth; don't take
+    away my color!"  That's a big change from just a few years ago. As recently
+    as 2019, in the Benchmark for 6D Object Pose Estimation (a nearly annual
+    competition), geometric pose estimation was still outperforming
+    deep-learning based approaches<elib>Hodan20</elib>. But by the 2020
+    version of the challenge, deep learning had caught up.</p>
 
-    <p>But deep learning and geometry can (should?) work nicely together. For
-    example, identifying correspondences between point clouds has been a major
-    theme in this chapter -- and we haven't completely solved it.  This is one
-    of the many places where the color values and deep learning have a lot to
-    offer <elib>Florence18a</elib>.  We'll turn our attention to them soon!</p>
+    <p>But deep learning and geometry can (should?) work nicely together. The
+    winners in the 2020 version of the object pose estimation challenge used
+    deep learning to make the initial guess at the pose, but still used
+    geometry perception (a variant of ICP) and the depth channel for refining
+    the estimate<elib>Hodan20</elib>.For another example, identifying
+    correspondences between point clouds has been a major theme in this chapter
+    -- and we haven't completely solved it.  This is one of the many places
+    where the color values and deep learning have a lot to offer
+    <elib>Florence18a</elib>.  We'll turn our attention to them soon!</p>
 
   </section>
   
@@ -1653,6 +1669,18 @@ Using your experience from part (b), describe an analogous method for compute th
 <span class="author">Marius Muja and David G Lowe</span>, 
 <span class="title">"Flann, fast library for approximate nearest neighbors"</span>, 
 <span class="publisher">International Conference on Computer Vision Theory and Applications (VISAPP’09)</span> , vol. 3, <span class="year">2009</span>.
+
+</li><br>
+<li id=Drost10>
+<span class="author">Bertram Drost and Markus Ulrich and Nassir Navab and Slobodan Ilic</span>, 
+<span class="title">"Model globally, match locally: Efficient and robust 3D object recognition"</span>, 
+<span class="publisher">2010 IEEE computer society conference on computer vision and pattern recognition</span> , pp. 998--1005, <span class="year">2010</span>.
+
+</li><br>
+<li id=Hodan20>
+<span class="author">Tom{\'a}s Hodan and Martin Sundermeyer and Bertram Drost and Yann Labb{\'e} and Eric Brachmann and Frank Michel and Carsten Rother and Jir{\'i} Matas</span>, 
+<span class="title">"{BOP} Challenge 2020 on {6D} Object Localization"</span>, 
+<span class="publisher">European Conference on Computer Vision Workshops (ECCVW)</span>, <span class="year">2020</span>.
 
 </li><br>
 <li id=Fischler81>
