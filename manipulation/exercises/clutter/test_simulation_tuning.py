@@ -176,7 +176,8 @@ class TestSimulationTuning(unittest.TestCase):
         contact_results = plant.get_contact_results_output_port().Eval(
             plant_context)
         info = contact_results.point_pair_contact_info(0)
-        normal_1 = info.contact_force()
+        force_1 = info.contact_force()
+        fn1 = force_1 / np.linalg.norm(force_1)
         point_1 = info.contact_point()
 
         plant.SetPositions(plant_context,
@@ -186,11 +187,14 @@ class TestSimulationTuning(unittest.TestCase):
         contact_results = plant.get_contact_results_output_port().Eval(
             plant_context)
         info = contact_results.point_pair_contact_info(0)
-        normal_2 = info.contact_force()
+        force_2 = info.contact_force()
+        fn2 = force_2 / np.linalg.norm(force_2)
         point_2 = info.contact_point()
 
-        contact_pt_dist = np.linalg.norm(point_1 - point_2)
-        force_angle = np.arccos(np.dot(normal_1, normal_2))
+        contact_pt_dist = np.linalg.norm(
+            np.array([point_1[0], point_1[2]])
+            - np.array([point_2[0], point_2[2]]))
+        force_angle = np.abs(np.arccos(np.dot(fn1, fn2)))
 
         self.assertLessEqual(
             contact_pt_dist, 0.01,
