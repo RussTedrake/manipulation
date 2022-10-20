@@ -6,7 +6,7 @@
     "pose",
     "clutter",
     "segmentation",
-    "perception",
+    "deep_perception",
     "trajectories",
     "force",
     "rl",

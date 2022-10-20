@@ -3,9 +3,11 @@
 <html>
 
   <head>
-    <title>Ch. 7 - Perceptual Representations for Manipulation</title>
-    <meta name="Ch. 7 - Perceptual Representations for Manipulation" content="text/html; charset=utf-8;" />
-    <link rel="canonical" href="http://manipulation.csail.mit.edu/perception.html" />
+    <title>Ch. 7 - Deep Perception for
+Manipulation</title>
+    <meta name="Ch. 7 - Deep Perception for
+Manipulation" content="text/html; charset=utf-8;" />
+    <link rel="canonical" href="http://manipulation.csail.mit.edu/deep_perception.html" />
 
     <script src="https://hypothes.is/embed.js" async></script>
     <script type="text/javascript" src="chapters.js"></script>
@@ -53,22 +55,85 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
   <td style="width:33%;text-align:right;"><a class="next_chapter" href=trajectories.html>Next Chapter</a></td>
 </tr></table>
 
-<script type="text/javascript">document.write(notebook_header('perception'))
+<script type="text/javascript">document.write(notebook_header('deep_perception'))
 </script>
 <!-- EVERYTHING ABOVE THIS LINE IS OVERWRITTEN BY THE INSTALL SCRIPT -->
-<chapter style="counter-reset: chapter 6"><h1>Perceptual Representations for Manipulation</h1>
+<chapter style="counter-reset: chapter 6"><h1>Deep Perception for
+Manipulation</h1>
 
-  <p>Coming soon (hopefully this week)!</p>
+  <p>In the previous chapter, we discussed deep-learning approaches to object
+  detection and (instance-level) segmentation; these are general-purpose tasks
+  for processing RGB images that are used broadly in computer vision. Detection
+  and segmentation alone can be combined with geometric perception to, for
+  instance, estimate the pose of a known object in just the segmented point
+  cloud instead of the entire scene, or to run our point-cloud grasp selection
+  algorithm only on the segmented point cloud in order to pick up an object of
+  interest.</p>
 
-  <!--
-    Deep pose estimation (or should it go in the previous chapter?); some notes in 2021 lecture 11 ithoughts.
-    Keypoints
-    Dense descriptors
-    TCC
-    anthony's neural descriptor fields
-    danny's compositional nerf    
-  -->
+  <p>One of the most amazing features of deep learning for perception is that
+  we can pre-train on a different dataset (like ImageNet or COCO) or even a
+  different task and then fine-tune on our domain-specific dataset or task. But
+  what are the right perception tasks for manipulation?  Object detection and
+  segmentation are a great start, but often we want to know more about the
+  scene/objects to manipulate them. That is the topic of this chapter.</p>
 
+  <p>There is a potential answer to this question that we will defer to a later
+  chapter: learning end-to-end "visuomotor" policies, sometimes affectionately
+  referred to as "pixels to torques". Here I want us to think first about how
+  we can combine a deep-learning-based perception system with the powerful
+  existing (model-based) tools that we have been building up for planning and
+  control.</p>
+
+  <p>I'll start with deep-learning versions of two perception tasks we've
+  already considered: object pose estimation and grasp selection.</p>
+
+  <section><h1>Pose estimation</h1>
+
+    <!-- some notes in 2021 lecture 11 ithoughts. -->
+    <!-- NOCS in here? -->
+
+  </section>
+
+  <section><h1>Grasp selection</h1>
+
+  </section>
+
+  <section><h1>(Semantic) Keypoints</h1>
+  
+    <!-- affordances -->
+    <!-- category level -->
+
+    <!-- wei's keypoint labeling tool -->
+  </section>
+
+  <section><h1>Dense Descriptors</h1>
+
+    <!-- dense correspondence -->
+    <!-- anthony's neural descriptor fields -->
+
+  </section>
+
+  <section><h1>Task-level state</h1>
+
+    <!-- tcc.  chris paxton "red block is on the blue block"-->
+  
+  </section>
+
+  <!-- Can I do a putting it all together section here?? Or in each section? -->
+
+  <section><h1>Other perceptual tasks / representations</h1>
+  
+    <p>My coverage above is necessarily incomplete and the field is moving
+    fast. Here is a quick "shout out" to a few other very relevant ideas.</p>
+
+    <p>More coming soon...</p>
+    <!-- shape estimation / completion -->
+    <!-- estimating dynamic parameters (mass / friction / etc) -->
+
+    <!-- danny's compositional nerf? -->
+    <!-- probably defer learning dynamics models to another chapter -->
+
+  </section>
 
 </chapter>
 <!-- EVERYTHING BELOW THIS LINE IS OVERWRITTEN BY THE INSTALL SCRIPT -->

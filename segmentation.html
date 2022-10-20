@@ -52,7 +52,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
 <table style="width:100%;" pdf="no"><tr style="width:100%">
   <td style="width:33%;text-align:left;"><a class="previous_chapter" href=clutter.html>Previous Chapter</a></td>
   <td style="width:33%;text-align:center;"><a href=index.html>Table of contents</a></td>
-  <td style="width:33%;text-align:right;"><a class="next_chapter" href=perception.html>Next Chapter</a></td>
+  <td style="width:33%;text-align:right;"><a class="next_chapter" href=deep_perception.html>Next Chapter</a></td>
 </tr></table>
 
 <script type="text/javascript">document.write(notebook_header('segmentation'))
@@ -147,18 +147,19 @@ Segmentation</h1>
 
       <p>One of the most amazing and magical properties of the deep
       architectures that have been working so well for instance-level
-      segmentation is their ability to transfer to new tasks.  A network that
-      was pre-trained on a large dataset like ImageNet or COCO can be
-      fine-tuned with a relatively much smaller amount of labeled data to a new
-      set of classes that are relevant to our particular application.  In fact,
-      the architectures are often referred to as having a "backbone" and a
-      "head" -- in order to train a new set of classes, it is often possible to
-      just pop off the existing head and replace it with a new head for the new
-      labels.  A relatively small amount of training with a relatively small
-      dataset can still achieve surprisingly robust performance.  Moreover, it
-      seems that training initially on the diverse dataset (ImageNet or COCO)
-      is actually important to learn the robust perceptual representations that
-      work for a broad class of perception tasks.  Incredible!</p>
+      segmentation is their ability to transfer to new tasks ("transfer
+      learning").  A network that was pre-trained on a large dataset like
+      ImageNet or COCO can be fine-tuned with a relatively much smaller amount
+      of labeled data to a new set of classes that are relevant to our
+      particular application.  In fact, the architectures are often referred to
+      as having a "backbone" and a "head" -- in order to train a new set of
+      classes, it is often possible to just pop off the existing head and
+      replace it with a new head for the new labels.  A relatively small amount
+      of training with a relatively small dataset can still achieve
+      surprisingly robust performance.  Moreover, it seems that training
+      initially on the diverse dataset (ImageNet or COCO) is actually important
+      to learn the robust perceptual representations that work for a broad
+      class of perception tasks.  Incredible!</p>
 
       <p>This is great news!  But we still need some amount of labeled data for
       our objects of interest.  The last few years have seen a number of
@@ -386,6 +387,8 @@ Segmentation</h1>
     <p>We can use our Mask R-CNN inference in a manipulation to do selective
     picking from the bin...</p>
 
+    <!-- Segmented RGB => segmented point clouds -->
+
     <!-- Segmentation + ICP; Segmentation => antipodal grasps -->
 
   </section>
@@ -555,7 +558,7 @@ Segmentation</h1>
 <table style="width:100%;" pdf="no"><tr style="width:100%">
   <td style="width:33%;text-align:left;"><a class="previous_chapter" href=clutter.html>Previous Chapter</a></td>
   <td style="width:33%;text-align:center;"><a href=index.html>Table of contents</a></td>
-  <td style="width:33%;text-align:right;"><a class="next_chapter" href=perception.html>Next Chapter</a></td>
+  <td style="width:33%;text-align:right;"><a class="next_chapter" href=deep_perception.html>Next Chapter</a></td>
 </tr></table>
 
 <div id="footer" pdf="no">
