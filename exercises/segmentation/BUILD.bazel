@@ -31,21 +31,3 @@ rt_ipynb_test(
 # because the grader gave different results on different platforms (and likely
 # would get zero on the autograder).  We'll need to clean that up before using
 # this problem in the future.
-rt_ipynb_test(
-    name = "segmentation_and_grasp",
-    srcs = ["segmentation_and_grasp.ipynb"],
-    grader_throws = True,
-    data = ["//manipulation/models"],
-    # This is failing on mac CI.  I don't understand why.
-    target_compatible_with = [
-        "@platforms//cpu:x86_64",
-        "@platforms//os:linux",
-    ],
-    deps = [
-        "//manipulation",
-        "//manipulation:mustard_depth_camera_example",
-        "//manipulation:scenarios",
-        "//manipulation/exercises:grader",
-        "//manipulation/exercises/segmentation:test_segmentation_and_grasp",
-    ],
-)
