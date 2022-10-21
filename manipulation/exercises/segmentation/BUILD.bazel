@@ -11,3 +11,9 @@ rt_py_library(
     srcs = ["test_mask.py"],
     visibility = ["//visibility:public"],
 )
+
+rt_py_library(
+    name = "test_segmentation_and_grasp",
+    srcs = ["test_segmentation_and_grasp.py"],
+    visibility = ["//visibility:public"],
+)
