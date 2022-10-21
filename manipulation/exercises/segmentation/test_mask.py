@@ -36,7 +36,7 @@ class TestMask(unittest.TestCase):
 
         # normalize student's mask
         mask_student = normalize(mask_student)
-        mask_sol = normalize(mask_student)
+        mask_sol = normalize(mask_sol.astype(np.uint8))
         # quantify image difference
         difference = np.sum(np.abs(mask_student - mask_sol))
         self.assertTrue(difference < 0.1 * 480 * 640,
