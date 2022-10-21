@@ -7,10 +7,10 @@ from manipulation.utils import LoadDataResource
 
 def chamfer_dist(pc_a, pc_b):
     """
-    pc_a of Size(3, N)
-    pc_b of Size(3, M)
+    pc_a of Size(N, 3)
+    pc_b of Size(M, 3)
     """
-    diff = np.linalg.norm(pc_a[:, :, None] - pc_b[:, None], axis=0)**2
+    diff = np.linalg.norm(pc_a[:, None] - pc_b[None], axis=2) ** 2
     dist = np.mean(np.min(diff, axis=0)) + np.mean(np.min(diff, axis=1))
     return dist
 
