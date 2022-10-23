@@ -112,17 +112,6 @@ rt_html_test(
     srcs = ["trajectories.html"],
 )
 
-rt_ipynb_test(
-    name = "trajectories",
-    srcs = ["trajectories.ipynb"],
-    data = ["//manipulation/models"],
-    deps = [
-      "//manipulation",
-      "//manipulation:meshcat_utils",
-      "//manipulation:scenarios",
-    ],
-)
-
 rt_html_test(
     srcs = ["rl.html"],
 )

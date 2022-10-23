@@ -265,7 +265,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
         interactive rates.  I've assembled a few examples of this in the
         chapter notebook:</p>
 
-        <script>document.write(notebook_link('trajectories'))</script>
+        <script>document.write(notebook_link('trajectories', d=deepnote, link_text="", notebook="interactive_ik"))</script>
 
         <p>In the first version, I've added sliders to let you control the
         desired pose of the end-effector.  This is the simple version of the IK
@@ -312,7 +312,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       gripper, then don't do it.</li></ol>  I'll follow-up with that second
       point using the following example.</p>
 
-      <example><h1>Grasp the cylinder.</h1>
+      <example><h1>Grasp the cylinder</h1>
       
         <p>Let's use IK to grasp a cylinder (call it a hand rail).  Suppose it
         doesn't matter where along the cylinder we grasp, nor the orientation
@@ -353,7 +353,7 @@ ik.AddPositionConstraint(
         axis as unconstrained, and capture the cylinder position constraints
         all quite nicely.</p>
 
-        <script>document.write(notebook_link('trajectories'))</script>
+        <script>document.write(notebook_link('trajectories', d=deepnote, link_text="", notebook="interactive_ik"))</script>
 
       </example>
 
@@ -393,7 +393,7 @@ ik.AddPositionConstraint(
         <a href="data/iiwa_shelves_configuration_space.html">3D
         visualization</a> so you can navigate around it yourself.  Scary!</p>
 
-        <script>document.write(notebook_link('trajectories'))</script>
+        <script>document.write(notebook_link('trajectories', d=deepnote, link_text="", notebook="cspace"))</script>
 
       </example>
 
@@ -428,7 +428,7 @@ ik.AddPositionConstraint(
         visualization is available in the notebook, and you can find the exact
         formulation of the costs and constraints there:</p>  
 
-        <script>document.write(notebook_link('trajectories'))</script>
+        <script>document.write(notebook_link('trajectories', d=deepnote, link_text="", notebook="optimization_landscape"))</script>
         
         <p>You should also take a quick look at the <a
         href="data/shelf_ik_prog.html">full optimization landscape</a>.  This
@@ -440,7 +440,7 @@ ik.AddPositionConstraint(
 
     </subsection>
     
-    <subsection><h1>Global Inverse Kinematics.</h1>      
+    <subsection><h1>Global inverse kinematics</h1>      
 
       <p>For unconstrained inverse kinematics with exactly six degrees of
       freedom, we have closed-form solutions. For the generalized inverse
@@ -484,7 +484,7 @@ ik.AddPositionConstraint(
     </subsection>
 
     <subsection>
-      <h1>Inverse Kinematics vs Differential Inverse Kinematics.</h1>
+      <h1>Inverse kinematics vs differential inverse kinematics</h1>
 
       <p>When should we use IK vs Differential IK?  IK solves a more global
       problem, but is not guaranteed to succeed.  It is also not guaranteed to
@@ -499,10 +499,41 @@ ik.AddPositionConstraint(
 
     </subsection>
 
-    <subsection><h1>Grasp planning as IK</h1>
+    <subsection><h1>Grasp planning using inverse kinematics</h1>
     
-      <!-- key idea to get across: solve for "pick up" and "put down" simultaneously.  -->
-    
+      <p>In our first version of <a href="clutter.html#grasp_sampling">grasp
+      selection</a> using sampling, we put an objective that rewarded grasps
+      that were oriented with the hand grasping from above the object. This was
+      a (sometimes poor) surrogate for the problem that we really wanted to
+      solve: we want the grasp to be achievable given a "comfortable" position
+      of the robot. So a simple and natural extension of our grasp scoring
+      metric would be to solve an inverse kinematics problem for the grasp
+      candidate, and instead of putting costs on the end-effector orientation,
+      we can use the joint-centering cost directly as our objective.
+      Furthermore, if the IK problem returns infeasible, we should reject the
+      sample.</p>
+
+      <p>There is a quite nice extension of this idea that becomes quite
+      natural once we take the optimization view, and it is a nice transition
+      to the trajectory planning we'll do in the next section.  Imagine if the
+      task requires us not only to pick up the object in clutter, but also to
+      place the object carefully in clutter as well. In this case, a good grasp
+      is finds a pose for the hand relative to the object that
+      <i>simultaneously optimizes</i> both the pick configuration and the place
+      configuration. This is actually quite natural to do with inverse
+      kinematics; one can formulate an optimization problem with decision
+      variables for both $q_{pick}$ and $q_{place}$, with constraints enforcing
+      that ${}^OX^{G_{pick}} = {}^OX^{G_{place}}$.</p> 
+      
+      <todo>Simple code example here</todo>
+
+      <p>Once we add in all of our other rich costs and constraints, this
+      becomes a quite sophisticated approach. In the <a
+      href="pose.html#tri_dishloading">dish-loading project at TRI</a>, this
+      approach proved to be very important. Both picking up a mug in the sink
+      and placing it in the dishwasher rack are highly constrained, so we
+      needed the simultaneous optimization to find successful grasps.</p>
+
     </subsection>
 
   </section>
@@ -548,14 +579,14 @@ ik.AddPositionConstraint(
     
       <example><h1>The basic RRT</h1>
     
-        <script>document.write(notebook_link('trajectories'))</script>
+        <script>document.write(notebook_link('trajectories', d=deepnote, link_text="", notebook="rrt"))</script>
       </example>
     
     </subsection>
 
     <example><h1>The RRT "Bug Trap"</h1>
     
-      <script>document.write(notebook_link('trajectories'))</script>
+      <script>document.write(notebook_link('trajectories', d=deepnote, link_text="", notebook="rrt"))</script>
     </example>
     
     </subsection>
