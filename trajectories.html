@@ -79,43 +79,54 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
   the manipulation process significantly.</li>
   </div>
 
+  <p>In fact, if you ran the <a href="clutter.html#clutter_clearing">clutter
+  clearing demo</a>, I would say that motion planning failures was the biggest
+  limitation of that solution so far: the hand or objects could sometimes
+  collide with the cameras or bins, or differential inverse kinematics strategy
+  (which largely ignored the joint angles) would sometime cause the robot to
+  almost fold in on itself. In this chapter we'll develop the tools to make
+  that much better!</p>
+
   <p>We'll focus on the problem of moving an arm through space in this chapter,
   because that is the classical and very important motivation.  But I need to
   cover this now for another reason, too: it will also soon help us think about
   programming a more dexterous hand.</p>
 
-  <p>I do need to make one important caveat.  Despite having done some work in
-  this field myself, I actually really dislike the problem formulation of
-  collision-free motion planning.  I think that on the whole, robots are too
-  afraid of bumping into the world (because things still go wrong when they do).
-  I don't think humans are solving these complex geometric problems every time
-  we reach... even when we are reaching in dense clutter (I actually suspect
-  that we are very bad at it). I would much rather see robots that perform well
-  even with very coarse / approximate plans for moving through a cluttered
-  environment, that are not afraid to make incidental contacts, and that can
-  still accomplish the task when they do!</p>
+  <p>I do need to make one important caveat. For motion planning in
+  manipulation, lots of emphasis is placed on the problem of avoiding
+  collisions. Despite having done some work in this field myself, I actually
+  really dislike the problem formulation of collision-free motion planning.  I
+  think that on the whole, robots are too afraid of bumping into the world
+  (because things still go wrong when they do). I don't think humans are
+  solving these complex geometric problems every time we reach... even when we
+  are reaching in dense clutter (I actually suspect that we are very bad at
+  it). I would much rather see robots that perform well even with very coarse /
+  approximate plans for moving through a cluttered environment, that are not
+  afraid to make incidental contacts, and that can still accomplish the task
+  when they do!</p>
 
   <section><h1>Inverse Kinematics</h1>
 
     <p>The goal of this chapter is to solve for motion trajectories.  But I would argue that if you really understand how to solve inverse kinematics, then you've got most of what you need to plan trajectories.</p>
 
-    <p>We know that that the <a href="pick.html#kinematics">forward
-    kinematics</a> give us a (nonlinear) mapping from joint angles to e.g. the
-    pose of the gripper: $X^G = f_{kin}(q)$.  So, naturally, the problem of
-    inverse kinematics (IK) is about solving for the inverse map, $q =
-    f^{-1}_{kin}(X^G).$  Indeed, that is perhaps the most common and classical
-    question studied in inverse kinematics.  But I want you to think of inverse
-    kinematics as a much richer topic than that.</p>
+    <p>We know that the <a href="pick.html#kinematics">forward kinematics</a>
+    give us a (nonlinear) mapping from joint angles to e.g. the pose of the
+    gripper: $X^G = f_{kin}(q)$.  So, naturally, one would think that the
+    problem of inverse kinematics (IK) is about solving for the inverse map, $q
+    = f^{-1}_{kin}(X^G).$  But, like we did with differential inverse
+    kinematics, I'd like to think about inverse kinematics as the more general
+    problem of finding joint angles subject to a rich library of costs and
+    constraints (including kinematic constraints).</p>
 
     <p>For example, when we were <a
     href="clutter.html#grasp_candidates">evaluating grasp candidates for bin
     picking</a>, we had only a soft preference on the orientation of the hand
-    relative to some antipodal grasp.  In that case, a full 6 DOF pose would
-    have been an overly constrained specification.  And often we have many
-    constraints on the kinematics: some in joint space (like joint limits) and
-    others in Cartesian space (like non-penetration constraints).  So really,
-    inverse kinematics is about solving for joint angles in a very rich
-    landscape of objectives and constraints.</p>
+    relative to some antipodal grasp.  In that case, specifying 6 DOF pose of
+    the gripper and finding one set of joint angles which satisfies it exactly
+    would have been an overly constrained specification.  I would say that it's
+    rare that we have only end-effector pose constraints to reason about, we
+    almost always have costs or constraints in joint space (like joint limits)
+    and others in Cartesian space (like non-penetration constraints).</p>
 
     <figure>
       <iframe width="560" height="315" src="https://www.youtube.com/embed/m1rv4d_zUCY" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen pdf="no"></iframe>
@@ -232,11 +243,11 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       closely related.  In fact, you can think about the differential IK
       algorithm as doing one step of (projected) gradient descent or  one-step
       of <a
-      href="https://en.wikipedia.org/wiki/Sequential_quadratic_programming">SQP</a>,
+      href="https://en.wikipedia.org/wiki/Sequential_quadratic_programming">Sequential Quadratic Programming</a>,
       for the full nonlinear problem.</p>
 
       <p>Drake provides a nice <a
-      href="https://drake.mit.edu/doxygen_cxx/classdrake_1_1multibody_1_1_inverse_kinematics.html"></a>InverseKinematics</a>
+      href="https://drake.mit.edu/doxygen_cxx/classdrake_1_1multibody_1_1_inverse_kinematics.html">InverseKinematics</a>
       class that makes it easy to assemble many of the standard
       kinematic/multibody constraints into a
       <code>MathematicalProgram</code>.  Take a minute to look at the
@@ -388,25 +399,103 @@ ik.AddPositionConstraint(
 
       <example><h1>Visualizing the IK optimization problem</h1>
       
-        <p><a href="data/shelf_ik_prog_zoom.html">Zoomed in</a>.  <a
-        href="data/shelf_ik_prog.html">The global optimization problem.</a>
-        Nonlinear optimizers like SNOPT can be pretty amazing sometimes!</p>
-      
+        <p>To help you appreciate the problem that we've formulated, I've made
+        a visualization of the optimization landscape. Take a look at the
+        landscape <a href="data/shelf_ik_prog_zoom.html">here</a> first; this
+        is only plotting a small region around the returned solution. You can
+        use the Meshcat controls to show/hide each of the individual costs and
+        constraints, to make sure you understand.</p>
+        
+        <p>As recommended, I've kept the cost landscape (the <i>green</i>
+        surface) to be simply the quadratic joint-centering cost. The
+        constraints are plotted in <i>blue</i> when they are feasible, and
+        <i>red</i> when they are infeasible:
+        <ul>
+          <li>The joint limit constraint is just a simple "bounding-box"
+          constraint here (only the red infeasible region is drawn for bounding
+          box constraints, to avoid making the visualization too
+          cluttered).</li>
+          <li>The position constraint has three elements: for the $x$, $y$, and
+          $z$ positions of the end-effector. The $y$ position constraint is
+          trivially satisfied (all blue) because the manipulator only has the
+          joints that move in the $x-z$ plane. The other two look all red, but
+          if you turn off the $y$ visualization, you can see two small strips
+          of blue in each. That's the conditions in our tight position
+          constraint.</li>
+          <li>But it's the "minimum-distance" (non-collision) constraint that is the most impressive / scary of all. While we visualized the configuration space above, you can see here that visualizing the distance as a real-valued function reveals the optimization landscape that we give to the solver.</li>
+        </ul> The intersection of all the blue regions here are what defined
+        the configuration-space in the example above. All of the code for this
+        visualization is available in the notebook, and you can find the exact
+        formulation of the costs and constraints there:</p>  
+
         <script>document.write(notebook_link('trajectories'))</script>
+        
+        <p>You should also take a quick look at the <a
+        href="data/shelf_ik_prog.html">full optimization landscape</a>.  This
+        is the same set of curves as in the visualization above, but now it's
+        plotted over the entire domain of joint angles within the joint limits.
+        Nonlinear optimizers like SNOPT can be pretty amazing sometimes!</p>
 
-    </example>
+      </example>
 
-      <p>Global IK.</p>      
+    </subsection>
+    
+    <subsection><h1>Global Inverse Kinematics.</h1>      
+
+      <p>For unconstrained inverse kinematics with exactly six degrees of
+      freedom, we have closed-form solutions. For the generalized inverse
+      kinematics problem with rich costs and constraints, we've got a nonlinear
+      optimization problem that works well in practice but is subject to local
+      minima (and therefore can fail to find a feasible solution if it exists).
+      If we give up on solving the optimization problem at interactive rates,
+      is there any hope of solving the richer IK formulation robustly?  Ideally
+      to global optimality?</p>
+
+      <p>This is actually and extremely relevant question. There are many
+      applications of inverse kinematics that work offline and don't have any
+      strict timing requirements. Imagine if you wanted to generate training
+      data to train a neural network to learn your inverse kinematics; this
+      would be a perfect application for global IK. Or if you want to do
+      workspace analysis to see if the robot can reach all of the places it
+      needs to reach in the workspace that you're designing for it, then you'd
+      like to use global IK. Some of the motion planning strategies that we'll
+      study below will also separate their computation into an offline
+      "building" phase to make the online "query" phase much faster.</p>
+
+      <p>In my experience, general-purpose global nonlinear solvers -- for
+      instance, based on mixed-integer nonlinear programming (MINLP) approaches
+      or the interval arithmetic used in <a href="https://en.wikipedia.org/wiki/Satisfiability_modulo_theories">satisfiability-modulo-theories (SMT)</a>
+      solvers -- typically don't scale the complexity of a full manipulator.
+      But if we only slightly restrict the class of costs and constraints that
+      we support, then we can begin to make progress.
+      </p>
+
+      <p>Drake provide an implementation of the <a
+      href="https://drake.mit.edu/doxygen_cxx/classdrake_1_1multibody_1_1_global_inverse_kinematics.html">GlobalInverseKinematics</a>
+      approach described in <elib>Dai17</elib> using mixed-integer convex
+      optimization. The solution times are on the order of a few seconds; it
+      can solve a full constrained bimanual problem in well under a minute.
+      <elib>Trutman22</elib> solves the narrow version of the problem (just
+      end-effector poses and joint limits) using convex optimization via a
+      hierarchy of semi-definite programming relaxations; it would be very
+      interesting to understand how well this approach works the larger family
+      of costs and constraints.</p>
+
+    </subsection>
+
+    <subsection>
+      <h1>Inverse Kinematics vs Differential Inverse Kinematics.</h1>
 
       <p>When should we use IK vs Differential IK?  IK solves a more global
       problem, but is not guaranteed to succeed.  It is also not guaranteed to
       make small changes to $q$ as you make small changes in the
       cost/constraints; so you might end up sending large $\Delta q$ commands
       to your robot.  Use IK when you need to solve the more global problem,
-      but then produce the actual $q$ trajectories with trajectory
-      optimization, etc.  Or use differential IK if you are able to design
-      smooth commands in end-effector space and simply track them in joint
-      space.</p>
+      and the trajectory optimization algorithms we produce in the next section
+      are the natural extension to producing actual $q$ trajectories.
+      Differential IK works extremely well for incremental motions -- for
+      instance if you are able to design smooth commands in end-effector space
+      and simply track them in joint space.</p>
 
     </subsection>
 
@@ -563,6 +652,19 @@ Name one pair of nodes for which the shortcutting algorithm would result in a sh
 <span class="author">Rosen Diankov</span>, 
 <span class="title">"Automated Construction of Robotic Manipulation Programs"</span>, 
 PhD thesis, Carnegie Mellon University, August, <span class="year">2010</span>.
+
+</li><br>
+<li id=Dai17>
+<span class="author">Hongkai Dai and Gregory Izatt and Russ Tedrake</span>, 
+<span class="title">"Global inverse kinematics via mixed-integer convex optimization"</span>, 
+<span class="publisher">International Symposium on Robotics Research</span>, <span class="year">2017</span>.
+[&nbsp;<a href="http://groups.csail.mit.edu/robotics-center/public_papers/Dai17.pdf">link</a>&nbsp;]
+
+</li><br>
+<li id=Trutman22>
+<span class="author">Pavel Trutman and Mohab Safey El Din and Didier Henrion and Tomas Pajdla</span>, 
+<span class="title">"Globally optimal solution to inverse kinematics of 7DOF serial manipulator"</span>, 
+<span class="publisher">IEEE Robotics and Automation Letters</span>, vol. 7, no. 3, pp. 6012--6019, <span class="year">2022</span>.
 
 </li><br>
 <li id=Ratliff09a>
