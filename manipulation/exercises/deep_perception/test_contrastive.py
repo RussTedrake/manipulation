@@ -33,6 +33,7 @@ def f_factory(rand_array):
 
     def dummy_f(x: np.ndarray):
         phi = rand_array.copy()[None]
+        phi = np.tile(phi, (len(x), 1, 1, 1))
         if x.ndim == 3:
             print('f takes in image of shape (N, H, W, 3), '
                   'did you forget to add batch dimension?')
