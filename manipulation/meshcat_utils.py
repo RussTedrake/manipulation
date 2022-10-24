@@ -446,3 +446,28 @@ def model_inspector(meshcat, filename):
     sliders = builder.AddSystem(JointSliders(meshcat, plant))
     diagram = builder.Build()
     sliders.Run(diagram, default_interactive_timeout)
+
+
+def PublishPositionTrajectory(trajectory,
+                              root_context,
+                              plant,
+                              visualizer,
+                              time_step=1.0 / 33.0):
+    """
+    Args:
+        trajectory: A Trajectory instance.
+    """
+    plant_context = plant.GetMyContextFromRoot(root_context)
+    visualizer_context = visualizer.GetMyContextFromRoot(root_context)
+
+    visualizer.StartRecording(False)
+
+    for t in np.append(
+            np.arange(trajectory.start_time(), trajectory.end_time(),
+                      time_step), trajectory.end_time()):
+        root_context.SetTime(t)
+        plant.SetPositions(plant_context, trajectory.value(t))
+        visualizer.Publish(visualizer_context)
+
+    visualizer.StopRecording()
+    visualizer.PublishRecording()

@@ -25,6 +25,17 @@ rt_ipynb_test(
     ],
 )
 
+# Waiting for my Drake PR with the KinematicTrajectoryOptimization class.
+#rt_ipynb_test(
+#    name = "kinematic_trajectory_optimization",
+#    srcs = ["kinematic_trajectory_optimization.ipynb"],
+#    deps = [
+#      "//manipulation",
+#      "//manipulation:meshcat_utils",
+#      "//manipulation:scenarios",
+#    ],
+#)
+
 rt_ipynb_test(
     name = "optimization_landscape",
     srcs = ["optimization_landscape.ipynb"],
