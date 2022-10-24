@@ -84,12 +84,23 @@ Manipulation</h1>
   existing (model-based) tools that we have been building up for planning and
   control.</p>
 
+  <todo> maybe a system diagram which includes perception, planning and
+  control? So far we’ve had two version - grasp candidates and/or object pose…
+  </todo>
+
   <p>I'll start with deep-learning versions of two perception tasks we've
   already considered: object pose estimation and grasp selection.</p>
+
+  <!-- representations of uncertainty should be a theme i'll carry throughout.
+  make analogy to object detection outputs (e.g. in mask-rcnn) -->
 
   <section><h1>Pose estimation</h1>
 
     <!-- some notes in 2021 lecture 11 ithoughts. -->
+
+    <!-- probably reconstruction loss (for instance, as used by the scoring
+    function in BOP) is better than e.g. quaternion loss.  -->
+
     <!-- NOCS in here? -->
 
   </section>
@@ -104,6 +115,9 @@ Manipulation</h1>
     <!-- category level -->
 
     <!-- wei's keypoint labeling tool -->
+
+    <todo>Example: corner keypoints for boxes.  (also pose+shape estimation
+    from keypoints?)</todo>
   </section>
 
   <section><h1>Dense Descriptors</h1>
@@ -128,11 +142,26 @@ Manipulation</h1>
 
     <p>More coming soon...</p>
     <!-- shape estimation / completion -->
+    <!-- transporter nets -->
     <!-- estimating dynamic parameters (mass / friction / etc) -->
 
     <!-- danny's compositional nerf? -->
     <!-- probably defer learning dynamics models to another chapter -->
+    <!-- M0m from lpk -->
+    <!-- Particles? or deformables more generally… -->
+    
+  </section>
 
+  <!-- maybe add a “looking forward” section?  Cracking an egg, etc.  what
+  should the perception system output?  How do we write the planning/control
+  system.  This is where full-stack deep learning approaches are winning.  But
+  i don’t know that being data-driven (or deep) is fundamental here.
+
+  Maybe future chapter on state representations?  In the model-learning
+  section? -->
+
+  <section><h1>Exercises</h1>
+  
   </section>
 
   <section id="exercises"><h1>Exercises</h1>
