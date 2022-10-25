@@ -92,11 +92,21 @@ def AddTwoLinkIiwa(plant, q0=[0.1, -1.2]):
 
 
 # TODO: take argument for whether we want the welded fingers version or not
-def AddWsg(plant, iiwa_model_instance, roll=np.pi / 2.0, welded=False):
+def AddWsg(plant,
+           iiwa_model_instance,
+           roll=np.pi / 2.0,
+           welded=False,
+           sphere=False):
     parser = Parser(plant)
     if welded:
-        gripper = parser.AddModelFromFile(
-            FindResource("models/schunk_wsg_50_welded_fingers.sdf"), "gripper")
+        if sphere:
+            gripper = parser.AddModelFromFile(
+                FindResource("models/schunk_wsg_50_welded_fingers_sphere.sdf"),
+                "gripper")
+        else:
+            gripper = parser.AddModelFromFile(
+                FindResource("models/schunk_wsg_50_welded_fingers.sdf"),
+                "gripper")
     else:
         gripper = parser.AddModelFromFile(
             FindResourceOrThrow(

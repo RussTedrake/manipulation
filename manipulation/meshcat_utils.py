@@ -417,7 +417,10 @@ def plot_mathematical_program(meshcat,
 
 # TODO(russt): Use the one true Drake version once this lands:
 # https://github.com/RobotLocomotion/drake/issues/17689
-def model_inspector(meshcat, filename):
+def model_inspector(meshcat,
+                    filename_or_file_contents=None,
+                    file_type=None,
+                    timeout=None):
     builder = DiagramBuilder()
 
     # Note: the time_step here is chosen arbitrarily.
@@ -425,7 +428,10 @@ def model_inspector(meshcat, filename):
 
     # Load the file into the plant/scene_graph.
     parser = Parser(plant)
-    parser.AddModelFromFile(filename)
+    if file_type:
+        parser.AddModelsFromString(filename_or_file_contents, file_type)
+    else:
+        parser.AddAllModelsFromFile(filename_or_file_contents)
     plant.Finalize()
 
     # Add two visualizers, one to publish the "visual" geometry, and one to
@@ -442,10 +448,11 @@ def model_inspector(meshcat, filename):
 
     # Set the timeout to a small number in test mode. Otherwise, JointSliders
     # will run until "Stop JointSliders" button is clicked.
-    default_interactive_timeout = None if running_as_notebook else 1.0
+    if not running_as_notebook:
+        timeout = 1.0
     sliders = builder.AddSystem(JointSliders(meshcat, plant))
     diagram = builder.Build()
-    sliders.Run(diagram, default_interactive_timeout)
+    sliders.Run(diagram, timeout)
 
 
 def PublishPositionTrajectory(trajectory,
