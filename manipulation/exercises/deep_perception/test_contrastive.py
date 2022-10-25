@@ -32,11 +32,11 @@ def gt_don_predict(f, img_a, img_b, u_a):
 def f_factory(rand_array):
 
     def dummy_f(x: np.ndarray):
-        phi = rand_array.copy()[None]
-        phi = np.tile(phi, (len(x), 1, 1, 1))
         if x.ndim == 3:
             print('f takes in image of shape (N, H, W, 3), '
                   'did you forget to add batch dimension?')
+        phi = rand_array.copy()[None]
+        phi = np.tile(phi, (len(x), 1, 1, 1))
         phi[..., 1:4] += x
         return phi
 
@@ -64,7 +64,7 @@ class TestContrastive(unittest.TestCase):
         self._match = np.random.rand(4096, 1) > 0.4
 
     @weight(4)
-    @timeout_decorator.timeout(1.0)
+    @timeout_decorator.timeout(2.0)
     def test_don_loss(self):
         """Testing don_loss"""
         expected_sol = gt_don_loss(self._f,
@@ -91,7 +91,7 @@ class TestContrastive(unittest.TestCase):
             'Computed loss_nonmatches is incorrect')
 
     @weight(4)
-    @timeout_decorator.timeout(1.0)
+    @timeout_decorator.timeout(2.0)
     def test_don_predict(self):
         """Testing don_predict"""
         expected_sol = gt_don_predict(self._f, self._img_a, self._img_b,
