@@ -239,7 +239,7 @@ class MeshcatPoseSliders(LeafSystem):
             root_context)
 
         print("Press the 'Stop PoseSliders' button in Meshcat to continue.")
-        self._meshcat.AddButton("Stop PoseSliders")
+        self._meshcat.AddButton("Stop PoseSliders", "Escape")
         while self._meshcat.GetButtonClicks("Stop PoseSliders") < 1:
             if self._update_values():
                 callback(root_context, self._get_transform())
