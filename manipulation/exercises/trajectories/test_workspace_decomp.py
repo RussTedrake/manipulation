@@ -94,23 +94,16 @@ class TestWorkspaceDecomp(unittest.TestCase):
             ])
 
         tris = [val for val in tri_obs]
-        # print(tris)
 
         x_diff = []
         dist_diff = []
         for i, idx in enumerate(test_idxs):
             o = tris[idx]
-            # print(f'o: {o}')
-            # print(f'test_C: {test_C}')
-            # print(f'test_C_inv: {test_C_inv}')
-            # print(f'test_d: {test_d}')
             x_star_pred, dist_pred = f(test_C, test_C_inv, test_d, o)
             
             x_diff.append(np.linalg.norm(x_star_sol[i] - x_star_pred))
             dist_diff.append(np.linalg.norm(dist_sol[i] - dist_pred))
 
-        # print(f'x_diff: {x_diff}')
-        # print(f'dist_diff: {dist_diff}')
         x_diff = np.asarray(x_diff)
         dist_diff = np.asarray(dist_diff)
         
@@ -150,21 +143,13 @@ class TestWorkspaceDecomp(unittest.TestCase):
              [-1.14084094],
              [ 1.22325314],
              [24.37936607]])
-
-        # print(f'A_sol_norm: {A_sol_norm}')
-        # print(f'A_pred_norm: {A_pred_norm}')
-        # print(f'b_sol: {b_sol}')
-        # print(f'b_pred: {b_pred}')
         
         A_pred_norm = A_pred_norm.T
         A_sol_norm = A_sol_norm.T
         A_dots = [np.dot(A_sol_norm[idx], A_pred_norm[idx]) for idx in range(A_sol_norm.shape[0])]
         A_thetas = np.arccos(A_dots)
 
-        #print(f'A_thetas: {A_thetas}')
-
         b_diff = np.linalg.norm(b_sol - b_pred, axis=-1)
-        #print(f'b_diff: {b_diff}')
 
         self.assertTrue((A_thetas < np.deg2rad(5)).all(), 'Hyperplane angles are off!')
         self.assertTrue((b_diff < 0.01).all(), 'Hyperplane offsets are off!')
