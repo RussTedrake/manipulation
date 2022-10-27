@@ -32,11 +32,11 @@ rt_ipynb_test(
 )
 
 rt_ipynb_test(
-    name = "workspace_decomp_iris",
-    srcs = ["workspace_decomp_iris.ipynb"],
+    name = "taskspace_iris",
+    srcs = ["taskspace_iris.ipynb"],
     deps = [
         "//manipulation",
         "//manipulation/exercises:grader",
-        "//manipulation/exercises/trajectories:test_workspace_decomp",
+        "//manipulation/exercises/trajectories:test_taskspace_iris",
     ],
 )

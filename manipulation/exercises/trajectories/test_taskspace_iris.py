@@ -29,7 +29,7 @@ tri_obs = np.array([[[0.98886109, 0.81957125], [0.92702203, 0.71246285],
                     [[0., 1.], [0., 0.], [-0.5, 0.5]]])
 
 
-class TestWorkspaceDecomp(unittest.TestCase):
+class TestTaskspaceIRIS(unittest.TestCase):
 
     def __init__(self, test_name, notebook_locals):
         super().__init__(test_name)
