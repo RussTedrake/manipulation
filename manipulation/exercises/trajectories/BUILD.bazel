@@ -17,3 +17,9 @@ rt_py_library(
     srcs = ["test_rrt_planning.py"],
     visibility = ["//visibility:public"],
 )
+
+rt_py_library(
+    name = "test_taskspace_iris",
+    srcs = ["test_taskspace_iris.py"],
+    visibility = ["//visibility:public"],
+)
