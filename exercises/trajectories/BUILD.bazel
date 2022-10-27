@@ -30,3 +30,13 @@ rt_ipynb_test(
         "//manipulation/exercises/trajectories/rrt_planner",
     ],
 )
+
+rt_ipynb_test(
+    name = "workspace_decomp_iris",
+    srcs = ["workspace_decomp_iris.ipynb"],
+    deps = [
+        "//manipulation",
+        "//manipulation/exercises:grader",
+        "//manipulation/exercises/trajectories:test_workspace_decomp",
+    ],
+)
