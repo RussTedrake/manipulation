@@ -209,6 +209,19 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
 
     <subsection><h1>IK as constrained optimization</h1>
 
+      <p>Rather than formulate inverse kinematics as $$q = f^{-1}_{kin}(X^G),$$
+      let's consider solving the same problem as an optimization: \begin{align}
+      \min_q & \quad |q - q_0|^2, \\ \subjto &\quad X^G = f_{kin}(q),
+      \end{align} where $q_0$ is some comfortable nominal position. While
+      writing the inverse directly is a bit problematic, especially because we
+      sometimes have multiple (even infinite) solutions or no solutions. This
+      optimization formulation is slightly more precise -- if we have multiple
+      joint angles which achieve the same end-effector position, then we prefer
+      the one that is closest to the nominal joint positions. But the real
+      value of switching to the optimization perspective of the problem is that
+      it allows us to connect to a rich library of additional costs and
+      constraints.</p>
+
       <figure><img style="width:60%" src="data/shelf_ik.png"><figcaption>A
       richer inverse kinematics problem: solve for the joint angles, $q$, that
       allow the robot to reach into the shelf and grab the object, while
@@ -542,13 +555,37 @@ ik.AddPositionConstraint(
 
   <section><h1>Kinematic trajectory optimization</h1>
   
-    <p>In our previous approach, we designed (simple) trajectories in the
-    end-effector coordinates, then used differential IK to get the joint
-    velocity commands.  Now we will switch to design the motions directly in
-    joint coordinates, and just add (forward) kinematics constraints.</p>
+    <p>Once you understand the optimization perspective of inverse kinematics,
+    then you are well on your way to understanding kinematic trajectory
+    optimization. Rather than solving multiple inverse kinematics problems
+    independently, the basic idea now is to solve for a sequence of joint
+    angles in the same optimization. Even better, let us define a parameterized
+    joint trajectory, $q_\alpha(t)$, where $\alpha$ are parameters. Then a
+    simple extension to our inverse kinematics problem would be to write
+    something like \begin{align} \min_{\alpha,T} & \quad T, \\ \subjto &\quad
+    X^{G_{start}} = f_{kin}(q_\alpha(0)),\\ & \quad X^{G_{goal}} =
+    f_{kin}(q_\alpha(T)), \\ & \quad \forall t , \quad
+    \left|\dot{q}_\alpha(t)\right| \le v_{max} \label{eq:vel_limits}.
+    \end{align} I read this as "find a trajectory, $q(t)$ for $t \in [0, T]$,
+    that moves the gripper from the start to the goal in minimum time".</p>
+    
+    <p>The last equation, (\ref{eq:vel_limits}), represents velocity limits;
+    this is the only way we are telling the optimizer that the robot cannot
+    teleport instantaneously from the start to the goal. Apart from this line
+    which looks a little non-standard, it is almost exactly like solving two
+    inverse kinematics problems jointly, except instead of having the solver
+    take gradients with respect to $q$, we will take gradients with respect to
+    $\alpha$. This is easily accomplished using the chain rule.</p>
 
     <subsection><h1>Trajectory parameterizations</h1>
     
+      <p>The interesting question, then, becomes how to do we actually
+      parameterize the trajectory $q(t)$ with a parameter vector $\alpha$? For
+      instance, $q_\alpha(t)$ could be a neural network that takes $t$ as an
+      input, offers $q$ as an output, and uses $\alpha$ to represent the
+      weights and biases of the neurons. Instead, we typically choose much
+      simpler forms like piecewise polynomials.</p>
+
       <p>Piecewise polynomial trajectories</p>
       <p>B-spline trajectories</p>
         
