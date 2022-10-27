@@ -17,3 +17,9 @@ rt_py_library(
     srcs = ["test_rrt_planning.py"],
     visibility = ["//visibility:public"],
 )
+
+rt_py_library(
+    name = "test_workspace_decomp",
+    srcs = ["test_workspace_decomp.py"],
+    visibility = ["//visibility:public"],
+)
