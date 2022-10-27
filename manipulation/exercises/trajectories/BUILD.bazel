@@ -19,7 +19,7 @@ rt_py_library(
 )
 
 rt_py_library(
-    name = "test_workspace_decomp",
-    srcs = ["test_workspace_decomp.py"],
+    name = "test_taskspace_iris",
+    srcs = ["test_taskspace_iris.py"],
     visibility = ["//visibility:public"],
 )
