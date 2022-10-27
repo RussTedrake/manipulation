@@ -690,7 +690,7 @@ Name one pair of nodes for which the shortcutting algorithm would result in a sh
     </exercise> 
 
     <exercise><h1>Decomposing Obstacle-Free Space with Convex Optimization</h1>
-      <p> For this exercise, you will implement part of the IRIS algorithm (cite), which is used to compute large regions of obstacle-free space through a series of convex optimizations. These regions can be used by various planning methods that search for trajectories from star to goal while remining collision-free. You will work exclusively in <script>document.write(notebook_link('taskspace_iris', deepnote['exercises/trajectories'], link_text='this notebook'))</script>. You will be asked to complete the following steps: </p>
+      <p> For this exercise, you will implement part of the IRIS algorithm <elib>Deits14</elib>, which is used to compute large regions of obstacle-free space through a series of convex optimizations. These regions can be used by various planning methods that search for trajectories from star to goal while remining collision-free. You will work exclusively in <script>document.write(notebook_link('taskspace_iris', deepnote['exercises/trajectories'], link_text='this notebook'))</script>. You will be asked to complete the following steps: </p>
       <ol type="a">
         <li> Implement a QP that finds the closest point on an obstacle to an ellipse in free-space. </li>
         <li> Implement the part of the algorithm that searches for a set of hyperplanes that separate a free-space ellipse from all the obstacles. </li>
@@ -773,6 +773,13 @@ PhD thesis, Carnegie Mellon University, August, <span class="year">2010</span>.
 <span class="author">S. Karaman and E. Frazzoli</span>, 
 <span class="title">"Sampling-based Algorithms for Optimal Motion Planning"</span>, 
 <span class="publisher">Int. Journal of Robotics Research</span>, vol. 30, pp. 846--894, June, <span class="year">2011</span>.
+
+</li><br>
+<li id=Deits14>
+<span class="author">Robin L H Deits and Russ Tedrake</span>, 
+<span class="title">"Computing Large Convex Regions of Obstacle-Free Space through Semidefinite Programming"</span>, 
+<span class="publisher">Proceedings of the Eleventh International Workshop on the Algorithmic Foundations of Robotics (WAFR 2014)</span> , <span class="year">2014</span>.
+[&nbsp;<a href="http://groups.csail.mit.edu/robotics-center/public_papers/Deits14.pdf">link</a>&nbsp;]
 
 </li><br>
 </ol>
