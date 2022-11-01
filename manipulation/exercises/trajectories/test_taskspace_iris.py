@@ -86,43 +86,37 @@ class TestTaskspaceIRIS(unittest.TestCase):
 
         self.assertTrue(hyp_sol, 'No solution found for hyperplanes!')
 
-        A_pred_norm = A_pred / np.linalg.norm(A_pred, axis=0)
-
-        A_sol = np.array([[-9.9585355, -6.5676601], [10.78383668, 8.62684478],
-                          [-1.18005283, 6.06107998], [5.09000672, -4.11054018],
-                          [-11.80111656,
-                           -0.70808857], [2.02598734, -10.40603528],
+        # store in sorted order (by first element of each hyperplane normal)
+        A_sol = np.array([[-11.80111656, -0.70808857], [-9.9585355, -6.5676601],
+                          [-1.18005283, 6.06107998], [2.02598734, -10.40603528],
+                          [5.09000672, -4.11054018], [10.78383668, 8.62684478],
                           [24.28562186, 1.06813158]]).T
-        A_sol_norm = A_sol / np.linalg.norm(A_sol, axis=0)
 
-        b_sol = np.array([[-4.57882326], [10.99093778], [4.3040654],
-                          [2.05286201], [-1.14084094], [1.22325314],
-                          [24.37936607]])
+        b_sol = np.array([
+            -1.14084094, -4.57882326, 4.3040654, 1.22325314, 2.05286201,
+            10.99093778, 24.37936607
+        ]).reshape(-1, 1)
 
-        self.assertTrue(A_sol_norm.shape[1] == A_pred_norm.shape[1],
+        self.assertTrue(A_sol.shape[1] == A_pred.shape[1],
                         'Incorrect number of hyperplanes returned!')
 
-        # loop through and assign each returned hyperplane to
-        # the closest solution hyperplane, based on angle
-        # (allows them to be returned in different orders)
-        A_thetas = []
-        b_diff = []
-        A_sol_norm_left = A_sol_norm
-        b_sol_left = b_sol
-        for idx in range(A_pred_norm.shape[1]):
-            dots = np.dot(A_pred_norm[:, idx], A_sol_norm_left)
-            min_theta_idx = np.argmin(np.arccos(dots))
-            A_thetas.append(np.arccos(dots)[min_theta_idx])
-            b_diff.append(
-                np.linalg.norm(b_sol_left[min_theta_idx] - b_pred[idx]))
+        A_sol_norm = A_sol / np.linalg.norm(A_sol, axis=0)
+        A_pred_norm = A_pred / np.linalg.norm(A_pred, axis=0)
 
-            keep_idx = np.ones(A_sol_norm_left.shape[1])
-            keep_idx[min_theta_idx] = 0
-            A_sol_norm_left = A_sol_norm_left[:, keep_idx.astype(bool)]
-            b_sol_left = b_sol_left[keep_idx.astype(bool)]
+        # sort predicted hyperplanes to handle different permutations
+        pred_sorted_idx = np.argsort(A_pred_norm[0, :])
+        A_pred_norm = A_pred_norm[:, pred_sorted_idx]
+        b_pred = b_pred[pred_sorted_idx]
 
-        A_thetas = np.asarray(A_thetas)
-        b_diff = np.asarray(b_diff)
+        A_pred_norm = A_pred_norm.T
+        A_sol_norm = A_sol_norm.T
+        A_dots = [
+            np.dot(A_sol_norm[idx], A_pred_norm[idx])
+            for idx in range(A_sol_norm.shape[0])
+        ]
+        A_thetas = np.arccos(A_dots)
+
+        b_diff = np.linalg.norm(b_sol - b_pred, axis=-1)
 
         self.assertTrue((A_thetas < np.deg2rad(5)).all(),
                         'Hyperplane angles are off!')
