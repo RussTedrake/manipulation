@@ -99,15 +99,30 @@ class TestTaskspaceIRIS(unittest.TestCase):
                           [2.05286201], [-1.14084094], [1.22325314],
                           [24.37936607]])
 
-        A_pred_norm = A_pred_norm.T
-        A_sol_norm = A_sol_norm.T
-        A_dots = [
-            np.dot(A_sol_norm[idx], A_pred_norm[idx])
-            for idx in range(A_sol_norm.shape[0])
-        ]
-        A_thetas = np.arccos(A_dots)
+        self.assertTrue(A_sol_norm.shape[1] == A_pred_norm.shape[1],
+                        'Incorrect number of hyperplanes returned!')
 
-        b_diff = np.linalg.norm(b_sol - b_pred, axis=-1)
+        # loop through and assign each returned hyperplane to
+        # the closest solution hyperplane, based on angle
+        # (allows them to be returned in different orders)
+        A_thetas = []
+        b_diff = []
+        A_sol_norm_left = A_sol_norm
+        b_sol_left = b_sol
+        for idx in range(A_pred_norm.shape[1]):
+            dots = np.dot(A_pred_norm[:, idx], A_sol_norm_left)
+            min_theta_idx = np.argmin(np.arccos(dots))
+            A_thetas.append(np.arccos(dots)[min_theta_idx])
+            b_diff.append(
+                np.linalg.norm(b_sol_left[min_theta_idx] - b_pred[idx]))
+
+            keep_idx = np.ones(A_sol_norm_left.shape[1])
+            keep_idx[min_theta_idx] = 0
+            A_sol_norm_left = A_sol_norm_left[:, keep_idx.astype(bool)]
+            b_sol_left = b_sol_left[keep_idx.astype(bool)]
+
+        A_thetas = np.asarray(A_thetas)
+        b_diff = np.asarray(b_diff)
 
         self.assertTrue((A_thetas < np.deg2rad(5)).all(),
                         'Hyperplane angles are off!')
