@@ -96,11 +96,11 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
   grasping. These strategies just come to the forefront in non-grasping
   manipulation.</p>
 
-  <p>As we build up our toolkit for prehensile and nonprehensile manipulation,
-  one of the things that is missing from our discussion so far, which has been
-  predominantly kinematic, has been thinking about forces.  This chapter aims to
-  begin that discussion.  By the end, I hope you'll agree that we have a pretty
-  satisfying way to flip up that box!</p>
+  <p>As we build up our toolkit for prehensile (grasping) and nonprehensile
+  manipulation, one of the things that is missing from our discussion so far,
+  which has been predominantly kinematic, has been thinking about forces.  This
+  chapter aims to begin that discussion.  By the end, I hope you'll agree that
+  we have a pretty satisfying way to flip up that box!</p>
 
   <section><h1>A simple model</h1>
   
@@ -122,24 +122,41 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
 
     <p>Even in this simple model, and throughout the discussions in this
     chapter, we will have two dynamic models that we care about.  The first is
-    the full dynamic model used for simulation: it contains the finger, the box,
-    and the bin, and has a total of 5 degrees of freedom ($x, z, \theta$ for the
-    box and $x, z$ for the finger).  The second is the robot model used for
-    designing the controllers: this model has just the two degrees of freedom of
-    the finger, and experiences unmodelled contact forces.  By design, the
-    equations of this second model are particularly simple: $$\begin{bmatrix}m &
-    0 \\ 0 & m \end{bmatrix} \dot{v} = m \begin{bmatrix}\ddot{x} \\ \ddot{z}
-    \end{bmatrix} = mg + \begin{bmatrix} u_x \\ u_z \end{bmatrix} + f^c,$$ where
-    $m$ is the mass, $g = [0, -9.81]^T$ is the gravity vector, $u$ is the
-    control input vector, and $f^c$ is the contact force (from the world to the
-    finger).  Notably absent is the contact Jacobian which normally
-    pre-multiplies the contact forces, $\sum_i J_i^T f^{c_i};$ in the case of a
-    point finger this Jacobian is always the identity matrix, and there is only
-    one point at which contact can be made, so there is no meaningful reason to
-    distinguish between multiple forces.</p>
+    the full dynamic model used for simulation: it contains the finger, the
+    box, and the bin, and has a total of 5 degrees of freedom ($x, z, \theta$
+    for the box and $x, z$ for the finger).  The second is the robot model used
+    for designing the controllers: this model has just the two degrees of
+    freedom of the finger, and experiences unmodelled contact forces.  By
+    design, the equations of this second model are particularly simple:
+    $$\begin{bmatrix}m & 0 \\ 0 & m \end{bmatrix} \dot{v} = m
+    \begin{bmatrix}\ddot{x} \\ \ddot{z} \end{bmatrix} = mg + \begin{bmatrix}
+    u_x \\ u_z \end{bmatrix} + f^{F_c},$$ where $m$ is the mass, $g = [0,
+    -9.81]^T$ is the gravity vector, $u$ is the control input vector, and $f^c$
+    is the Cartesian contact force applied to the finger, $F$, at $c$.  Notably
+    absent is the contact Jacobian which normally pre-multiplies the contact
+    forces, $\sum_i J_i^T f^{c_i};$ in the case of a point finger this Jacobian
+    is always the identity matrix, and there is only one point at which contact
+    can be made, so there is no meaningful reason to distinguish between
+    multiple forces.</p>
 
-    <todo>Add Jiaji's video?</todo>
-    <todo>Check yourself: can the finger move the box?  (only if the coefficient of friction is bigger).</todo>
+    <p>Just to make the notation clear, I've used $f^{F_c}$ above to denote
+    force <i>applied to the finger</i>, $F$, at point $c$. If we want to denote
+    the same force <i>applied to the box</i>, $B$, at point $c$, then we'll
+    denote it as $f^{B_c}$. Naturally, we have $f^{F_c} = - f^{B_c}$, because
+    the forces must be equal and opposite. If we're not careful about this
+    notation, the signs can get confusing below.</p>
+
+    <figure>
+      <iframe width="560" height="315" src="https://www.youtube.com/embed/PngdQGEUi7w?mute=1&rel=0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen pdf="no"></iframe>
+      <p pdf="only"><a href="https://www.youtube.com/embed/PngdQGEUi7w">Click here to watch the video.</a></p>
+      <figcaption>A simple example of force control; the robot needs to push
+      down hard enough that the contact between the fingers and book do not
+      slip, but gentle enough that the contacts between the book at the table
+      <i>do</i>
+      slide. You can explore this example in more detail in <a
+      href="#hybrid_book_push">an exercise</a>.</figcaption></figure>
+
+      <todo>Check yourself: can the finger move the box?  (only if the coefficient of friction is bigger).</todo>
 
     <subsection><h1>(Direct) force control</h1>
 
@@ -162,29 +179,31 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       </div>
 
       <p>What information do we need to regulate the contact forces?  Certainly
-      we need the desired contact force, $f^{c_d}$.  In general, we will need
-      the robot's state (though in the immediate example, the dynamics of our
-      point mass are not state dependent).  But we also need to either (1)
-      measure the robot accelerations (which we've repeatedly tried to avoid),
-      (2) assume the robot accelerations are zero, or (3) provide a measurement
-      of the contact force so that we can regulate it with feedback.</p>
+      we need the desired contact force, $f^{F_c}_{desired}$.  In general, we
+      will need the robot's state (though in the immediate example, the
+      dynamics of our point mass are not state dependent).  But we also need to
+      either (1) measure the robot accelerations (which we've repeatedly tried
+      to avoid), (2) assume the robot accelerations are zero, or (3) provide a
+      measurement of the contact force so that we can regulate it with
+      feedback.</p>
       
       <p>Let's consider the case where the robot is already in contact with the
       box.  Let's also assume for a moment that the accelerations are (nearly)
       zero.  This is actually not a horrible assumption for most manipulation
       tasks, where the movements are relatively slow.  In this case, our
-      equations of motion reduce to $$f^c = - mg - u.$$  Our force controller
-      implementation can be as simple as $u = -mg - f^{c_d}.$  Note that we only
-      need to know the mass of the robot to implement this controller.</p>
+      equations of motion reduce to $$f^{F_c} = - mg - u.$$  Our force
+      controller implementation can be as simple as $u = -mg -
+      f^{F_c}_{desired}.$  Note that we only need to know the mass <i>of the
+      robot</i> (not the box) to implement this controller.</p>
 
-      <p>What happens when the robot is not in contact?  In this case, we cannot
-      reasonably ignore the accelerations, and applying the same control results
-      in $m\dot{v} = - f^{c_d}.$  That's not all bad.  In fact, it's one of the
-      defining features of force control that makes it very appealing.  When you
-      specify a desired force and don't get it, the result is accelerating the
-      contact point in the (opposite) direction of the desired force.  In
-      practice, this (locally) tends to bring you into contact when you are not
-      in contact.</p>
+      <p>What happens when the robot is not in contact?  In this case, we
+      cannot reasonably ignore the accelerations, and applying the same control
+      results in $m\dot{v} = - f^{F_c}_{desired}.$  That's not all bad.  In
+      fact, it's one of the defining features of force control that makes it
+      very appealing.  When you specify a desired force and don't get it, the
+      result is accelerating the contact point in the (opposite) direction of
+      the desired force.  In practice, this (locally) tends to bring you into
+      contact when you are not in contact.</p>
 
       <example><h1>Commanding a constant force</h1>
 
@@ -201,13 +220,13 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
         horizontal position of the finger as a function of time, given different
         constant desired force commands.</figcaption></figure>
         
-        <p>For all strictly positive desired force commands,
-        the finger will accelerate at a constant rate until it collides with the
-        box (at $x=0.089$).  For small $f^{c_d}$, the box barely moves.  For an
-        intermediate range of $f^{c_d}$, the collision with the box is enough to
-        start it moving, but friction eventually brings the box and therefore
-        also the finger to rest.  For large values, the finger will keep pushing
-        the box until it runs into the far wall.</p>
+        <p>For all strictly positive desired force commands, the finger will
+        accelerate at a constant rate until it collides with the box (at
+        $x=0.089$).  For small $f^{F_c}_{desired}$, the box barely moves.  For
+        an intermediate range of $f^{F_c}_{desired}$, the collision with the
+        box is enough to start it moving, but friction eventually brings the
+        box and therefore also the finger to rest.  For large values, the
+        finger will keep pushing the box until it runs into the far wall.</p>
 
         <script>document.write(notebook_link('force'))</script>
           
@@ -248,97 +267,81 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
 
       <example id="force_flip_up"><h1>A force-based flip-up strategy</h1>
       
-        <todo>Flip theta. Right now tau_W_y makes theta more negative.</todo>
+        <todo>Update the code to match this updated derivation. In particular,
+        \theta_d(t) should get more negative.</todo>
 
-        <p>Let's encode the textual description above.  I'll use $C$ for the
-        contact frame between the finger and the box, and $A$ for the contact
-        frame for the lower left corner of the box contacting the bin.  The
-        friction cone provides (linear inequality) constraints on the forces we
-        want to apply. Within those constraints, we would like to rotate up the
-        box. Constrained least-squares is as natural a formulation for this as
-        any! Here is one version: \begin{align*}\min_{f^C_W} \quad& \left| w
-        f^{C}_{C_x} - \text{PID}(\theta_d, \theta) \right|^2,\\ \subjto \quad &
-        |f^C_{W_x}| \le \hat\mu_A (\hat{m}g - f^C_{W_z}), \\  & f^C_{C_z} \ge
-        0, \qquad |f^C_{C_x}| \le \hat\mu_C f^C_{C_z}, \\ \text{with} \quad &
-        {}^WR^C(\theta) = \begin{bmatrix} -\sin\theta & -\cos\theta \\
-        \cos\theta & -\sin\theta \end{bmatrix}.\end{align*} I've used
-        $\text{PID}$ here as shorthand for a simple
-        proportional-integral-derivative term. Implementing this strategy
-        assumes:
+        <p>Let's encode the textual description above, describing the forces
+        that are applied to the box. I'll use $C$ for the contact frame
+        between the finger and the box, with its normal pointing <i>into</i>
+        the box normal to the surface, and $A$ for the contact frame for the
+        lower left corner of the box contacting the bin, with the normal
+        pointing straight up in positive world $z$. $${}^BR^C =
+        \text{Rot}_y(-\frac{\pi}{2}), \qquad {}^WR^A = I.$$ Of course we also
+        have the force of gravity, which is applied at the body center of mass
+        (com): $$f^{B_{com}}_{gravity,W} = mg.$$ As you can see, we'll make heavy use of the spatial
+        force notation / spatial algebra <a
+        href="clutter.html#spatial_force">described here</a>.</p>
+        
+        <p>The friction cone provides (linear inequality) constraints on the
+        forces we want to apply. \begin{gather*} f^{B_C}_{\text{finger}, C_z}
+        \ge 0, \qquad |f^{B_C}_{\text{finger}, C_x}| \le \hat\mu_C
+        f^{B_C}_{\text{finger}, C_z}, \\ f^{B_A}_{\text{ground}, A_z} \ge 0,
+        \qquad |f^{B_A}_{\text{ground}, A_x}| \le \hat\mu_A
+        f^{B_A}_{\text{ground}, A_z}.\end{gather*} Please make sure you
+        understand the notation.  Within those constraints, we would like to
+        rotate up the box.</p>
+        
+        <p>To rotate the box about $A$, let's reason about the total torque
+        being applied about $A$: $$\tau^{B_A}_{total,W} = \tau^{B_A}_{gravity,
+        W} + \tau^{B_A}_{ground, W} + \tau^{B_A}_{finger, W},$$ but we know
+        that $\tau^{B_A}_{ground, W} = 0$ since the moment arm is zero. I have
+        a goal here of not making too many assumptions about the mass and
+        geometry of the box in our controller, so rather than try to regulate
+        this torque perfectly, let's write $$\tau^{B_A}_{total,W_y} =
+        \tau^{B_A}_{finger,W_y} + \text{unknown terms}.$$ <!--
+        and if we choose to
+        assume that the box is longer than it is tall (so ${}^Ap^C_{B_x} \gg
+        {}^Ap^C_{B_z}$), we can have approximately $$\tau^{B_A}_{finger,W_y}
+        \approx {}^A\hat{p}^C_{B_x} \, f^{B_C}_{finger, C_x}.$$ -->
+        A reasonable control strategy in the face of these unmodeled terms is
+        to use feedback control on the angle of the box (call it $\theta$)
+        which is the $y$ component of ${}^WR^B$: $$ \tau^{B_A}_{finger_d,W_y} =
+        \text{PID}(\theta_d, \theta), \qquad {}^WR^B(\theta) = \begin{bmatrix}
+        \cos\theta & 0 & \sin\theta \\ 0 & 1 & 0 \\ \sin\theta & 0 &
+        \cos\theta\end{bmatrix},$$ where I've used $\theta_{d}$ as shorthand
+        for the desired box angle and $\text{PID}$ as shorthand for a simple
+        proportional-integral-derivative term. Note that
+        $\tau^{B_A}_{finger,W_y} \propto f^{B_C}_{finger, C_x},$ where the
+        (constant) coefficient only depends on ${}^B\hat{p}^C,$ and does not
+        depend on $\hat\theta.$</p>
+        
+        <p>To execute the desired PID control subject to the friction-cone
+        constraints, we can use constrained least-squares:
+        \begin{align*}\min_{f^{B_C}_{finger,C}, \, f^{B_A}_{ground,A}} \quad&
+        \left| \tau^{B_A}_{finger,W_y} - \text{PID}(\theta_d, \hat\theta)
+        \right|^2,\\ \subjto \quad & f^{B_C}_{\text{finger}, C_z} \ge 0, \qquad
+        |f^{B_C}_{\text{finger}, C_x}| \le \hat\mu_C f^{B_C}_{\text{finger},
+        C_z}, \\ & f^{B_A}_{\text{ground}, A_z} \ge 0, \qquad
+        |f^{B_A}_{\text{ground}, A_x}| \le \hat\mu_A f^{B_A}_{\text{ground},
+        A_z}, \\ & f^{B_A}_{\text{ground}, A} + \hat{f}^{B_A}_{gravity, A} +
+        f^{B_A}_{finger, A} = 0.\end{align*} Note that the last line is still a
+        linear constraint once $\hat\theta$ is given, despite requiring some
+        spatial algebra operations. Implementing this strategy assumes:
         <ul style="margin-top:-10px; margin-bottom:5px"><li>We have some
         approximation, $\hat\theta$, for the orientation of the box.  We could
         obtain this from a point cloud normal estimation, or even from tracking
         the path of the fingers.</li>
         <li>We have conservative estimates of the coefficients of static
         friction between the wall and the box, $\hat\mu_A$, and between the
-        finger and the box, $\hat\mu_C$, as well as the box mass, $\hat{m}.$
-        (You should experiment and decide for yourself whether these estimates can be loose).</li>
-        <li>We assume that $\theta_d(t)$ changes slowly (in particular, that the
-        box accelerations are small), so that we can mostly ignore the unknown
-        inertial terms from the box .</li>
-<!---        
-        <li>We assume that the finger makes contact roughly near the top of the
-        box, but there is no other dependency on the size of the box.</li>
-        -->        
-        </ul> Apart from the finger making some contact, there are no other
-        assumptions about the shape of the box!</p>
+        finger and the box, $\hat\mu_C$, as well as the approximate location of
+        the finger relative to the box corner, and the box mass,
+        $\hat{m}.$</li>
+        </ul> You should experiment and decide for yourself whether these
+        estimates can be loose. I think that you'll find it's quite robust to
+        knowing the mass and geometry of the box.</p>
 
         <script>document.write(notebook_link('force'))</script>
     
-        <p>To understand this controller, let's break down the dynamics of the
-        task.</p>  
-        
-        <p>Once the box has rotated up off the bin bottom, the only forces on
-        the box are the gravitational force, the force that the bin applies on
-        the box corner, call it $f^A$, and the contact force, $f^C$, that the
-        finger applies on the box.  By convention, the contact frames $A$ and
-        $C$ have the $z$ axis aligned with the contact normal (pointing into the
-        box).  Remember the contact geometry we use for the cracker box has
-        small spheres in the corners; so both of these contacts are "sphere on
-        box", with the box normals defining the contact normals (e.g. the $x$
-        axis is aligned with the wall of the box), and ${}^WR^A = I$.  The
-        friction cone constraints are: \begin{gather*}f^A_{W_z} \ge
-        0, \qquad |f^A_{W_x}| \le \mu_A f^A_{W_z}, \\ f^C_{C_z}
-        \ge 0, \qquad |f^C_{C_x}| \le \mu_C f^C_{C_z}.\end{gather*}  The
-        orientation of frame $C$ is a function of the box orientation,
-        ${}^WR^C(\theta)$, and is written above.</p>
-
-        <todo>Add diagrams for the frames</todo>
-
-        <p>The dynamics of the box can be written as \begin{gather*} m\ddot{x} =
-        f^A_{W_x} + f^C_{W_x} \\ m \ddot{z} = f^A_{W_z} + f^C_{W_z} - mg \\
-        I\ddot\theta = ^Ap^{CM}_W \times \begin{bmatrix} 0 \\ -mg\end{bmatrix} +
-        {}^Ap^C_W \times f^C_W, \end{gather*} where $I$ is the moment of inertia
-        of the box taken around the top corner, and $p^{CM}$ is the position of
-        the center of mass.  We don't want our controller to depend on most of
-        these parameters, but it helps to understand them!  If we move slowly
-        (the velocities and accelerations are nearly zero), then we can write
-        $$f^A_{W_x} = -f^C_{W_x}, \qquad f^A_{W_z} = mg - f^C_{W_z}.$$ Taken
-        together, the friction cone constraints on the bin imply the following
-        constraints on our finger contact: $$|f^C_{W_x}| \le \mu_A (mg -
-        f^C_{W_z}).$$  Note that the <a
-        href="http://underactuated.mit.edu/multibody.html#bilateral">full
-        dynamic derivation</a> is not too much harder; I did it on paper by
-        writing ${}^{CM}p^A = [-\frac{h}{2}, -\frac{w}{2}]^T,$ with the height,
-        $h$, and width, $w$ of the box. Then one can write the no-slip at the
-        bin constraint as $\phi(q) = {}^{CM}p^A_{W_x} = \text{constant}$ which
-        implies that $\ddot{\phi} = 0,$ which gives the full expression for
-        $f^A_{W_x}$ (as long as we're in the friction cone).</p>
-
-        <p>Now here's a nice approximation.  By choosing to make contact near
-        the bottom of the box (since we know where the bin is), we can
-        approximate $${}^A\tau^{Box}_{W_y} = {}^Ap^{C}_W \times f^C_W \approx
-        -{}^Ap^C_{C_z} f^C_{C_x} = -w f^C_{C_x}.$$  In words, the moment
-        produce by the finger contact is approximately the tangential force on
-        the box (times the width of the box).  I therefore claim that choosing
-        the desired torque to be equal to $$w f^{C_d}_{C_x} \approx
-        \text{PID}(\theta_d, \theta),$$ is a good strategy for regulating the
-        orientation of the box.  It does not assume we know the box geometry
-        nor inertial properties.</p>
-
-        <p>That's a lot of details, but all to justify a very simple and robust
-        controller.</p>
-
         <todo>Generate random boxes.</todo>
 
       </example>
@@ -366,8 +369,10 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       control</i> <elib>Salisbury80</elib> and then Neville Hogan introducing
       <i>impedance control</i> <elib>Hogan85a+Hogan85b+Hogan85c</elib>.</p>
 
-      <p>This approach is conceptually very nice.  With only knowledge of the
-      parameters of the robot itself (not the environment), we can write a
+      <p>This approach is conceptually very nice. Imagine we were to walk up
+      and push on the end-effector of the iiwa &dagger;<sidenote>&dagger; But
+      please don't do it; that's not safe!</sidenote>. With only knowledge of
+      the parameters of the robot itself (not the environment), we can write a
       controller so that when we push on the end-effector, the end-effector
       pushes back (using the entire robot) as if you were pushing on, for
       instance, a simple spring-mass-damper system.  Rather than attempting to
@@ -387,15 +392,16 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
 
       <p>Our simple model with a point finger is ideal for understanding the
       essence of indirect force control.  The original equations of motion of
-      our system are $$m\begin{bmatrix}\ddot{x} \\ \ddot{z} \end{bmatrix} = mg + u +
-      f^c.$$  We can write a simple controller to make this system act, instead,
-      like (passive) mass-spring-damper system: $$m \begin{bmatrix}\ddot{x} \\
-      \ddot{z} \end{bmatrix} + b \begin{bmatrix} \dot{x} \\ \dot{z}
-      \end{bmatrix} + k \begin{bmatrix} x - x_d \\ z - z_d \end{bmatrix} =
-      f^c,$$ with the rest position of the spring at $(x_d, z_d).$  The
-      controller that implements this follows easily; in the point finger case
-      this has the familiar form of a proportional-derivative (PD)
-      controller, but with an additional "feed-forward" term to cancel out gravity.</p>
+      our system are $$m\begin{bmatrix}\ddot{x} \\ \ddot{z} \end{bmatrix} = mg
+      + u + f^{F_c}.$$  We can write a simple controller to make this system
+      act, instead, like (passive) mass-spring-damper system: $$m
+      \begin{bmatrix}\ddot{x} \\ \ddot{z} \end{bmatrix} + b \begin{bmatrix}
+      \dot{x} \\ \dot{z} \end{bmatrix} + k \begin{bmatrix} x - x_d \\ z - z_d
+      \end{bmatrix} = f^{F_c},$$ with the rest position of the spring at $(x_d,
+      z_d).$  The controller that implements this follows easily; in the point
+      finger case this has the familiar form of a proportional-derivative (PD)
+      controller, but with an additional "feed-forward" term to cancel out
+      gravity.</p>
 
       <p>Technically, if we are just programming the stiffness and damping, as
       I've written here, then a controller of this form would commonly be
@@ -403,10 +409,10 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       control.  We could also change the effective mass of the system; this
       would be impedance control in its full glory. <!--Importantly, changing
       the effective mass can be done without estimating the accelerations, but
-      it does require measuring the contact force.-->  My impression, though, is
-      that changing the effective mass is most often considered not worth the
-      complexity that comes from the extra sensing and bandwidth
-      requirements.</p>
+      it does require measuring the contact force.-->  My impression, though,
+      is that the consensus in robot control experts is that changing the
+      effective mass is most often considered not worth the complexity that
+      comes from the extra sensing and bandwidth requirements.</p>
 
       <p>The literature on indirect force control has a lot of terminology and
       implementation details that are important to get right in practice.  Your
@@ -804,7 +810,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
     </exercise>
 
 
-    <exercise><h1>Hybrid Force-Position Control</h1>
+    <exercise id="hybrid_book_push"><h1>Hybrid Force-Position Control</h1>
       <p> For this exercise, you will analyze and implement a hybrid force-position controller to drag a book, as we saw from <a href="https://www.youtube.com/watch?v=PngdQGEUi7w&ab_channel=JiajiZhou">this video</a> during lecture. You will work exclusively in <script>document.write(notebook_link('hybrid_force_position', deepnote['exercises/force'], link_text='this notebook'))</script>. You will be asked to complete the following steps: </p>
 
       <ol type="a">
