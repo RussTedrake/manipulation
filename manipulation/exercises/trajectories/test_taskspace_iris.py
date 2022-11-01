@@ -86,18 +86,27 @@ class TestTaskspaceIRIS(unittest.TestCase):
 
         self.assertTrue(hyp_sol, 'No solution found for hyperplanes!')
 
+        # store in sorted order (by first element of each hyperplane normal)
+        A_sol = np.array([[-11.80111656, -0.70808857], [-9.9585355, -6.5676601],
+                          [-1.18005283, 6.06107998], [2.02598734, -10.40603528],
+                          [5.09000672, -4.11054018], [10.78383668, 8.62684478],
+                          [24.28562186, 1.06813158]]).T
+
+        b_sol = np.array([
+            -1.14084094, -4.57882326, 4.3040654, 1.22325314, 2.05286201,
+            10.99093778, 24.37936607
+        ]).reshape(-1, 1)
+
+        self.assertTrue(A_sol.shape[1] == A_pred.shape[1],
+                        'Incorrect number of hyperplanes returned!')
+
+        A_sol_norm = A_sol / np.linalg.norm(A_sol, axis=0)
         A_pred_norm = A_pred / np.linalg.norm(A_pred, axis=0)
 
-        A_sol = np.array([[-9.9585355, -6.5676601], [10.78383668, 8.62684478],
-                          [-1.18005283, 6.06107998], [5.09000672, -4.11054018],
-                          [-11.80111656,
-                           -0.70808857], [2.02598734, -10.40603528],
-                          [24.28562186, 1.06813158]]).T
-        A_sol_norm = A_sol / np.linalg.norm(A_sol, axis=0)
-
-        b_sol = np.array([[-4.57882326], [10.99093778], [4.3040654],
-                          [2.05286201], [-1.14084094], [1.22325314],
-                          [24.37936607]])
+        # sort predicted hyperplanes to handle different permutations
+        pred_sorted_idx = np.argsort(A_pred_norm[0, :])
+        A_pred_norm = A_pred_norm[:, pred_sorted_idx]
+        b_pred = b_pred[pred_sorted_idx]
 
         A_pred_norm = A_pred_norm.T
         A_sol_norm = A_sol_norm.T
