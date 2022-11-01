@@ -83,10 +83,9 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope;
   picture-in-picture" allowfullscreen pdf="no"></iframe>
   <p pdf="only"><a href="https://www.youtube.com/embed/XqRczI4Fepk">Click here to watch the video.</a></p>
-  <figcaption>Just for fun, I asked
-  my daughter to try a similar task with the "two-fingered gripper" I scrounged
-  from my kitchen. How are we to program something like
-  that!</figcaption></figure>
+  <figcaption>Just for fun, I asked my daughter to try a similar task with the
+  "two-fingered gripper" I scrounged from my kitchen. How are we to program
+  something like that!</figcaption></figure>
 
   <p>The term <i>nonprehensile manipulation</i> means "manipulation without
   grasping", and humans do it often.  It is easy to appreciate this fact when we
@@ -131,13 +130,13 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
     $$\begin{bmatrix}m & 0 \\ 0 & m \end{bmatrix} \dot{v} = m
     \begin{bmatrix}\ddot{x} \\ \ddot{z} \end{bmatrix} = mg + \begin{bmatrix}
     u_x \\ u_z \end{bmatrix} + f^{F_c},$$ where $m$ is the mass, $g = [0,
-    -9.81]^T$ is the gravity vector, $u$ is the control input vector, and $f^c$
-    is the Cartesian contact force applied to the finger, $F$, at $c$.  Notably
-    absent is the contact Jacobian which normally pre-multiplies the contact
-    forces, $\sum_i J_i^T f^{c_i};$ in the case of a point finger this Jacobian
-    is always the identity matrix, and there is only one point at which contact
-    can be made, so there is no meaningful reason to distinguish between
-    multiple forces.</p>
+    -9.81]^T$ is the gravity vector, $u$ is the control input vector, and
+    $f^{F_c}$ is the Cartesian contact force applied to the finger, $F$, at
+    $c$.  Notably absent is the contact Jacobian which normally pre-multiplies
+    the contact forces, $\sum_i J_i^T f^{c_i};$ in the case of a point finger
+    this Jacobian is always the identity matrix, and there is only one point at
+    which contact can be made, so there is no meaningful reason to distinguish
+    between multiple forces.</p>
 
     <p>Just to make the notation clear, I've used $f^{F_c}$ above to denote
     force <i>applied to the finger</i>, $F$, at point $c$. If we want to denote
@@ -145,18 +144,6 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
     denote it as $f^{B_c}$. Naturally, we have $f^{F_c} = - f^{B_c}$, because
     the forces must be equal and opposite. If we're not careful about this
     notation, the signs can get confusing below.</p>
-
-    <figure>
-      <iframe width="560" height="315" src="https://www.youtube.com/embed/PngdQGEUi7w?mute=1&rel=0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen pdf="no"></iframe>
-      <p pdf="only"><a href="https://www.youtube.com/embed/PngdQGEUi7w">Click here to watch the video.</a></p>
-      <figcaption>A simple example of force control; the robot needs to push
-      down hard enough that the contact between the fingers and book do not
-      slip, but gentle enough that the contacts between the book at the table
-      <i>do</i>
-      slide. You can explore this example in more detail in <a
-      href="#hybrid_book_push">an exercise</a>.</figcaption></figure>
-
-      <todo>Check yourself: can the finger move the box?  (only if the coefficient of friction is bigger).</todo>
 
     <subsection><h1>(Direct) force control</h1>
 
@@ -276,10 +263,11 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
         the box normal to the surface, and $A$ for the contact frame for the
         lower left corner of the box contacting the bin, with the normal
         pointing straight up in positive world $z$. $${}^BR^C =
-        \text{Rot}_y(-\frac{\pi}{2}), \qquad {}^WR^A = I.$$ Of course we also
-        have the force of gravity, which is applied at the body center of mass
-        (com): $$f^{B_{com}}_{gravity,W} = mg.$$ As you can see, we'll make heavy use of the spatial
-        force notation / spatial algebra <a
+        R_y(-\frac{\pi}{2}), \qquad {}^WR^A = I,$$ where $R_y(\theta)$ is a
+        rotation by $\theta$ around the y axis. Of course we also have the
+        force of gravity, which is applied at the body center of mass (com):
+        $$f^{B_{com}}_{gravity,W} = mg.$$ As you can see, we'll make heavy use
+        of the spatial force notation / spatial algebra <a
         href="clutter.html#spatial_force">described here</a>.</p>
         
         <p>The friction cone provides (linear inequality) constraints on the
@@ -306,14 +294,12 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
         A reasonable control strategy in the face of these unmodeled terms is
         to use feedback control on the angle of the box (call it $\theta$)
         which is the $y$ component of ${}^WR^B$: $$ \tau^{B_A}_{finger_d,W_y} =
-        \text{PID}(\theta_d, \theta), \qquad {}^WR^B(\theta) = \begin{bmatrix}
-        \cos\theta & 0 & \sin\theta \\ 0 & 1 & 0 \\ \sin\theta & 0 &
-        \cos\theta\end{bmatrix},$$ where I've used $\theta_{d}$ as shorthand
-        for the desired box angle and $\text{PID}$ as shorthand for a simple
-        proportional-integral-derivative term. Note that
-        $\tau^{B_A}_{finger,W_y} \propto f^{B_C}_{finger, C_x},$ where the
-        (constant) coefficient only depends on ${}^B\hat{p}^C,$ and does not
-        depend on $\hat\theta.$</p>
+        \text{PID}(\theta_d, \theta), \qquad {}^WR^B(\theta) = R_y(\theta),$$
+        where I've used $\theta_{d}$ as shorthand for the desired box angle and
+        $\text{PID}$ as shorthand for a simple proportional-integral-derivative
+        term. Note that $\tau^{B_A}_{finger,W_y} \propto f^{B_C}_{finger,
+        C_x},$ where the (constant) coefficient only depends on
+        ${}^B\hat{p}^C;$ it does not actually depend on $\hat\theta.$</p>
         
         <p>To execute the desired PID control subject to the friction-cone
         constraints, we can use constrained least-squares:
@@ -494,26 +480,42 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       directions tangent to the surface.  In the simplest case, imagine
       controlling force in $z$ and position in $x$ for our point finger: $$u =
       -mg + \begin{bmatrix} k_p (x_d - x) + k_d (\dot{x}_d - \dot{x}) \\
-      -f^{C_d}_{W_z} \end{bmatrix}.$$  If want the forces/positions in a
-      different frame, $C$, then we can use $$u = -mg + {}^WR^{C}
+      -f^{F_C}_{desired, W_z} \end{bmatrix}.$$  If want the forces/positions in
+      a different frame, $C$, then we can use $$u = -mg + {}^WR^{C}
       \begin{bmatrix} k_p (p^{C_d}_{C_x} - p^{C}_{C_x}) + k_d (v^{C_d}_{C_x} -
-      v^{C}_{C_x}) \\ -f^{C_d}_{C_z}  \end{bmatrix}.$$  By commanding the normal
+      v^{C}_{C_x}) \\ -f^{F_C}_{desired, C_z}\end{bmatrix},$$ where $C_d$ is
+      the frame at the desired pose for the contact. By commanding the normal
       force, you not only have the benefit of controlling how hard the robot is
       pushing on the surface, but also gain some robustness to errors in
       estimating the surface normal.  If a position-controlled robot estimated
       the normal of a wall badly, then it might leave the wall entirely in one
-      direction, and push extremely hard in the other.  Having a commanded force
-      in the normal direction would allow the position of the robot in that
-      direction to become whatever is necessary to apply the force, and it will
-      follow the wall.</p>
+      direction, and push extremely hard in the other.  Having a commanded
+      force in the normal direction would allow the position of the robot in
+      that direction to become whatever is necessary to apply the force, and it
+      will follow the wall.</p>
+
+      <figure>
+        <iframe width="560" height="315" src="https://www.youtube.com/embed/PngdQGEUi7w?mute=1&rel=0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen pdf="no"></iframe>
+        <p pdf="only"><a href="https://www.youtube.com/embed/PngdQGEUi7w">Click here to watch the video.</a></p>
+        <figcaption>A simple example of hybrid position/force control; the
+        robot needs to push down hard enough that the contact between the
+        fingers and book do not slip, but gentle enough that the contacts
+        between the book at the table <i>do</i> slide. This is naturally
+        accomplished with force control in the world $z$. But moving the
+        gripper/book in the $x,y$ plane is more naturally described using
+        position control. You can explore this example in more detail in <a
+        href="#hybrid_book_push">an exercise</a>.</figcaption>
+      </figure>
+  
+      <todo>Check yourself: can the finger move the box?  (only if the coefficient of friction is bigger).</todo>      
 
       <p>The choice of position control or force control need not be a binary
       decision.  We can simply apply both the position command (as in
       stiffness/impedance control) and a "feed-forward" force command: $$u =
       -mg + {}^WR^C \left[K_p (p^{C_d}_C - p^{C}_C) + K_d (v^{C_d}_C - v^{C}_C)
-      + f^{ff}_C \right].$$ As we'll see, this is quite similar to the
-      interface provided by the iiwa (and many other torque-controlled
-      robots).</p>      
+      - f^{F_C}_{\text{feedforward}, C} \right].$$ As we'll see, this is quite
+      similar to the interface provided by the iiwa (and many other
+      torque-controlled robots).</p>      
 
     </subsection>
 
@@ -555,8 +557,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
     the coolest results in force control is the realization that a clever
     physical mechanism can be used to produce a "remote-centered compliance"
     (RCC) completely mechanically, with infinite bandwidth and no sensing
-    required
-    <elib>Drake78</elib>!</p>
+    required <elib>Drake78</elib>!</p>
 
     <figure><img width="40%" src="data/passive_remote_center_compliance.png">
     <img style="margin-left:4%; margin-bottom:3%" width="55%"
@@ -566,6 +567,8 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
     image credit for <a
     href="https://en.wikipedia.org/wiki/Remote_Center_Compliance">Arne
     Nordmann, 2008</a>.  See <a href="https://www.ati-ia.com/products/compliance/Compensator_main.aspx">here</a> for some example products, and <a href="https://www.youtube.com/watch?v=qFTUFHGGZIg">here</a> for a nice (older) video.</figcaption></figure>
+
+    <todo>Implement an RCC peg and hole in simulation (using stiffness control)</todo>
 
     <p>Interestingly, the peg-in-hole problem inspired incredibly important
     and influential ideas in mechanics and control, but also in motion planning
