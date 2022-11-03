@@ -678,7 +678,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       href="pick.html#kinematics">kinematics</a>
       and <a href="pick.html#jacobian">differential kinematics</a>, we'll
       define the forward kinematics of this frame as: \begin{equation}p^E =
-      f_{kin}(q), \qquad v^E = \dot{p}^E = J(q) \dot{q}, \qquad \dot{v}^E =
+      f_{kin}(q), \qquad v^E = \dot{p}^E = J(q) \dot{q}, \qquad a^E =
       \ddot{p}^E = J(q)\ddot{q} + \dot{J}(q)
       \dot{q}.\label{eq:kinematics}\end{equation} We haven't actually written
       the second derivative before, but it follows naturally from the chain
@@ -688,25 +688,25 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       <elib>Suh22</elib>).</p>
 
       <p>One of the big ideas from manipulator control is that we can actually
-      write the dynamics of the robot in the frame $E$, by writing the joint
-      torques in terms of a translational force command, $f^E_u$: $u = J^T(q)
-      f^E_u$. This comes from the <a
+      write the dynamics of the robot in the frame $E$, by parameterizing the
+      joint torques as a translational force applied to body $B$ at $E$,
+      $f^{B_E}_u$: $u = J^T(q) f^{B_E}_u$. This comes from the <a
       href="https://ocw.mit.edu/courses/mechanical-engineering/2-12-introduction-to-robotics-fall-2005/lecture-notes/chapter6.pdf">principle
       of virtual work</a>.  By substituting this and the manipulator equations
       (\ref{eq:manipulator}) into (\ref{eq:kinematics}) and assuming that the
       only external contacts happen at $E$, we can write the dynamics:
-      \begin{equation} M_E(q) \ddot{p}^E + C_E(q,\dot{q})\dot{q} = f^E_g(q) +
-      f^E_u + f^E_{ext} \label{eq:cartesian_dynamics},\end{equation} where
-      $$M_E(q) = (J M^{-1} J^T)^{-1}, \qquad C_E(q,\dot{q}) = M_E \left(J
-      M^{-1} C+ \dot{J} \right), \qquad f^E_g(q) = M_E J M^{-1} \tau_g.$$  Now
-      if we simply apply the controller we used in joint space, e.g.: $$f^E_u =
-      -f^E_g(q) + K_p(p^{E_d} - p^E) + K_d(\dot{p}^{E_d} - \dot{p}^E),$$ then
-      we can achieve the desired closed-loop dynamics <i>at the
-      end-effector</i>: $$M_E(q) \ddot{p}^E + C_E(q,\dot{q})\dot{q} + K_p(p^{E}
-      - p^{E_d}) + K_d(\dot{p}^{E} - \dot{p}^{E_d}) = f^E_{ext}.$$ So if I push
-      on the robot at the end-effector, the entire robot will move in a way
-      that will make it feel like I'm pushing on a spring-damper
-      system. Beautiful!</p>
+      \begin{equation} M_E(q) \ddot{p}^E + C_E(q,\dot{q})\dot{q} = f^{B_E}_g(q)
+      + f^{B_E}_u + f^{B_E}_{ext} \label{eq:cartesian_dynamics},\end{equation}
+      where $$M_E(q) = (J M^{-1} J^T)^{-1}, \qquad C_E(q,\dot{q}) = M_E \left(J
+      M^{-1} C+ \dot{J} \right), \qquad f^{B_E}_g(q) = M_E J M^{-1} \tau_g.$$
+      Now if we simply apply a controller analogous to what we used in joint
+      space, e.g.: $$f^{B_E}_u = -f^{B_E}_g(q) + K_p(p^{E_d} - p^E) +
+      K_d(\dot{p}^{E_d} - \dot{p}^E),$$ then we can achieve the desired
+      closed-loop dynamics <i>at the end-effector</i>: $$M_E(q) \ddot{p}^E +
+      C_E(q,\dot{q})\dot{q} + K_p(p^{E} - p^{E_d}) + K_d(\dot{p}^{E} -
+      \dot{p}^{E_d}) = f^{B_E}_{ext}.$$ So if I push on the robot at the
+      end-effector, the entire robot will move in a way that will make it feel
+      like I'm pushing on a spring-damper system. Beautiful!</p>
       
       <p>When $J(q)$ can be rank-deficient (for instance, if you have more
       degrees of freedom than you are trying to control at the end-effector),
@@ -715,7 +715,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       Jacobian</a>. Since we are operating here with torques instead of
       velocity commands, the natural analogue is to write the a joint-centering
       PD controller that operates in the nullspace of the end-effector control:
-      $$u = J^Tf^E_u + [I - J^+J][K_{p,joint} (q_0 - q) -
+      $$u = J^Tf^{B_E}_u + [I - J^+J][K_{p,joint} (q_0 - q) -
       K_{d,joint}\dot{q}].$$</p>
       
       <p>This approach of programming the task-space dynamics with
