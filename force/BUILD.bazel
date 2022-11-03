@@ -17,3 +17,8 @@ rt_ipynb_test(
       "//manipulation:scenarios",
     ],
 )
+
+rt_ipynb_test(
+    name = "tracking",
+    srcs = ["tracking.ipynb"],
+)
