@@ -712,9 +712,20 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       degrees of freedom than you are trying to control at the end-effector),
       you'll also want to add some terms to similar to 
       <a href="pick.html#joint_centering">stabilize the null space of your
-      Jacobian</a>.</p>
-
-      <todo>More operation space control.</todo>
+      Jacobian</a>. Since we are operating here with torques instead of
+      velocity commands, the natural analogue is to write the a joint-centering
+      PD controller that operates in the nullspace of the end-effector control:
+      $$u = J^Tf^E_u + [I - J^+J][K_{p,joint} (q_0 - q) -
+      K_{d,joint}\dot{q}].$$</p>
+      
+      <p>This approach of programming the task-space dynamics with
+      secondary joint-space objectives operating in the nullspace was developed
+      in <elib>Khatib87</elib> and is known as <i>operational space control</i>. It can be generalized to a rich composition of
+      <i>prioritized</i> task-space and joint-space control objectives; the
+      prioritization is accomplished by putting lower-priority tasks in the
+      nullspace of the primary task. Like the joint-centering differential
+      inverse kinematics, these can also be understood through the lens of
+      least-squares optimization.</p>
 
     </subsection>
 
@@ -994,6 +1005,12 @@ PhD thesis, Massachusetts Institute of Technology, <span class="year">1978</span
 <span class="title">"{SEED}: Series Elastic End Effectors in 6D for Visuotactile Tool Use"</span>, 
 <span class="publisher">Under review</span> , <span class="year">2022</span>.
 [&nbsp;<a href="http://groups.csail.mit.edu/robotics-center/public_papers/Suh22.pdf">link</a>&nbsp;]
+
+</li><br>
+<li id=Khatib87>
+<span class="author">Oussama Khatib</span>, 
+<span class="title">"A Unified Approach for Motion and Force Control of Robot Manipulators: The Operational Space Formulation"</span>, 
+<span class="publisher">IEEE Journal of Robotics and Automation</span>, vol. 3, no. 1, pp. 43-53, February, <span class="year">1987</span>.
 
 </li><br>
 <li id=Lynch17>
