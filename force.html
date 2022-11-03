@@ -215,7 +215,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
         box and therefore also the finger to rest.  For large values, the
         finger will keep pushing the box until it runs into the far wall.</p>
 
-        <script>document.write(notebook_link('force'))</script>
+        <script>document.write(notebook_link('force', d = deepnote, link_text = "", notebook = "point_finger"))</script>
           
       </example>
 
@@ -326,8 +326,8 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
         estimates can be loose. I think that you'll find it's quite robust to
         knowing the mass and geometry of the box.</p>
 
-        <script>document.write(notebook_link('force'))</script>
-    
+        <script>document.write(notebook_link('force', d = deepnote, link_text = "", notebook = "point_finger"))</script>
+
         <todo>Generate random boxes.</todo>
 
       </example>
@@ -420,17 +420,13 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
         the set points on virtual springs, however, is quite natural. Take a
         minute to try moving the box around, or even flipping it up.</p>
 
-        <script>document.write(notebook_link('force'))</script>
+        <script>document.write(notebook_link('force', d = deepnote, link_text = "", notebook = "point_finger"))</script>
     
         <p>To help your intuition, I've made the bin and the box slightly
         transparent, and added a visualization (in orange) of the virtual finger
         or gripper that you are moving with the sliders.</p>
 
       </example>
-
-    </subsection>
-
-    <subsection><h1>A stiffness-control-based "flip-up" strategy</h1>
 
       <p>Let's embrace indirect force control to come up with another approach
       to flipping up the box.  Flipping the box up in the middle of the bin
@@ -464,9 +460,27 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
         band) up the wall a bit, and we can let mechanics take care of the
         rest!</p>
 
-        <script>document.write(notebook_link('force'))</script>
+        <script>document.write(notebook_link('force', d = deepnote, link_text = "", notebook = "point_finger"))</script>
     
       </example>
+
+      <p>So far we've made our finger act like two independent
+      mass-spring-damper systems, one in $x$ and the other in $z$. We even used
+      the same stiffness, $k$, and damping, $b$, parameters for each.  More
+      generally, we can write stiffness and damping matrices, which we
+      typically would call $K_p$ and $K_d$, respectively: $$m
+      \begin{bmatrix}\ddot{x} \\ \ddot{z} \end{bmatrix} + K_d \begin{bmatrix}
+      \dot{x} \\ \dot{z} \end{bmatrix} + K_p \begin{bmatrix} x - x_d \\ z - z_d
+      \end{bmatrix} = f^{F_c}.$$  In order to emphasize the coordinate frame of
+      these stiffness matrices, let's write exactly the same equation,
+      realizing that with our point finger we have ${}^Wp^F = \begin{bmatrix}
+      x, z\end{bmatrix}^T,$ so: $$m\,{}^W\dot{v}^F + K_d \, {}^Wv^F +
+      K_p\left({}^Wp^F - {}^Wp^{F_d}\right) = f^F.$$  Sometimes it can be
+      convenient to express the stiffness (and/or damping) matrices in a
+      different frame, $A$: \begin{align*} m\,{}^W\dot{v}^F + {}^W R^A K_d \,
+      {}^Wv^F_A + {}^WR^W K_p\left({}^Wp^F_A - {}^Wp^{F_d}_A\right) =& \\
+      m\,{}^W\dot{v}^F + {}^W R^A K_d {}^A R^W\, {}^Wv^F + {}^WR^A K_p {}^A
+      R^W\left(\,{}^Wp^F - {}^Wp^{F_d}\right) =& \, f^F.\end{align*}</p>
 
     </subsection>
 
@@ -480,19 +494,19 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       directions tangent to the surface.  In the simplest case, imagine
       controlling force in $z$ and position in $x$ for our point finger: $$u =
       -mg + \begin{bmatrix} k_p (x_d - x) + k_d (\dot{x}_d - \dot{x}) \\
-      -f^{F_C}_{desired, W_z} \end{bmatrix}.$$  If want the forces/positions in
-      a different frame, $C$, then we can use $$u = -mg + {}^WR^{C}
-      \begin{bmatrix} k_p (p^{C_d}_{C_x} - p^{C}_{C_x}) + k_d (v^{C_d}_{C_x} -
-      v^{C}_{C_x}) \\ -f^{F_C}_{desired, C_z}\end{bmatrix},$$ where $C_d$ is
-      the frame at the desired pose for the contact. By commanding the normal
-      force, you not only have the benefit of controlling how hard the robot is
-      pushing on the surface, but also gain some robustness to errors in
-      estimating the surface normal.  If a position-controlled robot estimated
-      the normal of a wall badly, then it might leave the wall entirely in one
-      direction, and push extremely hard in the other.  Having a commanded
-      force in the normal direction would allow the position of the robot in
-      that direction to become whatever is necessary to apply the force, and it
-      will follow the wall.</p>
+      -f^F_{desired, W_z} \end{bmatrix}.$$  If want the forces/positions in a
+      different frame, for instance the contact frame, $C$, then we can use
+      \begin{equation} u = -mg + {}^WR^C \begin{bmatrix} k_p (p^{F_d}_{C_x} -
+      p^{F}_{C_x}) + k_d (v^{F_d}_{C_x} - v^F_{C_x}) \\ -f^{F}_{desired,
+      C_z}\end{bmatrix}. \label{eq:position-or-force}\end{equation}  By commanding the normal force, you not
+      only have the benefit of controlling how hard the robot is pushing on the
+      surface, but also gain some robustness to errors in estimating the
+      surface normal.  If a position-controlled robot estimated the normal of a
+      wall badly, then it might leave the wall entirely in one direction, and
+      push extremely hard in the other.  Having a commanded force in the normal
+      direction would allow the position of the robot in that direction to
+      become whatever is necessary to apply the force, and it will follow the
+      wall.</p>
 
       <figure>
         <iframe width="560" height="315" src="https://www.youtube.com/embed/PngdQGEUi7w?mute=1&rel=0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen pdf="no"></iframe>
@@ -512,10 +526,13 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       <p>The choice of position control or force control need not be a binary
       decision.  We can simply apply both the position command (as in
       stiffness/impedance control) and a "feed-forward" force command: $$u =
-      -mg + {}^WR^C \left[K_p (p^{C_d}_C - p^{C}_C) + K_d (v^{C_d}_C - v^{C}_C)
-      - f^{F_C}_{\text{feedforward}, C} \right].$$ As we'll see, this is quite
-      similar to the interface provided by the iiwa (and many other
-      torque-controlled robots).</p>      
+      -mg + K_p (p^{F_d} - p^{F}) + K_d (v^{F_d} - v^{F}) -
+      f^{F}_{\text{feedforward}}.$$ Certainly this is only more general that
+      the explicit position-or-force mode in Eq. (\ref{eq:position-or-force});
+      we could achieve the explicit position-or-force in this interface by the
+      appropriate choices of $K_p$, $K_d$, and $f^F_{feedforward}.$ As we'll
+      see, this is quite similar to the interface provided by the iiwa (and
+      many other torque-controlled robots).</p>      
 
     </subsection>
 
@@ -601,35 +618,6 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
     used $\dot{q}$ and $\ddot{q}$ instead of $v$ and $\dot{v}$.</p>
 
 <!--
-    <subsection><h1>Inverse dynamics control</h1>
-
-      <p>Let us ignore the contact terms for a moment: $$M(q)\ddot{q} +
-      C(q,\dot{q})\dot{q} = \tau_g(q) + u.$$  The <i>forward dynamics</i>
-      problem, which we use during simulation, is to compute the
-      accelerations, $\ddot{q}$, given the joint torques, $u$, (and $q,
-      \dot{q}$).  The <i>inverse dynamics</i>
-      problem, which we can use in control, is to compute $u$ given $\ddot{q}$
-      (and $q, \dot{q}$).  As a system, it looks like</p>
-
-      <div>
-        <script type="text/javascript">
-        var inverse_dynamics = { "name": "InverseDynamics", 
-          "input_ports" : ["estimated_state", "desired_acceleration"],
-          "output_ports" : ["actuation_input"]
-          };
-        document.write(system_html(inverse_dynamics, "https://drake.mit.edu/doxygen_cxx/classdrake_1_1systems_1_1controllers_1_1_inverse_dynamics.html"));
-        </script>
-      </div>
-
-      <p>This system implements the controller: $$u = M(q)\ddot{q}_d +
-      C(q,\dot{q})\dot{q} - \tau_g(q),$$ so that the resulting dynamics are
-      $M(q)\ddot{q} = M(q)\ddot{q}_d.$  Since we know that $M(q)$ is invertible,
-      this implies that $\ddot{q} = \ddot{q}_d$.</p>
-
-      <p>In practice, we only have estimates of the dynamics (mass matrix, etc) and even the states $q$ and $\dot{q}$.  We will need to account for these errors when we determine the acceleration commands to send.  For example, if we wanted to follow a desired joint trajectory, $q_0(t)$, we do not just differentiate the trajectory twice and command $\ddot{q}_0(t)$, but we could instead command e.g. $$\ddot{q}_d = \ddot{q}_0(t) + K_p(q_0(t) - q) + K_d(\dot{q}_0(t) - \dot{q}).$$</p>
-    
-    </subsection>
-
     <subsection><h1>Direct force control</h1>
 
       <p>Let's bring back our contact forces, but assume that we are only making
@@ -684,36 +672,49 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       <p>A better analogy for the control we were doing with the point finger
       example is to write a controller so that the robot acts like a simple
       dynamical system in the world frame.  To do that, we have to identify a
-      frame, $C$ on the robot where we want to impose these simple dynamics --
-      origin of this frame is the expected point of contact.  Following our
-      treatment of <a href="pick.html#kinematics">kinematics</a> and <a
-      href="pick.html#jacobian">differential kinematics</a>, we'll define the
-      forward kinematics of this frame as: \begin{equation}p^C = f_{kin}(q),
-      \qquad v^C = \dot{p}^C = J(q) \dot{q}, \qquad a^C = \ddot{p}^C =
-      J(q)\ddot{q} + \dot{J}(q) \dot{q}.\label{eq:kinematics}\end{equation} We
-      haven't actually written the second derivative before, but it follows
-      naturally from the chain rule. Also, I've restricted this to the
-      Cartesian positions; one can think about the orientation of the
-      end-effector, but this requires some care in defining the 3D stiffness in
-      orientation.</p>
+      frame, $E$ for "end-effector", on the robot where we want to impose these
+      simple dynamics -- ideally the origin of this frame will be the expected
+      point of contact with the environment. Following our treatment of <a
+      href="pick.html#kinematics">kinematics</a>
+      and <a href="pick.html#jacobian">differential kinematics</a>, we'll
+      define the forward kinematics of this frame as: \begin{equation}p^E =
+      f_{kin}(q), \qquad v^E = \dot{p}^E = J(q) \dot{q}, \qquad \dot{v}^E =
+      \ddot{p}^E = J(q)\ddot{q} + \dot{J}(q)
+      \dot{q}.\label{eq:kinematics}\end{equation} We haven't actually written
+      the second derivative before, but it follows naturally from the chain
+      rule. Also, I've restricted this to the Cartesian positions for
+      simplicity; one can think about the orientation of the end-effector, but
+      this requires some care in defining the 3D stiffness in orientation (e.g.
+      <elib>Suh22</elib>).</p>
 
       <p>One of the big ideas from manipulator control is that we can actually
-      write the dynamics of the robot in the frame $C$, by writing the joint
-      torques in terms of a spatial force command, $F^u$: $u = J^T(q) F^u$.
-      This comes from the <a
+      write the dynamics of the robot in the frame $E$, by writing the joint
+      torques in terms of a translational force command, $f^E_u$: $u = J^T(q)
+      f^E_u$. This comes from the <a
       href="https://ocw.mit.edu/courses/mechanical-engineering/2-12-introduction-to-robotics-fall-2005/lecture-notes/chapter6.pdf">principle
       of virtual work</a>.  By substituting this and the manipulator equations
       (\ref{eq:manipulator}) into (\ref{eq:kinematics}) and assuming that the
-      only external contacts happen at $C$, we can write the dynamics:
-      \begin{equation} M_C(q) \ddot{p}^C + C_C(q,\dot{q})\dot{q} = {}^C
-      F^{g}(q) + F^u + F^{ext} \label{eq:cartesian_dynamics},\end{equation}
-      where $$M_C = (J M^{-1} J^T)^{-1}, \qquad C_C = M_C \left(J M^{-1} C+
-      \dot{J} \right), \qquad {}^CF^g = M_C J M^{-1} \tau_g.$$  Now we can
-      simply apply the controller we used in joint space, e.g.: $$F^u = -{}^C
-      F^{g}(q) + K_p(p^{C_d} - p^C) + K_d(\dot{p}^{C_d} - \dot{p}^C) +
-      F^{ff}.$$  Please don't forget to add some terms to
+      only external contacts happen at $E$, we can write the dynamics:
+      \begin{equation} M_E(q) \ddot{p}^E + C_E(q,\dot{q})\dot{q} = f^E_g(q) +
+      f^E_u + f^E_{ext} \label{eq:cartesian_dynamics},\end{equation} where
+      $$M_E(q) = (J M^{-1} J^T)^{-1}, \qquad C_E(q,\dot{q}) = M_E \left(J
+      M^{-1} C+ \dot{J} \right), \qquad f^E_g(q) = M_E J M^{-1} \tau_g.$$  Now
+      if we simply apply the controller we used in joint space, e.g.: $$f^E_u =
+      -f^E_g(q) + K_p(p^{E_d} - p^E) + K_d(\dot{p}^{E_d} - \dot{p}^E),$$ then
+      we can achieve the desired closed-loop dynamics <i>at the
+      end-effector</i>: $$M_E(q) \ddot{p}^E + C_E(q,\dot{q})\dot{q} + K_p(p^{E}
+      - p^{E_d}) + K_d(\dot{p}^{E} - \dot{p}^{E_d}) = f^E_{ext}.$$ So if I push
+      on the robot at the end-effector, the entire robot will move in a way
+      that will make it feel like I'm pushing on a spring-damper
+      system. Beautiful!</p>
+      
+      <p>When $J(q)$ can be rank-deficient (for instance, if you have more
+      degrees of freedom than you are trying to control at the end-effector),
+      you'll also want to add some terms to similar to 
       <a href="pick.html#joint_centering">stabilize the null space of your
-      Jacobian</a> if necessary.</p>
+      Jacobian</a>.</p>
+
+      <todo>More operation space control.</todo>
 
     </subsection>
 
@@ -753,15 +754,100 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       position commands to obtain the desired velocity, which adds a delay of a
       few control timesteps (and sometimes <a
       href="https://github.com/RobotLocomotion/drake/issues/11955#issuecomment-524467883">non-monotonic
-      behavior</a>).  I don't really know why we aren't allowed to send our own
-      joint velocity commands.</p>
+      behavior</a>).  I suspect that the only reason why we aren't allowed to
+      send our own joint velocity commands is to make a simpler/safer API; they
+      don't want users to be able to send a series of inconsistent position and
+      velocity commands (where the velocities are not actually the time
+      derivatives of the positions).</p>
 
-      <todo>Think through and propose a specific velocity filtering/estimation system that could account for this behavior.</todo>
+      <todo>Summarize the email exchange with the kuka folks describing these
+      details.</todo>
 
-      <todo>Can also tell the firmware about the lumped inertia of the gripper.  But if you pick something up (or even move the fingers), that will not be included.</todo>
+      <p>Since the controller attempts to cancel gravitational terms, one can
+      also tell the iiwa firmware about the lumped inertia of the gripper. This
+      is set just once (in the pendant), and cannot be changed while the robot
+      is moving; if you pick something up (or even move the fingers), those
+      changes in the gravitational terms will not be compensated in the
+      controller.</p>
 
     </subsection>
 
+    <subsection><h1>Inverse dynamics control</h1>
+
+      <p>There is a variation on the joint-space stiffness control that we use
+      often in simulation; we call it <a
+      href="https://drake.mit.edu/doxygen_cxx/classdrake_1_1systems_1_1controllers_1_1_inverse_dynamics_controller.html">InverseDynamicsControl</a>.  </p>
+
+      <p>Let us ignore the contact terms for a moment: $$M(q)\ddot{q} +
+      C(q,\dot{q})\dot{q} = \tau_g(q) + u.$$  The <i>forward dynamics</i>
+      problem, which we use during simulation, is to compute the
+      accelerations, $\ddot{q}$, given the joint torques, $u$, (and $q,
+      \dot{q}$).  The <i>inverse dynamics</i>
+      problem, which we can use in control, is to compute $u$ given $\ddot{q}$
+      (and $q, \dot{q}$).  As a system, it looks like</p>
+
+      <div>
+        <script type="text/javascript">
+        var inverse_dynamics = { "name": "InverseDynamics", 
+          "input_ports" : ["estimated_state", "desired_acceleration"],
+          "output_ports" : ["actuation_input"]
+          };
+        document.write(system_html(inverse_dynamics, "https://drake.mit.edu/doxygen_cxx/classdrake_1_1systems_1_1controllers_1_1_inverse_dynamics.html"));
+        </script>
+      </div>
+
+      <p>This system implements the controller: $$u = M(q)\ddot{q}_d +
+      C(q,\dot{q})\dot{q} - \tau_g(q),$$ so that the resulting dynamics are
+      $M(q)\ddot{q} = M(q)\ddot{q}_d.$  Since we know that $M(q)$ is invertible,
+      this implies that $\ddot{q} = \ddot{q}_d$.</p>
+
+      <p>When we put the contact forces back in, In practice, we only have
+      estimates of the dynamics (mass matrix, etc) and even the states $q$ and
+      $\dot{q}$.  We will need to account for these errors when we determine
+      the acceleration commands to send.  For example, if we wanted to follow a
+      desired joint trajectory, $q_0(t)$, we do not just differentiate the
+      trajectory twice and command $\ddot{q}_0(t)$, but we could instead
+      command e.g. $$\ddot{q}_d = \ddot{q}_0(t) + K_p(q_0(t) - q) +
+      K_d(\dot{q}_0(t) - \dot{q}).$$  One could also include an integral gain
+      term.</p>
+
+      <p>The resulting <code>System</code> has one additional input port for the desired state:</p>
+      <div>
+        <script type="text/javascript">
+        var inverse_dynamics = { "name": "InverseDynamicsController", 
+          "input_ports" : ["estimated_state", "desired_state", "desired_acceleration"],
+          "output_ports" : ["actuation_input"]
+          };
+        document.write(system_html(inverse_dynamics, "https://drake.mit.edu/doxygen_cxx/classdrake_1_1systems_1_1controllers_1_1_inverse_dynamics_controller.html"));
+        </script>
+      </div>
+      <p>This "inverse dynamics control" also appears in the literature with a
+      few other names, such as "computed-torque control" and even the
+      "feedforward-plus-feedback-linearizing control" <elib
+      part="11.4.1.3">Lynch17</elib>.</p>
+
+      <details style-type="box"><summary><b>Check yourself:</b> What is the
+      difference between the joint stiffness control and the inverse dynamics
+      control?</summary> <p>The closed-loop dynamics with the joint stiffness
+      control (taking $\tau_{ff} = 0$) are given by $$M(q)\ddot{q} +
+      C(q,\dot{q})\dot{q} + K_p(q - q_d) + K_d(\dot{q} - \dot{q}_d) =
+      \tau_{ext},$$ where $\tau_{ext}$ summarized the results of (unmodeled)
+      forces like contacts. The closed-loop dynamics with the inverse dynamics
+      controllers are given by $$\ddot{q} + K_p(q - q_d) + K_d(\dot{q} -
+      \dot{q}_d) = M^{-1}(q) \tau_{ext}.$$  So the inverse dynamics controller
+      writes the feedback law in the units of accelerations rather than forces;
+      this would be similar to shaping the internal matrix into the diagonal
+      matrix.</p>  
+      
+      <p>The ability to realize this cancellation in hardware, however, will be
+      limited by the accuracy with which we estimate the model parameters,
+      $\hat{M}(q)$ and $\hat{C}(q,\dot{q})$.  The stiffness controller, on the
+      other hand, achieves much of the desired performance but only attempts to
+      cancel the gravity (and perhaps friction) terms; it does not shape the
+      inertia.</p></details>
+    </subsection>
+
+    <todo>Admittance control</todo>
     <todo>Adaptive control.  Slotine WAM throwing.</todo>
     <todo>Estimating contact location.  contact particle filter.  
       haddadin videos (e.g. http://www.diag.uniroma1.it/~deluca/IIT_Seminar_Jan23_2019_ADL.pdf)
@@ -772,7 +858,8 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
 
   <section><h1>Putting it all together</h1>
   
-  
+    <todo>Flip up the box using cartesian stiffness control.</todo>
+
   </section>
 
   <section><h1>Exercises</h1>
@@ -900,6 +987,19 @@ PhD thesis, Massachusetts Institute of Technology, <span class="year">1978</span
 <span class="author">Alin Albu-Schaffer and Gerd Hirzinger</span>, 
 <span class="title">"A globally stable state feedback controller for flexible joint robots"</span>, 
 <span class="publisher">Advanced Robotics</span>, vol. 15, no. 8, pp. 799--814, <span class="year">2001</span>.
+
+</li><br>
+<li id=Suh22>
+<span class="author">H.J. Terry Suh and Naveen Kuppuswamy and Tao Pang and Paul Mitiguy and Alex Alspach and Russ Tedrake</span>, 
+<span class="title">"{SEED}: Series Elastic End Effectors in 6D for Visuotactile Tool Use"</span>, 
+<span class="publisher">Under review</span> , <span class="year">2022</span>.
+[&nbsp;<a href="http://groups.csail.mit.edu/robotics-center/public_papers/Suh22.pdf">link</a>&nbsp;]
+
+</li><br>
+<li id=Lynch17>
+<span class="author">Kevin M Lynch and Frank C Park</span>, 
+<span class="title">"Modern Robotics"</span>, Cambridge University Press
+, <span class="year">2017</span>.
 
 </li><br>
 </ol>

@@ -96,18 +96,6 @@ rt_html_test(
     srcs = ["force.html"],
 )
 
-rt_ipynb_test(
-    name = "force",
-    srcs = ["force.ipynb"],
-    tags = ["requires-network"], # For gurobi
-    data = ["//manipulation/models"],
-    deps = [
-      "//manipulation",
-      "//manipulation:meshcat_utils",
-      "//manipulation:scenarios",
-    ],
-)
-
 rt_html_test(
     srcs = ["trajectories.html"],
 )
