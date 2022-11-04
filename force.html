@@ -878,32 +878,32 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
     <exercise><h1>Force and Position Control</h1>
 
       <p> Suppose you are given a point-mass system with the following dynamics:</p>
-      $$m\ddot{x} = u + f^c$$
+      $$m\ddot{x} = u + f^{F_c}$$
 
-      <p> where $x$ is the position, $u$ the input force applied on the point-mass, and $f^c$ the contact force from the environment. In order to control the position and force from the robot at the same time, the following controller is proposed:</p>
+      <p> where $x$ is the position, $u$ the input force applied on the point-mass, and $f^{F_c}$ the contact force from the environment on point ${F}$ applied at $c$. In order to control the position and force from the robot at the same time, the following controller is proposed:</p>
 
-      $$u = \underbrace{k_p(x_d-x) - k_d\dot{x}}_{\text{feedback force for position control}} - \underbrace{f^c_d}_{\text{feedforward force}}$$
+      $$u = \underbrace{k_p(x_d-x) - k_d\dot{x}}_{\text{feedback force for position control}} - \underbrace{f^{F_c}_{desired}}_{\text{feedforward force}}$$
 
       <p>Define the error for this system to be:</p>
 
-      $$e = (x - x_d)^2 + (f^c - f^c_d)^2$$
+      $$e = (x - x_d)^2 + (f^{F_c} - f^{F_c}_{desired})^2$$
 
       <ol type="a">
-        <li>Let's consider the case where our system is in free space (i.e. $f^c=0$) and we want to exert a non-zero desired force ($f^c_d \neq 0$) and drive our position to zero ($x_d = 0$). You wil show that this is not possible, i.e. we cannot achieve zero error for our desired force and desired position. You can show this by considering the steady-state error (i.e. set $\dot{x}=0,\ddot{x}=0$) as a function of the system dynamics, controller, desired position and desired force.</li>
-        <li>Now consider the system is in rigid body contact with a wall located at $x_d = 0$ and a desired non-zero force ($f^c_d > 0$) is being commanded. Considering the steady-state error in this case, show that system can achieve zero error.</li>
+        <li>Let's consider the case where our system is in free space (i.e. $f^{F_c}=0$) and we want to exert a non-zero desired force ($f^{F_c}_{desired} \neq 0$) and drive our position to zero ($x_d = 0$). You wil show that this is not possible, i.e. we cannot achieve zero error for our desired force and desired position. You can show this by considering the steady-state error (i.e. set $\dot{x}=0,\ddot{x}=0$) as a function of the system dynamics, controller, desired position and desired force.</li>
+        <li>Now consider the system is in rigid body contact with a wall located at $x_d = 0$ and a desired non-zero force ($f^{F_c}_{desired} > 0$) is being commanded. Considering the steady-state error in this case, show that system can achieve zero error.</li>
       </ol>
     </exercise>
 
     <exercise><h1>Box Flip-up</h1>
       
-      <p> Consider the initial phase of the box flip-up task from the <a href="#force_flip_up">example</a> above, when $\theta\approx 0$. We will assume that the forces can still be approximated as axis-aligned, but the ground contact is only being applied at the pivoting point $A$.</p>
+      <p> Consider the initial phase of the box flip-up task from the <a href="#force_flip_up">example</a> above, when $\theta\approx 0$. Let $B$ be the box, $A$ be the pivot point of the box, and $C$ be the contact point between the finger and box $B$. We will assume that the forces can still be approximated as axis-aligned, but the ground contact is only being applied at the pivoting point $A$.</p>
       <figure><img style="width:70%" src="figures/exercises/pivot.png"></figure>
 
 
       <ol type="a">
-        <li> If we do not push hard enough (i.e. $f^C_{C_z}$ is too small), then we will not be able to create enough friction ($f^C_{C_x}$) to counteract gravity. By summing the torques around the pivot point $A$, derive a lower bound for the required normal force $f^C_{C_z}$, as a function of $m,g,$ and $\mu^C$. You may assume that the moment arm of gravity is half that of the moment arm on C, and that the box is square.
+        <li> If we do not push hard enough (i.e. $f^{B_C}_{finger,C_z}$ is too small), then we will not be able to create enough friction ($f^{B_C}_{finger,C_x}$) to counteract gravity. By summing the torques around the pivot point $A$, derive a lower bound for the required normal force $f^{B_C}_{finger,C_z}$, as a function of $m,g,$ and $\mu^C$. You may assume that the moment arm of gravity is half that of the moment arm on C, and that the box is square.
         </li>
-        <li> If we push too hard (i.e. $f^C_{C_z}$ is too big), then the pivot point will end up sliding to the left. By writing the force balance along the horizontal axis, derive an upper bound for the required normal force $f^C_{C_z}$, as a function of $m,g,$ and $\mu^A$. (HINT: It will be necessary to use the torque balance equation from before) </li>
+        <li> If we push too hard (i.e. $f^{B_C}_{finger,C_z}$ is too big), then the pivot point will end up sliding to the left. By writing the force balance along the horizontal axis, derive an upper bound for the required normal force $f^{B_C}_{finger,C_z}$, as a function of $m,g,$ and $\mu^A$. (HINT: It will be necessary to use the torque balance equation from before) </li>
 
         <li> By combining the lower bounds and upper bounds from the previous problems, derive a relation for $\mu^A,\mu^C$ that must hold in order for this motion to be possible. If $\mu^A\approx 0.25$ (wood-metal), how high does $\mu^C$ have to be in order for the motion to be feasible? What if $\mu^A=1$ (concrete-rubber)?
         </li>
