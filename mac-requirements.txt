@@ -193,7 +193,7 @@ tinycss2==1.1.1
     # via nbconvert
 tomli==1.2.2
     # via setuptools-scm
-torch==1.12.1
+torch==1.13.0
     # via
     #   -r mac-requirements.in
     #   stable-baselines3

@@ -9,7 +9,7 @@ requests>=2.25
 stable-baselines3>=1.4.0
 tensorboard>=2.5.0
 timeout-decorator>=0.5
-torch>=1.12.1
+torch>=1.13.0
 #https://download.pytorch.org/whl/nightly/cpu/torch-1.12.0.dev20220225-cp39-none-macosx_10_9_x86_64.whl; platform_machine == 'x86_64' 
 #https://download.pytorch.org/whl/nightly/cpu/torch-1.12.0.dev20220225-cp39-none-macosx_11_0_arm64.whl; platform_machine == 'arm64' 
 # torchvision is only needed for the segmentation notebooks, which are not tested locally
