@@ -3,8 +3,8 @@
 <html>
 
   <head>
-    <title>Ch. 9 - Force Control</title>
-    <meta name="Ch. 9 - Force Control" content="text/html; charset=utf-8;" />
+    <title>Ch. 9 - Manipulator Control</title>
+    <meta name="Ch. 9 - Manipulator Control" content="text/html; charset=utf-8;" />
     <link rel="canonical" href="http://manipulation.csail.mit.edu/force.html" />
 
     <script src="https://hypothes.is/embed.js" async></script>
@@ -56,12 +56,14 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
 <script type="text/javascript">document.write(notebook_header('force'))
 </script>
 <!-- EVERYTHING ABOVE THIS LINE IS OVERWRITTEN BY THE INSTALL SCRIPT -->
-<chapter style="counter-reset: chapter 8"><h1>Force Control</h1>
+<chapter style="counter-reset: chapter 8">
+  <h1>Manipulator Control</h1>
     
   <p>Over the last few chapters, we've developed a great initial toolkit for
   perceiving objects (or piles of objects) in a scene, planning grasps, and
   moving the arm to grasp.  But there is a lot more to manipulation than
-  grasping!</p>
+  grasping! And as we get to more advanced manipulation, we are going to need
+  to understand more of the details of how we control the robot arm.</p>
 
   <p>In fact, the signs have already been there if you were paying close
   attention.  I'm sure that you noticed image number 9954 in my clutter
@@ -101,7 +103,77 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
   chapter aims to begin that discussion.  By the end, I hope you'll agree that
   we have a pretty satisfying way to flip up that box!</p>
 
-  <section><h1>A simple model</h1>
+  <section><h1>The Manipulator-Control Toolbox</h1>
+  
+    <p>Force control fits into a larger picture of "joint-level" control
+    systems for manipulators. These are the controllers that take (slightly)
+    higher-level commands, like desired joint positions and velocities, and
+    convert them into joint torques. As we will see in this chapter, some of
+    these controllers will also accept desired spatial forces as inputs; either
+    directly or indirectly. And many interesting tasks, like nonprehensile
+    manipulation, can be specified more naturally and more robustly in terms of
+    forces than in terms of positions and velocities.</p>
+    
+    <p>Typically these controllers are implemented in the firmware that runs
+    directly on the robot arm (or its control cabinet). For the purposes of
+    using that hardware, it's important to understand how they work and how you
+    should set their parameters. In simulation we need to implement
+    these controllers ourselves in order to model the robot.</p>
+
+    <p>Drake offers a number of <a
+    href="https://drake.mit.edu/doxygen_cxx/group__control__systems.html">low-level
+    control implementations</a>. In this chapter, we will work through the most
+    relevant ones for controlling a robotic arm:</p>
+
+    <figure>
+      <div style="padding: 10px;">
+        <script type="text/javascript">
+        var system = { "name": "PidController", 
+          "input_ports" : ["estimated_state", "desired_state"],
+          "output_ports" : ["force"]
+          };
+        document.write(system_html(system, "https://drake.mit.edu/doxygen_cxx/classdrake_1_1systems_1_1controllers_1_1_pid_controller.html"));
+        </script> 
+      </div><div style="padding: 10px;">
+        <script type="text/javascript">
+          var system = { "name": "InverseDynamicsController", 
+            "input_ports" : ["estimated_state", "desired_state", '<span style="color:gray">desired_acceleration</span>'],
+            "output_ports" : ["force"]
+            };
+          document.write(system_html(system, "https://drake.mit.edu/doxygen_cxx/classdrake_1_1systems_1_1controllers_1_1_inverse_dynamics_controller.html"));
+        </script>
+      </div><div style="padding: 10px;">
+        <script type="text/javascript">
+          var system = { "name": "JointStiffnessController", 
+            "input_ports" : ["estimated_state", "desired_state"],
+            "output_ports" : ["force"]
+            };
+          document.write(system_html(system, "https://github.com/RobotLocomotion/drake/pull/18272"));
+        </script>
+      </div><div style="padding: 10px;">
+        <script type="text/javascript">
+          var system = { "name": "SpatialStiffnessController", 
+            "input_ports" : ["estimated_state", "desired_pose", "desired_spatial_velocity", "secondary_force"],
+            "output_ports" : ["force"]
+            };
+          document.write(system_html(system));
+        </script>
+      </div><div style="padding: 10px;">
+        <script type="text/javascript">
+          var system = { "name": "SpatialForceController", 
+            "input_ports" : ["estimated_state", "desired_spatial_force"],
+            "output_ports" : ["force"]
+            };
+          document.write(system_html(system));
+        </script>
+      </div>
+    </figure>
+
+    <p>By the end of the chapter, I hope you'll understand the differences and
+    the essentials of how they all work.</p>
+  </section>
+
+  <section><h1>If your robot is a point (finger)</h1>
   
     <p>As always in our battle against complexity, I want to find a setup that
     is as simple as possible (but no simpler)!  Here is my proposal for the
