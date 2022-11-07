@@ -61,23 +61,24 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
     
   <p>Over the last few chapters, we've developed a great initial toolkit for
   perceiving objects (or piles of objects) in a scene, planning grasps, and
-  moving the arm to grasp.  But there is a lot more to manipulation than
-  grasping! And as we get to more advanced manipulation, we are going to need
-  to understand more of the details of how we control the robot arm.</p>
-
-  <p>In fact, the signs have already been there if you were paying close
-  attention.  I'm sure that you noticed image number 9954 in my clutter
-  segmentation dataset.  Good old <code>09954.png</code>. Just in case you
-  happened to miss it, here it is again.</p>
+  moving the arm to grasp. In the last chapter, we started designing motion
+  planning strategies that could produce beautiful smooth joint trajectories
+  for the robot that could move it quickly from one grasp to the next. As our
+  desired trajectories get closer to the dynamic limits of the robot, then the
+  control strategies that we use to execute them on the robot arm also need to
+  get a bit more sophisticated.</p>
+  
+  <p>Remember, too, that there is a lot more to manipulation than grasping!
+  Even in the bin picking application, we already have some examples where our
+  grasping-only strategy can be insufficient. Imagine that you look through the
+  robot cameras into the box and see the following scene:</p>
 
   <figure><img style="width:60%" src="data/09954.png"/></figure>
 
-  <p>I don't know how many of the other 9999 random scenes that we generated are
-  going to have this problem, but 9954 makes it nice and clear.  How in the
-  world are we going to pick up that "Cheez-it" cracker box with our
-  two-fingered gripper?  (I know there are a few of you out there thinking about
-  how easy that scene is for your suction gripper, but suction alone isn't going
-  to solve all of our problems either.)</p>
+  <p>How in the world are we going to pick up that "Cheez-it" cracker box with
+  our two-fingered gripper?  (I know there are a few of you out there thinking
+  about how easy that scene is for your suction gripper, but suction alone
+  isn't going to solve all of our problems either.)</p>
 
   <figure>
   <iframe width="560" height="315"
@@ -99,31 +100,35 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
 
   <p>As we build up our toolkit for prehensile (grasping) and nonprehensile
   manipulation, one of the things that is missing from our discussion so far,
-  which has been predominantly kinematic, has been thinking about forces.  This
-  chapter aims to begin that discussion.  By the end, I hope you'll agree that
-  we have a pretty satisfying way to flip up that box!</p>
+  which has been predominantly kinematic, has been thinking about forces.  In
+  addition to tracking motion planning trajectories, this chapter will also
+  introduce control techniques that reason about contact forces. I hope that by
+  the end you'll agree that we have pretty satisfying approaches to flipping up
+  that box!</p>
 
   <section id="toolbox"><h1>The Manipulator-Control Toolbox</h1>
   
-    <p>Force control fits into a larger picture of "joint-level" control
-    systems for manipulators. These are the controllers that take (slightly)
-    higher-level commands, like desired joint positions and velocities, and
-    convert them into joint torques. As we will see in this chapter, some of
-    these controllers will also accept desired spatial forces as inputs; either
-    directly or indirectly. And many interesting tasks, like nonprehensile
-    manipulation, can be specified more naturally and more robustly in terms of
-    forces than in terms of positions and velocities.</p>
+    <p>When I talk about "manipulator control", I am discussing robot
+    controllers that take (slightly) higher-level commands, like desired joint
+    positions and velocities or spatial forces, and convert them into motor
+    commands. Throughout this chapter we will assume that we can command
+    <i>generalized forces</i>, which for revolute-joint robots are just joint
+    torques. These controllers, by themselves, are not enough to complete any
+    meaningful task -- they are reasoning about the robot itself but not about
+    any of the objects in the environment. But they facilitate writing the rest
+    of the control systems by providing the higher-level abstraction.</p>
     
-    <p>Typically these controllers are implemented in the firmware that runs
-    directly on the robot arm (or its control cabinet). For the purposes of
-    using that hardware, it's important to understand how they work and how you
-    should set their parameters. In simulation we need to implement
-    these controllers ourselves in order to model the robot.</p>
+    <p>Typically the low-level controllers we will be discussing here are
+    implemented in the firmware that runs directly on the robot arm (or its
+    control cabinet). For the purposes of using that hardware, it's important
+    to understand how they work and how you should set their parameters. In
+    simulation we need to implement these controllers ourselves in order to
+    model the robot.</p>
 
     <p>Drake offers a number of <a
-    href="https://drake.mit.edu/doxygen_cxx/group__control__systems.html">low-level
-    control implementations</a>. In this chapter, we will work through the most
-    relevant ones for controlling a robotic arm:</p>
+    href="https://drake.mit.edu/doxygen_cxx/group__control__systems.html">
+    manipulator control implementations</a>. In this chapter, we will work
+    through the most relevant ones for controlling a robotic arm:</p>
 
     <figure>
       <div style="padding: 10px;">
@@ -144,6 +149,14 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
         </script>
       </div><div style="padding: 10px;">
         <script type="text/javascript">
+          var system = { "name": "SpatialForceController", 
+            "input_ports" : ["estimated_state", "desired_spatial_force"],
+            "output_ports" : ["generalized_force"]
+            };
+          document.write(system_html(system));
+        </script>
+      </div><div style="padding: 10px;">
+        <script type="text/javascript">
           var system = { "name": "JointStiffnessController", 
             "input_ports" : ["estimated_state", "desired_state"],
             "output_ports" : ["generalized_force"]
@@ -158,14 +171,6 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
             };
           document.write(system_html(system));
         </script>
-      </div><div style="padding: 10px;">
-        <script type="text/javascript">
-          var system = { "name": "SpatialForceController", 
-            "input_ports" : ["estimated_state", "desired_spatial_force"],
-            "output_ports" : ["generalized_force"]
-            };
-          document.write(system_html(system));
-        </script>
       </div>
     </figure>
 
@@ -173,7 +178,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
     the essentials of how they all work.</p>
   </section>
 
-  <section><h1>If your robot is a point (finger)</h1>
+  <section><h1>Assume your robot is a point mass</h1>
   
     <p>As always in our battle against complexity, I want to find a setup that
     is as simple as possible (but no simpler)!  Here is my proposal for the
@@ -200,15 +205,11 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
     freedom of the finger, and experiences unmodelled contact forces.  By
     design, the equations of this second model are particularly simple:
     $$\begin{bmatrix}m & 0 \\ 0 & m \end{bmatrix} \dot{v} = m
-    \begin{bmatrix}\ddot{x} \\ \ddot{z} \end{bmatrix} = mg + \begin{bmatrix}
-    u_x \\ u_z \end{bmatrix} + f^{F_c},$$ where $m$ is the mass, $g = [0,
-    -9.81]^T$ is the gravity vector, $u$ is the control input vector, and
-    $f^{F_c}$ is the Cartesian contact force applied to the finger, $F$, at
-    $c$.  Notably absent is the contact Jacobian which normally pre-multiplies
-    the contact forces, $\sum_i J_i^T f^{c_i};$ in the case of a point finger
-    this Jacobian is always the identity matrix, and there is only one point at
-    which contact can be made, so there is no meaningful reason to distinguish
-    between multiple forces.</p>
+    \begin{bmatrix}\ddot{x} \\ \ddot{z} \end{bmatrix} = \tau_g +
+    \begin{bmatrix} u_x \\ u_z \end{bmatrix} + f^{F_c},$$ where $m$ is the
+    mass, $\tau_g$ is the gravitational "torque" which here is just $\tau_g =
+    [0, -mg]^T$, $u$ is the control input vector, and $f^{F_c}$ is the
+    Cartesian contact force applied to the finger, $F$, at $c$.</p>
 
     <p>Just to make the notation clear, I've used $f^{F_c}$ above to denote
     force <i>applied to the finger</i>, $F$, at point $c$. If we want to denote
@@ -217,21 +218,68 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
     the forces must be equal and opposite. If we're not careful about this
     notation, the signs can get confusing below.</p>
 
+    <subsection><h1>Trajectory tracking</h1>
+    
+      <p>Before we even make contact with the box, let's make sure we know how
+      to move our robot finger around through the air. Assume that you've done
+      some motion planning, perhaps using optimization, and have developed a
+      beautiful desired trajectory, $q_d(t)$, that you want your finger to
+      follow. Let's assume that $q_d(t)$ is twice differentiable. What
+      generalized-force commands should you send to the robot to execute that
+      trajectory?</p>
+
+      <p>One of the first and most common ways to execute the trajectory is
+      with proportional-integral-derivative (PID) control, which we've
+      discussed when we talked about <a
+      href="robot.html#position-controlled">position-controlled robots</a>. The
+      <a
+      href="https://drake.mit.edu/doxygen_cxx/classdrake_1_1systems_1_1controllers_1_1_pid_controller.html">PidController</a>
+      uses the command $$u(t) = K_p (q_d(t) - q(t)) + K_d (\dot{q}_d(t) -
+      \dot{q}(t)) + K_i \int_0^t (q_d(t) - q(t)) dt,$$ with $K_p$, $K_d$, and
+      $K_i$ being the position, velocity, and integral gains. Often these gains
+      are diagonal matrices, making the command for each joint independent of
+      the rest. Note that in manipulation, we tend to avoid the integral term,
+      setting $K_i = 0$. You can imagine that if the robot is pushing up
+      against the wall and is unable to achieve $q(t) == q_d(t)$, then the
+      integral term will "wind-up", sending larger and larger commands to the
+      robot until some fault is reached.</p>
+      
+      <p>PD/PID control can be incredibly effective; it assumes almost nothing
+      about the dynamics of the robot. But this assumption is also a
+      limitation; if we do know something about the dynamics of the robot than
+      we can achieve better tracking performance. To make that clear, let's
+      write the closed-loop dynamics under PD control...</p>
+
+      <p>Gravity compensation...  For reasons that will become clear soon, this
+      controller is available in Drake as the <a
+      href="https://github.com/RobotLocomotion/drake/pull/18272">JointStiffnessController</a>.</p>
+
+      <p>Inverse dynamics control...</p>
+
+      <example><h1>Trajectory tracking for the point mass</h1>
+
+        <p>I've put together an extremely simple example to show the differences in tracking performance for the point mass using each of these control strategies.</p>
+
+        <script>document.write(notebook_link('force', d = deepnote, link_text = "", notebook = "tracking"))</script>
+
+        <todo>insert the figure here</todo>
+
+      </example>
+
+    </subsection>
+
     <subsection><h1>(Direct) force control</h1>
 
-      <p>Almost always, we implement a low-level controller that converts some
-      more intuitive command interface down into the generalized force inputs on
-      the robot.  In the case of direct force control, the abstraction that we
-      want is to be able to directly "control" the contact forces.  (In the
-      general case, we must specify the contact location to provide this
-      interface; again the point finger allows us to ignore that detail for the
-      moment).</p>
+      <p>In the case of direct force control, we implement a low-level
+      controller that accepts the desired contact forces and produces
+      generalized force inputs to the robot that try to make the actual contact
+      forces match the desired.</p>
       
       <div>
         <script type="text/javascript">
         var force_control = { "name": "ForceControl", 
-          "input_ports" : ["desired_contact_force", "robot_state", "robot_accelerations OR &nbsp; &nbsp; &nbsp;<br/> measured_contact_force"],
-          "output_ports" : ["robot_actuation"]
+          "input_ports" : ["estimated_state", "desired_contact_force", '<span style="color:gray">measured_accelerations</span>', '<span style="color:gray">measured_contact_force</span>'],
+          "output_ports" : ["generalized_force"]
           };
         document.write(system_html(force_control));
         </script>
@@ -304,30 +352,31 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       to actually set the foot down on the ground.  This can significantly
       reduce the requirements for accurate sensing of the terrain.</p>
 
-    </subsection>
-
-    <subsection><h1>A force-based "flip-up" strategy</h1>
-
-      <p>Here is my proposal for a simple strategy for flipping up the box. Once
-      in contact, we will use the contact force from the finger to apply a
-      moment around the bottom left corner of the box to generate the rotation.
-      But we'll add constraints to the forces that we apply so that the bottom
-      corner does not slip. </p>
-
-      <figure><img style="margin-top:-20px; width:60%" src="data/force_flip_up.png"><figcaption>Flipping the box.  <a href="data/force_flip_up.html">Click here</a> for an animation of the controller we'll write in the example below.  But it's worth running the code, where you can see the contact force visualization, too!</figcaption></figure>
-
-      <p>These conditions are very natural to express in terms of forces.  And
-      once again, we can implement this strategy with very little information
-      about the box.  The position of the finger will evolve naturally as we
-      apply the contact forces.  It's harder for me to imagine how to write an
-      equally robust strategy using a (high-gain) position-controller finger; it
-      would likely require many more assumptions about the geometry (and
-      possibly the mass) of the box.</p>
-
       <example id="force_flip_up"><h1>A force-based flip-up strategy</h1>
       
         <todo>Update the code to match this updated derivation. In particular,
         \theta_d(t) should get more negative.</todo>
+
+        <p>Here is my proposal for a simple strategy for flipping up the box.
+        Once in contact, we will use the contact force from the finger to apply
+        a moment around the bottom left corner of the box to generate the
+        rotation. But we'll add constraints to the forces that we apply so that
+        the bottom corner does not slip. </p>
+    
+        <figure><img style="margin-top:-20px; width:60%"
+        src="data/force_flip_up.png"><figcaption>Flipping the box.  <a
+        href="data/force_flip_up.html">Click here</a> for an animation of the
+        controller we'll write in the example below.  But it's worth running
+        the code, where you can see the contact force visualization,
+        too!</figcaption></figure>
+  
+        <p>These conditions are very natural to express in terms of forces.
+        And once again, we can implement this strategy with very little
+        information about the box.  The position of the finger will evolve
+        naturally as we apply the contact forces.  It's harder for me to
+        imagine how to write an equally robust strategy using a (high-gain)
+        position-controller finger; it would likely require many more
+        assumptions about the geometry (and possibly the mass) of the box.</p>
 
         <p>Let's encode the textual description above, describing the forces
         that are applied to the box. I'll use $C$ for the contact frame
@@ -402,18 +451,19 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
 
         <todo>Generate random boxes.</todo>
 
+        <p>We have multiple controllers in this example.  The first is the
+        low-level force controller that takes a desired contact force and sends
+        commands to the robot to attempt to regulate this force.  The second is
+        the higher-level controller that is looking at the orientation of the
+        box and deciding which forces to request from the low-level
+        controller.</p>
+    
+        <p>Please also understand that this is not some unique or optimal strategy
+        for box flipping.  I'm simply trying to demonstrate that sometimes
+        controllers which might be difficult to express otherwise can easily be
+        expressed in terms of forces!</p>
+    
       </example>
-
-      <p>We have multiple controllers in this example.  The first is the
-      low-level force controller that takes a desired contact force and sends
-      commands to the robot to attempt to regulate this force.  The second is
-      the higher-level controller that is looking at the orientation of the box
-      and deciding which forces to request from the low-level controller.</p>
-
-      <p>Please also understand that this is not some unique or optimal strategy
-      for box flipping.  I'm simply trying to demonstrate that sometimes
-      controllers which might be difficult to express otherwise can easily be
-      expressed in terms of forces!</p>
 
     </subsection>
 
@@ -607,65 +657,9 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       many other torque-controlled robots).</p>      
 
     </subsection>
-
   </section>
 
-  <section><h1>Peg in hole</h1>
-
-    <p>One of the classic problems for manipulator force control, inspired by
-    robotic assembly, is the problem of mating two parts together under
-    tight kinematic tolerances.  Perhaps the cleanest and most famous version of
-    this is the problem of inserting a (round) peg into a (round) hole.  If your
-    <a href="https://en.wikipedia.org/wiki/Square_peg_in_a_round_hole">peg is
-    square and your hole is round</a>, I can't help.  Interestingly, much of the
-    literature on this topic in the late 1970's and early 1980's came out of MIT
-    and the Draper Laboratory.</p>
-
-    <figure><img width="35%" src="data/peg-in-hole.png"> <img style="margin-left:4%; margin-right:10%;" width="18%" src="data/peg-in-hole-force.png"> <img width="16%" src="data/peg-in-hole-moment.png"><figcaption>(Left) the
-    "peg in hole" insertion problem with kinematic tolerance $c$.  (Middle) the
-    desired response to a contact force.  (Right) the desired response to a
-    contact moment.  Figures reproduced (with some symbols removed) from
-    <elib>Drake78</elib>.
-    </figcaption></figure>
-
-    <p>For many peg insertion tasks, it's acceptable to add a small <a
-    href="https://en.wikipedia.org/wiki/Chamfer_(geometry)">chamfer</a> to the
-    part and/or the top of the hole.  This allows small errors in horizontal
-    alignment to be accounted for with a simple compliance in the horizontal
-    direction.  Misalignment in orientation is even more interesting.  Small
-    misalignments can cause the object to become "jammed", at which point the
-    frictional forces become large and ambiguous (under the Coulomb model); we
-    really want to avoid this. Again, we can avoid jamming by allowing a
-    rotational compliance at the contact.  I think you can see why this is a
-    great example for force control!</p>
-
-    <p>The key insight here is that the rotational stiffness that we want
-    should result in rotations around the part/contact, not around the gripper.
-    We can program this with stiffness control; but for very tight tolerances
-    the sensing and bandwidth requirements become a real limitation.  One of
-    the coolest results in force control is the realization that a clever
-    physical mechanism can be used to produce a "remote-centered compliance"
-    (RCC) completely mechanically, with infinite bandwidth and no sensing
-    required <elib>Drake78</elib>!</p>
-
-    <figure><img width="40%" src="data/passive_remote_center_compliance.png">
-    <img style="margin-left:4%; margin-bottom:3%" width="55%"
-    src="data/Remote_Center_of_Compliance.svg"><figcaption>A passive
-    remote-center compliance device.  (Left) concept schematic from
-    <elib>Drake78</elib>.  (Right) schematic of a mechanical implementation;
-    image credit for <a
-    href="https://en.wikipedia.org/wiki/Remote_Center_Compliance">Arne
-    Nordmann, 2008</a>.  See <a href="https://www.ati-ia.com/products/compliance/Compensator_main.aspx">here</a> for some example products, and <a href="https://www.youtube.com/watch?v=qFTUFHGGZIg">here</a> for a nice (older) video.</figcaption></figure>
-
-    <todo>Implement an RCC peg and hole in simulation (using stiffness control)</todo>
-
-    <p>Interestingly, the peg-in-hole problem inspired incredibly important
-    and influential ideas in mechanics and control, but also in motion planning
-    <elib>Lozano-Perez84</elib>.  The general ideas are quite relevant and applicable for a wide variety of tasks for which compliant contact is a reasonable strategy, such as opening doors, tool use, etc.</p>
-
-  </section>
-
-  <section><h1>Manipulator control</h1>
+  <section><h1>The general case (using the manipulator equations)</h1>
 
     <p>Using the floating finger/gripper is a good way to understand the main
     concepts of force control without the details.  But now it's time to
@@ -689,7 +683,83 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
     is bolted to the table, so does not have any floating joints; I've therefore
     used $\dot{q}$ and $\ddot{q}$ instead of $v$ and $\dot{v}$.</p>
 
+    <subsection><h1>Trajectory tracking</h1>
+
 <!--
+      <p>There is a variation on the joint-space stiffness control that we use
+      often in simulation; we call it <a
+      href="https://drake.mit.edu/doxygen_cxx/classdrake_1_1systems_1_1controllers_1_1_inverse_dynamics_controller.html">InverseDynamicsControl</a>.  </p>
+-->
+      <p>Let us ignore the contact terms for a moment: $$M(q)\ddot{q} +
+      C(q,\dot{q})\dot{q} = \tau_g(q) + u.$$  The <i>forward dynamics</i>
+      problem, which we use during simulation, is to compute the
+      accelerations, $\ddot{q}$, given the joint torques, $u$, (and $q,
+      \dot{q}$).  The <i>inverse dynamics</i>
+      problem, which we can use in control, is to compute $u$ given $\ddot{q}$
+      (and $q, \dot{q}$).  As a system, it looks like</p>
+
+      <div>
+        <script type="text/javascript">
+        var inverse_dynamics = { "name": "InverseDynamics", 
+          "input_ports" : ["estimated_state", "desired_acceleration"],
+          "output_ports" : ["actuation_input"]
+          };
+        document.write(system_html(inverse_dynamics, "https://drake.mit.edu/doxygen_cxx/classdrake_1_1systems_1_1controllers_1_1_inverse_dynamics.html"));
+        </script>
+      </div>
+
+      <p>This system implements the controller: $$u = M(q)\ddot{q}_d +
+      C(q,\dot{q})\dot{q} - \tau_g(q),$$ so that the resulting dynamics are
+      $M(q)\ddot{q} = M(q)\ddot{q}_d.$  Since we know that $M(q)$ is invertible,
+      this implies that $\ddot{q} = \ddot{q}_d$.</p>
+
+      <p>When we put the contact forces back in, In practice, we only have
+      estimates of the dynamics (mass matrix, etc) and even the states $q$ and
+      $\dot{q}$.  We will need to account for these errors when we determine
+      the acceleration commands to send.  For example, if we wanted to follow a
+      desired joint trajectory, $q_0(t)$, we do not just differentiate the
+      trajectory twice and command $\ddot{q}_0(t)$, but we could instead
+      command e.g. $$\ddot{q}_d = \ddot{q}_0(t) + K_p(q_0(t) - q) +
+      K_d(\dot{q}_0(t) - \dot{q}).$$  One could also include an integral gain
+      term.</p>
+
+      <p>The resulting <code>System</code> has one additional input port for the desired state:</p>
+      <div>
+        <script type="text/javascript">
+        var inverse_dynamics = { "name": "InverseDynamicsController", 
+          "input_ports" : ["estimated_state", "desired_state", "desired_acceleration"],
+          "output_ports" : ["actuation_input"]
+          };
+        document.write(system_html(inverse_dynamics, "https://drake.mit.edu/doxygen_cxx/classdrake_1_1systems_1_1controllers_1_1_inverse_dynamics_controller.html"));
+        </script>
+      </div>
+      <p>This "inverse dynamics control" also appears in the literature with a
+      few other names, such as "computed-torque control" and even the
+      "feedforward-plus-feedback-linearizing control" <elib
+      part="11.4.1.3">Lynch17</elib>.</p>
+
+      <details style-type="box"><summary><b>Check yourself:</b> What is the
+      difference between the joint stiffness control and the inverse dynamics
+      control?</summary> <p>The closed-loop dynamics with the joint stiffness
+      control (taking $\tau_{ff} = 0$) are given by $$M(q)\ddot{q} +
+      C(q,\dot{q})\dot{q} + K_p(q - q_d) + K_d(\dot{q} - \dot{q}_d) =
+      \tau_{ext},$$ where $\tau_{ext}$ summarized the results of (unmodeled)
+      forces like contacts. The closed-loop dynamics with the inverse dynamics
+      controllers are given by $$\ddot{q} + K_p(q - q_d) + K_d(\dot{q} -
+      \dot{q}_d) = M^{-1}(q) \tau_{ext}.$$  So the inverse dynamics controller
+      writes the feedback law in the units of accelerations rather than forces;
+      this would be similar to shaping the internal matrix into the diagonal
+      matrix.</p>  
+      
+      <p>The ability to realize this cancellation in hardware, however, will be
+      limited by the accuracy with which we estimate the model parameters,
+      $\hat{M}(q)$ and $\hat{C}(q,\dot{q})$.  The stiffness controller, on the
+      other hand, achieves much of the desired performance but only attempts to
+      cancel the gravity (and perhaps friction) terms; it does not shape the
+      inertia.</p></details>
+    </subsection>
+
+    <!--
     <subsection><h1>Direct force control</h1>
 
       <p>Let's bring back our contact forces, but assume that we are only making
@@ -855,80 +925,6 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
 
     </subsection>
 
-    <subsection><h1>Inverse dynamics control</h1>
-
-      <p>There is a variation on the joint-space stiffness control that we use
-      often in simulation; we call it <a
-      href="https://drake.mit.edu/doxygen_cxx/classdrake_1_1systems_1_1controllers_1_1_inverse_dynamics_controller.html">InverseDynamicsControl</a>.  </p>
-
-      <p>Let us ignore the contact terms for a moment: $$M(q)\ddot{q} +
-      C(q,\dot{q})\dot{q} = \tau_g(q) + u.$$  The <i>forward dynamics</i>
-      problem, which we use during simulation, is to compute the
-      accelerations, $\ddot{q}$, given the joint torques, $u$, (and $q,
-      \dot{q}$).  The <i>inverse dynamics</i>
-      problem, which we can use in control, is to compute $u$ given $\ddot{q}$
-      (and $q, \dot{q}$).  As a system, it looks like</p>
-
-      <div>
-        <script type="text/javascript">
-        var inverse_dynamics = { "name": "InverseDynamics", 
-          "input_ports" : ["estimated_state", "desired_acceleration"],
-          "output_ports" : ["actuation_input"]
-          };
-        document.write(system_html(inverse_dynamics, "https://drake.mit.edu/doxygen_cxx/classdrake_1_1systems_1_1controllers_1_1_inverse_dynamics.html"));
-        </script>
-      </div>
-
-      <p>This system implements the controller: $$u = M(q)\ddot{q}_d +
-      C(q,\dot{q})\dot{q} - \tau_g(q),$$ so that the resulting dynamics are
-      $M(q)\ddot{q} = M(q)\ddot{q}_d.$  Since we know that $M(q)$ is invertible,
-      this implies that $\ddot{q} = \ddot{q}_d$.</p>
-
-      <p>When we put the contact forces back in, In practice, we only have
-      estimates of the dynamics (mass matrix, etc) and even the states $q$ and
-      $\dot{q}$.  We will need to account for these errors when we determine
-      the acceleration commands to send.  For example, if we wanted to follow a
-      desired joint trajectory, $q_0(t)$, we do not just differentiate the
-      trajectory twice and command $\ddot{q}_0(t)$, but we could instead
-      command e.g. $$\ddot{q}_d = \ddot{q}_0(t) + K_p(q_0(t) - q) +
-      K_d(\dot{q}_0(t) - \dot{q}).$$  One could also include an integral gain
-      term.</p>
-
-      <p>The resulting <code>System</code> has one additional input port for the desired state:</p>
-      <div>
-        <script type="text/javascript">
-        var inverse_dynamics = { "name": "InverseDynamicsController", 
-          "input_ports" : ["estimated_state", "desired_state", "desired_acceleration"],
-          "output_ports" : ["actuation_input"]
-          };
-        document.write(system_html(inverse_dynamics, "https://drake.mit.edu/doxygen_cxx/classdrake_1_1systems_1_1controllers_1_1_inverse_dynamics_controller.html"));
-        </script>
-      </div>
-      <p>This "inverse dynamics control" also appears in the literature with a
-      few other names, such as "computed-torque control" and even the
-      "feedforward-plus-feedback-linearizing control" <elib
-      part="11.4.1.3">Lynch17</elib>.</p>
-
-      <details style-type="box"><summary><b>Check yourself:</b> What is the
-      difference between the joint stiffness control and the inverse dynamics
-      control?</summary> <p>The closed-loop dynamics with the joint stiffness
-      control (taking $\tau_{ff} = 0$) are given by $$M(q)\ddot{q} +
-      C(q,\dot{q})\dot{q} + K_p(q - q_d) + K_d(\dot{q} - \dot{q}_d) =
-      \tau_{ext},$$ where $\tau_{ext}$ summarized the results of (unmodeled)
-      forces like contacts. The closed-loop dynamics with the inverse dynamics
-      controllers are given by $$\ddot{q} + K_p(q - q_d) + K_d(\dot{q} -
-      \dot{q}_d) = M^{-1}(q) \tau_{ext}.$$  So the inverse dynamics controller
-      writes the feedback law in the units of accelerations rather than forces;
-      this would be similar to shaping the internal matrix into the diagonal
-      matrix.</p>  
-      
-      <p>The ability to realize this cancellation in hardware, however, will be
-      limited by the accuracy with which we estimate the model parameters,
-      $\hat{M}(q)$ and $\hat{C}(q,\dot{q})$.  The stiffness controller, on the
-      other hand, achieves much of the desired performance but only attempts to
-      cancel the gravity (and perhaps friction) terms; it does not shape the
-      inertia.</p></details>
-    </subsection>
 
     <todo>Admittance control</todo>
     <todo>Adaptive control.  Slotine WAM throwing.</todo>
@@ -942,6 +938,61 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
   <section><h1>Putting it all together</h1>
   
     <todo>Flip up the box using cartesian stiffness control.</todo>
+
+  </section>
+
+  <section><h1>Peg in hole</h1>
+
+    <p>One of the classic problems for manipulator force control, inspired by
+    robotic assembly, is the problem of mating two parts together under
+    tight kinematic tolerances.  Perhaps the cleanest and most famous version of
+    this is the problem of inserting a (round) peg into a (round) hole.  If your
+    <a href="https://en.wikipedia.org/wiki/Square_peg_in_a_round_hole">peg is
+    square and your hole is round</a>, I can't help.  Interestingly, much of the
+    literature on this topic in the late 1970's and early 1980's came out of MIT
+    and the Draper Laboratory.</p>
+
+    <figure><img width="35%" src="data/peg-in-hole.png"> <img style="margin-left:4%; margin-right:10%;" width="18%" src="data/peg-in-hole-force.png"> <img width="16%" src="data/peg-in-hole-moment.png"><figcaption>(Left) the
+    "peg in hole" insertion problem with kinematic tolerance $c$.  (Middle) the
+    desired response to a contact force.  (Right) the desired response to a
+    contact moment.  Figures reproduced (with some symbols removed) from
+    <elib>Drake78</elib>.
+    </figcaption></figure>
+
+    <p>For many peg insertion tasks, it's acceptable to add a small <a
+    href="https://en.wikipedia.org/wiki/Chamfer_(geometry)">chamfer</a> to the
+    part and/or the top of the hole.  This allows small errors in horizontal
+    alignment to be accounted for with a simple compliance in the horizontal
+    direction.  Misalignment in orientation is even more interesting.  Small
+    misalignments can cause the object to become "jammed", at which point the
+    frictional forces become large and ambiguous (under the Coulomb model); we
+    really want to avoid this. Again, we can avoid jamming by allowing a
+    rotational compliance at the contact.  I think you can see why this is a
+    great example for force control!</p>
+
+    <p>The key insight here is that the rotational stiffness that we want
+    should result in rotations around the part/contact, not around the gripper.
+    We can program this with stiffness control; but for very tight tolerances
+    the sensing and bandwidth requirements become a real limitation.  One of
+    the coolest results in force control is the realization that a clever
+    physical mechanism can be used to produce a "remote-centered compliance"
+    (RCC) completely mechanically, with infinite bandwidth and no sensing
+    required <elib>Drake78</elib>!</p>
+
+    <figure><img width="40%" src="data/passive_remote_center_compliance.png">
+    <img style="margin-left:4%; margin-bottom:3%" width="55%"
+    src="data/Remote_Center_of_Compliance.svg"><figcaption>A passive
+    remote-center compliance device.  (Left) concept schematic from
+    <elib>Drake78</elib>.  (Right) schematic of a mechanical implementation;
+    image credit for <a
+    href="https://en.wikipedia.org/wiki/Remote_Center_Compliance">Arne
+    Nordmann, 2008</a>.  See <a href="https://www.ati-ia.com/products/compliance/Compensator_main.aspx">here</a> for some example products, and <a href="https://www.youtube.com/watch?v=qFTUFHGGZIg">here</a> for a nice (older) video.</figcaption></figure>
+
+    <todo>Implement an RCC peg and hole in simulation (using stiffness control)</todo>
+
+    <p>Interestingly, the peg-in-hole problem inspired incredibly important
+    and influential ideas in mechanics and control, but also in motion planning
+    <elib>Lozano-Perez84</elib>.  The general ideas are quite relevant and applicable for a wide variety of tasks for which compliant contact is a reasonable strategy, such as opening doors, tool use, etc.</p>
 
   </section>
 
@@ -1042,16 +1093,10 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
 <span class="publisher">The International Journal of Robotics Research</span>, vol. 6, no. 1, pp. 3--14, <span class="year">1987</span>.
 
 </li><br>
-<li id=Drake78>
-<span class="author">Samuel Hunt Drake</span>, 
-<span class="title">"Using compliance in lieu of sensory feedback for automatic assembly."</span>, 
-PhD thesis, Massachusetts Institute of Technology, <span class="year">1978</span>.
-
-</li><br>
-<li id=Lozano-Perez84>
-<span class="author">Tomas Lozano-Perez and Matthew Mason and Russell Taylor</span>, 
-<span class="title">"Automatic synthesis of fine-motion strategies for robots"</span>, 
-<span class="publisher">The International Journal of Robotics Research</span>, vol. 3, no. 1, pp. 3--24, <span class="year">1984</span>.
+<li id=Lynch17>
+<span class="author">Kevin M Lynch and Frank C Park</span>, 
+<span class="title">"Modern Robotics"</span>, Cambridge University Press
+, <span class="year">2017</span>.
 
 </li><br>
 <li id=Ott08>
@@ -1085,10 +1130,16 @@ PhD thesis, Massachusetts Institute of Technology, <span class="year">1978</span
 <span class="publisher">IEEE Journal of Robotics and Automation</span>, vol. 3, no. 1, pp. 43-53, February, <span class="year">1987</span>.
 
 </li><br>
-<li id=Lynch17>
-<span class="author">Kevin M Lynch and Frank C Park</span>, 
-<span class="title">"Modern Robotics"</span>, Cambridge University Press
-, <span class="year">2017</span>.
+<li id=Drake78>
+<span class="author">Samuel Hunt Drake</span>, 
+<span class="title">"Using compliance in lieu of sensory feedback for automatic assembly."</span>, 
+PhD thesis, Massachusetts Institute of Technology, <span class="year">1978</span>.
+
+</li><br>
+<li id=Lozano-Perez84>
+<span class="author">Tomas Lozano-Perez and Matthew Mason and Russell Taylor</span>, 
+<span class="title">"Automatic synthesis of fine-motion strategies for robots"</span>, 
+<span class="publisher">The International Journal of Robotics Research</span>, vol. 3, no. 1, pp. 3--24, <span class="year">1984</span>.
 
 </li><br>
 </ol>
