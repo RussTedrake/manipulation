@@ -478,9 +478,8 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       <i>impedance control</i> <elib>Hogan85a+Hogan85b+Hogan85c</elib>.</p>
 
       <p>This approach is conceptually very nice. Imagine we were to walk up
-      and push on the end-effector of the iiwa &dagger;<sidenote>&dagger; But
-      please don't do it; that's not safe!</sidenote>. With only knowledge of
-      the parameters of the robot itself (not the environment), we can write a
+      and push on the end-effector of the iiwa. With only knowledge of the
+      parameters of the robot itself (not the environment), we can write a
       controller so that when we push on the end-effector, the end-effector
       pushes back (using the entire robot) as if you were pushing on, for
       instance, a simple spring-mass-damper system.  Rather than attempting to
@@ -775,17 +774,18 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
     <subsection><h1>Joint stiffness control</h1>
 
       <p>In practice, the way that we most often interface with the iiwa is
-      through the its "joint-impedance control" mode, which is written up nicely
-      in <elib>Ott08+Albu-Schaffer07</elib>.  For our purposes, we can view this
-      as a stiffness control in joint space: $$u = -\tau_g(q) + K_p(q_d - q) +
-      K_d(\dot{q}_d - \dot{q}) + \tau_{ff},$$ where $K_p, K_d$ are positive
-      diagonal matrices, and $\tau_{ff}$ is a "feed-forward" torque.  In
-      practice the controller also includes some joint friction
+      through the its "joint-impedance control" mode, which is written up
+      nicely in <elib>Ott08+Albu-Schaffer07</elib>.  For our purposes, we can
+      view this as a stiffness control in joint space: $$u = -\tau_g(q) +
+      K_p(q_d - q) + K_d(\dot{q}_d - \dot{q}) + \tau_{ff},$$ where $K_p, K_d$
+      are positive diagonal matrices, and $\tau_{ff}$ is a "feed-forward"
+      torque.  In practice the controller also includes some joint friction
       compensation<elib>Albu-Schaffer01</elib>, but I've left those friction
       terms out here for the sake of brevity.  The controller does also do some
       shaping of the inertias (earning it the label "impedance control" instead
       of only "stiffness control"), but only the rotor inertias, and the user
-      does not set these effective inertias.</p>
+      does not set these effective inertias.  From the user perspective it
+      should be viewed as stiffness control.</p>
 
       <details style-type="box"><summary><b>Check yourself:</b> What is the
       difference between traditional position control with a PD controller and

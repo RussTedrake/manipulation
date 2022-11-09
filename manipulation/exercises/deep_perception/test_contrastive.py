@@ -64,7 +64,7 @@ class TestContrastive(unittest.TestCase):
         self._match = np.random.rand(4096, 1) > 0.4
 
     @weight(4)
-    @timeout_decorator.timeout(2.0)
+    @timeout_decorator.timeout(5.0)
     def test_don_loss(self):
         """Testing don_loss"""
         expected_sol = gt_don_loss(self._f,
@@ -91,7 +91,7 @@ class TestContrastive(unittest.TestCase):
             'Computed loss_nonmatches is incorrect')
 
     @weight(4)
-    @timeout_decorator.timeout(2.0)
+    @timeout_decorator.timeout(5.0)
     def test_don_predict(self):
         """Testing don_predict"""
         expected_sol = gt_don_predict(self._f, self._img_a, self._img_b,
