@@ -9,8 +9,12 @@ load("//htmlbook/tools/jupyter:defs.bzl", "rt_ipynb_test")
 rt_ipynb_test(
     name = "hybrid_force_position",
     srcs = ["hybrid_force_position.ipynb"],
+    data = [
+      "//manipulation/models",
+    ],
     deps = [
         "//manipulation",
+        "//manipulation:scenarios",
         "//manipulation/exercises:grader",
         "//manipulation/exercises/force:test_hybrid",
     ],

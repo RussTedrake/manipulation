@@ -1,0 +1,68 @@
+directives:
+- add_model:
+    name: iiwa
+    file: package://drake/manipulation/models/iiwa_description/iiwa7/iiwa7_no_collision.sdf
+    default_joint_positions:
+        iiwa_joint_1: [0]
+        iiwa_joint_2: [0.6]
+        iiwa_joint_3: [0]
+        iiwa_joint_4: [-1.75]
+        iiwa_joint_5: [0]
+        iiwa_joint_6: [ 1.0]
+        iiwa_joint_7: [0]
+- add_weld:
+    parent: world
+    child: iiwa::iiwa_link_0
+- add_model:
+    name: wsg
+    file: package://drake/manipulation/models/wsg_50_description/sdf/schunk_wsg_50_no_tip.sdf
+- add_weld:
+    parent: iiwa::iiwa_link_7
+    child: wsg::body
+    X_PC:
+        translation: [0, 0, 0.114]
+        rotation: !Rpy { deg: [90, 0, 90]}
+- add_model:
+    name: table
+    file: package://drake/examples/manipulation_station/models/amazon_table_simplified.sdf
+- add_weld:
+    parent: world
+    child: table::amazon_table
+    X_PC:
+        translation: [0.3257, 0, -0.0127]
+- add_model:
+    name: cupboard
+    file: package://drake/examples/manipulation_station/models/cupboard.sdf
+- add_weld:
+    parent: world
+    child: cupboard::cupboard_body
+    X_PC:
+        translation: [0.9057, 0, 0.4148]
+        rotation: !Rpy { deg: [0, 0, 180]}
+- add_model:
+    name: camera0
+    file: package://manipulation/camera_box.sdf
+- add_weld:
+    parent: world
+    child: camera0::base
+    X_PC:
+        translation: [-0.228895, -0.452176, 0.486308]
+        rotation: !Rpy { deg: [146.0, 78.0, 170]}
+- add_model:
+    name: camera1
+    file: package://manipulation/camera_box.sdf
+- add_weld:
+    parent: world
+    child: camera1::base
+    X_PC:
+        translation: [-0.201813, 0.469259, 0.417045]
+        rotation: !Rpy { deg: [150.0, -76.6, -9.8]}
+- add_model:
+    name: camera2
+    file: package://manipulation/camera_box.sdf
+- add_weld:
+    parent: world
+    child: camera2::base
+    X_PC:
+        translation: [0.786258, -0.048422, 1.043315]
+        rotation: !Rpy { deg: [150.0, 1.3, 88]}

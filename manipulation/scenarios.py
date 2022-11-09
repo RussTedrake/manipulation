@@ -479,6 +479,7 @@ def MakeManipulationStation(model_directives=None,
                             iiwa_prefix="iiwa",
                             wsg_prefix="wsg",
                             camera_prefix="camera",
+                            prefinalize_callback=None,
                             package_xmls=[]):
     """
     Creates a manipulation station system, which is a sub-diagram containing:
@@ -511,6 +512,10 @@ def MakeManipulationStation(model_directives=None,
         plant_setup_callback) starting with this prefix will get a camera
         attached.
 
+        prefinalize_callback: A function, setup(plant), that will be called
+        with the multibody plant before calling finalize.  This can be useful
+        for e.g. adding additional bodies/models to the simulation.
+
         package_xmls: A list of filenames to be passed to
         PackageMap.AddPackageXml().  This is useful if you need to add more
         models to your path (e.g. from your current working directory).
@@ -529,6 +534,8 @@ def MakeManipulationStation(model_directives=None,
         ProcessModelDirectives(directives, parser)
     if filename:
         parser.AddAllModelsFromFile(filename)
+    if prefinalize_callback:
+        prefinalize_callback(plant)
     plant.Finalize()
 
     for i in range(plant.num_model_instances()):
