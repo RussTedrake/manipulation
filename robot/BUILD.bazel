@@ -20,3 +20,12 @@ rt_ipynb_test(
     srcs = ["simulation.ipynb"],
     deps = ["//manipulation"],
 )
+
+rt_ipynb_test(
+    name = "bimanual",
+    srcs = ["bimanual.ipynb"],
+    deps = [
+      "//manipulation",
+      "//manipulation:scenarios",
+    ],
+)
