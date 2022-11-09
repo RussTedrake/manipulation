@@ -551,7 +551,7 @@ output_ports:
         <script>document.write(notebook_link('robot', d=deepnote, link_text="",notebook='simulation'))</script>
         
       </example>
-      
+
       <p>As a final note, you might think that simulating the <i>dynamics</i> of
       the robot is overkill, if our only goal is to simulate manipulation tasks
       where the robot is moving only relatively slowly, and effects of mass,
@@ -836,6 +836,25 @@ output_ports:
       </script>
     </div>
 
+    <example><h1>A bimanual manipulation station</h1>
+      
+      <p>The teleop notebook in the first chapter used the
+      <code>MakeManipulationStation</code> interface to set up the simulation.
+      Now you have a better sense for what is going on inside that subsystem!
+      Here is the link if you want to take a look at that example again:</p>
+
+      <script>document.write(notebook_link('intro', d=deepnote, link_text=""))</script>
+
+      <p>I've intentionally provided this version of the manipulation station
+      in Python so that you could easily customize it to your needs.  But even
+      the version I've provided should address many use cases.  Here is a
+      simple example of setting up a bimanual version of the manipulation
+      station:</p>
+
+      <script>document.write(notebook_link('robot', d=deepnote, link_text="",notebook='bimanual'))</script>
+
+    </example>
+    
     <p>This diagram itself can then be used as a <code>System</code> in
     additional diagrams, which can include our perception, planning, and,
     higher-level control systems.  This model also defines the abstraction
