@@ -12,7 +12,7 @@ from pydrake.all import (
     Box, CameraInfo, ClippingRange, CoulombFriction, Cylinder, Demultiplexer,
     DepthImageToPointCloud, DepthRange, DepthRenderCamera, DiagramBuilder,
     FindResourceOrThrow, GeometryInstance, InverseDynamicsController,
-    JointStiffnessController, LeafSystem, LoadModelDirectivesFromString,
+    LeafSystem, LoadModelDirectivesFromString,
     MakeMultibodyStateToWsgStateSystem, MakePhongIllustrationProperties,
     MakeRenderEngineVtk, ModelInstanceIndex, MultibodyPlant, Parser,
     PassThrough, PrismaticJoint, ProcessModelDirectives, RenderCameraCore,
@@ -475,7 +475,7 @@ def AddIiwaDifferentialIK(builder, plant, frame=None):
 
 def MakeManipulationStation(model_directives=None,
                             filename=None,
-                            time_step=0.001,
+                            time_step=0.002,
                             iiwa_prefix="iiwa",
                             wsg_prefix="wsg",
                             camera_prefix="camera",
@@ -569,16 +569,18 @@ def MakeManipulationStation(model_directives=None,
 
             # Add the iiwa controller
             iiwa_controller = builder.AddSystem(
-                JointStiffnessController(controller_plant,
-                                         kp=[50] * num_iiwa_positions,
-                                         kd=[20] * num_iiwa_positions))
+                InverseDynamicsController(controller_plant,
+                                          kp=[100] * num_iiwa_positions,
+                                          ki=[1] * num_iiwa_positions,
+                                          kd=[20] * num_iiwa_positions,
+                                          has_reference_acceleration=False))
             iiwa_controller.set_name(model_instance_name + "_controller")
             builder.Connect(plant.get_state_output_port(model_instance),
                             iiwa_controller.get_input_port_estimated_state())
 
             # Add in the feed-forward torque
             adder = builder.AddSystem(Adder(2, num_iiwa_positions))
-            builder.Connect(iiwa_controller.get_output_port_generalized_force(),
+            builder.Connect(iiwa_controller.get_output_port_control(),
                             adder.get_input_port(0))
             # Use a PassThrough to make the port optional (it will provide zero
             # values if not connected).
