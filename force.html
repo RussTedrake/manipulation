@@ -907,8 +907,9 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       position commands to obtain the desired velocity, which adds a delay of a
       few control timesteps (and sometimes <a
       href="https://github.com/RobotLocomotion/drake/issues/11955#issuecomment-524467883">non-monotonic
-      behavior</a>).  I suspect that the only reason why we aren't allowed to
-      send our own joint velocity commands is to make a simpler/safer API; they
+      behavior</a>).  I believe that the reason why we aren't allowed to send
+      our own joint velocity commands is to to make the passivity argument in
+      their paper go through, and perhaps to make a simpler/safer API -- they
       don't want users to be able to send a series of inconsistent position and
       velocity commands (where the velocities are not actually the time
       derivatives of the positions).</p>
@@ -922,6 +923,16 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       is moving; if you pick something up (or even move the fingers), those
       changes in the gravitational terms will not be compensated in the
       controller.</p>
+
+      <p>Although the JointStiffnessController in Drake is the best model for
+      the iiwa control stack, we commonly use the InverseDynamicsController in
+      our simulations instead. This is for a fairly subtle reason -- the
+      numerics are better. The effective stiffness of the differential
+      equations to achieve comparable stiffness in the physics is smaller, and
+      one can take bigger integration timesteps. On the iiwa hardware, we
+      commonly use [800., 600, 600, 600, 400, 200, 200] Nm/rad as the stiffness
+      values for the JointStiffnessController; but simulating with those
+      requires small integration steps.</p>
 
     </subsection>
 
