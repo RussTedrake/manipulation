@@ -17,7 +17,11 @@ the `DRAKE_INSTALL_DIR` environment variable. Otherwise it will look in
 
 ## To update the pip wheels
 
-Update the version number in `setup.cfg`, then from the root directory, run:
+Note: This should really only happen when drake publishes new wheels (since I'm
+testing on drake master, not on the drake release).
+
+Update the version number in `setup.cfg`, and the drake version, then from the
+root directory, run:
 ```
 python3 -m pip install --upgrade build twine
 rm -rf dist/*
