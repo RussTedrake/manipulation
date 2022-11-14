@@ -80,17 +80,12 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
   </div>
 
   <p>In fact, if you ran the <a href="clutter.html#clutter_clearing">clutter
-  clearing demo</a>, I would say that motion planning failures was the biggest
+  clearing demo</a>, I would say that motion planning failures were the biggest
   limitation of that solution so far: the hand or objects could sometimes
-  collide with the cameras or bins, or differential inverse kinematics strategy
-  (which largely ignored the joint angles) would sometime cause the robot to
-  almost fold in on itself. In this chapter we'll develop the tools to make
-  that much better!</p>
-
-  <p>We'll focus on the problem of moving an arm through space in this chapter,
-  because that is the classical and very important motivation.  But I need to
-  cover this now for another reason, too: it will also soon help us think about
-  programming a more dexterous hand.</p>
+  collide with the cameras or bins, or the differential-inverse kinematics
+  strategy (which effectively ignored the joint angles) would sometime cause the
+  robot to fold in on itself. In this chapter we'll develop the tools to
+  make that much better!</p>
 
   <p>I do need to make one important caveat. For motion planning in
   manipulation, lots of emphasis is placed on the problem of avoiding
@@ -99,11 +94,11 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
   think that on the whole, robots are too afraid of bumping into the world
   (because things still go wrong when they do). I don't think humans are
   solving these complex geometric problems every time we reach... even when we
-  are reaching in dense clutter (I actually suspect that we are very bad at
-  it). I would much rather see robots that perform well even with very coarse /
-  approximate plans for moving through a cluttered environment, that are not
-  afraid to make incidental contacts, and that can still accomplish the task
-  when they do!</p>
+  are reaching in dense clutter. I actually suspect that we are very bad at
+  solving them. I would much rather see robots that perform well even with very
+  coarse / approximate plans for moving through a cluttered environment, that
+  are not afraid to make incidental contacts, and that can still accomplish the
+  task when they do!</p>
 
   <section><h1>Inverse Kinematics</h1>
 
@@ -116,7 +111,8 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
     = f^{-1}_{kin}(X^G).$  But, like we did with differential inverse
     kinematics, I'd like to think about inverse kinematics as the more general
     problem of finding joint angles subject to a rich library of costs and
-    constraints (including kinematic constraints).</p>
+    constraints; and the space of possible kinematic constraints is indeed
+    rich.</p>
 
     <p>For example, when we were <a
     href="clutter.html#grasp_candidates">evaluating grasp candidates for bin
@@ -580,25 +576,147 @@ ik.AddPositionConstraint(
     <subsection><h1>Trajectory parameterizations</h1>
     
       <p>The interesting question, then, becomes how to do we actually
-      parameterize the trajectory $q(t)$ with a parameter vector $\alpha$? For
-      instance, $q_\alpha(t)$ could be a neural network that takes $t$ as an
-      input, offers $q$ as an output, and uses $\alpha$ to represent the
-      weights and biases of the neurons. Instead, we typically choose much
-      simpler forms like piecewise polynomials.</p>
+      parameterize the trajectory $q(t)$ with a parameter vector $\alpha$?
+      These says, you might think that $q_\alpha(t)$ could be a neural network
+      that takes $t$ as an input, offers $q$ as an output, and uses $\alpha$ to
+      represent the weights and biases of the network. Of course you could, but
+      for inputs with a scalar input like this, we often take much simpler and
+      sparser parameterizations, often based on polynomials.</p>
 
-      <p>Piecewise polynomial trajectories</p>
-      <p>B-spline trajectories</p>
-        
+      <p>There are many ways one can parameterize a trajectory with
+      polynomials. For example in <i>dynamic</i> motion planning, <a
+      href="https://underactuated.csail.mit.edu/trajopt.html#direct_collocation">direct
+      collocation methods</a> uses <a
+      href="https://drake.mit.edu/doxygen_cxx/classdrake_1_1trajectories_1_1_piecewise_polynomial.html">piecewise-cubic
+      polynomials</a> to represent the state trajectory, and the <a
+      href="https://underactuated.csail.mit.edu/trajopt.html#pseudo-spectral">pseudo-spectral
+      methods</a> use Lagrange polynomials. In each case, the choice of basis
+      functions is made so that algorithm can leverage a particular property of
+      the basis. In dynamic motion planning, a great deal of focus is on the integration accuracy of the dynamic equations to ensure that we obtain feasible solutions to the dynamic constraints..</p>
+
+      <p>When we are planning the motions of our fully-actuated robot arms, we
+      typically worry less about dynamic feasibility, and focus instead on the
+      kinematics. For <i>kinematic</i> trajectory optimization, the so-called
+      <a
+      href="https://drake.mit.edu/doxygen_cxx/classdrake_1_1trajectories_1_1_bspline_trajectory.html">B-spline
+      trajectory</a> parameterization has a few particularly nice properties
+      that we can leverage here:
+      <ul><li>The derivative of a B-spline is still a B-spline (of one less
+      degree), with coefficients that are linear in the original
+      coefficients.</li><li>The bases themselves are non-negative and sparse.
+      This gives the coefficients of the B-spline polynomial, which are
+      referred to as the <i>control points</i>, a strong geometric
+      interpretation.</li>
+      <li>In particular, the entire trajectory is guaranteed to lie inside the
+      convex hull of the active control points (the control points who's bases
+      are not zero).</li></ul>
+      Taken together this means that we can optimize over finitely
+      parameterized trajectories, but use the convex hull property to ensure
+      that limits on the joint positions and any of its derivatives are
+      satisfied $\forall t\in [0,T]$ using <i>linear</i> constraints.  This
+      sort of guarantee is much more costly to obtain using most other
+      polynomial bases.</p>
+      
+      <p>Note that <a
+      href="https://en.wikipedia.org/wiki/B-spline">B-splines</a> are closely
+      related to <a
+      href="https://en.wikipedia.org/wiki/B%C3%A9zier_curve">B&eacute;zier
+      curves</a>. But the "B" in "B-spline" actually just stands for "basis"
+      (no, I'm not kidding) and "<a
+      href="https://en.wikipedia.org/wiki/Composite_B%C3%A9zier_curve">B&eacute;zier-splines</a>"
+      are slightly different.
+      </p>
+      
+      <todo>A simple interactive gui for moving around the control points and visualizing the spline.</todo>
+
     </subsection>
 
     <subsection><h1>Optimization algorithms</h1>
 
-      <p><a
-      href="https://github.com/RobotLocomotion/drake/issues/10188">B-spline
-      kinematic trajectory optimization</a>.</p>
+      <p>The default <a
+      href="https://drake.mit.edu/doxygen_cxx/classdrake_1_1systems_1_1trajectory__optimization_1_1_kinematic_trajectory_optimization.html"><code>KinematicTrajectoryOptimization</code></a>
+      class in Drake optimizes a trajectory defined using a B-spline to
+      represent a path, $r(s)$ over the interval $s \in [0,1]$, plus an
+      additional scalar decision variable corresponding to the trajectory
+      duration, $T$. The final trajectory combines the path with the
+      time-rescaling: $q(t) = r(t/T).$ This is a particularly nice way to
+      represent a trajectory of unknown duration, and has the excellent feature
+      that the convex hull property can still be used. Velocity constraints are
+      still linear; constraints on acceleration and higher derivatives do
+      become nonlinear, but if satisfied they still imply strict bounds
+      $\forall t \in [0, T].$</p>
 
-      <p>CHOMP <elib>Ratliff09a</elib>, STOMP <elib>Kalakrishnan11a</elib>,
-      KOMO<elib>Toussaint17</elib>.  SQP methods vs Augmented Lagrangian</p>
+      <p>Since the <code>KinematicTrajectoryOptimization</code> is written
+      using Drake's <code>MathematicalProgram</code>, by default it will
+      automatically select what we think is the best solver given the available
+      solvers. If the optimization has only convex costs and constraints, it
+      will be dispatched to a convex optimization solver. But most often we add
+      in nonconvex <a
+      href="https://drake.mit.edu/doxygen_cxx/group__solver__evaluators.html">costs
+      and constraints from kinematics</a>. Therefore in most cases, the default
+      solver would again be the SQP-solver, SNOPT. You are free to experiment
+      with others!</p>
+
+      <p>One of the most interesting set of constraints that we can add to our
+      kinematic trajectory optimization problem is the <a
+      href="https://drake.mit.edu/doxygen_cxx/classdrake_1_1multibody_1_1_minimum_distance_constraint.html">MinimumDistanceConstraint</a>;
+      when the minimum distance between all potential collision pairs is
+      greater than zero then we have avoided collisions. Please note, though,
+      that these collision constraints can only be enforced at discrete
+      samples, $s_i \in [0,1]$, along the path. <i>They do not guarantee that
+      the trajectory is collision free $\forall t\in[0,T].$</i> It required
+      very special properties of the derivative constraints to leverage the
+      convex hull property; we do not have them for more general nonlinear
+      constraints. A common strategy is to add constraints at some modest
+      number of samples along the interval during optimization, then to check
+      for collisions more densely on the optimized trajectory before executing
+      it on the robot.</p>
+
+      <example><h1>Kinematic trajectory optimization for moving between shelves</h1>
+      
+        <p>As a warm-up, I've provided a simple example of the planar iiwa
+        reaching from the top shelf into the middle shelf.</p>
+
+        <script>document.write(notebook_link('trajectories', d=deepnote, link_text="", notebook="kinematic_trajectory_optimization"))</script>
+      
+        <p>If you look carefully at the code, I actually had to solve this
+        trajectory optimization twice to get SNOPT to return a good solution
+        (unfortunately, since it is a local optimization, this can happen). For
+        this particular problem, the strategy that worked was to solve once
+        without the collision avoidance constraint, and then use that
+        trajectory as an initial guess for the problem with the collision
+        avoidance constraint.</p>
+
+      </example>
+
+      <example><h1>Kinematic trajectory optimization for clutter clearing</h1>
+      
+        <p>We can use <code>KinematicTrajectoryOptimization</code> to do the
+        planning for our clutter clearing example, too. This optimization was
+        more robust, and did not require solving twice. I only seeded it with a
+        trivial initial trajectory to avoid solutions where the robot tried to
+        rotate 270 degrees around its base instead of taking the shorter
+        path.</p>
+
+        <script>document.write(notebook_link('trajectories', d=deepnote, link_text="", notebook="kinematic_trajectory_optimization"))</script>
+      
+      </example>
+
+      <p>There are a number of related approaches to kinematic trajectory
+      optimization in the motion planning literature, which differ either by
+      their parameterization or by the solution technique (or both). Some of
+      the more well-known include CHOMP
+      <elib>Ratliff09a</elib>, STOMP <elib>Kalakrishnan11a</elib>, and
+      KOMO<elib>Toussaint17</elib>.</p>
+      
+      <p>KOMO, for instance, is one of a wave of trajectory optimization
+      techniques that use the <a
+      href="https://en.wikipedia.org/wiki/Augmented_Lagrangian_method">Augmented
+      Lagrangian method</a> of transcribing a constrained optimization problem
+      into an unconstrained problem, then using a simple but fast
+      gradient-based solver<elib>Toussaint14</elib>. Augmented-Lagrangian-based
+      approaches appear to be the most popular and successful these days; I
+      hope to provide a nice implementation in Drake soon!</p>
 
     </subsection>
 
@@ -646,9 +764,7 @@ ik.AddPositionConstraint(
     <!-- time-scaling trajectories (TOPPRA?) -->
   </section>
 
-  <section><h1>Active areas of research</h1>
-
-    <p>Task and motion planning, graphs of convex sets, ...</p>
+  <section><h1>Graphs of Convex Sets</h1>
 
   </section>
 
@@ -761,6 +877,12 @@ PhD thesis, Carnegie Mellon University, August, <span class="year">2010</span>.
 <span class="author">Marc Toussaint</span>, 
 <span class="title">"A tutorial on Newton methods for constrained trajectory optimization and relations to SLAM, Gaussian Process smoothing, optimal control, and probabilistic inference"</span>, 
 <span class="publisher">Geometric and numerical foundations of movements</span>, pp. 361--392, <span class="year">2017</span>.
+
+</li><br>
+<li id=Toussaint14>
+<span class="author">Marc Toussaint</span>, 
+<span class="title">"A Novel Augmented Lagrangian Approach for Inequalities and Convergent Any-Time Non-Central Updates"</span>, 
+, <span class="year">2014</span>.
 
 </li><br>
 <li id=Geraerts04>
