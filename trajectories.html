@@ -617,6 +617,12 @@ ik.AddPositionConstraint(
       sort of guarantee is much more costly to obtain using most other
       polynomial bases.</p>
       
+      <todo>Write up the B-spline math here; and clean up the Drake
+      notation/implementation in the process. In particular, I want to purse
+      the use of symbolic from KinematicTrajectoryOptimization. My
+      `RussTedrake/drake:bsplinebasis_derivatives` branch has a start at
+      getting analytical derivatives for the trajopt workflow. </todo>
+
       <p>Note that <a
       href="https://en.wikipedia.org/wiki/B-spline">B-splines</a> are closely
       related to <a
@@ -687,6 +693,18 @@ ik.AddPositionConstraint(
         trajectory as an initial guess for the problem with the collision
         avoidance constraint.</p>
 
+        <p>Another thing to notice in the code is the "visualization callback"
+        that I use to plot a little blue line for the trajectory as the
+        optimizer is solving. Visualization callbacks are implemented by e.g.
+        telling the solver about a cost function that depends on all of the
+        variables, and always returns zero cost; they get called every time the
+        solver evaluates the cost functions. What I've done here can definitely
+        slow down the optimization, but it's an excellent way to get some
+        intuition about when the solver is "struggling" to numerically solve a
+        problem. I think that the people / papers in this field with the
+        fastest and most robust solvers are highly correlated with people who
+        spend time visualizing and massaging the numerics of their solvers.</p>
+
       </example>
 
       <example><h1>Kinematic trajectory optimization for clutter clearing</h1>
@@ -701,6 +719,8 @@ ik.AddPositionConstraint(
         <script>document.write(notebook_link('trajectories', d=deepnote, link_text="", notebook="kinematic_trajectory_optimization"))</script>
       
       </example>
+
+      <todo>Show example(s) from TRI dish-loading.</todo>
 
       <p>There are a number of related approaches to kinematic trajectory
       optimization in the motion planning literature, which differ either by
@@ -718,11 +738,62 @@ ik.AddPositionConstraint(
       approaches appear to be the most popular and successful these days; I
       hope to provide a nice implementation in Drake soon!</p>
 
+      <p>When kinematic trajectory optimizations succeed, they are an
+      incredibly satisfying solution to the motion planning problem. They give
+      a very natural and expressive language for specifying the desired motion
+      (with needing to sample nonlinear constraints as perhaps the one
+      exception), and they can be solved fast enough for online planning. The
+      only problem is: they don't always succeed. Because they are based on
+      nonconvex optimization, they are susceptible to local minima, and can
+      fail to find a feasible path even when one exists.</p>
+
+      <example><h1>Local minima in collision-free trajectory optimization</h1>
+        <p>Consider the extremely simple example of finding the shortest path
+        from the start (blue star) to the goal (green star) in the image above,
+        avoiding collisions with the red box. Avoiding even the complexity of
+        B-splines, we can write an extremely simple optimization of the form:
+        \begin{aligned} \min_{q_0, ..., q_N} \quad & \sum_{n=0}^{N-1} | q_{n+1}
+        - q_n|_2^2 & \\ \text{subject to} \quad & q_0 = q_{start} \\ & q_N =
+        q_{goal} \\ & |q_n|_1 \ge 1 & \forall n, \end{aligned} where the last
+        line is the collision-avoidance constraint saying that each sample
+        point has to be <i>outside</i> of the $\ell_1$-ball.
+        </p>
+        
+        <figure>
+          <img height="200" src="data/redbox_shortest_path.png">
+        </figure>
+        <todo>Turn that into an animation like the ICP where the initial condition changes</todo>
+          
+        <p>Once a nonlinear solver is
+        considering paths that go right around the obstacle, it is very
+        unlikely to find a solution that goes left around the obstacle, because
+        the solution would have to get worse (violate the collision constraint)
+        before it gets better.</p> 
+
+        <todo>Make a version of this with B-splines</todo>
+      </example>
+
+      <p>To deal with this limitation, the field of collision-free motion
+      planning has trended heavily towards sampling-based methods.</p>
     </subsection>
 
   </section>
 
   <section><h1>Sampling-based motion planning</h1>
+
+    <figure>
+      <img height="200" class="invisible_on_hover" src="data/h5chess-static.gif"/>
+      <img height="200" src="data/h5chess.gif">
+
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+
+      <img height="200" class="invisible_on_hover" src="data/h6crouchchair-static.gif"/>
+      <img height="200" src="data/h6crouchchair.gif">
+
+      <figcaption>Some incredible early (circa 2002) sampling-based motion planning
+      results <a href="http://www.kuffner.org/james/humanoid/planning.php">from
+      James Kuffner</a> (hover over the image to animate). These are kinematically complex and quite high dimensional.</figcaption>
+    </figure>
 
     <p>The <a href="https://ompl.kavrakilab.org/">Open Motion Planning
     Library</a>. We have our <a
