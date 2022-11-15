@@ -30,7 +30,7 @@ viz.start_recording()
 for t in np.linspace(0, T, num=100):
     context.SetTime(t)
     plant.SetPositions(plant_context, q.value(t))
-    diagram.Publish(context)
+    diagram.ForcedPublish(context)
 viz.stop_recording()
 ani = viz.get_recording_as_animation(repeat=False)
 

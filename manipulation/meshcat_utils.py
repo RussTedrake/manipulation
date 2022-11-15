@@ -230,8 +230,8 @@ class MeshcatPoseSliders(LeafSystem):
         return EventStatus.DidNothing()
 
     def Run(self, publishing_system, root_context, callback):
-        # Calls callback(root_context, pose), then publishing_system.Publish()
-        # each time the sliders change value.
+        # Calls callback(root_context, pose), then
+        # publishing_system.ForcedPublish() each time the sliders change value.
         if not running_as_notebook:
             return
 
@@ -243,7 +243,7 @@ class MeshcatPoseSliders(LeafSystem):
         while self._meshcat.GetButtonClicks("Stop PoseSliders") < 1:
             if self._update_values():
                 callback(root_context, self._get_transform())
-                publishing_system.Publish(publishing_context)
+                publishing_system.ForcedPublish(publishing_context)
             time.sleep(.1)
 
         self._meshcat.DeleteButton("Stop PoseSliders")
@@ -474,7 +474,7 @@ def PublishPositionTrajectory(trajectory,
                       time_step), trajectory.end_time()):
         root_context.SetTime(t)
         plant.SetPositions(plant_context, trajectory.value(t))
-        visualizer.Publish(visualizer_context)
+        visualizer.ForcedPublish(visualizer_context)
 
     visualizer.StopRecording()
     visualizer.PublishRecording()

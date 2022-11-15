@@ -240,7 +240,8 @@ class DrakeGymEnv(gym.Env):
         assert self.simulator, "You must call reset() first"
 
         if mode == 'human':
-            self.simulator.get_system().Publish(self.simulator.get_context())
+            self.simulator.get_system().ForcedPublish(
+                self.simulator.get_context())
             return
         elif mode == 'ansi':
             return __repr__(self.simulator.get_context())
