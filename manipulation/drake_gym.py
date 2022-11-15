@@ -1,12 +1,11 @@
-# Note: My goal is to move this to it's own repo: See Drake issue #15508.
+from typing import Callable, Optional, Union
+import warnings
 
 import gym
 import numpy as np
-from typing import Callable, Union
-import warnings
 
 from pydrake.common import RandomGenerator
-from pydrake.systems.sensors import ImageRgba8U
+from pydrake.systems.analysis import Simulator, SimulatorStatus
 from pydrake.systems.framework import (
     Context,
     InputPort,
@@ -16,7 +15,7 @@ from pydrake.systems.framework import (
     PortDataType,
     System,
 )
-from pydrake.systems.analysis import Simulator, SimulatorStatus
+from pydrake.systems.sensors import ImageRgba8U
 
 
 class DrakeGymEnv(gym.Env):
@@ -35,39 +34,54 @@ class DrakeGymEnv(gym.Env):
                                OutputPortIndex, str],
                  action_port_id: Union[InputPort, InputPortIndex, str] = None,
                  observation_port_id: Union[OutputPortIndex, str] = None,
-                 render_rgb_port_id: Union[OutputPortIndex, str] = None):
+                 render_rgb_port_id: Union[OutputPortIndex, str] = None,
+                 set_home: Callable[[Simulator, Context], None] = None,
+                 hardware: bool = False):
         """
         Args:
-            system: A Drake System
+            simulator: Either:
+                * A drake.systems.analysis.Simulator, or
+                * A function that produces a (randomized) Simulator.
             time_step: Each call to step() will advance the simulator by
                 `time_step` seconds.
             reward: The reward can be specified in one of two
                 ways: (1) by passing a callable with the signature
                 `value = reward(context)` or (2) by passing a scalar
-                vector-valued output port of `system`.
-            action_port: An input port of `system` compatible with the
-                action_space.  Each Env *must* have an action port; passing
-                `None` defaults to using the *first* input port (inspired by
+                vector-valued output port of `simulator`'s system.
+            action_port_id: The ID of an input port of `simulator`'s system
+                compatible with the action_space.  Each Env *must* have an
+                action port; passing `None` defaults to using the *first*
+                input port (inspired by
                 `InputPortSelection.kUseFirstInputIfItExists`).
             action_space: Defines the `gym.spaces.space` for the actions.  If
-                action_port is vector-valued, then passing `None` defaults to a
-                gym.spaces.Box of the correct dimension with bounds at negative
-                and positive infinity.  Note: Stable Baselines 3 strongly
-                encourages normalizing the action_space to [-1, 1].
-            observation_port: An output port of `system` compatible with the
-                observation_space. Each Env *must* have an observation port (it
-                seems that gym doesn't support empty observation spaces /
-                open-loop policies); passing `None` defaults to using the
-                *first* input port (inspired by
+                the action port is vector-valued, then passing `None` defaults
+                to a gym.spaces.Box of the correct dimension with bounds at
+                negative and positive infinity.  Note: Stable Baselines 3
+                strongly encourages normalizing the action_space to [-1, 1].
+            observation_port_id: An output port of `simulator`'s system
+                compatible with the observation_space. Each Env *must* have
+                an observation port (it seems that gym doesn't support empty
+                observation spaces / open-loop policies); passing `None`
+                defaults to using the *first* input port (inspired by
                 `OutputPortSelection.kUseFirstOutputIfItExists`).
             observation_space: Defines the gym.spaces.space for the
-                observations.  If observation_port is vector-valued, then
+                observations.  If the observation port is vector-valued, then
                 passing `None` defaults to a gym.spaces.Box of the correct
                 dimension with bounds at negative and positive infinity.
-            render_rgb_port: An optional output port of `system` that returns
-                an `ImageRgba8U`; often the `color_image` port of Drake's
-                `RgbdSensor`.  When not `None`, this enables the environment
-                `render_mode` `rgb_array`.
+            render_rgb_port: An optional output port of `simulator`'s system
+                that returns  an `ImageRgba8U`; often the `color_image` port
+                of a Drake `RgbdSensor`.  When not `None`, this enables the
+                environment `render_mode` `rgb_array`.
+            set_home: A function that sets the home state (plant, and/or env.)
+                at reset(). The reset state can be specified in one of
+                the two ways:
+                (1) setting random context using a Drake random_generator
+                (e.g. joint.set_random_pose_distribution()),
+                (2) parssing a function set_home().
+            hardware: If True, it prevents from setting random context at
+                reset() when using random_generator, but it does execute
+                set_home() if given.
+
 
         Notes (using `env` as an instance of this class):
         - You may set simulator/integrator preferences by using `env.simulator`
@@ -78,6 +92,7 @@ class DrakeGymEnv(gym.Env):
         - You may additionally wish to directly set `env.reward_range` and/or
           `env.spec`.  See the docs for gym.Env for more details.
         """
+        super().__init__()
         if isinstance(simulator, Simulator):
             self.simulator = simulator
             self.make_simulator = None
@@ -126,6 +141,13 @@ class DrakeGymEnv(gym.Env):
         self.render_rgb_port_id = render_rgb_port_id
 
         self.generator = RandomGenerator()
+
+        if set_home is None or callable(set_home):
+            self.set_home = set_home
+        else:
+            raise ValueError("Invalid set_home argument")
+
+        self.hardware = hardware
 
         if self.simulator:
             self._setup()
@@ -187,7 +209,7 @@ class DrakeGymEnv(gym.Env):
         time = context.get_time()
 
         self.action_port.FixValue(context, action)
-        catch = False
+        truncated = False
         try:
             status = self.simulator.AdvanceTo(time + self.time_step)
         except RuntimeError as e:
@@ -196,33 +218,57 @@ class DrakeGymEnv(gym.Env):
                 raise
             warnings.warn("Calling Done after catching RuntimeError:")
             warnings.warn(e.args[0])
-            catch = True
+            truncated = True
+            status = e.args[0]
 
         observation = self.observation_port.Eval(context)
         reward = self.reward(self.simulator.get_system(), context)
-        done = catch or status.reason() == \
-            SimulatorStatus.ReturnReason.kReachedTerminationCondition
+        reached_term = SimulatorStatus.ReturnReason.kReachedTerminationCondition
+        terminated = (not truncated and (status.reason() == reached_term))
         info = dict()
 
-        return observation, reward, done, info
+        # TODO(ggould) This interface is in flux and lags its documentation;
+        # when gym is next upgraded it will begin to generate warnings.  At
+        # that time replace `(terminated or truncated)`
+        # with `terminated, truncated`.
+        return observation, reward, (terminated or truncated), info
 
-    def reset(self):
+    def reset(self,
+              *,
+              seed: Optional[int] = None,
+              return_info: bool = False,
+              options: Optional[dict] = None):
         """
         If a callable "simulator factory" was passed to the constructor, then a
         new simulator is created.  Otherwise this method simply resets the
         `simulator` and its Context.
         """
+        assert options is None  # No options supported yet.
+
+        if (seed is not None):
+            # TODO(ggould) This should not reset the generator if it was
+            # already explicitly seeded (see API spec), but we have no way to
+            # check that at the moment.
+            self.generator = RandomGenerator(seed)
+
         if self.make_simulator:
             self.simulator = self.make_simulator(self.generator)
             self._setup()
 
         context = self.simulator.get_mutable_context()
         context.SetTime(0)
-        self.simulator.get_system().SetRandomContext(context, self.generator)
         self.simulator.Initialize()
-        # Note: The output port will be evaluated without fixing the input port.
+        if self.set_home is not None:
+            self.simulator.get_system().SetDefaultContext(context)
+            self.set_home(self.simulator, context, seed)
+        else:
+            if not self.hardware:
+                self.simulator.get_system().SetRandomContext(
+                    context, self.generator)
+        # Note: The output port will be evaluated without fixing the input
+        # port.
         observations = self.observation_port.Eval(context)
-        return observations
+        return observations if not return_info else (observations, dict())
 
     def render(self, mode='human'):
         """

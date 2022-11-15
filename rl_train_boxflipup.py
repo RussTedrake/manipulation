@@ -1,27 +1,45 @@
 import argparse
-import gym
 import os
+import sys
 
-from stable_baselines3 import A2C, PPO
-from stable_baselines3.common.vec_env import SubprocVecEnv
-from stable_baselines3.common.env_util import make_vec_env
+import gym
+# `multiprocessing` also provides this method, but empirically `psutil`'s
+# version seems more reliable.
+from psutil import cpu_count
 
-gym.envs.register(id="BoxFlipUp-v0",
-                  entry_point="manipulation.envs.box_flipup:BoxFlipUpEnv")
+from manipulation.envs.box_flipup import BoxFlipUpEnv
 
-parser = argparse.ArgumentParser(
-    description='Install ToC and Navigation into book html files.')
-parser.add_argument('--test', action='store_true')
-args = parser.parse_args()
+sb3_available = False
+try:
+    from stable_baselines3 import A2C, PPO
+    from stable_baselines3.common.vec_env import SubprocVecEnv
+    from stable_baselines3.common.env_util import make_vec_env
+    sb3_available = True
+except ImportError:
+    print("stable_baselines3 not found")
 
-observations = "state"
-time_limit = 10 if not args.test else 0.5
-zip = "data/box_flipup_ppo_{observations}.zip"
-log = "/tmp/ppo_box_flipup/"
 
-if __name__ == '__main__':
-    num_cpu = 48 if not args.test else 2
-    env = make_vec_env("BoxFlipUp-v0",
+def main():
+    parser = argparse.ArgumentParser(
+        description='Train a policy for //manipulation.envs:box_flipup.')
+    parser.add_argument('--test', action='store_true')
+    args = parser.parse_args()
+
+    if not sb3_available:
+        print("stable_baselines3 not available.")
+        return 0 if args.test else 1
+
+    observations = "state"
+    time_limit = 10 if not args.test else 0.5
+    zip = "data/box_flipup_ppo_{observations}.zip"
+    log = "/tmp/ppo_box_flipup/"
+
+#    gym.envs.register(
+#        id="BoxFlipUp-v0",
+#        entry_point="manipulation.envs.box_flipup:BoxFlipUpEnv")
+
+    num_cpu = int(cpu_count() / 2) if not args.test else 2
+    env = make_vec_env(BoxFlipUpEnv,
                        n_envs=num_cpu,
                        seed=0,
                        vec_env_cls=SubprocVecEnv,
@@ -29,7 +47,6 @@ if __name__ == '__main__':
                            'observations': observations,
                            'time_limit': time_limit,
                        })
-    #    env = "BoxFlipUp-v0"
 
     if args.test:
         model = PPO('MlpPolicy', env, n_steps=4, n_epochs=2, batch_size=8)
@@ -46,3 +63,7 @@ if __name__ == '__main__':
             break
         model.save(zip)
         new_log = False
+
+
+if __name__ == '__main__':
+    sys.exit(main())

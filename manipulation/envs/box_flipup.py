@@ -1,5 +1,6 @@
 import gym
 import numpy as np
+import os.path
 
 from pydrake.all import (
     AddMultibodyPlantSceneGraph,
@@ -45,7 +46,8 @@ def AddPlanarBinAndSimpleBox(plant,
                              depth=0.05,
                              height=0.3):
     parser = Parser(plant)
-    bin = parser.AddModelFromFile(FindResource("models/planar_bin.sdf"))
+    sdf_location = FindResource("models/planar_bin.sdf")
+    bin = parser.AddModelFromFile(sdf_location)
     plant.WeldFrames(
         plant.world_frame(), plant.GetFrameByName("bin_base", bin),
         RigidTransform(RotationMatrix.MakeZRotation(np.pi / 2.0),
@@ -219,19 +221,30 @@ def BoxFlipUpEnv(observations="state", meshcat=None, time_limit=10):
                                 observations,
                                 meshcat=meshcat,
                                 time_limit=time_limit)
-    action_space = gym.spaces.Box(low=np.array([-.5, -0.1], dtype="float32"),
-                                  high=np.array([.5, 0.6], dtype="float32"))
+    action_space = gym.spaces.Box(low=np.array([-.5, -0.1]),
+                                  high=np.array([.5, 0.6]),
+                                  dtype=np.float64)
 
     plant = simulator.get_system().GetSubsystemByName("plant")
 
+    # It is unsound to use raw MBP dof limits as observation bounds, because
+    # most simulations will violate those limits in practice (in collision, or
+    # due to gravity, or in general because no constraint force is incurred
+    # except in violation).  However we don't have any other better limits
+    # here.  So we broaden the limits by a fixed offset and hope for the best.
+    NUM_DOFS = 5
+    POSITION_LIMIT_TOLERANCE = np.full((NUM_DOFS,), 0.1)
+    VELOCITY_LIMIT_TOLERANCE = np.full((NUM_DOFS,), 0.5)
     if observations == "state":
         low = np.concatenate(
-            (plant.GetPositionLowerLimits(), plant.GetVelocityLowerLimits()))
+            (plant.GetPositionLowerLimits() - POSITION_LIMIT_TOLERANCE,
+             plant.GetVelocityLowerLimits() - VELOCITY_LIMIT_TOLERANCE))
         high = np.concatenate(
-            (plant.GetPositionUpperLimits(), plant.GetVelocityUpperLimits()))
-        observation_space = gym.spaces.Box(low=np.asarray(low, dtype="float32"),
-                                           high=np.asarray(high,
-                                                           dtype="float32"))
+            (plant.GetPositionUpperLimits() + POSITION_LIMIT_TOLERANCE,
+             plant.GetVelocityUpperLimits() + VELOCITY_LIMIT_TOLERANCE))
+        observation_space = gym.spaces.Box(low=np.asarray(low),
+                                           high=np.asarray(high),
+                                           dtype=np.float64)
 
     env = DrakeGymEnv(simulator=simulator,
                       time_step=0.1,

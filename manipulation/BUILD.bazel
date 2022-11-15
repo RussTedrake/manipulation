@@ -73,10 +73,12 @@ rt_py_library(
 
 rt_py_test(
     name = "test_gym",
+    data = ["//manipulation:models"],
     srcs = ["test/test_gym.py"],
     imports = [".."],
     deps = [
       "drake_gym",
+      "//manipulation/envs:box_flipup",
       "manipulation",
       "scenarios",
     ],

@@ -1,78 +1,99 @@
+import unittest
+
 import gym
-import matplotlib.pyplot as plt
 import numpy as np
-from stable_baselines3.common.env_checker import check_env
+import stable_baselines3.common.env_checker
 
-from pydrake.all import (
-    DiagramBuilder,
-    Meshcat,
-    MeshcatVisualizer,
-    MeshcatVisualizerParams,
-    RigidTransform,
-    RotationMatrix,
-    RollPitchYaw,
-    SceneGraph,
-    Simulator,
-)
-from pydrake.examples.pendulum import PendulumPlant, PendulumGeometry
+from manipulation.envs.box_flipup import BoxFlipUpEnv
 
-from manipulation.drake_gym import DrakeGymEnv
-from manipulation.scenarios import AddRgbdSensor
-
-meshcat = Meshcat()
-
-show = False
+vec_env_available = False
+try:
+    from stable_baselines3.common.env_util import make_vec_env
+    from stable_baselines3.common.vec_env import SubprocVecEnv
+    vec_env_availabe = True
+except ImportError:
+    print("vec_env is not available, so not testing it.")
 
 
-def PendulumExample():
-    builder = DiagramBuilder()
-    plant = builder.AddSystem(PendulumPlant())
-    scene_graph = builder.AddSystem(SceneGraph())
-    PendulumGeometry.AddToBuilder(builder, plant.get_state_output_port(),
-                                  scene_graph)
-    MeshcatVisualizer.AddToBuilder(
-        builder, scene_graph, meshcat,
-        MeshcatVisualizerParams(publish_period=np.inf))
+class DrakeGymTest(unittest.TestCase):
+    """
+    Test that an DrakeGymEnv satisfies the OpenAI Gym Env specifications as to
+    * API https://www.gymlibrary.ml/content/api/#standard-methods, and
+    * semantics https://www.gymlibrary.ml/content/environment_creation/
 
-    builder.ExportInput(plant.get_input_port(), "torque")
-    # Note: The Pendulum-v0 in gym outputs [cos(theta), sin(theta), thetadot]
-    builder.ExportOutput(plant.get_state_output_port(), "state")
+    Not every Gym optimizer algorithm uses every part of the API (for
+    instance none use `reset(seed)` as far as I can tell) but we check them
+    anyway because if they ever are used the errors will be hard to find.
+    """
 
-    # Add a camera (I have sugar for this in the manip repo)
-    X_WC = RigidTransform(RotationMatrix.MakeXRotation(-np.pi / 2),
-                          [0, -1.5, 0])
-    rgbd = AddRgbdSensor(builder, scene_graph, X_WC)
-    builder.ExportOutput(rgbd.color_image_output_port(), "camera")
+    @classmethod
+    def setUpClass(cls):
+        gym.envs.register(
+            id="BoxFlipUp-v0",
+            entry_point="manipulation.envs.box_flipup:BoxFlipUpEnv")
 
-    diagram = builder.Build()
-    simulator = Simulator(diagram)
+    def make_env(self):
+        # `new_step_api=False` was supposed to be deprecated some time ago
+        # but is still required by stable_baselines3.
+        return gym.make("BoxFlipUp-v0")
 
-    def reward(system, context):
-        plant_context = plant.GetMyContextFromRoot(context)
-        state = plant_context.get_continuous_state_vector()
-        u = plant.get_input_port().Eval(plant_context)[0]
-        theta = state[0] % 2 * np.pi  # Wrap to 2*pi
-        theta_dot = state[1]
-        return (theta - np.pi)**2 + 0.1 * theta_dot**2 + 0.001 * u
+    def test_make_env(self):
+        self.make_env()
 
-    max_torque = 3
-    env = DrakeGymEnv(simulator,
-                      time_step=0.05,
-                      action_space=gym.spaces.Box(low=np.array([-max_torque]),
-                                                  high=np.array([max_torque])),
-                      observation_space=gym.spaces.Box(
-                          low=np.array([-np.inf, -np.inf]),
-                          high=np.array([np.inf, np.inf])),
-                      reward=reward,
-                      render_rgb_port_id="camera")
-    check_env(env)
+    # This test is comprehensive enough to make many other tests below
+    # redundant, but we can't port it to Drake when the time comes for that
+    # without eating `stable_baselines3`'s enormous dependency tree.
+    def test_openai_check_env(self):
+        """Run OpenAI's built-in test suite for our env."""
+        dut = self.make_env()
+        stable_baselines3.common.env_checker.check_env(env=dut,
+                                                       warn=True,
+                                                       skip_render_check=True)
 
-    if show:
-        env.reset()
-        image = env.render(mode='rgb_array')
-        fig, ax = plt.subplots()
-        ax.imshow(image)
-        plt.show()
+    def test_openai_check_vector_env(self):
+        if not vec_env_available:
+            return
+        # Check that we can construct a vector env.
+        vector_dut = make_vec_env(BoxFlipUpEnv,
+                                  n_envs=2,
+                                  seed=0,
+                                  vec_env_cls=SubprocVecEnv,
+                                  env_kwargs={
+                                      'observations': 'state',
+                                      'time_limit': 5,
+                                  })
+        # We should `check_env` here, but in our currently supported versions
+        # of `gym` and `stable_baselines3`, stable baselines vector envs do
+        # not pass stable baselines' `check_env` tests
+
+    def test_reset(self):
+        # reset(int) sets a deterministic seed.
+        dut = self.make_env()
+        obs1 = dut.reset(seed=7)
+        obs2 = dut.reset(seed=7)
+        self.assertTrue((obs1 == obs2).all())
+
+        # reset() on its own gets a new arbitrary seed.
+        dut = self.make_env()
+        obs1 = dut.reset()
+        obs2 = dut.reset()
+        self.assertFalse((obs1 == obs2).all())
+
+        # The difference when reset() follows reset(seed) is not
+        # externally observable, so don't test it.
+
+        # return_options changes the return type.
+        (observation, opts) = dut.reset(return_info=True)
+        self.assertIsInstance(opts, dict)
+        self.assertTrue(dut.observation_space.contains(observation))
+
+    def test_step(self):
+        dut = self.make_env()
+        dut.reset()
+        # TODO(ggould): This uses the old, pseudo-deprecated gym API.
+        observation, _, _, _ = dut.step(dut.action_space.sample())
+        self.assertTrue(dut.observation_space.contains(observation))
 
 
-PendulumExample()
+if __name__ == "__main__":
+    unittest.main()
