@@ -29,3 +29,11 @@ rt_ipynb_test(
       "//manipulation:scenarios",
     ],
 )
+
+rt_ipynb_test(
+    name = "iiwa_with_allegro",
+    srcs = ["iiwa_with_allegro.ipynb"],
+    deps = [
+      "//manipulation",
+    ],
+)
