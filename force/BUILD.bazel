@@ -22,3 +22,12 @@ rt_ipynb_test(
     name = "tracking",
     srcs = ["tracking.ipynb"],
 )
+
+rt_ipynb_test(
+    name = "writing",
+    srcs = ["writing.ipynb"],
+    deps = [
+      "//manipulation",
+      "//manipulation:scenarios",
+    ],
+)

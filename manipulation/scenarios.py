@@ -9,10 +9,10 @@ import warnings
 import numpy as np
 from pydrake.all import (
     AbstractValue, Adder, AddMultibodyPlantSceneGraph, BallRpyJoint, BaseField,
-    Box, CameraInfo, ClippingRange, CoulombFriction, Cylinder, Demultiplexer,
-    DepthImageToPointCloud, DepthRange, DepthRenderCamera, DiagramBuilder,
-    FindResourceOrThrow, GeometryInstance, InverseDynamicsController,
-    LeafSystem, LoadModelDirectivesFromString,
+    Box, CameraInfo, Capsule, ClippingRange, CoulombFriction, Cylinder,
+    Demultiplexer, DepthImageToPointCloud, DepthRange, DepthRenderCamera,
+    DiagramBuilder, FindResourceOrThrow, GeometryInstance,
+    InverseDynamicsController, LeafSystem, LoadModelDirectivesFromString,
     MakeMultibodyStateToWsgStateSystem, MakePhongIllustrationProperties,
     MakeRenderEngineVtk, ModelInstanceIndex, MultibodyPlant, Parser,
     PassThrough, PrismaticJoint, ProcessModelDirectives, RenderCameraCore,
@@ -119,26 +119,36 @@ def AddWsg(plant,
     return gripper
 
 
-def AddFloatingRpyJoint(plant, frame, instance):
+def AddFloatingXyzJoint(plant, frame, instance, actuators=False):
     inertia = UnitInertia.SolidSphere(1.0)
     x_body = plant.AddRigidBody(
         "x", instance,
         SpatialInertia(mass=0, p_PScm_E=[0., 0., 0.], G_SP_E=inertia))
-    plant.AddJoint(
+    x_joint = plant.AddJoint(
         PrismaticJoint("x", plant.world_frame(), x_body.body_frame(),
                        [1, 0, 0]))
+    if actuators:
+        plant.AddJointActuator("x", x_joint)
     y_body = plant.AddRigidBody(
         "y", instance,
         SpatialInertia(mass=0, p_PScm_E=[0., 0., 0.], G_SP_E=inertia))
-    plant.AddJoint(
+    y_joint = plant.AddJoint(
         PrismaticJoint("y", x_body.body_frame(), y_body.body_frame(),
                        [0, 1, 0]))
+    if actuators:
+        plant.AddJointActuator("y", y_joint)
+    z_joint = plant.AddJoint(
+        PrismaticJoint("z", y_body.body_frame(), frame, [0, 0, 1]))
+    if actuators:
+        plant.AddJointActuator("z", z_joint)
+
+
+def AddFloatingRpyJoint(plant, frame, instance):
+    inertia = UnitInertia.SolidSphere(1.0)
     z_body = plant.AddRigidBody(
         "z", instance,
         SpatialInertia(mass=0, p_PScm_E=[0., 0., 0.], G_SP_E=inertia))
-    plant.AddJoint(
-        PrismaticJoint("z", y_body.body_frame(), z_body.body_frame(),
-                       [0, 0, 1]))
+    AddFloatingXyzJoint(plant, z_body.body_frame(), instance)
     plant.AddJoint(BallRpyJoint("ball", z_body.body_frame(), frame))
 
 
@@ -153,8 +163,11 @@ def AddShape(plant, shape, name, mass=1, mu=1, color=[.5, .5, .9, 1.0]):
         inertia = UnitInertia.SolidCylinder(shape.radius(), shape.length())
     elif isinstance(shape, Sphere):
         inertia = UnitInertia.SolidSphere(shape.radius())
+    elif isinstance(shape, Capsule):
+        # TODO(russt): Add python bindings for SolidCapsule.
+        inertia = UnitInertia.SolidCylinder(shape.radius(), shape.length())
     else:
-        raise RunTimeError(
+        raise RuntimeError(
             f"need to write the unit inertia for shapes of type {shape}")
     body = plant.AddRigidBody(
         name, instance,
