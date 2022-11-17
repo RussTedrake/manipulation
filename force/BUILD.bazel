@@ -31,3 +31,11 @@ rt_ipynb_test(
       "//manipulation:scenarios",
     ],
 )
+
+rt_ipynb_test(
+    name = "bounce",
+    srcs = ["bounce.ipynb"],
+    deps = [
+      "//manipulation",
+    ],
+)
