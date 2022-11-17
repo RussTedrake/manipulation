@@ -8,7 +8,6 @@ psutil
 requests>=2.25
 #scipy # only needed for pymcubes
 stable-baselines3>=1.4.0
-tensorboard>=2.5.0
 timeout-decorator>=0.5
 torch>=1.13.0  # doesn't support python3.11 yet
 #torchvision
