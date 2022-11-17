@@ -41,6 +41,7 @@ def LoadDataResource(filename):
         os.makedirs(data)
     path = os.path.join(data, filename)
     if not os.path.exists(path):
+        print(f"{path} was not found locally; downloading it now...")
         urlretrieve(f"https://manipulation.csail.mit.edu/data/{filename}", path)
     return path
 

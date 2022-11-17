@@ -96,17 +96,53 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
     Gym is to expose the absolute minimal details, so that it's possible to
     easily wrap every possible system under the same common interface (it doesn't matter if it's a robot, an Atari game, or
     even a <a href="https://github.com/facebookresearch/CompilerGym">compiler</a>). Almost
-    by definition, you can wrap any Drake system as a Gym Environment; I have
-    examples of how to do it correctly <a
-    href="https://github.com/RobotLocomotion/drake/issues/15508">here</a>.  You
-    can also use any Gym environment in the Drake ecosystem; you just won't be
-    able to apply some of the more advanced algorithms that Drake provides.  Of
-    course, I think that you should use Drake for your work in RL, too (many
-    people do), because it provides the rich library of dynamical systems that
-    are rigorously authored and tested, and leaves open the option to put RL
-    approaches head-to-head against more model-based alternatives. I admit I
-    might be a little biased. At any rate, that's the approach we will take in
-    these notes.</p>
+    by definition, you can wrap any Drake system as a Gym Environment.</p>  
+
+    <example id="drake_gym">
+      <h1>Using a Drake simulation as an OpenAI Gym Environment</h1>
+    
+      <p>An OpenAI Gym Environment is an incredibly simple wrapper around
+      simulators which offers a <a
+      href="https://github.com/openai/gym/blob/6a04d49722724677610e36c1f92908e72f51da0c/gym/core.py#L35">very
+      basic interface</a>, most notably consisting of <code>reset()</code>,
+      <code>step()</code>, <code>render()</code>. The
+      <code>step()</code> method returns the current observations and the
+      one-step reward (as well as some additional termination conditions).
+      </p>
+
+      <p>You can wrap any Drake simulation in an OpenAI gym environment, using 
+      <pre><code class="python">from manipulation.drake_gym import DrakeGymEnv</code></pre>
+      The <a
+      href="https://github.com/RussTedrake/manipulation/blob/master/manipulation/drake_gym.py"><code>DrakeGym</code>
+      constructor</a> takes a <code>Simulator</code> as well as an input port
+      to associate with the actions, an output port to associate with the
+      observations, etc. For the reward, you can implement it as a simple function of the <code>Simulator</code>
+      <code>Context</code>, or as another output port.
+      </p>
+
+      <p><code>DrakeGym</code> is built around a <code>Simulator</code>
+      (not just a <code>System</code>) or a function that produces a random
+      <code>Simulator</code> because you might want to control the integrator
+      parameters or have each rollout contain the same robot in a different
+      environment, with potentially different numbers of objects. This would
+      mean that the underlying <code>System</code> might have a different
+      number of states / ports. The notion of a function that can produce
+      simulators, referred to as a <code>SimulatorFactory</code>, is core to
+      the <a
+      href="https://drake.mit.edu/doxygen_cxx/group__stochastic__systems.html">stochastic
+      system modeling framework</a> in Drake.</p>
+    
+    </example>
+    
+    <p>You can also use any Gym environment in the Drake ecosystem; you just
+    won't be able to apply some of the more advanced algorithms that Drake
+    provides.  Of course, I think that you should use Drake for your work in
+    RL, too (many people do), because it provides a the rich library of
+    dynamical systems that are rigorously authored and tested, including a
+    great physics engine for dealing with contact, and leaves open the option
+    to put RL approaches head-to-head against more model-based alternatives. I
+    admit I might be a little biased. At any rate, that's the approach we will
+    take in these notes.</p>
     
     <p>Some people <a
     href="http://www.incompleteideas.net/IncIdeas/BitterLesson.html">might
