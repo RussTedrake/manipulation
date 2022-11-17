@@ -1,38 +1,15 @@
-import gym
-import numpy as np
 import os.path
 
+import gym
+import numpy as np
 from pydrake.all import (
-    AddMultibodyPlantSceneGraph,
-    Box,
-    ConstantVectorSource,
-    ContactVisualizer,
-    ContactVisualizerParams,
-    DiagramBuilder,
-    EventStatus,
-    FixedOffsetFrame,
-    InverseDynamicsController,
-    LeafSystem,
-    MeshcatVisualizer,
-    MeshcatVisualizerParams,
-    MultibodyPlant,
-    MultibodyPositionToGeometryPose,
-    Multiplexer,
-    Parser,
-    PassThrough,
-    PlanarJoint,
-    PrismaticJoint,
-    RandomGenerator,
-    Rgba,
-    RigidTransform,
-    RotationMatrix,
-    SceneGraph,
-    Simulator,
-    SpatialInertia,
-    Sphere,
-    UnitInertia,
-    Variable,
-)
+    AddMultibodyPlantSceneGraph, Box, ConstantVectorSource, ContactVisualizer,
+    ContactVisualizerParams, DiagramBuilder, DiscreteContactSolver, EventStatus,
+    FixedOffsetFrame, InverseDynamicsController, LeafSystem, MeshcatVisualizer,
+    MeshcatVisualizerParams, MultibodyPlant, MultibodyPositionToGeometryPose,
+    Multiplexer, Parser, PassThrough, PlanarJoint, PrismaticJoint,
+    RandomGenerator, Rgba, RigidTransform, RotationMatrix, SceneGraph,
+    Simulator, SpatialInertia, Sphere, UnitInertia, Variable)
 
 from manipulation.drake_gym import DrakeGymEnv
 from manipulation.scenarios import AddShape, SetColor, SetTransparency
@@ -98,7 +75,13 @@ def make_box_flipup(generator,
                     time_limit=10):
     builder = DiagramBuilder()
     plant, scene_graph = AddMultibodyPlantSceneGraph(builder, time_step=0.001)
+
+    # TODO(russt): Re-enable Sap pending resolution of
+    # https://github.com/RobotLocomotion/drake/issues/18338
+    # plant.set_discrete_contact_solver(DiscreteContactSolver.kSap)
+
     # TODO(russt): randomize parameters.
+
     box = AddPlanarBinAndSimpleBox(plant)
     finger = AddPointFinger(plant)
     plant.Finalize()

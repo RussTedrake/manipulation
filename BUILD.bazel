@@ -104,28 +104,6 @@ rt_html_test(
     srcs = ["rl.html"],
 )
 
-# Having cuda issues on puget
-#rt_ipynb_test(
-#    name = "rl",
-#    srcs = ["rl.ipynb"],
-#    data = ["//data:box_flipup_ppo_state_3.zip"],
-#    deps = [
-#      "//manipulation",
-#      "//manipulation:meshcat_utils",
-#      "//manipulation/envs:box_flipup",
-#    ],
-#)
-
-#rt_py_test(
-#  name = "rl_train_boxflipup",
-#    srcs = ["rl_train_boxflipup.py"],
-#    args = ["--test"],
-#    imports = [".."],
-#    deps = [
-#      "//manipulation/envs:box_flipup",
-#    ],
-#)
-
 rt_html_test(
     srcs = ["drake.html"],
 )

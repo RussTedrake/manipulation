@@ -31,12 +31,8 @@ def main():
 
     observations = "state"
     time_limit = 10 if not args.test else 0.5
-    zip = "data/box_flipup_ppo_{observations}.zip"
+    zip = f"data/box_flipup_ppo_{observations}.zip"
     log = "/tmp/ppo_box_flipup/"
-
-#    gym.envs.register(
-#        id="BoxFlipUp-v0",
-#        entry_point="manipulation.envs.box_flipup:BoxFlipUpEnv")
 
     num_cpu = int(cpu_count() / 2) if not args.test else 2
     env = make_vec_env(BoxFlipUpEnv,
