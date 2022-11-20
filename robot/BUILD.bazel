@@ -36,3 +36,12 @@ rt_ipynb_test(
       "//manipulation",
     ],
 )
+
+rt_ipynb_test(
+    name = "rubiks_cube",
+    data = ["//manipulation/models"],
+    srcs = ["rubiks_cube.ipynb"],
+    deps = [
+      "//manipulation",
+    ],
+)
