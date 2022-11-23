@@ -1,1 +1,11 @@
-recursive-include manipulation *.txt *.md *.py *.npy *.urdf *.sdf *.obj *.mtl *.jpg *.ply *.yaml *.xml
+exclude *
+include LICENSE.txt README.md 
+exclude *.egg-info/**
+exclude **/__pycache__/**
+exclude *.bazel
+exclude **/test/**
+prune bazel-* 
+prune htmlbook
+prune data
+prune solutions
+prune figures
