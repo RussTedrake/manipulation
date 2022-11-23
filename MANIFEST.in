@@ -1,1 +1,1 @@
-recursive-include manipulation *.txt *.md *.py *.urdf *.sdf *.obj *.mtl *.jpg *.ply *.yaml
+recursive-include manipulation *.txt *.md *.py *.npy *.urdf *.sdf *.obj *.mtl *.jpg *.ply *.yaml *.xml
