@@ -535,10 +535,9 @@ pose = plant.EvalBodyPoseInWorld(context, gripper)</pre></code>
       frames: \begin{equation} {}^A\text{v}^B_G = {}^GR^F {}^A\text{v}^B_F,
       \qquad {}^A\omega^B_G = {}^GR^F {}^A\omega^B_F.\end{equation}
         </li>
-        <li>Translational velocities have the additive inverse,
-        ${}^A\text{v}^C_F = - {}^C\text{v}^A_F,$ and compose across frames
-        with: \begin{equation}{}^A\text{v}^C_F = {}^A\text{v}^B_F +
-        {}^B\text{v}^C_F + {}^A\omega^B_F \times {}^Bp^C_F.\end{equation} 
+        <li>Translational velocities compose across frames with:
+        \begin{equation}{}^A\text{v}^C_F = {}^A\text{v}^B_F + {}^B\text{v}^C_F
+        + {}^A\omega^B_F \times {}^Bp^C_F.\end{equation} 
       <details><summary>This can be derived in a few steps (click the triangle
       to expand)</summary><p>Differentiating $${}^Ap^C = {}^AX^B {}^Bp^C =
       {}^Ap^B + {}^AR^B {}^Bp^C,$$ yields \begin{align} {}^A\text{v}^C =&
@@ -555,6 +554,8 @@ pose = plant.EvalBodyPoseInWorld(context, gripper)</pre></code>
       product, so $\dot{R}R^Tp = \omega \times p.$</p>  <p>Multiply the right
       and left sides by ${}^FR^A$ to change the expressed-in frame, and we have
       our result.</p></details></li>
+      <li>Unfortunately, this implies that translational velocities <i>do
+      not</i> have the simple additive inverse.</li>
     </ul>
     </div>
 
