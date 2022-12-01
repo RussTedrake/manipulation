@@ -554,8 +554,10 @@ pose = plant.EvalBodyPoseInWorld(context, gripper)</pre></code>
       product, so $\dot{R}R^Tp = \omega \times p.$</p>  <p>Multiply the right
       and left sides by ${}^FR^A$ to change the expressed-in frame, and we have
       our result.</p></details></li>
-      <li>Unfortunately, this implies that translational velocities <i>do
-      not</i> have the simple additive inverse.</li>
+      <li>This reveals that additive inverse for translational velocities is
+      not obtained by switching the reference and measured-in frames; it is
+      slightly more complicated: \begin{equation}-{}^A\text{v}^B_F =
+      {}^B\text{v}^A_F + {}^A\omega^B_F \times {}^Bp^A_F.\end{equation} .</li>
     </ul>
     </div>
 
