@@ -1,10 +1,10 @@
 exclude *
-include LICENSE.txt README.md 
+include LICENSE.txt README.md pyproject.toml setup.cfg
 exclude *.egg-info/**
 exclude **/__pycache__/**
 exclude *.bazel
 exclude **/test/**
-prune bazel-* 
+prune bazel-*
 prune htmlbook
 prune data
 prune solutions
