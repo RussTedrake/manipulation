@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+
+<html>
+
+  <head>
+    <title>Ch. 11 - Task and Motion Planning</title>
+    <meta name="Ch. 11 - Task and Motion Planning" content="text/html; charset=utf-8;" />
+    <link rel="canonical" href="http://manipulation.csail.mit.edu/tamp.html" />
+
+    <script src="https://hypothes.is/embed.js" async></script>
+    <script type="text/javascript" src="chapters.js"></script>
+    <script type="text/javascript" src="htmlbook/book.js"></script>
+
+    <script src="htmlbook/mathjax-config.js" defer></script> 
+    <script type="text/javascript" id="MathJax-script" defer
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js">
+    </script>
+    <script>window.MathJax || document.write('<script type="text/javascript" src="htmlbook/MathJax/es5/tex-chtml.js" defer><\/script>')</script>
+
+    <link rel="stylesheet" href="htmlbook/highlight/styles/default.css">
+    <script src="htmlbook/highlight/highlight.pack.js"></script> <!-- http://highlightjs.readthedocs.io/en/latest/css-classes-reference.html#language-names-and-aliases -->
+    <script>hljs.initHighlightingOnLoad();</script>
+
+    <link rel="stylesheet" type="text/css" href="htmlbook/book.css" />
+  </head>
+
+<body onload="loadChapter('manipulation');">
+
+<div data-type="titlepage" pdf="no">
+  <header>
+    <h1><a href="index.html" style="text-decoration:none;">Robotic Manipulation</a></h1>
+    <p data-type="subtitle">Perception, Planning, and Control</p> 
+    <p style="font-size: 18px;"><a href="http://people.csail.mit.edu/russt/">Russ Tedrake</a></p>
+    <p style="font-size: 14px; text-align: right;"> 
+      &copy; Russ Tedrake, 2020-2022<br/>
+      Last modified <span id="last_modified"></span>.</br>
+      <script>
+      var d = new Date(document.lastModified);
+      document.getElementById("last_modified").innerHTML = d.getFullYear() + "-" + (d.getMonth()+1) + "-" + d.getDate();</script>
+      <a href="misc.html">How to cite these notes, use annotations, and give feedback.</a><br/>
+    </p>
+  </header>
+</div>
+
+<p pdf="no"><b>Note:</b> These are working notes used for <a
+href="http://manipulation.csail.mit.edu/Fall2022/">a course being taught
+at MIT</a>. They will be updated throughout the Fall 2022 semester.  <!-- <a 
+href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos are available on YouTube</a>.--></p> 
+
+<table style="width:100%;" pdf="no"><tr style="width:100%">
+  <td style="width:33%;text-align:left;"><a class="previous_chapter" href=rl.html>Previous Chapter</a></td>
+  <td style="width:33%;text-align:center;"><a href=index.html>Table of contents</a></td>
+  <td style="width:33%;text-align:right;"><a class="next_chapter" href=drake.html>Next Chapter</a></td>
+</tr></table>
+
+<script type="text/javascript">document.write(notebook_header('tamp'))
+</script>
+<!-- EVERYTHING ABOVE THIS LINE IS OVERWRITTEN BY THE INSTALL SCRIPT -->
+<chapter style="counter-reset: chapter 10"><h1>Task and Motion Planning</h1>
+
+<p>As we develop more and more sophisticated manipulation capabilities, we will
+need increasingly sophisticated programming strategies for the the high-level
+(aka "task-level") execution of the robot. For the relatively simple task of
+moving YCB objects between bins, a simple <a
+href="clutter.html#task">state-machine</a>-programming paradigm was sufficient.
+If the task is "make me a pizza", where we need to find and fetch all of the
+tools and ingredients from various places throughout the kitchen, it would be
+unwieldy to program a state machine that can work in any kitchen.</p>
+
+<p>In this chapter we'll look at the problem of programming the task-level
+using AI-style <i>symbolic</i> planning, which has advanced significantly over
+the last decades to the point where it can solve enormously complex problems.
+But to ground the symbols in our robot motions and constraints, we must tightly
+integrate the task-level planning with the lower-level motion planning; this
+integration is the object of study in <i>task and motion planning (TAMP)</i>.
+For an excellent review, see <elib>Garrett21</elib>.</p>
+
+<section><h1>A case study: Loading the dishwasher</h1>
+
+
+</section>
+
+<section><h1>Symbolic Planning</h1>
+
+  <subsection><h1>STRIPS</h1></subsection>
+  
+  <subsection><h1>PDDL</h1></subsection>
+  
+  <subsection><h1>Factorized planners</h1></subsection>
+
+  <todo>Fastforward, fastdownward</todo>
+
+</section>
+
+<!--
+<section><h1>Task and Motion Planning</h1>
+
+  <p>We've seen powerful algorithms for motion planning, and now some powerful
+  algorithms for task planning. It's tempting to separate the two -- first we
+  construct a task plan, then we do motion planning to fill in the details.
+  Unfortunately, for many problems in robotics, these two levels cannot be
+  solved independently -- the symbolic predicates in the high-level planner
+  depend on the continuous variables that will be determined by the motion
+  planner, and the costs and constraints for the motion planner rely on the
+  task plan. In most cases, we need to solve the problem jointly.</p>
+
+  <example><h1></h1>
+  
+    <todo>A simple example making the case that the task level and motion level
+    must be solved jointly.</todo>
+
+  </example>
+
+</section>
+-->
+
+<!--<section><h1>Multi-modal motion planning</h1>
+</section>-->
+
+<section><h1>Adding continuous variables to symbolic planners</h1></section>
+
+<section><h1>Adding discrete variables to motion planners</h1></section>
+
+<section><h1>Graphs of Convex Sets</h1></section>
+
+</chapter>
+<!-- EVERYTHING BELOW THIS LINE IS OVERWRITTEN BY THE INSTALL SCRIPT -->
+
+<div id="references"><section><h1>References</h1>
+<ol>
+
+<li id=Garrett21>
+<span class="author">Caelan Reed Garrett and Rohan Chitnis and Rachel Holladay and Beomjoon Kim and Tom Silver and Leslie Pack Kaelbling and Tom{\'a}s Lozano-P{\'e}rez</span>, 
+<span class="title">"Integrated task and motion planning"</span>, 
+<span class="publisher">Annual review of control, robotics, and autonomous systems</span>, vol. 4, pp. 265--293, <span class="year">2021</span>.
+
+</li><br>
+</ol>
+</section><p/>
+</div>
+
+<table style="width:100%;" pdf="no"><tr style="width:100%">
+  <td style="width:33%;text-align:left;"><a class="previous_chapter" href=rl.html>Previous Chapter</a></td>
+  <td style="width:33%;text-align:center;"><a href=index.html>Table of contents</a></td>
+  <td style="width:33%;text-align:right;"><a class="next_chapter" href=drake.html>Next Chapter</a></td>
+</tr></table>
+
+<div id="footer" pdf="no">
+  <hr>
+  <table style="width:100%;">
+    <tr><td><a href="https://accessibility.mit.edu/">Accessibility</a></td><td style="text-align:right">&copy; Russ
+      Tedrake, 2022</td></tr>
+  </table>
+</div>
+
+
+</body>
+</html>

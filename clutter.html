@@ -1101,7 +1101,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
 
   </section>
 
-  <section><h1>Programming the Task Level</h1>
+  <section id="task"><h1>Programming the Task Level</h1>
 
     <p>Most of us are used to writing code in a <a
     href="https://hackr.io/blog/procedural-programming">procedural
@@ -1144,9 +1144,9 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
     Each of these paradigms has its place, and some researchers heavily favor
     one over the other. I'll always remember Rod Brooks writing papers like
     <u>Elephants Don't Play Chess</u> to argue against task-level
-    planning<elib>Brooks90+Brooks91+Brooks91a</elib>; his "subsumption
+    planning<elib>Brooks90+Brooks91+Brooks91a</elib>. Rod's "subsumption
     architecture" was distinctly in the "task-level policies" category and can
-    be seen as a precursor to Behavior Trees and established its credibility by
+    be seen as a precursor to Behavior Trees; it established its credibility by
     having success on the early Roomba vacuum cleaners. The planning community
     might counter that for truly complicated tasks, it would be impossible for
     human programmers to author a policy for all possible permutations /
@@ -1157,15 +1157,25 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
     parts of the notes. 
     </p>
 
+    <p>For the purposes of clutter clearing in the systems framework, taking
+    the second approach: writing the task-level behavior "policy" as a simple
+    state machine will work nicely.</p>
+
     <example><h1>A simple state machine for "clutter clearing"</h1>
-    
+
+      <todo>Draw the simple state machine diagram here, and write a minimal
+      system that implements it.</todo>
+
     </example>
 
   </section>
 
   <section><h1>Putting it all together</h1>
   
-    <p>First, we bundle up our grasp-selection algorithm into a system that reads the point clouds from 3 cameras, does the point cloud processing (including normal estimation), and the random sampling, and puts the grasp selection onto the output port:</p>
+    <p>First, we bundle up our grasp-selection algorithm into a system that
+    reads the point clouds from 3 cameras, does the point cloud processing
+    (including normal estimation), and the random sampling, and puts the grasp
+    selection onto the output port:</p>
     <p text-align="center">
       <script src="htmlbook/js-yaml.min.js"></script>
       <script type="text/javascript">
@@ -1188,7 +1198,10 @@ output_ports:
     relatively expensive sampling procedure only gets called when the
     downstream system evaluates the output port.</p>
 
-    <p>The work-horse system in this example is the <code>Planner</code> system which implements the basic state machine, calls the planning functions, stores the resulting plans in its <code>Context</code>, and evaluates the plans on the output port:</p>
+    <p>The work-horse system in this example is the <code>Planner</code> system
+    which implements the basic state machine, calls the planning functions,
+    stores the resulting plans in its <code>Context</code>, and evaluates the
+    plans on the output port:</p>
     <p text-align="center">
       <script src="htmlbook/js-yaml.min.js"></script>
       <script type="text/javascript">
@@ -1207,7 +1220,9 @@ output_ports:
       document.write(system_html(sys));
       </script>
     </p> 
-    <p>This system needs enough input / output ports to get the relevant information into the planner, and to command the downstream controllers.</p>
+    <p>This system needs enough input / output ports to get the relevant
+    information into the planner, and to command the downstream
+    controllers.</p>
 
     <example id="clutter_clearing">
       <h1>Clutter clearing (complete demo)</h1>
@@ -1221,27 +1236,38 @@ output_ports:
   <section id="exercises"><h1>Exercises</h1>
 
     <exercise id="static_equilibrium"><h1>Assessing static equilibrium</h1>
-        <p>For this problem, we'll use the Coulomb friction model, where $|f_t| \le \mu f_n$. In other words, the friction force is large enough to resist any movement up until the force required would exceed $\mu f_n$, in which case $|f_t| = \mu f_n$.
+        <p>For this problem, we'll use the Coulomb friction model, where $|f_t|
+        \le \mu f_n$. In other words, the friction force is large enough to
+        resist any movement up until the force required would exceed $\mu f_n$,
+        in which case $|f_t| = \mu f_n$.
         <ol type="a">
           <li>
-            <p>Consider a box with mass $m$ sitting on a ramp at angle $\theta$, with coefficient of box $\mu$ in between the sphere and the ramp:</p>
+            <p>Consider a box with mass $m$ sitting on a ramp at angle
+            $\theta$, with coefficient of box $\mu$ in between the sphere and
+            the ramp:</p>
             <figure>
-                <img style="width:50%", src="figures/exercises/static_equilibrium_ramp.png"/>
+                <img style="width:50%",
+                src="figures/exercises/static_equilibrium_ramp.png"/>
             </figure>
-            <p>For a given angle $\theta$, what is the minimum coefficient of friction required for the box to not slip down the plane? Use $g$ for acceleration due to gravity.</p>
+            <p>For a given angle $\theta$, what is the minimum coefficient of
+            friction required for the box to not slip down the plane? Use $g$
+            for acceleration due to gravity.</p>
           </li>
         </ol>
-        <p>Now consider a flat ground plane with three solid (uniform density) spheres sitting on it, with
-             radius $r$ and mass $m$.
-             Assume they have the same coefficient of friction $\mu$ between each other as with the ground.</p>
+        <p>Now consider a flat ground plane with three solid (uniform density)
+        spheres sitting on it, with radius $r$ and mass $m$. Assume they have
+        the same coefficient of friction $\mu$ between each other as with the
+        ground.</p>
 
         <p>For each of the following configurations: could the spheres be in
         static equilibrium for some $\mu\in[0,1]$, $m > 0$, $r > 0$? Explain
         why or why not. Remember that both torques and forces need to be
         balanced for all bodies to be in equilibrium.</p>
 
-        <p>To help you solve these problems, we have <script>document.write(notebook_link('static_equilibrium', deepnote['exercises/clutter'], link_text='a notebook'))</script> to help you build intuition and test your answers. It lets
-        you specify the configuration of the spheres and then uses the <a
+        <p>To help you solve these problems, we have
+        <script>document.write(notebook_link('static_equilibrium', deepnote['exercises/clutter'], link_text = 'a notebook'))</script>
+        to help you build intuition and test your answers. It lets you specify
+        the configuration of the spheres and then uses the <a
         href="https://drake.mit.edu/doxygen_cxx/classdrake_1_1multibody_1_1_static_equilibrium_problem.html">StaticEquilbriumProblem</a>
         class to solve for static equilibrium. Use this notebook to help
         visualize and think about the system, but for each of the
@@ -1263,88 +1289,151 @@ output_ports:
           </li>
           <li> Spheres stacked in a pyramid:
             <figure>
-                <img style="width:50%", src="figures/exercises/static_equilibrium_pyramid.png"/>
+                <img style="width:50%",
+                src="figures/exercises/static_equilibrium_pyramid.png"/>
             </figure>
           </li>
-          <li> Spheres stacked in a pyramid, but with a distance $d$ in between the bottom two:
+          <li> Spheres stacked in a pyramid, but with a distance $d$ in between
+          the bottom two:
             <figure>
-                <img style="width:50%", src="figures/exercises/static_equilibrium_pyramid_with_space.png"/>
+                <img style="width:50%",
+                src="figures/exercises/static_equilibrium_pyramid_with_space.png"/>
             </figure>
           </li>
         </ol>
-        <p>Finally, a few conceptual questions on the StaticEquilbriumProblem:</p>
+        <p>Finally, a few conceptual questions on the
+        StaticEquilbriumProblem:</p>
         <ol start="6" type="a">
-            <li>Why does it matter what initial guess we specify for the system? (Hint: what type of optimization problem is this?)</li>
-            <li>Take a look at the Drake documentation for <a href="https://drake.mit.edu/doxygen_cxx/classdrake_1_1multibody_1_1_static_equilibrium_problem.html">StaticEquilbriumProblem</a>. It lists the constraints that are used when it's solve for equilibrium. Which two of these can a free body diagram answer?</li>
+            <li>Why does it matter what initial guess we specify for the
+            system? (Hint: what type of optimization problem is this?)</li>
+            <li>Take a look at the Drake documentation for <a
+            href="https://drake.mit.edu/doxygen_cxx/classdrake_1_1multibody_1_1_static_equilibrium_problem.html">StaticEquilbriumProblem</a>.
+            It lists the constraints that are used when it's solve for
+            equilibrium. Which two of these can a free body diagram
+            answer?</li>
         </ol>
       </exercise>
 
     <exercise><h1>Normal Estimation from Depth</h1>
+
       <p>For this exercise, you will investigate a slightly different approach to normal vector estimation. In particular, we can exploit the spatial structure that is already in a depth image to avoid computing nearest neighbors. You will work exclusively in <script>document.write(notebook_link('normal_estimation_depth', deepnote['exercises/clutter'], link_text='this notebook'))</script>. You will be asked to complete the following steps:</p>
       <ol type="a">
-        <li> Implement a method to estimate normal vectors from a depth image, without computing nearest neighbors. </li>
-        <li> Reason about a scenario where the depth image-based solution will not be as performant as computing nearest-neighbors.</li>
+        <li> Implement a method to estimate normal vectors from a depth image,
+        without computing nearest neighbors. </li>
+        <li> Reason about a scenario where the depth image-based solution will
+        not be as performant as computing nearest-neighbors.</li>
       </ol>    
     </exercise>
 
     <exercise><h1>Analytic Antipodal Grasping</h1>
       <p>So far, we have used sampling-based methods to find antipodal grasps - but can we have find one analytically if we knew the equation of the object shape? For this exercise, you will analyze and implement a correct-by-construction method to find antipodal points using symbolic differentiation and MathematicalProgram. You will work exclusively in <script>document.write(notebook_link('analytic_antipodal_grasps', deepnote['exercises/clutter'], link_text='this notebook'))</script>. You will be asked to complete the following steps:</p>
       <ol type="a">
-        <li> Prove that antipodal points are critical points of an energy function defined on the shape. </li>
+        <li> Prove that antipodal points are critical points of an energy
+        function defined on the shape. </li>
         <li> Prove the converse does not hold.</li>
-        <li> Implement a method to find these antipodal points using MathematicalProgram.</li>
-        <li> Analyze the Hessian of the energy function and its relation to the type of antipodal grasps.</li>
+        <li> Implement a method to find these antipodal points using
+        MathematicalProgram.</li>
+        <li> Analyze the Hessian of the energy function and its relation to the
+        type of antipodal grasps.</li>
       </ol>    
     </exercise>
 
     <exercise id="gpg"><h1>Grasp Candidate Generation</h1>
 
       <p>In the chapter Colab notebook, we generated grasp candidates using the
-      antipodal heuristic.  In this exercise, we will investigate an alternative
-      method for generating grasp candidates based on local curvature, similar
-      to the one proposed in <elib>tenPas17</elib>. This exercise is
+      antipodal heuristic.  In this exercise, we will investigate an
+      alternative method for generating grasp candidates based on local
+      curvature, similar to the one proposed in <elib>tenPas17</elib>. This
+      exercise is
       implementation-heavy, and you will work exclusively in <script>document.write(notebook_link('grasp_candidate', deepnote['exercises/clutter'], link_text='this notebook'))</script>.</p>
       
     </exercise>    
 
     <exercise id="behaviorTrees"><h1>Behavior Trees</h1>
 
-      <p>Let's reintroduce the terminology of behavior trees. Behavior trees provide a structure for switching between different tasks in a way that is both modular and reactive. Behavior trees are a directed rooted tree where the internal nodes manage the control flow and the leaf nodes are actions to be executed or conditions to be evaluated. For example, an action may be to "pick ball". This action can succeed or fail. A condition may be "Is my hand empty?" which can be true (thus the condition succeeds) or can be false (the condition fails). <br/><br/>
+      <p>Let's reintroduce the terminology of behavior trees. Behavior trees
+      provide a structure for switching between different tasks in a way that
+      is both modular and reactive. Behavior trees are a directed rooted tree
+      where the internal nodes manage the control flow and the leaf nodes are
+      actions to be executed or conditions to be evaluated. For example, an
+      action may be to "pick ball". This action can succeed or fail. A
+      condition may be "Is my hand empty?" which can be true (thus the
+      condition succeeds) or can be false (the condition fails). <br/><br/>
 
       We'll consider two categories of control flow nodes:
       <dl>
-        <dt>Sequence Node: ($\rightarrow$)</dt> <dd>Sequence nodes execute each of the child behaviors one after another. The sequence <i>fails if any of the children fail</i>. One way to think about this operator is that a sequence node takes an "and" over all of the child behaviors.</dd>
-        <dt>Fallback Node: (?)</dt> <dd>Fallback nodes also execute each of the child behaviors one after another. However, fallback <i>succeeds if any of the children succeed</i>. One way to think about this operator is that the fallback node takes an "or" over all of the children behaviors.</dd>
+        <dt>Sequence Node: ($\rightarrow$)</dt> <dd>Sequence nodes execute each
+        of the child behaviors one after another. The sequence <i>fails if any
+        of the children fail</i>. One way to think about this operator is that
+        a sequence node takes an "and" over all of the child behaviors.</dd>
+        <dt>Fallback Node: (?)</dt> <dd>Fallback nodes also execute each of the
+        child behaviors one after another. However, fallback <i>succeeds if any
+        of the children succeed</i>. One way to think about this operator is
+        that the fallback node takes an "or" over all of the children
+        behaviors.</dd>
 </dl>
 
-    The symbols are visualized below. Sequence nodes are represented as an arrow in a box, fallback nodes are represented as a question mark in a box, actions are inside boxes and conditions are inside ovals.</p>
+    The symbols are visualized below. Sequence nodes are represented as an
+    arrow in a box, fallback nodes are represented as a question mark in a box,
+    actions are inside boxes and conditions are inside ovals.</p>
     <figure><img style="width:70%", src="figures/exercises/behaviorTree_symbols.png"/></figure>
 
-    <p>Let's apply our understanding of behavior trees in the context of a simple task where a robot's goal is to: find a ball, pick the ball up and place the ball in a bin. We can describe task with the high-level behavior tree:</p>
+    <p>Let's apply our understanding of behavior trees in the context of a
+    simple task where a robot's goal is to: find a ball, pick the ball up and
+    place the ball in a bin. We can describe task with the high-level behavior
+    tree:</p>
     <figure><img style="width:80%", src="figures/exercises/behaviorTree_highLevel.png"/></figure>
 
-    <p>Confirm to yourself that this small behavior tree captures the task! We can go one level deeper and expand out our "Pick Ball" behavior:</p>
+    <p>Confirm to yourself that this small behavior tree captures the task! We
+    can go one level deeper and expand out our "Pick Ball" behavior:</p>
     <figure><img style="width:80%", src="figures/exercises/behaviorTree_pick.png"/></figure>
 
-    <p>The pick ball behavior can be considered as such: Let's start with the left branch. If the ball is already close, the condition "Ball Close?" returns true. If the ball is not close, we execute an action to "Approach ball", thus making the ball close. Thus either the ball is already close (i.e. the condition "Ball Close?" is true) or we approach the ball (i.e. the action "Approach ball" is successfully executed) to make the ball close. Given that the ball is now close, we consider the right branch of the pick action. If the ball is already grasped, the condition "Ball Grasped?" returns true. if the ball is not grasped, we execute the action, "Grasp Ball".<br/>
+    <p>The pick ball behavior can be considered as such: Let's start with the
+    left branch. If the ball is already close, the condition "Ball Close?"
+    returns true. If the ball is not close, we execute an action to "Approach
+    ball", thus making the ball close. Thus either the ball is already close
+    (i.e. the condition "Ball Close?" is true) or we approach the ball (i.e.
+    the action "Approach ball" is successfully executed) to make the ball
+    close. Given that the ball is now close, we consider the right branch of
+    the pick action. If the ball is already grasped, the condition "Ball
+    Grasped?" returns true. if the ball is not grasped, we execute the action,
+    "Grasp Ball".<br/>
 
-    We can expand our our behavior tree even further to give our full behavior:</p>
+    We can expand our our behavior tree even further to give our full
+    behavior:</p>
     <figure><img style="width:99%", src="figures/exercises/behaviorTree_detail.png" id="behaviorTree"/>
             <figcaption>Behavior Tree for Pick-Up Task</figcaption></figure>
 
-    <p>Here we've added the behavior that if the robot cannot complete the task, it can ask a kind human for help. Take a few minutes to walk through the behavior tree and convince yourself it encodes the desired task behavior.</p>
+    <p>Here we've added the behavior that if the robot cannot complete the
+    task, it can ask a kind human for help. Take a few minutes to walk through
+    the behavior tree and convince yourself it encodes the desired task
+    behavior.</p>
 
     <ol type="a">
-        <li> We claimed behavior trees enable reactive behavior. Let's explore that. Imagine we have a robot executing our <a href="#behaviorTree">behavior tree</a>. As the robot is executing the action "Approach Bin", a rude human knocks the ball out of the robot's hand. The ball rolls to a position that the robot can still see, but is quite far away. Following the logic of the behavior tree, what condition fails and what action is executed because of this?</li>
+        <li> We claimed behavior trees enable reactive behavior. Let's explore
+        that. Imagine we have a robot executing our <a
+        href="#behaviorTree">behavior tree</a>. As the robot is executing the
+        action "Approach Bin", a rude human knocks the ball out of the robot's
+        hand. The ball rolls to a position that the robot can still see, but is
+        quite far away. Following the logic of the behavior tree, what
+        condition fails and what action is executed because of this?</li>
 
-        <li>Another way to mathematically model computation is through finite state machines (FSM). Finite state machines are composed of states, transitions and events. We can encode the behavior of our behavior tree for our pick-up task through a finite state machine, as shown below:
+        <li>Another way to mathematically model computation is through finite
+        state machines (FSM). Finite state machines are composed of states,
+        transitions and events. We can encode the behavior of our behavior tree
+        for our pick-up task through a finite state machine, as shown below:
 
 
-    <figure><img style="width:99%", src="figures/exercises/fsm_blanked.png"/></figure>
-    We have left a few states and transitions blank. Your task is to fill in those 4 values such that the finite state machine produces the same behavior as the behavior tree. </li>
+    <figure><img style="width:99%",
+    src="figures/exercises/fsm_blanked.png"/></figure>
+    We have left a few states and transitions blank. Your task is to fill in
+    those 4 values such that the finite state machine produces the same
+    behavior as the behavior tree. </li>
     </ol>
 
-    <p>From this simple task we can see that while finite state machines can often be easy to understand and intuitive, they can quickly get quite messy!</p>
+    <p>From this simple task we can see that while finite state machines can
+    often be easy to understand and intuitive, they can quickly get quite
+    messy!</p>
 
     <ol type="a" start=3> 
         <li> Throughout this chapter and the lectures we've discussed a bin
@@ -1376,17 +1465,31 @@ output_ports:
           <li>"Transport grasped object(s) to above Bin 2"</li>
         </ul><br/>
 
-        Using these conditions, actions and our two control flow nodes (Sequence and Fallback), we want you to draw a behavior tree that captures the behavior of our bin picking task. To get you started, we have included a "rough draft" behavior tree below, but it's broken in a number of places (e.g., some branches might be missing, some control flow nodes/actions/conditions might have the wrong type, etc.):
+        Using these conditions, actions and our two control flow nodes
+        (Sequence and Fallback), we want you to draw a behavior tree that
+        captures the behavior of our bin picking task. To get you started, we
+        have included a "rough draft" behavior tree below, but it's broken in a
+        number of places (e.g., some branches might be missing, some control
+        flow nodes/actions/conditions might have the wrong type, etc.):
 
-        <figure><img style="width:80%", src="figures/exercises/behaviorTreeBroken.png"/></figure>
+        <figure><img style="width:80%",
+        src="figures/exercises/behaviorTreeBroken.png"/></figure>
 
-        Your job is to identify all of the places where it's broken, and draw your own correct behavior tree with all the broken components fixed. 
+        Your job is to identify all of the places where it's broken, and draw
+        your own correct behavior tree with all the broken components fixed. 
         </li>
     </ol>
 
-    <p>We claimed behavior trees are modular. Their modularity comes from the fact that we can write reusable snippets of code that define actions and conditions and then compose them using behavior trees. For example, we can imagine that the "Select Grasp" action from part (c) is implemented using the antipodal grasping mechanism we have built up throughout this chapter. And the "Transport grasped object(s) to above Bin 2" action could be implemented using the pick and place tools we developed in Chapter 3.</p>
+    <p>We claimed behavior trees are modular. Their modularity comes from the
+    fact that we can write reusable snippets of code that define actions and
+    conditions and then compose them using behavior trees. For example, we can
+    imagine that the "Select Grasp" action from part (c) is implemented using
+    the antipodal grasping mechanism we have built up throughout this chapter.
+    And the "Transport grasped object(s) to above Bin 2" action could be
+    implemented using the pick and place tools we developed in Chapter 3.</p>
 
-    <p>Source: The scenario and figures for parts (a) and (b) of this exercise are inspired by material in <elib>Colledanchise18</elib></p>
+    <p>Source: The scenario and figures for parts (a) and (b) of this exercise
+    are inspired by material in <elib>Colledanchise18</elib></p>
     </exercise>   
     <exercise id="simulationTuning"><h1>Simulation Tuning</h1>
       <p>
