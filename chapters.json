@@ -21,7 +21,7 @@
     "(learned) visual representations (autoencoders, dense descriptors, tcc, etc)",
     "visuomotor / imitation learning / behavior cloning",
     "underactuated (maybe dexterous?)",
-    "belief-space planning",
+    "belief-space planning (draft in underactuated)",
     "tactile (estimation, tracking, slip detection, etc)?",
     "tracking",
     "dense reconstruction (more merge with real2sim?).  NeRF, kinect fusion, elastic fusion, surfelwarp. ",
