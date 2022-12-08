@@ -10,10 +10,12 @@
     "trajectories",
     "force",
     "rl",
-    "tamp",
     "drake",
     "station",
     "misc"
+  ],
+  "draft_chapter_ids": [
+    "tamp"
   ],
   "other_potential_chapters": [ 
     "(learned) visual representations (autoencoders, dense descriptors, tcc, etc)",
