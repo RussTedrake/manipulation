@@ -8,12 +8,14 @@ from copy import deepcopy
 
 def ransac_solution(point_cloud,
                     model_fit_func,
+                    rng,
                     tolerance=1e-3,
                     max_iterations=500):
     """
     Args:
       point_cloud is (3, N) numpy array
       tolerance is a float
+      rng is a random number generator
       max_iterations is a (small) integer
       model_fit_func: the function to fit the model (point clouds)
 
@@ -29,7 +31,7 @@ def ransac_solution(point_cloud,
     point_cloud_1 = np.ones((N, 4))
     point_cloud_1[:, :3] = point_cloud.T
     for i in range(max_iterations):
-        s = point_cloud[:, np.random.randint(N, size=sample_size)]
+        s = point_cloud[:, rng.integers(0, N - 1, size=sample_size)]
         m = model_fit_func(s)
         abs_distances = np.abs(np.dot(m, point_cloud_1.T))  # 1 x N
         inliner_count = np.sum(abs_distances < tolerance)
@@ -56,10 +58,12 @@ class TestRANSAC(unittest.TestCase):
         simple_cloud = np.array([[0, 1, 0], [0, 0, 0], [1, 0, 0], [1, 1, 0],
                                  [0.2, 0.5, 0], [2, 4, 1]]).T
 
+        rng = np.random.default_rng(135)
         _, plane_student = self.ransac_student(simple_cloud, self.fit_plane,
-                                               1e-5, 100)
-        _, plane_solution = ransac_solution(simple_cloud, self.fit_plane, 1e-5,
-                                            100)
+                                               rng, 1e-5, 100)
+        rng = np.random.default_rng(135)
+        _, plane_solution = ransac_solution(simple_cloud, self.fit_plane, rng,
+                                            1e-5, 100)
         self.assertTrue(np.array_equal(plane_solution, plane_student),
                         "ransac implementation incorrect")
 
@@ -72,8 +76,10 @@ class TestRANSAC(unittest.TestCase):
         bunny_w_plane = self.notebook_locals['bunny_w_plane']
         bunny_w_plane_copy = deepcopy(bunny_w_plane)
 
+        rng = np.random.default_rng(135)
         student_answer = remove_plane(bunny_w_plane,
                                       self.ransac_student,
+                                      rng,
                                       tol=1e-4)
 
         outliers = []
