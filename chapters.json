@@ -15,17 +15,18 @@
     "misc"
   ],
   "draft_chapter_ids": [
-    "tamp"
+    "tamp", 
+    "visuomotor",
+    "foundation_models"
   ],
   "other_potential_chapters": [ 
     "(learned) visual representations (autoencoders, dense descriptors, tcc, etc)",
-    "visuomotor / imitation learning / behavior cloning",
     "underactuated (maybe dexterous?)",
     "belief-space planning (draft in underactuated)",
     "tactile (estimation, tracking, slip detection, etc)?",
-    "tracking",
+    "tracking (or this could go with geometric perception)",
     "dense reconstruction (more merge with real2sim?).  NeRF, kinect fusion, elastic fusion, surfelwarp. ",
-    "mobile (octrees, estimation, etc)",
+    "mobile (octrees, estimation, navigation, etc)",
     "teleop (keyboard + mouse, HTC Vive, data gloves, haptic feedback)",
     "system id / intuitive physics / real 2 sim",
     "verification and/or distributions over the world (scene grammars)"
