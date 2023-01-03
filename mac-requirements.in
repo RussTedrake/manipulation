@@ -6,7 +6,7 @@ psutil
 #nevergrad>=0.4.3; platform_machine == 'x86_64'
 #pymcubes>=0.1  # was causing a numpy mismatch on python3.10 (forcing numpy 1.21.6 to be installed, somehow)
 requests>=2.25
-#scipy # only needed for pymcubes
+#scipy # see setup/mac/Brewfile
 stable-baselines3>=1.4.0
 timeout-decorator>=0.5
 torch>=1.13.0  # doesn't support python3.11 yet
