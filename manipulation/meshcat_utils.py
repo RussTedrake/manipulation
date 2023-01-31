@@ -15,7 +15,7 @@ from pydrake.multibody.parsing import Parser
 from pydrake.multibody.plant import AddMultibodyPlantSceneGraph
 from pydrake.multibody.tree import BodyIndex, JointIndex
 from pydrake.perception import BaseField, Fields, PointCloud
-from pydrake.solvers.mathematicalprogram import BoundingBoxConstraint
+from pydrake.solvers import BoundingBoxConstraint
 from pydrake.systems.framework import (DiagramBuilder, EventStatus, LeafSystem,
                                        PublishEvent, VectorSystem)
 
