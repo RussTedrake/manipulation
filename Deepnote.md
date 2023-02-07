@@ -8,26 +8,10 @@ You will want to duplicate the project again whenever the staff pushes new conte
 
 # For developers
 
-Any changes to .ipynb in this repo must be "released" (manually, for now) on Deepnote.  We have a separate Deepnote project for each chapter under the Deepnote [Manipulation team](https://deepnote.com/dashboard/Manipulation/projects).  This workflow was recommended by the Deepnote team; it allows users to duplicate small pieces at a time and for developers to version each chapter with the most recent/relevant dockerfile.
+Any changes to .ipynb in this repo must be "released" on Deepnote.  We have a separate Deepnote project for each chapter under the Deepnote [Manipulation team](https://deepnote.com/dashboard/Manipulation/projects).  This workflow was recommended by the Deepnote team; it allows users to duplicate small pieces at a time and for developers to version each chapter with the most recent/relevant dockerfile.
 
 This requires:
-- Pushing a new dockerfile to `russtedrake/manipulation:tagname` *from a branch of master*. 
-```
-docker pull robotlocomotion/drake:focal
-docker build -f setup/docker/Dockerfile -t russtedrake/manipulation:latest .
-docker push russtedrake/manipulation:latest
-docker build -f setup/docker/Dockerfile -t russtedrake/manipulation:$(git rev-parse --short HEAD) .
-docker push russtedrake/manipulation:$(git rev-parse --short HEAD)
-echo russtedrake/manipulation:$(git rev-parse --short HEAD)
-python3 htmlbook/publish_to_deepnote.py $(git rev-parse --short HEAD)
-echo "Remember to log on to deepnote and build the dockerfile in any one of the notebooks"
-```
-  - I am working on adding github integration for the docker.  See [#147](https://github.com/RussTedrake/manipulation/issues/147).
-- Open the deepnote project, and
-  - Update the environment dockerfile to point to the new tag.  Note: Deepnote seems to cache docker instances.  If you've pushed something new to the same image tag, then you still need to "set up a new environment". 
-  - Manually copy the files from `/root/manipulation` to `~/work`.
-  - Make sure that the "Allow incoming connections" is enabled in the Environment settings.
-
+- Pushing a new dockerfile to `russtedrake/manipulation:tagname` *from a branch of master*. Run `Deepnote.sh`.
 Note that the git sha will change if I merge a branch into master.  Pegging to a branch sha is almost certainly not a stable reference.
 
 The manipulation dockerfile builds on the drake dockerfile.  Ideally this would be `robotlocomotion/drake:focal`.  This is updated nightly with binaries representing the master branch.  If we need changes to drake that are not yet in the nightly binaries then we can:
