@@ -48,14 +48,10 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
 
 <section id="search" pdf="no"><h1>Search these notes</h1>
 
-  <form id="searchform" action="https://google.com/search" method="get">
-    <input type="text" name="q" id="box" placeholder="Search these notes..." />
+  <form id="search_form" action="https://google.com/search" method="get">
+    <input type="text" name="q" placeholder="Search these notes…" />
+    <input type="hidden" name="q" value="site:manipulation.csail.mit.edu" />
   </form>
-  <script>
-    searchform.addEventListener('submit', function() {
-      box.value = box.value + ' site:manipulation.csail.mit.edu';
-    })
-  </script>
   
 </section>
 
