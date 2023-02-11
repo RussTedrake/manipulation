@@ -18,8 +18,7 @@ from pydrake.all import (
     PassThrough, PrismaticJoint, ProcessModelDirectives, RenderCameraCore,
     RenderEngineVtkParams, RevoluteJoint, Rgba, RgbdSensor, RigidTransform,
     RollPitchYaw, RotationMatrix, SchunkWsgPositionController, SpatialInertia,
-    Sphere, StateInterpolatorWithDiscreteDerivative, UnitInertia)
-from pydrake.manipulation.planner import (
+    Sphere, StateInterpolatorWithDiscreteDerivative, UnitInertia,
     DifferentialInverseKinematicsIntegrator,
     DifferentialInverseKinematicsParameters)
 
