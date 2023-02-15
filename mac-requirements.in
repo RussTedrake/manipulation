@@ -9,5 +9,9 @@ requests>=2.25
 scipy # see setup/mac/Brewfile
 stable-baselines3>=1.4.0
 timeout-decorator>=0.5
-torch>=1.13.0  # doesn't support python3.11 yet
+pyzmq>=25.0.0 # seems to be needed on python 3.11
+lxml>=4.9.2 # seems to be needed on python 3.11
+#torch>=1.13.1  # doesn't support python3.11 yet
+https://download.pytorch.org/whl/nightly/cpu/torch-2.0.0.dev20230215-cp311-none-macosx_11_0_arm64.whl; platform_machine == 'arm64'
+https://download.pytorch.org/whl/nightly/cpu/torch-2.0.0.dev20230215-cp311-none-macosx_10_9_x86_64.whl; platform_machine == 'x86_64'
 #torchvision
