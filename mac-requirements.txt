@@ -18,8 +18,9 @@ certifi==2020.12.5
     # via requests
 chardet==4.0.0
     # via requests
-cloudpickle==1.6.0
+cloudpickle==2.2.1
     # via
+    #   -r mac-requirements.in
     #   gym
     #   stable-baselines3
 cycler==0.10.0
@@ -32,10 +33,12 @@ fonttools==4.28.2
     # via matplotlib
 gradescope-utils==0.4.0
     # via -r mac-requirements.in
-gym==0.19.0
+gym==0.21
     # via stable-baselines3
 idna==2.10
     # via requests
+importlib-metadata==4.13.0
+    # via stable-baselines3
 ipython-genutils==0.2.0
     # via nbformat
 jinja2==3.1.2
@@ -159,7 +162,7 @@ snowballstemmer==2.1.0
     # via pydocstyle
 soupsieve==2.2
     # via beautifulsoup4
-stable-baselines3==1.4.0
+stable-baselines3==1.7.0
     # via -r mac-requirements.in
 sympy==1.11.1
     # via torch
@@ -192,6 +195,8 @@ webencodings==0.5.1
     #   tinycss2
 yapf==0.30.0
     # via -r htmlbook/mac-requirements.in
+zipp==3.14.0
+    # via importlib-metadata
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools
