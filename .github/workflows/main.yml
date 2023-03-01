@@ -88,19 +88,20 @@ jobs:
       - name: test
         run: ./htmlbook/workflows/ci/focal/test
         shell: bash
-  monterey:
-    name: macos monterey 12
-    runs-on: macos-12
-    steps:
-      - name: checkout
-        uses: actions/checkout@v2
-      - name: submodule checkout
-        run:  ./setup/submodule_checkout
-        shell: zsh -efuo pipefail {0}
-      - name: setup
-        run: ./htmlbook/workflows/ci/monterey/setup
-        shell: zsh -efuo pipefail {0}
-      - name: test
-        run: ./htmlbook/workflows/ci/monterey/test
-        shell: zsh -efuo pipefail {0}
+# Disabled until we have pypl wheels for torch 2.0
+#  monterey:
+#    name: macos monterey 12
+#    runs-on: macos-12
+#    steps:
+#      - name: checkout
+#        uses: actions/checkout@v2
+#      - name: submodule checkout
+#        run:  ./setup/submodule_checkout
+#        shell: zsh -efuo pipefail {0}
+#      - name: setup
+#        run: ./htmlbook/workflows/ci/monterey/setup
+#        shell: zsh -efuo pipefail {0}
+#      - name: test
+#        run: ./htmlbook/workflows/ci/monterey/test
+#        shell: zsh -efuo pipefail {0}
 ...
