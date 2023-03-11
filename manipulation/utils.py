@@ -1,19 +1,21 @@
-import numpy as np
 import os
 import sys
 from urllib.request import urlretrieve
-from IPython import get_ipython
 
+import numpy as np
 import pydrake.all
-
-from pydrake.multibody.tree import JointIndex
+from IPython import get_ipython
 from pydrake.common.containers import namedview
+from pydrake.multibody.tree import JointIndex
 
 # Use a global variable here because some calls to IPython will actually case an
 # interpreter to be created.  This file needs to be imported BEFORE that
 # happens.
-running_as_notebook = "COLAB_TESTING" not in os.environ and get_ipython(
-) and hasattr(get_ipython(), 'kernel')
+running_as_notebook = (
+    "COLAB_TESTING" not in os.environ
+    and get_ipython()
+    and hasattr(get_ipython(), "kernel")
+)
 
 running_as_test = False
 
@@ -27,6 +29,7 @@ def pyplot_is_interactive():
     # import needs to happen after the backend is set.
     import matplotlib.pyplot as plt
     from matplotlib.rcsetup import interactive_bk
+
     return plt.get_backend() in interactive_bk
 
 
@@ -42,8 +45,17 @@ def LoadDataResource(filename):
     path = os.path.join(data, filename)
     if not os.path.exists(path):
         print(f"{path} was not found locally; downloading it now...")
-        urlretrieve(f"https://manipulation.csail.mit.edu/data/{filename}", path)
+        urlretrieve(
+            f"https://manipulation.csail.mit.edu/data/{filename}", path
+        )
     return path
+
+
+def ConfigureParser(parser):
+    """Add the manipulation/package.xml index to the given pydrake Parser."""
+    package_xml = os.path.join(os.path.dirname(__file__), "models/package.xml")
+    parser.package_map().AddPackageXml(filename=package_xml)
+    AddPackagePaths(parser)
 
 
 def AddPackagePaths(parser):
@@ -51,15 +63,22 @@ def AddPackagePaths(parser):
     parser.package_map().PopulateFromFolder(FindResource(""))
     parser.package_map().Add(
         "manipulation_station",
-        os.path.join(pydrake.common.GetDrakePath(),
-                     "examples/manipulation_station/models"))
+        os.path.join(
+            pydrake.common.GetDrakePath(),
+            "examples/manipulation_station/models",
+        ),
+    )
     parser.package_map().Add(
         "ycb",
-        os.path.join(pydrake.common.GetDrakePath(), "manipulation/models/ycb"))
+        os.path.join(pydrake.common.GetDrakePath(), "manipulation/models/ycb"),
+    )
     parser.package_map().Add(
         "wsg_50_description",
-        os.path.join(pydrake.common.GetDrakePath(),
-                     "manipulation/models/wsg_50_description"))
+        os.path.join(
+            pydrake.common.GetDrakePath(),
+            "manipulation/models/wsg_50_description",
+        ),
+    )
 
 
 reserved_labels = [
@@ -72,8 +91,9 @@ reserved_labels = [
 
 def colorize_labels(image):
     # import needs to happen after backend is set up.
-    import matplotlib.pyplot as plt
     import matplotlib as mpl
+    import matplotlib.pyplot as plt
+
     """Colorizes labels."""
     # TODO(eric.cousineau): Revive and use Kuni's palette.
     cc = mpl.colors.ColorConverter()
@@ -108,7 +128,7 @@ def SetupMatplotlibBackend(wishlist=["notebook"]):
     if running_as_notebook:
         ipython = get_ipython()
         # Short-circuit for google colab.
-        if 'google.colab' in sys.modules:
+        if "google.colab" in sys.modules:
             ipython.run_line_magic("matplotlib", "inline")
             return False
         # TODO: Find a way to detect vscode, and use inline instead of notebook
@@ -125,7 +145,9 @@ def SetupMatplotlibBackend(wishlist=["notebook"]):
 # TODO(russt): promote these to drake (and make a version with model_instance)
 
 
-def MakeNamedViewPositions(mbp, view_name, add_suffix_if_single_position=False):
+def MakeNamedViewPositions(
+    mbp, view_name, add_suffix_if_single_position=False
+):
     names = [None] * mbp.num_positions()
     for ind in range(mbp.num_joints()):
         joint = mbp.get_joint(JointIndex(ind))
@@ -133,20 +155,22 @@ def MakeNamedViewPositions(mbp, view_name, add_suffix_if_single_position=False):
             names[joint.position_start()] = joint.name()
         else:
             for i in range(joint.num_positions()):
-                names[joint.position_start() + i] = \
-                    f"{joint.name()}_{joint.position_suffix(i)}"
+                names[
+                    joint.position_start() + i
+                ] = f"{joint.name()}_{joint.position_suffix(i)}"
     for ind in mbp.GetFloatingBaseBodies():
         body = mbp.get_body(ind)
         start = body.floating_positions_start()
         for i in range(7):
-            names[start
-                  + i] = f"{body.name()}_{body.floating_position_suffix(i)}"
+            names[
+                start + i
+            ] = f"{body.name()}_{body.floating_position_suffix(i)}"
     return namedview(view_name, names)
 
 
-def MakeNamedViewVelocities(mbp,
-                            view_name,
-                            add_suffix_if_single_velocity=False):
+def MakeNamedViewVelocities(
+    mbp, view_name, add_suffix_if_single_velocity=False
+):
     names = [None] * mbp.num_velocities()
     for ind in range(mbp.num_joints()):
         joint = mbp.get_joint(JointIndex(ind))
@@ -154,14 +178,16 @@ def MakeNamedViewVelocities(mbp,
             names[joint.velocity_start()] = joint.name()
         else:
             for i in range(joint.num_velocities()):
-                names[joint.velocity_start() + i] = \
-                    f"{joint.name()}_{joint.velocity_suffix(i)}"
+                names[
+                    joint.velocity_start() + i
+                ] = f"{joint.name()}_{joint.velocity_suffix(i)}"
     for ind in mbp.GetFloatingBaseBodies():
         body = mbp.get_body(ind)
         start = body.floating_velocities_start() - mbp.num_positions()
         for i in range(6):
-            names[start
-                  + i] = f"{body.name()}_{body.floating_velocity_suffix(i)}"
+            names[
+                start + i
+            ] = f"{body.name()}_{body.floating_velocity_suffix(i)}"
     return namedview(view_name, names)
 
 
@@ -179,25 +205,28 @@ def SystemHtml(system):
     input_port_html = ""
     for p in range(system.num_input_ports()):
         input_port_html += (
-            f'<tr><td align=right style=\"padding:5px 0px 5px 0px\">'
-            f'{system.get_input_port(p).get_name()} &rarr;</td></tr>')
+            f'<tr><td align=right style="padding:5px 0px 5px 0px">'
+            f"{system.get_input_port(p).get_name()} &rarr;</td></tr>"
+        )
     output_port_html = ""
     for p in range(system.num_output_ports()):
         output_port_html += (
-            '<tr><td align=left style=\"padding:5px 0px 5px 0px\">'
-            f'&rarr; {system.get_output_port(p).get_name()}</td></tr>')
+            '<tr><td align=left style="padding:5px 0px 5px 0px">'
+            f"&rarr; {system.get_output_port(p).get_name()}</td></tr>"
+        )
     # Note: keeping this on a single line avoids having to handle comment line
     # markers (e.g. * or ///)
     html = (
-        f'<table align=center cellpadding=0 cellspacing=0><tr align=center>'
-        f'<td style=\"vertical-align:middle\">'
-        f'<table cellspacing=0 cellpadding=0>{input_port_html}</table>'
-        f'</td>'
-        f'<td align=center style=\"border:2px solid black;padding-left:20px;'
-        f'padding-right:20px;vertical-align:middle\" bgcolor=#F0F0F0>'
-        f'{system.get_name()}</td>'
-        f'<td style=\"vertical-align:middle\">'
-        f'<table cellspacing=0 cellpadding=0>{output_port_html}</table>'
-        f'</td></tr></table>')
+        f"<table align=center cellpadding=0 cellspacing=0><tr align=center>"
+        f'<td style="vertical-align:middle">'
+        f"<table cellspacing=0 cellpadding=0>{input_port_html}</table>"
+        f"</td>"
+        f'<td align=center style="border:2px solid black;padding-left:20px;'
+        f'padding-right:20px;vertical-align:middle" bgcolor=#F0F0F0>'
+        f"{system.get_name()}</td>"
+        f'<td style="vertical-align:middle">'
+        f"<table cellspacing=0 cellpadding=0>{output_port_html}</table>"
+        f"</td></tr></table>"
+    )
 
     return html

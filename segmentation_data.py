@@ -8,47 +8,43 @@
 
 import argparse
 import json
-import matplotlib.pyplot as plt
 import multiprocessing
-import numpy as np
-from PIL import Image
 import os
 import shutil
 import warnings
 
+import matplotlib.pyplot as plt
+import numpy as np
+from PIL import Image
 from pydrake.all import (
-    AddMultibodyPlantSceneGraph,
-    DiagramBuilder,
-    FindResourceOrThrow,
-    Parser,
-    RandomGenerator,
-    RigidTransform,
-    Role,
-    RollPitchYaw,
-    Simulator,
+    AddMultibodyPlantSceneGraph, DiagramBuilder, Parser, RandomGenerator,
+    RigidTransform, Role, RollPitchYaw, Simulator,
     UniformlyRandomRotationMatrix,
 )
-from manipulation.scenarios import ycb, AddRgbdSensor
+
+from manipulation.scenarios import AddRgbdSensor, ycb
 from manipulation.utils import colorize_labels
 
 parser = argparse.ArgumentParser(
-    description='Install ToC and Navigation into book html files.')
-parser.add_argument('--test', action='store_true')
+    description="Install ToC and Navigation into book html files."
+)
+parser.add_argument("--test", action="store_true")
 args = parser.parse_args()
 
 if args.test:
     from pydrake.common.deprecation import DrakeDeprecationWarning
+
     warnings.simplefilter("error", DrakeDeprecationWarning)
 
 debug = True
-path = '/tmp/clutter_maskrcnn_data'
+path = "/tmp/clutter_maskrcnn_data"
 num_images = 10000 if not args.test else 2
 
 if not debug and not args.test:
     if os.path.exists(path):
         shutil.rmtree(path)
     os.makedirs(path)
-    print(f'Creating dataset in {path} with {num_images} images')
+    print(f"Creating dataset in {path} with {num_images} images")
 
 rng = np.random.default_rng()  # this is for python
 generator = RandomGenerator(rng.integers(1000))  # for c++
@@ -60,9 +56,9 @@ def generate_image(image_num):
     builder = DiagramBuilder()
     plant, scene_graph = AddMultibodyPlantSceneGraph(builder, time_step=0.0005)
     parser = Parser(plant)
-    parser.AddModelFromFile(
-        FindResourceOrThrow(
-            "drake/examples/manipulation_station/models/bin.sdf"))
+    parser.AddModelsFromUrl(
+        "package://drake/examples/manipulation_station/models/bin.sdf"
+    )[0]
     plant.WeldFrames(plant.world_frame(), plant.GetFrameByName("bin_base"))
     inspector = scene_graph.model_inspector()
 
@@ -71,17 +67,26 @@ def generate_image(image_num):
     for object_num in range(rng.integers(1, 10)):
         this_object = ycb[rng.integers(len(ycb))]
         class_name = os.path.splitext(this_object)[0]
-        sdf = FindResourceOrThrow("drake/manipulation/models/ycb/sdf/"
-                                  + this_object)
-        instance = parser.AddModelFromFile(sdf, f"object{object_num}")
+        directives = f"""
+directives:
+- add_model:
+    name: object{object_num}
+    file: package://drake/manipulation/models/ycb/sdf/{this_object}
+"""
+        instance = parser.AddModelsFromString(directives, ".dmd.yaml")[0]
 
         frame_id = plant.GetBodyFrameIdOrThrow(
-            plant.GetBodyIndices(instance)[0])
+            plant.GetBodyIndices(instance)[0]
+        )
         geometry_ids = inspector.GetGeometries(frame_id, Role.kPerception)
         for geom_id in geometry_ids:
-            instance_id_to_class_name[int(
-                inspector.GetPerceptionProperties(geom_id).GetProperty(
-                    "label", "id"))] = class_name
+            instance_id_to_class_name[
+                int(
+                    inspector.GetPerceptionProperties(geom_id).GetProperty(
+                        "label", "id"
+                    )
+                )
+            ] = class_name
 
     plant.Finalize()
 
@@ -90,8 +95,10 @@ def generate_image(image_num):
             json.dump(instance_id_to_class_name, f)
 
     camera = AddRgbdSensor(
-        builder, scene_graph,
-        RigidTransform(RollPitchYaw(np.pi, 0, np.pi / 2.0), [0, 0, .8]))
+        builder,
+        scene_graph,
+        RigidTransform(RollPitchYaw(np.pi, 0, np.pi / 2.0), [0, 0, 0.8]),
+    )
     camera.set_name("rgbd_sensor")
     builder.ExportOutput(camera.color_image_output_port(), "color_image")
     builder.ExportOutput(camera.label_image_output_port(), "label_image")
@@ -107,9 +114,11 @@ def generate_image(image_num):
         for body_index in plant.GetFloatingBaseBodies():
             tf = RigidTransform(
                 UniformlyRandomRotationMatrix(generator),
-                [rng.uniform(-.15, .15),
-                 rng.uniform(-.2, .2), z])
-            plant.SetFreeBodyPose(plant_context, plant.get_body(body_index), tf)
+                [rng.uniform(-0.15, 0.15), rng.uniform(-0.2, 0.2), z],
+            )
+            plant.SetFreeBodyPose(
+                plant_context, plant.get_body(body_index), tf
+            )
             z += 0.1
 
         try:
@@ -129,10 +138,10 @@ def generate_image(image_num):
         plt.figure()
         plt.subplot(121)
         plt.imshow(color_image.data)
-        plt.axis('off')
+        plt.axis("off")
         plt.subplot(122)
         plt.imshow(colorize_labels(label_image.data))
-        plt.axis('off')
+        plt.axis("off")
         plt.show()
     else:
         Image.fromarray(color_image.data).save(f"{filename_base}.png")
@@ -144,6 +153,7 @@ if args.test or debug:
         generate_image(image_num)
 else:
     from tqdm import tqdm
+
     pool = multiprocessing.Pool(10)
     list(tqdm(pool.imap(generate_image, range(num_images)), total=num_images))
     pool.close()

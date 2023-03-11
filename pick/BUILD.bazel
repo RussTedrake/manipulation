@@ -18,6 +18,10 @@ rt_ipynb_test(
 rt_ipynb_test(
     name = "kinematic_tree",
     srcs = ["kinematic_tree.ipynb"],
+    data = ["//manipulation/models"],
+    deps = [
+      "//manipulation",
+    ],
 )
 
 rt_ipynb_test(
@@ -37,9 +41,9 @@ rt_ipynb_test(
 rt_ipynb_test(
     name = "jacobian",
     srcs = ["jacobian.ipynb"],
+    data = ["//manipulation/models"],
     deps = [
       "//manipulation",
-      "//manipulation:scenarios",
     ],
 )
 

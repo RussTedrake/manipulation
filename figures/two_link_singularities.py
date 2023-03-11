@@ -1,29 +1,30 @@
 import numpy as np
+from pydrake.all import (
+    AddMultibodyPlantSceneGraph, ConnectPlanarSceneGraphVisualizer,
+    DiagramBuilder, Parser, PiecewisePolynomial,
+)
 
-from pydrake.all import (DiagramBuilder, AddMultibodyPlantSceneGraph,
-                         ConnectPlanarSceneGraphVisualizer, Parser,
-                         PiecewisePolynomial)
-from manipulation.utils import FindResource
+from manipulation.utils import ConfigureParser
 
 builder = DiagramBuilder()
 
 plant, scene_graph = AddMultibodyPlantSceneGraph(builder, time_step=0.0)
-Parser(plant, scene_graph).AddModelFromFile(
-    FindResource("models/double_pendulum.urdf"))
+parser = Parser(plant)
+ConfigureParser(parser)
+parser.AddModelsFromUrl("package://manipulation/double_pendulum.urdf")
 plant.Finalize()
 
-viz = ConnectPlanarSceneGraphVisualizer(builder,
-                                        scene_graph,
-                                        show=False,
-                                        xlim=[-.2, 2.2],
-                                        ylim=[-1., 1.])
+viz = ConnectPlanarSceneGraphVisualizer(
+    builder, scene_graph, show=False, xlim=[-0.2, 2.2], ylim=[-1.0, 1.0]
+)
 viz.fig.set_size_inches([3, 2.5])
 diagram = builder.Build()
 context = diagram.CreateDefaultContext()
 
-T = 2.
+T = 2.0
 q = PiecewisePolynomial.FirstOrderHold(
-    [0, T], np.array([[-np.pi / 2.0 + 1., -np.pi / 2.0 - 1.], [-2., 2.]]))
+    [0, T], np.array([[-np.pi / 2.0 + 1.0, -np.pi / 2.0 - 1.0], [-2.0, 2.0]])
+)
 plant_context = plant.GetMyContextFromRoot(context)
 
 viz.start_recording()

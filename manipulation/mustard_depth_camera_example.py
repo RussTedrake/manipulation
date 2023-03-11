@@ -4,7 +4,7 @@ from pydrake.perception import Concatenate
 from pydrake.systems.framework import DiagramBuilder
 
 from manipulation.scenarios import AddRgbdSensors
-from manipulation.utils import FindResource, AddPackagePaths
+from manipulation.utils import ConfigureParser
 
 
 def MustardExampleSystem():
@@ -13,17 +13,20 @@ def MustardExampleSystem():
     # Create the physics engine + scene graph.
     plant, scene_graph = AddMultibodyPlantSceneGraph(builder, time_step=0.0)
     parser = Parser(plant)
-    AddPackagePaths(parser)
-    parser.AddAllModelsFromFile(
-        FindResource("models/mustard_w_cameras.dmd.yaml"))
+    ConfigureParser(parser)
+    parser.AddModelsFromUrl(
+        "package://manipulation/mustard_w_cameras.dmd.yaml"
+    )
     plant.Finalize()
 
     # Add a visualizer just to help us see the object.
     use_meshcat = False
     if use_meshcat:
         meshcat = builder.AddSystem(MeshcatVisualizer(scene_graph))
-        builder.Connect(scene_graph.get_query_output_port(),
-                        meshcat.get_geometry_query_input_port())
+        builder.Connect(
+            scene_graph.get_query_output_port(),
+            meshcat.get_geometry_query_input_port(),
+        )
 
     AddRgbdSensors(builder, plant, scene_graph)
 
@@ -43,8 +46,9 @@ def MustardPointCloud(normals=False, down_sample=True):
         cloud = system.GetOutputPort(f"camera{i}_point_cloud").Eval(context)
 
         # Crop to region of interest.
-        pcd.append(cloud.Crop(lower_xyz=[-.3, -.3, -.3], upper_xyz=[.3, .3,
-                                                                    .3]))
+        pcd.append(
+            cloud.Crop(lower_xyz=[-0.3, -0.3, -0.3], upper_xyz=[0.3, 0.3, 0.3])
+        )
 
         if normals:
             pcd[i].EstimateNormals(radius=0.1, num_closest=30)
