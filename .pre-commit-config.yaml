@@ -2,7 +2,8 @@ repos:
 - repo: https://github.com/psf/black
   rev: 23.1.0
   hooks:
-    - id: black
+    - id: black-jupyter
+      types_or: ["python","jupyter"] 
 - repo: https://github.com/PyCQA/autoflake
   rev: v2.0.2
   hooks:
