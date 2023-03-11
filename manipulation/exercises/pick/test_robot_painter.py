@@ -2,11 +2,6 @@ import unittest
 import timeout_decorator
 from gradescope_utils.autograder_utils.decorators import weight
 import numpy as np
-from pydrake.all import (
-    PiecewiseQuaternionSlerp,
-    PiecewisePolynomial,
-    ToleranceType,
-)
 
 
 class TestRobotPainter(unittest.TestCase):

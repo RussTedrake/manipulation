@@ -4,7 +4,6 @@ from pydrake.all import (
     PiecewisePolynomial,
     PiecewisePose,
     RigidTransform,
-    RotationMatrix,
 )
 
 

@@ -3,29 +3,17 @@ from collections import namedtuple
 from functools import partial
 
 import numpy as np
-from IPython.display import HTML, Javascript, display
 from pydrake.common.value import AbstractValue
 from pydrake.geometry import (
     Cylinder,
-    MeshcatVisualizer,
-    MeshcatVisualizerParams,
     Rgba,
-    Role,
     Sphere,
 )
 from pydrake.math import RigidTransform, RollPitchYaw, RotationMatrix
-from pydrake.multibody.meshcat import JointSliders
-from pydrake.multibody.parsing import Parser
-from pydrake.multibody.plant import AddMultibodyPlantSceneGraph
-from pydrake.multibody.tree import BodyIndex, JointIndex
-from pydrake.perception import BaseField, Fields, PointCloud
 from pydrake.solvers import BoundingBoxConstraint
 from pydrake.systems.framework import (
-    DiagramBuilder,
     EventStatus,
     LeafSystem,
-    PublishEvent,
-    VectorSystem,
 )
 
 from manipulation import running_as_notebook

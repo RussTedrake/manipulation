@@ -1,7 +1,6 @@
 import unittest
 import timeout_decorator
 from gradescope_utils.autograder_utils.decorators import weight
-import numpy as np
 import hashlib
 
 

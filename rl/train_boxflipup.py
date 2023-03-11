@@ -2,7 +2,6 @@ import argparse
 import os
 import sys
 
-import gym
 
 # `multiprocessing` also provides this method, but empirically `psutil`'s
 # version seems more reliable.
@@ -12,7 +11,7 @@ from manipulation.envs.box_flipup import BoxFlipUpEnv
 
 sb3_available = False
 try:
-    from stable_baselines3 import A2C, PPO
+    from stable_baselines3 import PPO
     from stable_baselines3.common.vec_env import SubprocVecEnv
     from stable_baselines3.common.env_util import make_vec_env
 

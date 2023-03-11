@@ -1,7 +1,6 @@
 import unittest
 import timeout_decorator
 from gradescope_utils.autograder_utils.decorators import weight
-import pydrake.symbolic as ps
 import numpy as np
 
 

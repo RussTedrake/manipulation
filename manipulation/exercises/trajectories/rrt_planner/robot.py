@@ -1,5 +1,5 @@
 # yapf: disable
-from .geometry import Point, Pose, Polygon, Object
+from .geometry import Point, Pose, Object
 import random
 from math import ceil, sqrt
 

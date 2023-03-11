@@ -4,11 +4,9 @@ import numpy as np
 import timeout_decorator
 from gradescope_utils.autograder_utils.decorators import weight
 from pydrake.all import (
-    RandomGenerator,
     RigidTransform,
     RollPitchYaw,
     RotationMatrix,
-    UniformlyRandomRotationMatrix,
 )
 
 

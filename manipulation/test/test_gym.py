@@ -1,7 +1,6 @@
 import unittest
 
 import gym
-import numpy as np
 import stable_baselines3.common.env_checker
 
 from manipulation.envs.box_flipup import BoxFlipUpEnv
