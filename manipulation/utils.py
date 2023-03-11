@@ -104,7 +104,7 @@ def colorize_labels(image):
     background = np.zeros(image.shape[:2], dtype=bool)
     for label in reserved_labels:
         background |= image == int(label)
-    foreground = image[np.logical_not(background)]
+    image[np.logical_not(background)]
     color_image = colors[image % len(colors)]
     color_image[background] = bg_color
     return color_image
