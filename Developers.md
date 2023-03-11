@@ -1,3 +1,10 @@
+## To install the pre-commit hooks
+
+```
+pip3 install pre-commit
+pre-commit install
+```
+
 ## To Run the Unit Tests
 
 Make sure that you have done a recursive checkout in this repository, or have run

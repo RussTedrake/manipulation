@@ -172,10 +172,6 @@ tinycss2==1.1.1
     # via nbconvert
 tomli==1.2.2
     # via setuptools-scm
-torch @ https://download.pytorch.org/whl/nightly/cpu/torch-2.0.0.dev20230215-cp311-none-macosx_11_0_arm64.whl ; platform_machine == "arm64"
-    # via
-    #   -r mac-requirements.in
-    #   stable-baselines3
 tornado==6.1
     # via jupyter-client
 traitlets==5.1.1

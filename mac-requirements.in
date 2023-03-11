@@ -7,12 +7,12 @@ psutil
 #pymcubes>=0.1  # was causing a numpy mismatch on python3.10 (forcing numpy 1.21.6 to be installed, somehow)
 requests>=2.25
 scipy # see setup/mac/Brewfile
-stable-baselines3>=1.7.0
+#stable-baselines3>=1.7.0
 cloudpickle==2.2.1  # needs to be pinned for stored files to remain compatible.
 timeout-decorator>=0.5
 pyzmq>=25.0.0 # seems to be needed on python 3.11
 lxml>=4.9.2 # seems to be needed on python 3.11
 #torch>=1.13.1  # doesn't support python3.11 yet
-https://download.pytorch.org/whl/nightly/cpu/torch-2.0.0.dev20230215-cp311-none-macosx_11_0_arm64.whl; platform_machine == 'arm64'
-https://download.pytorch.org/whl/nightly/cpu/torch-2.0.0.dev20230215-cp311-none-macosx_10_9_x86_64.whl; platform_machine == 'x86_64'
+#https://download.pytorch.org/whl/nightly/cpu/torch-2.0.0.dev20230215-cp311-none-macosx_11_0_arm64.whl; platform_machine == 'arm64'
+#https://download.pytorch.org/whl/nightly/cpu/torch-2.0.0.dev20230215-cp311-none-macosx_10_9_x86_64.whl; platform_machine == 'x86_64'
 #torchvision
