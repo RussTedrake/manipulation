@@ -1,5 +1,3 @@
-import os
-
 import pydrake.multibody.parsing
 import pydrake.multibody.plant
 import pydrake.systems.framework

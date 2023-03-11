@@ -2,17 +2,15 @@ import unittest
 import timeout_decorator
 from gradescope_utils.autograder_utils.decorators import weight
 import numpy as np
-import os
 
 
 class TestAnalyticGrasp(unittest.TestCase):
-
     def __init__(self, test_name, notebook_locals):
         super().__init__(test_name)
         self.notebook_locals = notebook_locals
 
     @weight(4)
-    @timeout_decorator.timeout(10.)
+    @timeout_decorator.timeout(10.0)
     def test_antipodal_points(self):
         """Test find_antipodal_pts"""
         shape = self.notebook_locals["shape"]
@@ -47,9 +45,13 @@ class TestAnalyticGrasp(unittest.TestCase):
         # yapf: enable
 
         self.assertLessEqual(
-            np.linalg.norm(result_lst_target - result_lst_eval), 1e-4,
-            "The optimal values are not returned correctly.")
+            np.linalg.norm(result_lst_target - result_lst_eval),
+            1e-4,
+            "The optimal values are not returned correctly.",
+        )
 
-        self.assertLessEqual(np.linalg.norm(H_eig_lst_target - H_eig_lst_eval),
-                             1e-4,
-                             "The Hessian values are not returned correctly.")
+        self.assertLessEqual(
+            np.linalg.norm(H_eig_lst_target - H_eig_lst_eval),
+            1e-4,
+            "The Hessian values are not returned correctly.",
+        )
