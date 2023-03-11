@@ -1,7 +1,10 @@
 import numpy as np
 from pydrake.all import (
-    AddMultibodyPlantSceneGraph, ConnectPlanarSceneGraphVisualizer,
-    DiagramBuilder, Parser, PiecewisePolynomial,
+    AddMultibodyPlantSceneGraph,
+    ConnectPlanarSceneGraphVisualizer,
+    DiagramBuilder,
+    Parser,
+    PiecewisePolynomial,
 )
 
 from manipulation.utils import ConfigureParser

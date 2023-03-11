@@ -1,5 +1,8 @@
-from pydrake.all import (PiecewiseQuaternionSlerp, RandomGenerator,
-                         UniformlyRandomQuaternion)
+from pydrake.all import (
+    PiecewiseQuaternionSlerp,
+    RandomGenerator,
+    UniformlyRandomQuaternion,
+)
 
 g = RandomGenerator()
 q1 = UniformlyRandomQuaternion(g)

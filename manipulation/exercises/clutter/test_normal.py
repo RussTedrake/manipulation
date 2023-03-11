@@ -6,7 +6,6 @@ from manipulation.utils import FindResource
 
 
 class TestNormal(unittest.TestCase):
-
     def __init__(self, test_name, notebook_locals):
         super().__init__(test_name)
         self.notebook_locals = notebook_locals
@@ -15,17 +14,19 @@ class TestNormal(unittest.TestCase):
     @timeout_decorator.timeout(60.0)
     def test_normal(self):
         """Testing the normal vectors"""
-        env = self.notebook_locals['env']
-        f = self.notebook_locals['estimate_normal_by_nearest_pixels']
-        pC = self.notebook_locals['pC']
+        env = self.notebook_locals["env"]
+        f = self.notebook_locals["estimate_normal_by_nearest_pixels"]
+        pC = self.notebook_locals["pC"]
 
         student_sol = f(env.X_WC, pC, uv_step=10)
         reference_sol = np.load(
-            FindResource("exercises/clutter/normal_solution.npy"))
+            FindResource("exercises/clutter/normal_solution.npy")
+        )
 
         self.assertTrue(
             len(student_sol) == len(reference_sol),
-            'the number of the normals is incorrect')
+            "the number of the normals is incorrect",
+        )
 
         for X, X_sol in zip(student_sol, reference_sol):
             # check only points within the bounding box
@@ -38,7 +39,10 @@ class TestNormal(unittest.TestCase):
                 student_v = student_v / np.linalg.norm(student_v)
                 test = np.dot(student_v, sol_v)
                 self.assertTrue(
-                    test > 0.7, 'error at the point: \n {} \
+                    test > 0.7,
+                    "error at the point: \n {} \
                     \n normal is: {} \
-                    \n solution normal is: {}'.format([pos_x, pos_y, pos_z],
-                                                      student_v, sol_v))
+                    \n solution normal is: {}".format(
+                        [pos_x, pos_y, pos_z], student_v, sol_v
+                    ),
+                )

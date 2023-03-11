@@ -27,13 +27,12 @@ test_indices = [10137, 21584, 7259, 32081]
 
 
 class TestGraspCandidate(unittest.TestCase):
-
     def __init__(self, test_name, notebook_locals):
         super().__init__(test_name)
         self.notebook_locals = notebook_locals
 
     @weight(4)
-    @timeout_decorator.timeout(10.)
+    @timeout_decorator.timeout(10.0)
     def test_darboux_frame(self):
         """Test compute_darboux_frame"""
         pcd = self.notebook_locals["pcd"]
@@ -46,7 +45,8 @@ class TestGraspCandidate(unittest.TestCase):
             RT_desired = RigidTransform(X_lst_target[i])
             self.assertTrue(
                 RT.IsNearlyEqualTo(RT_desired, 0.1),
-                "Your transform doesn't match the expected transform")
+                "Your transform doesn't match the expected transform",
+            )
 
         index = 5
         RT = f(index, pcd, kdtree)
@@ -61,10 +61,11 @@ class TestGraspCandidate(unittest.TestCase):
         self.assertTrue(
             RT.IsNearlyEqualTo(RT_desired, 0.01),
             "Did you forget to sort the eigenvalues, "
-            "or handle improper rotations?")
+            "or handle improper rotations?",
+        )
 
     @weight(4)
-    @timeout_decorator.timeout(10.)
+    @timeout_decorator.timeout(10.0)
     def test_minimum_distance(self):
         """Test find_minimum_distance"""
         pcd = self.notebook_locals["pcd"]
@@ -74,13 +75,16 @@ class TestGraspCandidate(unittest.TestCase):
         for i in [0, 2]:
             dist, X_new = f(pcd, RigidTransform(X_lst_target[i]))
             self.assertTrue(
-                np.isnan(dist), "There is no value of y that results in "
-                "no collision in the grid, but dist is not nan")
+                np.isnan(dist),
+                "There is no value of y that results in "
+                "no collision in the grid, but dist is not nan",
+            )
             self.assertTrue(
                 isinstance(X_new, type(None)),
                 "There is no value of y that results in "
                 "no collision in the grid, but X_WGnew is"
-                "not None.")
+                "not None.",
+            )
 
         # yapf: disable
         dist_new_target = np.array([  # noqa
@@ -104,47 +108,59 @@ class TestGraspCandidate(unittest.TestCase):
             self.assertTrue(
                 not np.isnan(dist),
                 "There is a valid value of y that results in "
-                "no collision in the grid, but dist is nan")
+                "no collision in the grid, but dist is nan",
+            )
             self.assertTrue(
                 not isinstance(X_new, type(None)),
                 "There is a valid value of y that results in no "
-                "collision in the grid, but X_WGnew is None.")
+                "collision in the grid, but X_WGnew is None.",
+            )
             dist_new_eval.append(dist)
             X_new_eval.append(X_new.GetAsMatrix34())
 
         dist_new_eval = np.array(dist_new_eval)
         X_new_eval = np.array(X_new_eval)
 
-        self.assertLessEqual(np.linalg.norm(dist_new_target - dist_new_eval),
-                             1e-5, "The returned distance is not correct.")
-        self.assertLessEqual(np.linalg.norm(X_new_target - X_new_eval), 1e-4,
-                             "The returned transform is not correct.")
+        self.assertLessEqual(
+            np.linalg.norm(dist_new_target - dist_new_eval),
+            1e-5,
+            "The returned distance is not correct.",
+        )
+        self.assertLessEqual(
+            np.linalg.norm(X_new_target - X_new_eval),
+            1e-4,
+            "The returned transform is not correct.",
+        )
 
     @weight(4)
-    @timeout_decorator.timeout(60.)
+    @timeout_decorator.timeout(60.0)
     def test_candidate_grasps(self):
         """Test compute_candidate_grasps"""
         pcd = self.notebook_locals["pcd_downsampled"]
         compute_candidate_grasps = self.notebook_locals[
-            "compute_candidate_grasps"]
+            "compute_candidate_grasps"
+        ]
         find_minimum_distance = self.notebook_locals["find_minimum_distance"]
         check_collision = self.notebook_locals["check_collision"]
         check_nonempty = self.notebook_locals["check_nonempty"]
 
-        grasp_candidates = compute_candidate_grasps(pcd,
-                                                    candidate_num=3,
-                                                    random_seed=5)
+        grasp_candidates = compute_candidate_grasps(
+            pcd, candidate_num=3, random_seed=5
+        )
 
         self.assertTrue(
             len(grasp_candidates) == 3,
-            "Length of returned array is not correct.")
+            "Length of returned array is not correct.",
+        )
 
         for X_WP in grasp_candidates:
             distance, X_WP_new = find_minimum_distance(pcd, X_WP)
             self.assertLessEqual(
-                distance,
-                1e-2), "The returned grasp candidates are not minimum distance"
-            self.assertTrue(check_collision(
-                pcd, X_WP)), "The returned grasp candidates have collisions"
-            self.assertTrue(check_nonempty(
-                pcd, X_WP)), "The returned grasp candidates are not empty"
+                distance, 1e-2
+            ), "The returned grasp candidates are not minimum distance"
+            self.assertTrue(
+                check_collision(pcd, X_WP)
+            ), "The returned grasp candidates have collisions"
+            self.assertTrue(
+                check_nonempty(pcd, X_WP)
+            ), "The returned grasp candidates are not empty"

@@ -3,6 +3,7 @@ import os
 import sys
 
 import gym
+
 # `multiprocessing` also provides this method, but empirically `psutil`'s
 # version seems more reliable.
 from psutil import cpu_count
@@ -14,6 +15,7 @@ try:
     from stable_baselines3 import A2C, PPO
     from stable_baselines3.common.vec_env import SubprocVecEnv
     from stable_baselines3.common.env_util import make_vec_env
+
     sb3_available = True
 except ImportError:
     print("stable_baselines3 not found")
@@ -21,8 +23,9 @@ except ImportError:
 
 def main():
     parser = argparse.ArgumentParser(
-        description='Train a policy for //manipulation.envs:box_flipup.')
-    parser.add_argument('--test', action='store_true')
+        description="Train a policy for //manipulation.envs:box_flipup."
+    )
+    parser.add_argument("--test", action="store_true")
     args = parser.parse_args()
 
     if not sb3_available:
@@ -35,31 +38,35 @@ def main():
     log = "/tmp/ppo_box_flipup/"
 
     num_cpu = int(cpu_count() / 2) if not args.test else 2
-    env = make_vec_env(BoxFlipUpEnv,
-                       n_envs=num_cpu,
-                       seed=0,
-                       vec_env_cls=SubprocVecEnv,
-                       env_kwargs={
-                           'observations': observations,
-                           'time_limit': time_limit,
-                       })
+    env = make_vec_env(
+        BoxFlipUpEnv,
+        n_envs=num_cpu,
+        seed=0,
+        vec_env_cls=SubprocVecEnv,
+        env_kwargs={
+            "observations": observations,
+            "time_limit": time_limit,
+        },
+    )
 
     if args.test:
-        model = PPO('MlpPolicy', env, n_steps=4, n_epochs=2, batch_size=8)
+        model = PPO("MlpPolicy", env, n_steps=4, n_epochs=2, batch_size=8)
     elif os.path.exists(zip):
         model = PPO.load(zip, env, verbose=1, tensorboard_log=log)
     else:
-        model = PPO('MlpPolicy', env, verbose=1, tensorboard_log=log)
+        model = PPO("MlpPolicy", env, verbose=1, tensorboard_log=log)
 
     new_log = True
     while True:
-        model.learn(total_timesteps=100000 if not args.test else 4,
-                    reset_num_timesteps=new_log)
+        model.learn(
+            total_timesteps=100000 if not args.test else 4,
+            reset_num_timesteps=new_log,
+        )
         if args.test:
             break
         model.save(zip)
         new_log = False
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     sys.exit(main())

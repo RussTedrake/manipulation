@@ -2,21 +2,24 @@ import unittest
 import timeout_decorator
 from gradescope_utils.autograder_utils.decorators import weight
 import numpy as np
-from pydrake.all import (PiecewiseQuaternionSlerp, PiecewisePolynomial,
-                         RigidTransform, RotationMatrix)
+from pydrake.all import (
+    PiecewiseQuaternionSlerp,
+    PiecewisePolynomial,
+    RigidTransform,
+    RotationMatrix,
+)
 
 
 class TestRigidTransforms(unittest.TestCase):
-
     def __init__(self, test_name, notebook_locals):
         super().__init__(test_name)
         self.notebook_locals = notebook_locals
 
     @weight(1)
-    @timeout_decorator.timeout(1.)
+    @timeout_decorator.timeout(1.0)
     def test_X_WB(self):
         """Testing X_WB"""
-        f = self.notebook_locals['compute_X_WB']
+        f = self.notebook_locals["compute_X_WB"]
 
         # construct a test case
         theta1, theta2, theta3 = np.pi / 3.0, np.pi / 6.0, np.pi / 4.0
@@ -36,10 +39,10 @@ class TestRigidTransforms(unittest.TestCase):
         self.assertTrue(np.allclose(test_result, np.eye(4)))
 
     @weight(1)
-    @timeout_decorator.timeout(1.)
+    @timeout_decorator.timeout(1.0)
     def test_X_CW(self):
         """Testing X_CW"""
-        f = self.notebook_locals['compute_X_CW']
+        f = self.notebook_locals["compute_X_CW"]
 
         # construct a test case
         theta1, theta2, theta3 = np.pi / 3.0, np.pi / 6.0, np.pi / 4.0
@@ -61,11 +64,11 @@ class TestRigidTransforms(unittest.TestCase):
         self.assertTrue(np.allclose(test_result, np.eye(4)))
 
     @weight(2)
-    @timeout_decorator.timeout(1.)
+    @timeout_decorator.timeout(1.0)
     def test_grasp_pose(self):
         """Testing grasp pose"""
-        f = self.notebook_locals['design_grasp_pose']
-        X_WO = self.notebook_locals['X_WO']
+        f = self.notebook_locals["design_grasp_pose"]
+        X_WO = self.notebook_locals["X_WO"]
 
         test_X_OG, test_X_WG = f(X_WO)
 
@@ -74,7 +77,7 @@ class TestRigidTransforms(unittest.TestCase):
         X_OG = RigidTransform(R_OG, p_OG)
         X_WG = X_WO.multiply(X_OG)
 
-        test_X_CW = f(X_WO)
+        f(X_WO)
 
         test_result = test_X_OG.multiply(X_OG.inverse())
         test_result = test_result.GetAsMatrix4()

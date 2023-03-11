@@ -3,8 +3,13 @@ import unittest
 import numpy as np
 import timeout_decorator
 from gradescope_utils.autograder_utils.decorators import weight
-from pydrake.all import (RandomGenerator, RigidTransform, RollPitchYaw,
-                         RotationMatrix, UniformlyRandomRotationMatrix)
+from pydrake.all import (
+    RandomGenerator,
+    RigidTransform,
+    RollPitchYaw,
+    RotationMatrix,
+    UniformlyRandomRotationMatrix,
+)
 
 
 def least_squares_transform(scene, model):
@@ -30,13 +35,12 @@ def least_squares_transform(scene, model):
 
 def generate_arbitrary_transform(seed):
     R_BA = RollPitchYaw(seed * 7.363, seed * 1.35, seed * 5.47)
-    p_BA = np.mod([seed * 2.13, seed * 3.3, seed * 5.225], .1) - 0.05
+    p_BA = np.mod([seed * 2.13, seed * 3.3, seed * 5.225], 0.1) - 0.05
     X_BA = RigidTransform(R_BA, p_BA)
     return X_BA
 
 
 class TestICP(unittest.TestCase):
-
     def __init__(self, test_name, notebook_locals):
         super().__init__(test_name)
         self.notebook_locals = notebook_locals
@@ -44,7 +48,7 @@ class TestICP(unittest.TestCase):
         self.model = self.notebook_locals["pointcloud_model"]
 
     @weight(3)
-    @timeout_decorator.timeout(5.)
+    @timeout_decorator.timeout(5.0)
     def test_least_square(self):
         """Test least square transform"""
         f = self.notebook_locals["least_squares_transform"]
@@ -59,22 +63,27 @@ class TestICP(unittest.TestCase):
             distances, indices = nearest_neighbors(self.scene, self.model)
 
             X_BA_test = f(self.scene, self.model[:, indices])
-            X_BA_true = least_squares_transform(self.scene, self.model[:,
-                                                                       indices])
+            X_BA_true = least_squares_transform(
+                self.scene, self.model[:, indices]
+            )
 
             # check answer
             result = X_BA_true.inverse().multiply(X_BA_test)
 
-            self.assertTrue(np.allclose(result.GetAsMatrix4(), np.eye(4)),
-                            'least square transform is incorrect')
+            self.assertTrue(
+                np.allclose(result.GetAsMatrix4(), np.eye(4)),
+                "least square transform is incorrect",
+            )
 
         # Test improper matrix
         result = f(self.model, np.diag([1, 1, -1]) @ self.model)
-        self.assertTrue(result.rotation().IsValid(),
-                        "Your method returned an improper rotation matrix")
+        self.assertTrue(
+            result.rotation().IsValid(),
+            "Your method returned an improper rotation matrix",
+        )
 
     @weight(3)
-    @timeout_decorator.timeout(10.)
+    @timeout_decorator.timeout(10.0)
     def test_icp(self):
         """Test icp implementation"""
         f = self.notebook_locals["icp"]
@@ -93,15 +102,20 @@ class TestICP(unittest.TestCase):
 
         while True:
             num_iters += 1
-            distances, indices = nearest_neighbors(self.scene,
-                                                   X_BA.multiply(self.model))
+            distances, indices = nearest_neighbors(
+                self.scene, X_BA.multiply(self.model)
+            )
             X_BA = least_squares_transform(self.scene, self.model[:, indices])
             mean_error = np.mean(distances)
-            if abs(mean_error
-                   - prev_error) < tolerance or num_iters >= max_iterations:
+            if (
+                abs(mean_error - prev_error) < tolerance
+                or num_iters >= max_iterations
+            ):
                 break
             prev_error = mean_error
 
         result = X_BA.multiply(X_BA_test.inverse())
-        self.assertTrue(np.allclose(result.GetAsMatrix4(), np.eye(4)),
-                        'icp implementation is incorrect')
+        self.assertTrue(
+            np.allclose(result.GetAsMatrix4(), np.eye(4)),
+            "icp implementation is incorrect",
+        )

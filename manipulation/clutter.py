@@ -3,13 +3,15 @@ import numpy as np
 from pydrake.all import RotationMatrix, RigidTransform
 
 
-def GraspCandidateCost(diagram,
-                       context,
-                       cloud,
-                       wsg_body_index=None,
-                       plant_system_name="plant",
-                       scene_graph_system_name="scene_graph",
-                       adjust_X_G=False):
+def GraspCandidateCost(
+    diagram,
+    context,
+    cloud,
+    wsg_body_index=None,
+    plant_system_name="plant",
+    scene_graph_system_name="scene_graph",
+    adjust_X_G=False,
+):
     """
     Args:
         diagram: A diagram containing a MultibodyPlant+SceneGraph that contains
@@ -46,12 +48,19 @@ def GraspCandidateCost(diagram,
     p_GC = X_GW @ cloud.xyzs()
 
     # Crop to a region inside of the finger box.
-    crop_min = [-.05, 0.1, -0.00625]
-    crop_max = [.05, 0.1125, 0.00625]
-    indices = np.all((crop_min[0] <= p_GC[0, :], p_GC[0, :] <= crop_max[0],
-                      crop_min[1] <= p_GC[1, :], p_GC[1, :] <= crop_max[1],
-                      crop_min[2] <= p_GC[2, :], p_GC[2, :] <= crop_max[2]),
-                     axis=0)
+    crop_min = [-0.05, 0.1, -0.00625]
+    crop_max = [0.05, 0.1125, 0.00625]
+    indices = np.all(
+        (
+            crop_min[0] <= p_GC[0, :],
+            p_GC[0, :] <= crop_max[0],
+            crop_min[1] <= p_GC[1, :],
+            p_GC[1, :] <= crop_max[1],
+            crop_min[2] <= p_GC[2, :],
+            p_GC[2, :] <= crop_max[2],
+        ),
+        axis=0,
+    )
 
     if adjust_X_G and np.sum(indices) > 0:
         p_GC_x = p_GC[0, indices]
@@ -60,7 +69,9 @@ def GraspCandidateCost(diagram,
         plant.SetFreeBodyPose(plant_context, wsg, X_G)
         X_GW = X_G.inverse()
 
-    query_object = scene_graph.get_query_output_port().Eval(scene_graph_context)
+    query_object = scene_graph.get_query_output_port().Eval(
+        scene_graph_context
+    )
 
     # Check collisions between the gripper and the sink
     if query_object.HasCollisions():
@@ -71,8 +82,9 @@ def GraspCandidateCost(diagram,
     # be smaller than the margin used in the point cloud preprocessing.
     margin = 0.0
     for i in range(cloud.size()):
-        distances = query_object.ComputeSignedDistanceToPoint(cloud.xyz(i),
-                                                              threshold=margin)
+        distances = query_object.ComputeSignedDistanceToPoint(
+            cloud.xyz(i), threshold=margin
+        )
         if distances:
             cost = np.inf
             return cost
@@ -84,17 +96,19 @@ def GraspCandidateCost(diagram,
     cost = 20.0 * X_G.rotation().matrix()[2, 1]
 
     # Reward sum |dot product of normals with gripper x|^2
-    cost -= np.sum(n_GC[0, :]**2)
+    cost -= np.sum(n_GC[0, :] ** 2)
     return cost
 
 
-def GenerateAntipodalGraspCandidate(diagram,
-                                    context,
-                                    cloud,
-                                    rng,
-                                    wsg_body_index=None,
-                                    plant_system_name="plant",
-                                    scene_graph_system_name="scene_graph"):
+def GenerateAntipodalGraspCandidate(
+    diagram,
+    context,
+    cloud,
+    rng,
+    wsg_body_index=None,
+    plant_system_name="plant",
+    scene_graph_system_name="scene_graph",
+):
     """
     Picks a random point in the cloud, and aligns the robot finger with the
     normal of that pixel. The rotation around the normal axis is drawn from a
@@ -119,7 +133,7 @@ def GenerateAntipodalGraspCandidate(diagram,
     plant = diagram.GetSubsystemByName(plant_system_name)
     plant_context = plant.GetMyMutableContextFromRoot(context)
     scene_graph = diagram.GetSubsystemByName(scene_graph_system_name)
-    scene_graph_context = scene_graph.GetMyMutableContextFromRoot(context)
+    scene_graph.GetMyMutableContextFromRoot(context)
     if wsg_body_index:
         wsg = plant.get_body(wsg_body_index)
     else:
@@ -135,8 +149,9 @@ def GenerateAntipodalGraspCandidate(diagram,
     p_WS = cloud.xyz(index)
     n_WS = cloud.normal(index)
 
-    assert np.isclose(np.linalg.norm(n_WS),
-                      1.0), f"Normal has magnitude: {np.linalg.norm(n_WS)}"
+    assert np.isclose(
+        np.linalg.norm(n_WS), 1.0
+    ), f"Normal has magnitude: {np.linalg.norm(n_WS)}"
 
     Gx = n_WS  # gripper x axis aligns with normal
     # make orthonormal y axis, aligned with world down
@@ -154,7 +169,7 @@ def GenerateAntipodalGraspCandidate(diagram,
     min_roll = -np.pi / 3.0
     max_roll = np.pi / 3.0
     alpha = np.array([0.5, 0.65, 0.35, 0.8, 0.2, 1.0, 0.0])
-    for theta in (min_roll + (max_roll - min_roll) * alpha):
+    for theta in min_roll + (max_roll - min_roll) * alpha:
         # Rotate the object in the hand by a random rotation (around the
         # normal).
         R_WG2 = R_WG.multiply(RotationMatrix.MakeXRotation(theta))

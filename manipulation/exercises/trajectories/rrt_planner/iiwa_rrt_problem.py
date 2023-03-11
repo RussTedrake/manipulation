@@ -1,27 +1,30 @@
 # %%
 import numpy as np
-from rrt_planner.manipulation_station_collision_checker import \
-    ManipulationStationCollisionChecker
+from rrt_planner.manipulation_station_collision_checker import (
+    ManipulationStationCollisionChecker,
+)
 from rrt_planner.robot import Range, ConfigurationSpace
 from rrt_planner.rrt_planning import Problem
 
 
 class IiwaProblem(Problem):
-
-    def __init__(self,
-                 q_start: np.array,
-                 q_goal: np.array,
-                 gripper_setpoint: float,
-                 left_door_angle: float,
-                 right_door_angle: float,
-                 is_visualizing=False):
+    def __init__(
+        self,
+        q_start: np.array,
+        q_goal: np.array,
+        gripper_setpoint: float,
+        left_door_angle: float,
+        right_door_angle: float,
+        is_visualizing=False,
+    ):
         self.gripper_setpoint = gripper_setpoint
         self.left_door_angle = left_door_angle
         self.right_door_angle = right_door_angle
         self.is_visualizing = is_visualizing
 
         self.collision_checker = ManipulationStationCollisionChecker(
-            is_visualizing=is_visualizing)
+            is_visualizing=is_visualizing
+        )
 
         # Construct configuration space for IIWA.
         plant = self.collision_checker.plant
@@ -54,43 +57,54 @@ class IiwaProblem(Problem):
             obstacles=None,  # not used.
             start=tuple(q_start),
             goal=tuple(q_goal),
-            cspace=cspace_iiwa)
+            cspace=cspace_iiwa,
+        )
 
     def collide(self, configuration):
         q = np.array(configuration)
-        return self.collision_checker.ExistsCollision(q, self.gripper_setpoint,
-                                                      self.left_door_angle,
-                                                      self.right_door_angle)
+        return self.collision_checker.ExistsCollision(
+            q,
+            self.gripper_setpoint,
+            self.left_door_angle,
+            self.right_door_angle,
+        )
 
     def run_planner(self, method: str):
         path = None
-        if method == 'rrt':
+        if method == "rrt":
             path = self.rrt_planning()
-        elif method == 'birrt':
+        elif method == "birrt":
             path = self.bidirectional_rrt_planning()
         else:
             raise NotImplementedError
 
         if path is None:
-            print('No path found')
+            print("No path found")
             return None
         else:
             print(
-                'Path found with ' + str(len(path) - 1)
-                + ' movements of distance ', self.path_distance(path))
+                "Path found with "
+                + str(len(path) - 1)
+                + " movements of distance ",
+                self.path_distance(path),
+            )
             smooth_path = self.smooth_path(path)
             print(
-                'Smoothed path found with ' + str(len(smooth_path) - 1)
-                + ' movements of distance ', self.path_distance(smooth_path))
+                "Smoothed path found with "
+                + str(len(smooth_path) - 1)
+                + " movements of distance ",
+                self.path_distance(smooth_path),
+            )
             # interpolated smooth path
             spath = []
             for i in range(1, len(smooth_path)):
                 spath.extend(
-                    self.cspace.path(smooth_path[i - 1], smooth_path[i]))
+                    self.cspace.path(smooth_path[i - 1], smooth_path[i])
+                )
 
             # make sure path is collision free
             if any([self.collide(c) for c in spath]):
-                print('Collision in smoothed path')
+                print("Collision in smoothed path")
                 return None
 
             return spath
@@ -99,7 +113,10 @@ class IiwaProblem(Problem):
         # show path in meshcat
         for q in path:
             q = np.array(q)
-            self.collision_checker.DrawStation(q, self.gripper_setpoint,
-                                               self.left_door_angle,
-                                               self.right_door_angle)
+            self.collision_checker.DrawStation(
+                q,
+                self.gripper_setpoint,
+                self.left_door_angle,
+                self.right_door_angle,
+            )
             input("next?")

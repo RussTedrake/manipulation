@@ -6,13 +6,12 @@ import numpy as np
 
 
 class TestPlanarManipulator(unittest.TestCase):
-
     def __init__(self, test_name, notebook_locals):
         super().__init__(test_name)
         self.notebook_locals = notebook_locals
 
     @weight(2)
-    @timeout_decorator.timeout(1.)
+    @timeout_decorator.timeout(1.0)
     def test_forward_kinematics(self):
         """Test forward kinematics"""
         f = self.notebook_locals["forward_kinematics"]
@@ -45,17 +44,19 @@ class TestPlanarManipulator(unittest.TestCase):
         n_rands = 20
         f_eval = []
         for i in range(n_rands):
-            q = 2. * np.pi * np.random.rand(2)
+            q = 2.0 * np.pi * np.random.rand(2)
             f_eval.append(f(q))
 
         f_eval = np.array(f_eval).squeeze()
 
         self.assertLessEqual(
-            np.linalg.norm(f_target - np.stack(f_eval)), 1e-6,
-            'The forward kinematics implementation is not correct')
+            np.linalg.norm(f_target - np.stack(f_eval)),
+            1e-6,
+            "The forward kinematics implementation is not correct",
+        )
 
     @weight(2)
-    @timeout_decorator.timeout(1.)
+    @timeout_decorator.timeout(1.0)
     def test_jacobian(self):
         """Test jacobian"""
         f = self.notebook_locals["Jacobian"]
@@ -88,10 +89,13 @@ class TestPlanarManipulator(unittest.TestCase):
         n_rands = 10
         f_eval = []
         for i in range(n_rands):
-            q = 2. * np.pi * np.random.rand(2)
+            q = 2.0 * np.pi * np.random.rand(2)
             f_eval.append(f(q))
 
         f_eval = np.array(f_eval).squeeze()
 
-        self.assertLessEqual(np.linalg.norm(f_target - np.stack(f_eval)), 1e-6,
-                             'The Jacobian implementation is not correct')
+        self.assertLessEqual(
+            np.linalg.norm(f_target - np.stack(f_eval)),
+            1e-6,
+            "The Jacobian implementation is not correct",
+        )

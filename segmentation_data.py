@@ -17,8 +17,14 @@ import matplotlib.pyplot as plt
 import numpy as np
 from PIL import Image
 from pydrake.all import (
-    AddMultibodyPlantSceneGraph, DiagramBuilder, Parser, RandomGenerator,
-    RigidTransform, Role, RollPitchYaw, Simulator,
+    AddMultibodyPlantSceneGraph,
+    DiagramBuilder,
+    Parser,
+    RandomGenerator,
+    RigidTransform,
+    Role,
+    RollPitchYaw,
+    Simulator,
     UniformlyRandomRotationMatrix,
 )
 

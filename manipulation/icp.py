@@ -60,13 +60,15 @@ def PrintResults(X_O, Xhat_O):
     print(f"Estimated orientation: {aa}")
 
 
-def IterativeClosestPoint(p_Om,
-                          p_Ws,
-                          X_Ohat=RigidTransform(),
-                          X_O=None,
-                          meshcat=None,
-                          meshcat_scene_path=None,
-                          max_iterations=None):
+def IterativeClosestPoint(
+    p_Om,
+    p_Ws,
+    X_Ohat=RigidTransform(),
+    X_O=None,
+    meshcat=None,
+    meshcat_scene_path=None,
+    max_iterations=None,
+):
     """
     Implements the vanilla ICP algorithm corresponding all scene points to a
     model point.
