@@ -6,6 +6,8 @@
 #
 asttokens==2.2.1
     # via stack-data
+autoflake==2.0.2
+    # via pyproject-autoflake
 backcall==0.2.0
     # via ipython
 bayesian-optimization==1.4.2
@@ -45,8 +47,6 @@ importlib-metadata==4.13.0
     # via stable-baselines3
 ipython==8.11.0
     # via black
-isort==5.12.0
-    # via -r jammy-requirements.in
 jedi==0.18.2
     # via ipython
 jinja2==3.1.2
@@ -124,12 +124,16 @@ pycodestyle==2.10.0
     # via -r htmlbook/focal-requirements.in
 pydocstyle==6.3.0
     # via -r htmlbook/focal-requirements.in
+pyflakes==3.0.1
+    # via autoflake
 pygments==2.14.0
     # via ipython
 pymcubes==0.1.4
     # via -r jammy-requirements.in
 pyparsing==3.0.9
     # via matplotlib
+pyproject-autoflake==1.0.2
+    # via -r jammy-requirements.in
 python-dateutil==2.8.2
     # via
     #   matplotlib
@@ -161,8 +165,12 @@ timeout-decorator==0.5.0
     # via -r jammy-requirements.in
 tokenize-rt==5.0.0
     # via black
+toml==0.10.2
+    # via pyproject-autoflake
 tomli==2.0.1
-    # via black
+    # via
+    #   autoflake
+    #   black
 torch==1.13.1
     # via
     #   -r jammy-requirements.in
