@@ -1,10 +1,12 @@
 -r htmlbook/mac-requirements.in
 -c htmlbook/mac-constraints.txt
+black[jupyter]
 gradescope-utils>=0.4
 mpld3>=0.5.6 # for matplotlib>=3.5.0
-psutil
 #nevergrad>=0.4.3; platform_machine == 'x86_64'
+psutil
 #pymcubes>=0.1  # was causing a numpy mismatch on python3.10 (forcing numpy 1.21.6 to be installed, somehow)
+pyproject-autoflake
 requests>=2.25
 scipy # see setup/mac/Brewfile
 #stable-baselines3>=1.7.0
