@@ -3,9 +3,10 @@ import sys
 from urllib.request import urlretrieve
 
 import numpy as np
-import pydrake.all
 from IPython import get_ipython
+from pydrake.common import GetDrakePath
 from pydrake.common.containers import namedview
+from pydrake.geometry import RenderLabel
 from pydrake.multibody.tree import JointIndex
 
 # Use a global variable here because some calls to IPython will actually case an
@@ -52,7 +53,7 @@ def LoadDataResource(filename):
 
 
 def ConfigureParser(parser):
-    """Add the manipulation/package.xml index to the given pydrake Parser."""
+    """Add the manipulation/package.xml index to the given Parser."""
     package_xml = os.path.join(os.path.dirname(__file__), "models/package.xml")
     parser.package_map().AddPackageXml(filename=package_xml)
     AddPackagePaths(parser)
@@ -64,28 +65,28 @@ def AddPackagePaths(parser):
     parser.package_map().Add(
         "manipulation_station",
         os.path.join(
-            pydrake.common.GetDrakePath(),
+            GetDrakePath(),
             "examples/manipulation_station/models",
         ),
     )
     parser.package_map().Add(
         "ycb",
-        os.path.join(pydrake.common.GetDrakePath(), "manipulation/models/ycb"),
+        os.path.join(GetDrakePath(), "manipulation/models/ycb"),
     )
     parser.package_map().Add(
         "wsg_50_description",
         os.path.join(
-            pydrake.common.GetDrakePath(),
+            GetDrakePath(),
             "manipulation/models/wsg_50_description",
         ),
     )
 
 
 reserved_labels = [
-    pydrake.geometry.render.RenderLabel.kDoNotRender,
-    pydrake.geometry.render.RenderLabel.kDontCare,
-    pydrake.geometry.render.RenderLabel.kEmpty,
-    pydrake.geometry.render.RenderLabel.kUnspecified,
+    RenderLabel.kDoNotRender,
+    RenderLabel.kDontCare,
+    RenderLabel.kEmpty,
+    RenderLabel.kUnspecified,
 ]
 
 
