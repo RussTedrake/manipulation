@@ -6,7 +6,7 @@ import numpy as np
 from IPython import get_ipython
 from pydrake.common import GetDrakePath
 from pydrake.common.containers import namedview
-from pydrake.geometry import RenderLabel
+from pydrake.geometry.render import RenderLabel
 from pydrake.multibody.tree import JointIndex
 
 # Use a global variable here because some calls to IPython will actually case an
