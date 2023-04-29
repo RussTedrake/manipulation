@@ -1098,13 +1098,17 @@ output_ports:
       constraints<elib>Izatt17b</elib>, but this method is still limited to
       relatively small problems.</p>
 
-      <p>In recent work, TEASER <elib>Yang20a</elib> takes a different approach,
-      using the observation that truncated least squares can be optimized
-      efficiently for the case of scale and translation.  For rotations, they
-      solve a semi-definite relaxation of the truncated least-squares objective.
-      This relaxation is not guaranteed to be tight, but (like all of the convex
-      relaxations we describe in this chapter), it is easy to certify after the
-      fact whether the optimal solution satisfied the original constraints.</p>
+      <p>In recent work, TEASER <elib>Yang20a</elib> takes a different
+      approach, using the observation that truncated least squares can be
+      optimized efficiently for the case of scale and translation.  For
+      rotations, they solve a semidefinite (SDP) relaxation of the truncated
+      least-squares objective. This relaxation is not guaranteed to be tight,
+      but (like all of the convex relaxations we describe in this chapter), it
+      is easy to certify after the fact whether the optimal solution satisfied
+      the original constraints. And the SDP relaxation of the quadratic
+      rotation matrix constraints <a
+      href="https://underactuated.csail.mit.edu/optimization.html#sdp_unit_circle">can
+      be surprisingly effective</a> <elib>Saunderson15</elib>!</p>
 
     </subsection>
     
@@ -1756,6 +1760,12 @@ Using your experience from part (b), describe an analogous method for compute th
 <span class="title">"Globally Optimal Object Pose Estimation in Point Clouds with Mixed-Integer Programming"</span>, 
 <span class="publisher">International Symposium on Robotics Research</span>, Dec, <span class="year">2017</span>.
 [&nbsp;<a href="http://groups.csail.mit.edu/robotics-center/public_papers/Izatt17b.pdf">link</a>&nbsp;]
+
+</li><br>
+<li id=Saunderson15>
+<span class="author">James Saunderson and Pablo A Parrilo and Alan S Willsky</span>, 
+<span class="title">"Semidefinite descriptions of the convex hull of rotation matrices"</span>, 
+<span class="publisher">SIAM Journal on Optimization</span>, vol. 25, no. 3, pp. 1314--1343, <span class="year">2015</span>.
 
 </li><br>
 <li id=Schmidt15>
