@@ -13,7 +13,7 @@ pyproject-autoflake
 pyzmq>=25.0.0 # seems to be needed on python 3.11
 requests>=2.25
 scipy # see setup/mac/Brewfile
-#stable-baselines3>=1.7.0
+stable-baselines3>=1.7.0
 timeout-decorator>=0.5
 torch>=2.0.1  
 #torchvision
