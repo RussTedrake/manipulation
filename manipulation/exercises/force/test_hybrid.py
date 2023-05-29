@@ -35,7 +35,7 @@ class TestHybrid(unittest.TestCase):
         self.assertLessEqual(
             -p_WB[0],
             -0.5,
-            "Edge of the book is not betwee the gap. " "It is too close.",
+            "Edge of the book is not between the gap. " "It is too close.",
         )
 
         time = log.sample_times()
