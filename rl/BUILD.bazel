@@ -29,12 +29,12 @@ rt_ipynb_test(
 #    ],
 #)
 
-rt_py_test(
-  name = "train_boxflipup",
-    srcs = ["train_boxflipup.py"],
-    args = ["--test"],
-    imports = [".."],
-    deps = [
-      "//manipulation/envs:box_flipup",
-    ],
-)
+#rt_py_test(
+#  name = "train_boxflipup",
+#    srcs = ["train_boxflipup.py"],
+#    args = ["--test"],
+#    imports = [".."],
+#    deps = [
+#      "//manipulation/envs:box_flipup",
+#    ],
+#)

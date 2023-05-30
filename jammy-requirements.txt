@@ -55,6 +55,8 @@ joblib==1.2.0
     # via scikit-learn
 kiwisolver==1.4.4
     # via matplotlib
+lxml==4.9.2
+    # via -r htmlbook/focal-requirements.in
 markupsafe==2.1.2
     # via jinja2
 matplotlib==3.1.2
@@ -84,16 +86,6 @@ numpy==1.24.2
     #   scikit-learn
     #   scipy
     #   stable-baselines3
-nvidia-cublas-cu11==11.10.3.66
-    # via
-    #   nvidia-cudnn-cu11
-    #   torch
-nvidia-cuda-nvrtc-cu11==11.7.99
-    # via torch
-nvidia-cuda-runtime-cu11==11.7.99
-    # via torch
-nvidia-cudnn-cu11==8.5.0.96
-    # via torch
 packaging==23.0
     # via black
 pandas==1.5.3
@@ -155,7 +147,7 @@ snowballstemmer==2.2.0
     # via pydocstyle
 soupsieve==2.4
     # via beautifulsoup4
-stable-baselines3==1.7.0
+stable-baselines3==1.8.0
     # via -r jammy-requirements.in
 stack-data==0.6.2
     # via ipython
@@ -171,7 +163,7 @@ tomli==2.0.1
     # via
     #   autoflake
     #   black
-torch==1.13.1
+torch==1.12.1
     # via
     #   -r jammy-requirements.in
     #   stable-baselines3
@@ -187,14 +179,7 @@ urllib3==1.26.15
     # via requests
 wcwidth==0.2.6
     # via prompt-toolkit
-wheel==0.38.4
-    # via
-    #   nvidia-cublas-cu11
-    #   nvidia-cuda-runtime-cu11
 yapf==0.32.0
     # via -r htmlbook/focal-requirements.in
 zipp==3.15.0
     # via importlib-metadata
-
-# The following packages are considered to be unsafe in a requirements file:
-# setuptools
