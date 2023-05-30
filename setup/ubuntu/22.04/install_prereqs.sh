@@ -57,12 +57,13 @@ apt-get update -qq || (sleep 15; apt-get update -qq)
 
 apt-get install -o APT::Acquire::Retries=4 -o Dpkg::Use-Pty=0 -qy \
   --no-install-recommends $(cat <<EOF
+graphviz
 jupyter
 jupyter-nbconvert
 jupyter-notebook
-libx11-6
 libsm6
 libglib2.0-0
+libx11-6
 locales
 python3
 python3-pip
