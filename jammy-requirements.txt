@@ -13,7 +13,7 @@ backcall==0.2.0
 bayesian-optimization==1.4.2
     # via nevergrad
 beautifulsoup4==4.11.2
-    # via -r htmlbook/focal-requirements.in
+    # via -r htmlbook/jammy-requirements.in
 black[jupyter]==23.1.0
     # via -r jammy-requirements.in
 certifi==2022.12.7
@@ -37,6 +37,8 @@ decorator==5.1.1
     # via ipython
 executing==1.2.0
     # via stack-data
+fonttools==4.39.4
+    # via matplotlib
 gradescope-utils==0.5.0
     # via -r jammy-requirements.in
 gym==0.21
@@ -56,12 +58,12 @@ joblib==1.2.0
 kiwisolver==1.4.4
     # via matplotlib
 lxml==4.9.2
-    # via -r htmlbook/focal-requirements.in
+    # via -r htmlbook/jammy-requirements.in
 markupsafe==2.1.2
     # via jinja2
-matplotlib==3.1.2
+matplotlib==3.5.1
     # via
-    #   -c htmlbook/focal-constraints.txt
+    #   -c htmlbook/jammy-constraints.txt
     #   mpld3
     #   stable-baselines3
 matplotlib-inline==0.1.6
@@ -71,7 +73,7 @@ mpld3==0.5.9
 mypy-extensions==1.0.0
     # via black
 mysql-connector-python==8.0.32
-    # via -r htmlbook/focal-requirements.in
+    # via -r htmlbook/jammy-requirements.in
 nevergrad==0.6.0
     # via -r jammy-requirements.in
 numpy==1.24.2
@@ -87,7 +89,9 @@ numpy==1.24.2
     #   scipy
     #   stable-baselines3
 packaging==23.0
-    # via black
+    # via
+    #   black
+    #   matplotlib
 pandas==1.5.3
     # via
     #   nevergrad
@@ -100,6 +104,8 @@ pexpect==4.8.0
     # via ipython
 pickleshare==0.7.5
     # via ipython
+pillow==9.5.0
+    # via matplotlib
 platformdirs==3.1.1
     # via black
 prompt-toolkit==3.0.38
@@ -112,10 +118,6 @@ ptyprocess==0.7.0
     # via pexpect
 pure-eval==0.2.2
     # via stack-data
-pycodestyle==2.10.0
-    # via -r htmlbook/focal-requirements.in
-pydocstyle==6.3.0
-    # via -r htmlbook/focal-requirements.in
 pyflakes==3.0.1
     # via autoflake
 pygments==2.14.0
@@ -133,7 +135,7 @@ python-dateutil==2.8.2
 pytz==2022.7.1
     # via pandas
 requests==2.28.2
-    # via -r htmlbook/focal-requirements.in
+    # via -r htmlbook/jammy-requirements.in
 scikit-learn==1.2.2
     # via bayesian-optimization
 scipy==1.10.1
@@ -143,8 +145,6 @@ scipy==1.10.1
     #   scikit-learn
 six==1.16.0
     # via python-dateutil
-snowballstemmer==2.2.0
-    # via pydocstyle
 soupsieve==2.4
     # via beautifulsoup4
 stable-baselines3==1.8.0
@@ -179,7 +179,5 @@ urllib3==1.26.15
     # via requests
 wcwidth==0.2.6
     # via prompt-toolkit
-yapf==0.32.0
-    # via -r htmlbook/focal-requirements.in
 zipp==3.15.0
     # via importlib-metadata
