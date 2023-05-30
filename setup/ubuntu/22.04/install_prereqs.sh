@@ -60,6 +60,9 @@ apt-get install -o APT::Acquire::Retries=4 -o Dpkg::Use-Pty=0 -qy \
 jupyter
 jupyter-nbconvert
 jupyter-notebook
+libx11-6
+libsm6
+libglib2.0-0
 locales
 python3
 python3-pip
