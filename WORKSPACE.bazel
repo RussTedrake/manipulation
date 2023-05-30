@@ -20,6 +20,13 @@ load("@bazel_skylib//lib:versions.bzl", "versions")
 
 versions.check("2.0.0")
 
+load("@rules_python//python:pip.bzl", "pip_install")
+
+pip_install(
+    name = "pip",
+    requirements = "//:requirements.txt",
+)
+
 load("//htmlbook/tools/buildifier:repositories.bzl", "buildifier_dependencies")
 
 buildifier_dependencies()
@@ -57,10 +64,3 @@ new_local_repository(
 load("@rules_drake//:share/drake/repo.bzl", "drake_repository")
 
 drake_repository(name = "drake")
-
-load("@rules_python//python:pip.bzl", "pip_install")
-
-pip_install(
-    name = "pip",
-    requirements = "//:requirements.txt",
-)
