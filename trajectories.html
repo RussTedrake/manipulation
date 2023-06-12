@@ -830,9 +830,123 @@ ik.AddPositionConstraint(
 
   </section>
 
-  <section><h1>Time-optimal path parameterizations</h1>
+  <section id="topp"><h1>Time-optimal path parameterizations</h1>
 
-    <!-- time-scaling trajectories (TOPPRA?) -->
+    <p>Once we have a motion plan, a natural question is: what is the fastest
+    that we can execute that plan, subject to velocity, acceleration, and
+    torque-limit constraints? </p>
+
+    <!--
+    <p> Let's define a trajectory $\bq(t)$ defined over the interval $t \in
+    [t_0, t_f]$ via a <i>path parameterization</i>, ${\bf r}(s)$, and a <i>time
+    parameterization</i>, $t = h(s)$, such that $${\bf r}(s) = \bq(h(s)),
+    \text{ where }s \in [0,1], h(0) = t_0, h(1) = t_f.$$ We will require that
+    the time-scaling is monotonic, so $\forall s, h'(s) > 0,$ where $h'(s) =
+    \pd{h}{s}.$ We'll also use the shorthand $h''(s) = \pd{^2 h}{s^2},$ etc.
+    The advantage of this parameterization is that when ${\bf r}(s)$ is fixed,
+    many of the objectives and constraints that we might want to put on
+    $\bq(t)$ are actually convex constraints on $h(s).$ To see this, write
+    \begin{align*} {\bf r}'(s) &= \dot\bq(t) h'(s),\\ {\bf r}''(s) &=
+    \ddot{\bq}(t)h'(s)^2 + \dot{\bq}(t)h''(s).\end{align*}</p>
+    -->
+
+    <p>
+    To study this, let's define a trajectory $\bq(t)$ defined over the interval
+    $t \in [t_0, t_f]$ via a <i>path parameterization</i>, ${\bf r}(s)$, and a
+    <i>time parameterization</i>, $s(t)$, such that $$\bq(t) = {\bf r}(s(t)),
+    \text{ where }s(t) \in [0,1], s(t_0) = 0, s(t_f) = 1.$$ We will constrain
+    $\forall t \in [t_0, t_f], \dot{s}(t) > 0,$ so that the inverse mapping
+    from $s$ to $t$ always exists. The advantage of this parameterization is
+    that when ${\bf r}(s)$ is fixed, many of the objectives and constraints
+    that we might want to put on $\bq(t)$ are actually convex in the
+    derivatives of $s(t).$ To see this, using the shorthand ${\bf r}'(s) =
+    \pd{\bf r}{s}, {\bf r}''(s) = \pd{^2 {\bf r}}{s^2},$ etc., write
+    \begin{align*} \dot\bq &= {\bf r}'(s)\dot{s},\\ \ddot\bq(t) &= {\bf r}''(s)
+    \dot{s}^2 + {\bf r}'(s)\ddot{s}.\end{align*} Even more important/exciting,
+    substituting these terms into the <a
+    href="https://underactuated.mit.edu/multibody.html#manipulator">manipulator
+    equations</a> yields: $$\bu(s) = {\bf m}(s)\ddot{s} + {\bf c}(s)\dot{s}^2 +
+    \bar{\bf \tau}_g(s),$$ where $\bu(s)$ is the commanded torque at the scaled
+    time $s(t)$, and \begin{align} {\bf m}(s) &= {\bf M}({\bf r}(s)){\bf
+    r}'(s), \\ {\bf c}(s) &= {\bf M}({\bf r}(s)){\bf r}''(s) + \bC({\bf r}(s),
+    {\bf r}'(s)) {\bf r}'(s), \\ \bar{\bf \tau}_g(s) &= {\bf \tau}_g({\bf
+    r}(s)).\end{align}</p> 
+    
+    <p>The next key step is to introduce a change of variables: $b(s(t)) =
+    \dot{s}^2(t)  ,$ and note<sup>&dagger;</sup> that $b'(s) = 2 \ddot{s}.$
+    <sidenote><sup>&dagger;</sup>
+    Because $\dot{b}(s) = b'(s)\dot{s}$ and $\dot{b}(s) =
+    2\dot{s}\ddot{s}.$</sidenote> We will use a parameterized trajectory to
+    represent $b(s)$ over the interval $s\in[0,1]$. Let's see that we can write
+    an extremely useful set of costs and constraints as convex functions of
+    $b(s)$, evaluated at sampled time points, $s_i = s(t_i)$:
+    <ul><li>Monotonicity constraint: $$b(s_i) \ge \epsilon \Rightarrow
+    \dot{s}(t_i) >
+    0.$$</li><li>Velocity limits are bounding-box constraints: $$\forall j,\,
+    \dot{q}_{min,j}^2 \le r'_j(s_i)^2 b(s_i) \le \dot{q}_{max,j}^2 \Rightarrow
+    \dot{\bq}_{min} \le \dot{\bq}(t_i) \le \dot{\bq}_{max}.$$</li>
+    <li>Acceleration limits are linear constraints: $$ \ddot{\bq}_{min} \le
+    {\bf r}''(s_i)b(s_i) + \frac{1}{2} {\bf r}'(s_i) b'(s_i) \le
+    \ddot{\bq}_{max} \Rightarrow \ddot{\bq}_{min} \le \ddot\bq(t_i) \le
+    \ddot\bq_{max}.$$
+    </li><li>Torque limits are linear constraints: \begin{gather*}\bu_{min} \le
+    \frac{1}{2}{\bf m}(s_i)b'(s_i) + {\bf c}(s_i)b(s_i) + \bar{\bf \tau}_g(s_i)
+    \le \bu_{max} \Rightarrow\\ \bu_{min} \le \bu(t_i) \le
+    \bu_{max}.\end{gather*}</li><li>Minimizing the time duration is a convex
+    objective: $$t_f - t_0 = \int_{t_0}^{t_f} 1 dt = \int_0^1
+    \frac{1}{\sqrt{b(s)}} ds.$$ This looks nonconvex, but can be written using
+    ...
+    <!--
+    slack variables: $a(s) = \dot{s}$ with Lorentz cone (convex) constraints
+    $a(s) \ge \sqrt{b(s)}$, and work with $a(s)$ directly; as long as we're
+    always pushing down on $a(s)$. 
+    
+    $\min \int_0^1 \sigma(s) ds,
+    \sigma(s) \sqrt{b(s)} \ge 1.$ --></li></ul>
+    In some limited cases <elib>Marcucci22</elib>, satisfying a finite number
+    of constraints can be sufficient to imply that these constraints hold over
+    the entire time interval, $[t_0, t_f]$. <!-- For instance, if we
+    parameterize ${\bf r}(s)$ and $b(s)$ using Bezier curves, enforce the
+    constraints on the control points (of the higher-order curves generated by
+    the multiplicative combinations listed above), then we can leverage the
+    convex hull property of the Bezier curves, along with the facts that Bezier
+    curves are closed under derivatives, addition (via degree elevation) and
+    multiplication. We would have to use polynomial forms of the manipulator
+    equations. Even still, making this claim does assume a perfect integration
+    of $s(t) = \int_{t_0}^t \sqrt{b(s(t'))} dt'.$ --> In practice, we often
+    just enforce the constraints at a sufficiently large number of sampled
+    times and forgo the strict guarantees.</p>
+    
+<!--    <p>\begin{gather*}t = h(s), \\\dot{t} = h'(s) \dot{s} = 1. \quad \dot{s}(t) = \frac{1}{h(s)}. \\ \ddot{t} = 0 = h''(s) \dot{s}^2 + h'(s) \ddot{s}.\end{gather*}</p>-->
+
+    <p>These time-optimal path parameterizations (TOPP) were studied
+    extensively throughout the 1980's (e.g. <elib>Bobrow85</elib>) with bespoke
+    algorithms that, for instance, attempted to uncover all of the switching
+    times of the bang-bang trajectory. <elib>Verscheure09+Debrouwere13</elib>
+    made the connections to convex optimization that I've described here.
+    <elib>Pham18</elib> made a popular numerical implementation of this called
+    <a
+    href="https://drake.mit.edu/doxygen_cxx/classdrake_1_1multibody_1_1_toppra.html">TOPPRA</a>
+    (time-optimal path parameterizations based on reachability analysis). We
+    make heavy use of these ideas (and spell out the detailed
+    connections to the Bezier curve parameterization) in
+    <elib>Marcucci22</elib>. You can find a <a
+    href="https://drake.mit.edu/doxygen_cxx/classdrake_1_1trajectories_1_1_path_parameterized_trajectory.html">PathParameterizedTrajectory</a>
+    class in Drake.</p>
+    
+    <p>One common question is whether TOPP can be used to write convex
+    constraints on the <i>jerk</i> (or higher derivatives) of the trajectory,
+    <!--$${\bf r}'''(s) = \dddot{\bq}(t)h'(s)^3 + 3\ddot{\bq}(t)h'(s)h''(s) +
+    \dot{\bq}h'''(t).$$ -->
+    $$\dddot\bq(t) = {\bf r}'''(s) \dot{s}^3(t) + 3{\bf r}''(s) \dot{s}(t)
+    \ddot{s}(t) + {\bf r}'(s)\dddot{s}(t).$$ This comes up because many
+    industrial robot manipulators have jerk limits that must be respected.
+    <elib>Debrouwere13</elib>
+    addressed a version of this question. (More soon...) <!-- We can impose
+    these with additional slack variables $j(s)$, and convex
+    rotated-Lorentz-cone constraints $j(s) \le a(s)b(s).$ -->
+  </p>
+
   </section>
 
   <section><h1>Graphs of Convex Sets</h1>
@@ -954,6 +1068,37 @@ PhD thesis, Carnegie Mellon University, August, <span class="year">2010</span>.
 <span class="author">Marc Toussaint</span>, 
 <span class="title">"A Novel Augmented Lagrangian Approach for Inequalities and Convergent Any-Time Non-Central Updates"</span>, 
 , <span class="year">2014</span>.
+
+</li><br>
+<li id=Marcucci22>
+<span class="author">Tobia Marcucci and Mark Petersen and David von Wrangel and Russ Tedrake</span>, 
+<span class="title">"Motion Planning around Obstacles with Convex Optimization"</span>, 
+, <span class="year">2022</span>.
+[&nbsp;<a href="http://groups.csail.mit.edu/robotics-center/public_papers/Marcucci22.pdf">link</a>&nbsp;]
+
+</li><br>
+<li id=Bobrow85>
+<span class="author">J.E. Bobrow and S. Dubowsky and J.S. Gibson</span>, 
+<span class="title">"Time-Optimal Control of Robotic Manipulators Along Specified Paths"</span>, 
+<span class="publisher">Int. J of Robotics Research</span>, vol. 4, no. 3, pp. 3--17, <span class="year">1985</span>.
+
+</li><br>
+<li id=Verscheure09>
+<span class="author">Diederik Verscheure and Bram Demeulenaere and Jan Swevers and Joris De Schutter and Moritz Diehl</span>, 
+<span class="title">"Time-optimal path tracking for robots: A convex optimization approach"</span>, 
+<span class="publisher">Automatic Control, IEEE Transactions on</span>, vol. 54, no. 10, pp. 2318--2327, <span class="year">2009</span>.
+
+</li><br>
+<li id=Debrouwere13>
+<span class="author">Frederik Debrouwere and Wannes Van Loock and Goele Pipeleers and Quoc Tran Dinh and Moritz Diehl and Joris De Schutter and Jan Swevers</span>, 
+<span class="title">"Time-optimal path following for robots with convex--concave constraints using sequential convex programming"</span>, 
+<span class="publisher">IEEE Transactions on Robotics</span>, vol. 29, no. 6, pp. 1485--1495, <span class="year">2013</span>.
+
+</li><br>
+<li id=Pham18>
+<span class="author">Hung Pham and Quang-Cuong Pham</span>, 
+<span class="title">"A new approach to time-optimal path parameterization based on reachability analysis"</span>, 
+<span class="publisher">IEEE Transactions on Robotics</span>, vol. 34, no. 3, pp. 645--659, <span class="year">2018</span>.
 
 </li><br>
 <li id=Geraerts04>
