@@ -43,4 +43,5 @@ RUN rm -f /var/cache/debconf/*-old
 RUN rm -rf /var/lib/apt/lists/*
 RUN rm -f /var/log/*.log
 RUN rm -f /var/log/apt/*
-ENV PYTHONPATH="/opt/manipulation:${PYTHONPATH}"
+ENV PATH="/opt/drake/bin:${PATH}" \
+  PYTHONPATH="/opt/manipulation:/opt/drake/lib/python3.10/site-packages:${PYTHONPATH}"
