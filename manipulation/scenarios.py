@@ -5,6 +5,7 @@ experiments with less code.
 import os
 import sys
 import warnings
+from enum import Enum
 
 import numpy as np
 from pydrake.all import (
@@ -119,6 +120,11 @@ def AddTwoLinkIiwa(plant, q0=[0.1, -1.2]):
             index += 1
 
     return iiwa
+
+
+class WsgPositions(Enum):
+    OPEN = 0.107
+    CLOSED = 0.002
 
 
 # TODO: take argument for whether we want the welded fingers version or not

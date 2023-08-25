@@ -50,6 +50,17 @@ rt_py_library(
 )
 
 rt_py_library(
+    name = "station",
+    deps = [
+      "//manipulation",
+      "scenarios",
+    ],
+    srcs = ["station.py"],
+    imports = [".."],
+    visibility = ["//visibility:public"],
+)
+
+rt_py_library(
     name = "pick",
     srcs = ["pick.py"],
     imports = [".."],
