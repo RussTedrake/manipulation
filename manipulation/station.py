@@ -66,7 +66,9 @@ class Scenario:
     )
 
     # Plant configuration (time step and contact parameters).
-    plant_config: MultibodyPlantConfig = MultibodyPlantConfig()
+    plant_config: MultibodyPlantConfig = MultibodyPlantConfig(
+        discrete_contact_solver="sap"
+    )
 
     # All of the fully deterministic elements of the simulation.
     directives: typing.List[ModelDirective] = dc.field(default_factory=list)
@@ -97,25 +99,35 @@ class Scenario:
     visualization: VisualizationConfig = VisualizationConfig()
 
 
-def load_scenario(*, filename, scenario_name, scenario_text=""):
+def load_scenario(*, filename=None, data=None, scenario_name=None):
     """Implements the command-line handling logic for scenario data.
     Returns a `Scenario` object loaded from the given input arguments.
+
+    Args:
+        filename (optional): A yaml filename to load the scenario from.
+
+        data (optional): A yaml string to load the scenario from. If both
+            filename and string are specified, then the filename is parsed
+            first, and then the string is _also_ parsed, potentially overwriting defaults from the filename..
+
+        scenario_name (optional): The name of the scenario/child to load from
+            the yaml file. If None, then the entire file is loaded.
     """
-    result = yaml_load_typed(
-        schema=Scenario,
-        filename=filename,
-        child_name=scenario_name,
-        defaults=Scenario(),
-    )
-    if scenario_text:
+    result = Scenario()
+    if filename:
         result = yaml_load_typed(
-            schema=Scenario, data=scenario_text, defaults=result
+            schema=Scenario,
+            filename=filename,
+            child_name=scenario_name,
+            defaults=result,
         )
+    if data:
+        result = yaml_load_typed(schema=Scenario, data=data, defaults=result)
     return result
 
 
 # TODO(russt): Use the c++ version pending https://github.com/RobotLocomotion/drake/issues/20055
-def ApplyDriverConfig(
+def ApplyDriverConfigSim(
     driver_config,
     model_instance_name,
     sim_plant,
@@ -160,7 +172,8 @@ def ApplyDriverConfig(
 
         # Make the plant for the iiwa controller to use.
         controller_plant = MultibodyPlant(time_step=sim_plant.time_step())
-        # TODO: Add the correct IIWA model (introspected from MBP)
+        # TODO: Add the correct IIWA model (introspected from MBP). See
+        # build_iiwa_control in Drake for a slightly closer attempt.
         if num_iiwa_positions == 3:
             controller_iiwa = AddPlanarIiwa(controller_plant)
         else:
@@ -281,14 +294,14 @@ def ApplyDriverConfig(
         )
 
 
-def ApplyDriverConfigs(
+def ApplyDriverConfigsSim(
     *, driver_configs, sim_plant, models_from_directives, builder
 ):
     models_from_directives_map = dict(
         [(info.model_name, info) for info in models_from_directives]
     )
     for model_instance_name, driver_config in driver_configs.items():
-        ApplyDriverConfig(
+        ApplyDriverConfigSim(
             driver_config,
             model_instance_name,
             sim_plant,
@@ -299,8 +312,8 @@ def ApplyDriverConfigs(
 
 def MakeHardwareStation(
     scenario: Scenario,
-    package_xmls=[],
     meshcat=None,
+    package_xmls=[],
 ):
     """
     Creates a manipulation station system, which is a sub-diagram containing:
@@ -362,17 +375,13 @@ def MakeHardwareStation(
     # Now the plant is complete.
     sim_plant.Finalize()
 
-    # Add actuation inputs.
-    ApplyDriverConfigs(
+    # Add drivers.
+    ApplyDriverConfigsSim(
         driver_configs=scenario.model_drivers,
         sim_plant=sim_plant,
         models_from_directives=added_models,
         builder=builder,
     )
-
-    # for system in builder.GetMutableSystems():
-    #     if isinstance(system, (LcmInterfaceSystem, LcmSubscriberSystem,LcmPublisherSystem, IiwaCommandReceiver, IiwaStatusSender, SchunkWsgStatusSender)):
-    #         builder.RemoveSystem(system)
 
     # TODO(russt): Add scene cameras. https://github.com/RobotLocomotion/drake/issues/20055
 
@@ -390,8 +399,119 @@ def MakeHardwareStation(
     builder.ExportOutput(sim_plant.get_body_poses_output_port(), "body_poses")
 
     diagram = builder.Build()
-    diagram.set_name("ManipulationStation")
+    diagram.set_name("HardwareStation")
     return diagram
+
+
+# TODO(russt): Use the c++ version pending https://github.com/RobotLocomotion/drake/issues/20055
+def ApplyDriverConfigInterface(
+    driver_config,
+    model_instance_name,
+    sim_plant,
+    models_from_directives_map,
+    lcm_buses,
+    builder,
+):
+    sim_plant.GetModelInstanceByName(model_instance_name)
+    if isinstance(driver_config, IiwaDriver):
+        lcm = lcm_buses.Find(
+            "Driver for " + model_instance_name, driver_config.lcm_bus
+        )
+
+        # Publish IIWA command.
+        iiwa_command_sender = builder.AddSystem(IiwaCommandSender())
+        # Note on publish period: IIWA driver won't respond faster than 200Hz
+        iiwa_command_publisher = builder.AddSystem(
+            LcmPublisherSystem.Make(
+                channel="IIWA_COMMAND",
+                lcm_type=lcmt_iiwa_command,
+                lcm=lcm,
+                publish_period=0.005,
+                use_cpp_serializer=True,
+            )
+        )
+        iiwa_command_publisher.set_name(
+            model_instance_name + "_command_publisher"
+        )
+        builder.ExportInput(
+            iiwa_command_sender.get_position_input_port(),
+            model_instance_name + "_position",
+        )
+        builder.ExportInput(
+            iiwa_command_sender.get_torque_input_port(),
+            model_instance_name + "_feedforward_torque",
+        )
+        builder.Connect(
+            iiwa_command_sender.get_output_port(),
+            iiwa_command_publisher.get_input_port(),
+        )
+        # Receive IIWA status and populate the output ports.
+        iiwa_status_receiver = builder.AddSystem(IiwaStatusReceiver())
+        iiwa_status_subscriber = builder.AddSystem(
+            LcmSubscriberSystem.Make(
+                channel="IIWA_STATUS",
+                lcm_type=lcmt_iiwa_status,
+                lcm=lcm,
+                use_cpp_serializer=True,
+                wait_for_message_on_initialization_timeout=10,
+            )
+        )
+        iiwa_status_subscriber.set_name(
+            model_instance_name + "_status_subscriber"
+        )
+
+        # builder.Connect(
+        #    iiwa_status_receiver.get_position_measured_output_port(),
+        #    to_pose.get_input_port(),
+        # )
+
+        builder.ExportOutput(
+            iiwa_status_receiver.get_position_commanded_output_port(),
+            model_instance_name + "_position_commanded",
+        )
+        builder.ExportOutput(
+            iiwa_status_receiver.get_position_measured_output_port(),
+            model_instance_name + "_position_measured",
+        )
+        builder.ExportOutput(
+            iiwa_status_receiver.get_velocity_estimated_output_port(),
+            model_instance_name + "_velocity_estimated",
+        )
+        builder.ExportOutput(
+            iiwa_status_receiver.get_torque_commanded_output_port(),
+            model_instance_name + "_torque_commanded",
+        )
+        builder.ExportOutput(
+            iiwa_status_receiver.get_torque_measured_output_port(),
+            model_instance_name + "_torque_measured",
+        )
+        builder.ExportOutput(
+            iiwa_status_receiver.get_torque_external_output_port(),
+            model_instance_name + "_torque_external",
+        )
+        builder.Connect(
+            iiwa_status_subscriber.get_output_port(),
+            iiwa_status_receiver.get_input_port(),
+        )
+    if isinstance(driver_config, SchunkWsgDriver):
+        assert False, "TODO: Implement WSG driver"
+
+
+def ApplyDriverConfigsInterface(
+    *, driver_configs, sim_plant, models_from_directives, lcm_buses, builder
+):
+    models_from_directives_map = dict(
+        [(info.model_name, info) for info in models_from_directives]
+    )
+    for model_instance_name, driver_config in driver_configs.items():
+        ApplyDriverConfigInterface(
+            driver_config,
+            model_instance_name,
+            sim_plant,
+            models_from_directives_map,
+            lcm_buses,
+            builder,
+        )
 
 
 def MakeHardwareStationInterface(
@@ -404,6 +524,7 @@ def MakeHardwareStationInterface(
     # Visualization
     scene_graph = builder.AddNamedSystem("scene_graph", SceneGraph())
     plant = MultibodyPlant(time_step=scenario.plant_config.time_step)
+    ApplyMultibodyPlantConfig(scenario.plant_config, plant)
     plant.RegisterAsSourceForSceneGraph(scene_graph)
     parser = Parser(plant)
     for p in package_xmls:
@@ -438,89 +559,17 @@ def MakeHardwareStationInterface(
         lcm_buses=scenario.lcm_buses, builder=builder
     )
 
-    for model_instance_name, driver_config in scenario.model_drivers.items():
-        if isinstance(driver_config, IiwaDriver):
-            lcm = lcm_buses.Find(
-                "Driver for " + model_instance_name, driver_config.lcm_bus
-            )
+    # Add drivers.
+    ApplyDriverConfigsInterface(
+        driver_configs=scenario.model_drivers,
+        sim_plant=sim_plant,
+        models_from_directives=added_models,
+        lcm_buses=lcm_buses,
+        builder=builder,
+    )
 
-            # Publish IIWA command.
-            iiwa_command_sender = builder.AddSystem(IiwaCommandSender())
-            # Note on publish period: IIWA driver won't respond faster than 200Hz
-            iiwa_command_publisher = builder.AddSystem(
-                LcmPublisherSystem.Make(
-                    channel="IIWA_COMMAND",
-                    lcm_type=lcmt_iiwa_command,
-                    lcm=lcm,
-                    publish_period=0.005,
-                    use_cpp_serializer=True,
-                )
-            )
-            iiwa_command_publisher.set_name(
-                model_instance_name + "_command_publisher"
-            )
-            builder.ExportInput(
-                iiwa_command_sender.get_position_input_port(),
-                model_instance_name + "_position",
-            )
-            builder.ExportInput(
-                iiwa_command_sender.get_torque_input_port(),
-                model_instance_name + "_feedforward_torque",
-            )
-            builder.Connect(
-                iiwa_command_sender.get_output_port(),
-                iiwa_command_publisher.get_input_port(),
-            )
-            # Receive IIWA status and populate the output ports.
-            iiwa_status_receiver = builder.AddSystem(IiwaStatusReceiver())
-            iiwa_status_subscriber = builder.AddSystem(
-                LcmSubscriberSystem.Make(
-                    channel="IIWA_STATUS",
-                    lcm_type=lcmt_iiwa_status,
-                    lcm=lcm,
-                    use_cpp_serializer=True,
-                    wait_for_message_on_initialization_timeout=10,
-                )
-            )
-            iiwa_status_subscriber.set_name(
-                model_instance_name + "_status_subscriber"
-            )
+    # Add cameras.
 
-            # builder.Connect(
-            #    iiwa_status_receiver.get_position_measured_output_port(),
-            #    to_pose.get_input_port(),
-            # )
-
-            builder.ExportOutput(
-                iiwa_status_receiver.get_position_commanded_output_port(),
-                model_instance_name + "_position_commanded",
-            )
-            builder.ExportOutput(
-                iiwa_status_receiver.get_position_measured_output_port(),
-                model_instance_name + "_position_measured",
-            )
-            builder.ExportOutput(
-                iiwa_status_receiver.get_velocity_estimated_output_port(),
-                model_instance_name + "_velocity_estimated",
-            )
-            builder.ExportOutput(
-                iiwa_status_receiver.get_torque_commanded_output_port(),
-                model_instance_name + "_torque_commanded",
-            )
-            builder.ExportOutput(
-                iiwa_status_receiver.get_torque_measured_output_port(),
-                model_instance_name + "_torque_measured",
-            )
-            builder.ExportOutput(
-                iiwa_status_receiver.get_torque_external_output_port(),
-                model_instance_name + "_torque_external",
-            )
-            builder.Connect(
-                iiwa_status_subscriber.get_output_port(),
-                iiwa_status_receiver.get_input_port(),
-            )
-
-        elif isinstance(driver_config, SchunkWsgDriver):
-            assert False, "TODO: Implement WSG driver"
-
-    return builder.Build()
+    diagram = builder.Build()
+    diagram.set_name("HardwareStationInterface")
+    return diagram
