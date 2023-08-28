@@ -142,11 +142,11 @@ def ApplyDriverConfigSim(
         iiwa_position = builder.AddSystem(PassThrough(num_iiwa_positions))
         builder.ExportInput(
             iiwa_position.get_input_port(),
-            model_instance_name + "_position",
+            model_instance_name + ".position",
         )
         builder.ExportOutput(
             iiwa_position.get_output_port(),
-            model_instance_name + "_position_commanded",
+            model_instance_name + ".position_commanded",
         )
 
         # Export the iiwa "state" outputs.
@@ -159,15 +159,15 @@ def ApplyDriverConfigSim(
         )
         builder.ExportOutput(
             demux.get_output_port(0),
-            model_instance_name + "_position_measured",
+            model_instance_name + ".position_measured",
         )
         builder.ExportOutput(
             demux.get_output_port(1),
-            model_instance_name + "_velocity_estimated",
+            model_instance_name + ".velocity_estimated",
         )
         builder.ExportOutput(
             sim_plant.get_state_output_port(model_instance),
-            model_instance_name + "_state_estimated",
+            model_instance_name + ".state_estimated",
         )
 
         # Make the plant for the iiwa controller to use.
@@ -191,7 +191,7 @@ def ApplyDriverConfigSim(
                 has_reference_acceleration=False,
             )
         )
-        iiwa_controller.set_name(model_instance_name + "_controller")
+        iiwa_controller.set_name(model_instance_name + ".controller")
         builder.Connect(
             sim_plant.get_state_output_port(model_instance),
             iiwa_controller.get_input_port_estimated_state(),
@@ -213,7 +213,7 @@ def ApplyDriverConfigSim(
         )
         builder.ExportInput(
             torque_passthrough.get_input_port(),
-            model_instance_name + "_feedforward_torque",
+            model_instance_name + ".feedforward_torque",
         )
         builder.Connect(
             adder.get_output_port(),
@@ -229,7 +229,7 @@ def ApplyDriverConfigSim(
             )
         )
         desired_state_from_position.set_name(
-            model_instance_name + "_desired_state_from_position"
+            model_instance_name + ".desired_state_from_position"
         )
         builder.Connect(
             desired_state_from_position.get_output_port(),
@@ -243,24 +243,24 @@ def ApplyDriverConfigSim(
         # Export commanded torques.
         builder.ExportOutput(
             adder.get_output_port(),
-            model_instance_name + "_torque_commanded",
+            model_instance_name + ".torque_commanded",
         )
         builder.ExportOutput(
             adder.get_output_port(),
-            model_instance_name + "_torque_measured",
+            model_instance_name + ".torque_measured",
         )
 
         builder.ExportOutput(
             sim_plant.get_generalized_contact_forces_output_port(
                 model_instance
             ),
-            model_instance_name + "_torque_external",
+            model_instance_name + ".torque_external",
         )
 
     if isinstance(driver_config, SchunkWsgDriver):
         # Wsg controller.
         wsg_controller = builder.AddSystem(SchunkWsgPositionController())
-        wsg_controller.set_name(model_instance_name + "_controller")
+        wsg_controller.set_name(model_instance_name + ".controller")
         builder.Connect(
             wsg_controller.get_generalized_force_output_port(),
             sim_plant.get_actuation_input_port(model_instance),
@@ -271,11 +271,11 @@ def ApplyDriverConfigSim(
         )
         builder.ExportInput(
             wsg_controller.get_desired_position_input_port(),
-            model_instance_name + "_position",
+            model_instance_name + ".position",
         )
         builder.ExportInput(
             wsg_controller.get_force_limit_input_port(),
-            model_instance_name + "_force_limit",
+            model_instance_name + ".force_limit",
         )
         wsg_mbp_state_to_wsg_state = builder.AddSystem(
             MakeMultibodyStateToWsgStateSystem()
@@ -286,11 +286,11 @@ def ApplyDriverConfigSim(
         )
         builder.ExportOutput(
             wsg_mbp_state_to_wsg_state.get_output_port(),
-            model_instance_name + "_state_measured",
+            model_instance_name + ".state_measured",
         )
         builder.ExportOutput(
             wsg_controller.get_grip_force_output_port(),
-            model_instance_name + "_force_measured",
+            model_instance_name + ".force_measured",
         )
 
 
@@ -431,15 +431,15 @@ def ApplyDriverConfigInterface(
             )
         )
         iiwa_command_publisher.set_name(
-            model_instance_name + "_command_publisher"
+            model_instance_name + ".command_publisher"
         )
         builder.ExportInput(
             iiwa_command_sender.get_position_input_port(),
-            model_instance_name + "_position",
+            model_instance_name + ".position",
         )
         builder.ExportInput(
             iiwa_command_sender.get_torque_input_port(),
-            model_instance_name + "_feedforward_torque",
+            model_instance_name + ".feedforward_torque",
         )
         builder.Connect(
             iiwa_command_sender.get_output_port(),
@@ -457,7 +457,7 @@ def ApplyDriverConfigInterface(
             )
         )
         iiwa_status_subscriber.set_name(
-            model_instance_name + "_status_subscriber"
+            model_instance_name + ".status_subscriber"
         )
 
         # builder.Connect(
@@ -467,27 +467,27 @@ def ApplyDriverConfigInterface(
 
         builder.ExportOutput(
             iiwa_status_receiver.get_position_commanded_output_port(),
-            model_instance_name + "_position_commanded",
+            model_instance_name + ".position_commanded",
         )
         builder.ExportOutput(
             iiwa_status_receiver.get_position_measured_output_port(),
-            model_instance_name + "_position_measured",
+            model_instance_name + ".position_measured",
         )
         builder.ExportOutput(
             iiwa_status_receiver.get_velocity_estimated_output_port(),
-            model_instance_name + "_velocity_estimated",
+            model_instance_name + ".velocity_estimated",
         )
         builder.ExportOutput(
             iiwa_status_receiver.get_torque_commanded_output_port(),
-            model_instance_name + "_torque_commanded",
+            model_instance_name + ".torque_commanded",
         )
         builder.ExportOutput(
             iiwa_status_receiver.get_torque_measured_output_port(),
-            model_instance_name + "_torque_measured",
+            model_instance_name + ".torque_measured",
         )
         builder.ExportOutput(
             iiwa_status_receiver.get_torque_external_output_port(),
-            model_instance_name + "_torque_external",
+            model_instance_name + ".torque_external",
         )
         builder.Connect(
             iiwa_status_subscriber.get_output_port(),
