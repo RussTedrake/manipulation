@@ -7,6 +7,7 @@ from pydrake.all import (
     Adder,
     AddMultibodyPlant,
     ApplyLcmBusConfig,
+    ApplyMultibodyPlantConfig,
     ApplyVisualizationConfig,
     CameraConfig,
     Demultiplexer,
@@ -29,13 +30,20 @@ from pydrake.all import (
     SceneGraph,
     SchunkWsgDriver,
     SchunkWsgPositionController,
+    SchunkWsgCommandSender,
+    SchunkWsgStatusReceiver,
     SimulatorConfig,
     StateInterpolatorWithDiscreteDerivative,
     VisualizationConfig,
     ZeroForceDriver,
 )
 from pydrake.common.yaml import yaml_load_typed
-from drake import lcmt_iiwa_command, lcmt_iiwa_status
+from drake import (
+    lcmt_iiwa_command,
+    lcmt_iiwa_status,
+    lcmt_schunk_wsg_command,
+    lcmt_schunk_wsg_status,
+)
 
 from manipulation.scenarios import (
     AddIiwa,
@@ -407,12 +415,11 @@ def MakeHardwareStation(
 def ApplyDriverConfigInterface(
     driver_config,
     model_instance_name,
-    sim_plant,
+    plant,
     models_from_directives_map,
     lcm_buses,
     builder,
 ):
-    sim_plant.GetModelInstanceByName(model_instance_name)
     if isinstance(driver_config, IiwaDriver):
         lcm = lcm_buses.Find(
             "Driver for " + model_instance_name, driver_config.lcm_bus
@@ -494,11 +501,67 @@ def ApplyDriverConfigInterface(
             iiwa_status_receiver.get_input_port(),
         )
     if isinstance(driver_config, SchunkWsgDriver):
-        assert False, "TODO: Implement WSG driver"
+        lcm = lcm_buses.Find(
+            "Driver for " + model_instance_name, driver_config.lcm_bus
+        )
+
+        # Publish WSG command.
+        wsg_command_sender = builder.AddSystem(SchunkWsgCommandSender())
+        wsg_command_publisher = builder.AddSystem(
+            LcmPublisherSystem.Make(
+                channel="SCHUNK_WSG_COMMAND",
+                lcm_type=lcmt_schunk_wsg_command,
+                lcm=lcm,
+                publish_period=0.05,  # Schunk driver won't respond faster than 20Hz
+                use_cpp_serializer=True,
+            )
+        )
+        wsg_command_publisher.set_name(
+            model_instance_name + ".command_publisher"
+        )
+        builder.ExportInput(
+            wsg_command_sender.get_position_input_port(),
+            model_instance_name + ".position",
+        )
+        builder.ExportInput(
+            wsg_command_sender.get_force_limit_input_port(),
+            model_instance_name + ".force_limit",
+        )
+        builder.Connect(
+            wsg_command_sender.get_output_port(0),
+            wsg_command_publisher.get_input_port(),
+        )
+
+        # Receive WSG status and populate the output ports.
+        wsg_status_receiver = builder.AddSystem(SchunkWsgStatusReceiver())
+        wsg_status_subscriber = builder.AddSystem(
+            LcmSubscriberSystem.Make(
+                channel="SCHUNK_WSG_STATUS",
+                lcm_type=lcmt_schunk_wsg_status,
+                lcm=lcm,
+                use_cpp_serializer=True,
+                wait_for_message_on_initialization_timeout=10,
+            )
+        )
+        wsg_status_subscriber.set_name(
+            model_instance_name + ".status_subscriber"
+        )
+        builder.ExportOutput(
+            wsg_status_receiver.get_state_output_port(),
+            model_instance_name + ".state_measured",
+        )
+        builder.ExportOutput(
+            wsg_status_receiver.get_force_output_port(),
+            model_instance_name + ".force_measured",
+        )
+        builder.Connect(
+            wsg_status_subscriber.get_output_port(),
+            wsg_status_receiver.get_input_port(0),
+        )
 
 
 def ApplyDriverConfigsInterface(
-    *, driver_configs, sim_plant, models_from_directives, lcm_buses, builder
+    *, driver_configs, plant, models_from_directives, lcm_buses, builder
 ):
     models_from_directives_map = dict(
         [(info.model_name, info) for info in models_from_directives]
@@ -507,7 +570,7 @@ def ApplyDriverConfigsInterface(
         ApplyDriverConfigInterface(
             driver_config,
             model_instance_name,
-            sim_plant,
+            plant,
             models_from_directives_map,
             lcm_buses,
             builder,
@@ -516,8 +579,8 @@ def ApplyDriverConfigsInterface(
 
 def MakeHardwareStationInterface(
     scenario: Scenario,
-    package_xmls=[],
     meshcat=None,
+    package_xmls=[],
 ):
     builder = DiagramBuilder()
 
@@ -562,7 +625,7 @@ def MakeHardwareStationInterface(
     # Add drivers.
     ApplyDriverConfigsInterface(
         driver_configs=scenario.model_drivers,
-        sim_plant=sim_plant,
+        plant=plant,
         models_from_directives=added_models,
         lcm_buses=lcm_buses,
         builder=builder,
