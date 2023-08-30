@@ -191,7 +191,7 @@ def make_box_flipup(
         controller.get_input_port_desired_state(),
     )
     builder.Connect(
-        controller.get_output_port(), plant.get_actuation_input_port()
+        controller.get_output_port_control(), plant.get_actuation_input_port()
     )
     if meshcat:
         positions_to_poses = builder.AddSystem(
