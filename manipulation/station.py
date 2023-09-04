@@ -20,6 +20,7 @@ from pydrake.all import (
     LcmPublisherSystem,
     LcmSubscriberSystem,
     MakeMultibodyStateToWsgStateSystem,
+    Meshcat,
     ModelDirective,
     ModelDirectives,
     MultibodyPlant,
@@ -320,48 +321,32 @@ def ApplyDriverConfigsSim(
 
 def MakeHardwareStation(
     scenario: Scenario,
-    meshcat=None,
-    package_xmls=[],
+    meshcat: Meshcat = None,
+    *,
+    package_xmls: typing.List[str] = [],
+    hardware: bool = False,
 ):
     """
-    Creates a manipulation station system, which is a sub-diagram containing:
-      - A MultibodyPlant with populated via the Parser from the
-        `model_directives` argument AND the `filename` argument.
+    If `hardware=False`, (the default) returns a HardwareStation diagram containing:
+      - A MultibodyPlant with populated via the directives in `scenario`.
       - A SceneGraph
-      - For each model instance starting with `iiwa_prefix`, we add an
-        additional iiwa controller system
-      - For each model instance starting with `wsg_prefix`, we add an
-        additional schunk controller system
-      - For each body starting with `camera_prefix`, we add a RgbdSensor
+      - The default Drake visualizers
+      - Any robot / sensors drivers specified in the YAML description.
+
+    If `hardware=True`, returns a HardwareStationInterface diagram containing the network interfaces to communicate directly with the hardware drivers.
 
     Args:
-        model_directives: a string containing any model directives to be parsed
-
-        filename: a string containing the name of an sdf, urdf, mujoco xml, or
-        model directives yaml file.
-
-        time_step: the standard MultibodyPlant time step.
-
-        iiwa_prefix: Any model instances starting with `iiwa_prefix` will get
-        an inverse dynamics controller, etc attached
-
-        wsg_prefix: Any model instance starting with `wsg_prefix` will get a
-        schunk controller
-
-        camera_prefix: Any bodies in the plant (created during the
-        plant_setup_callback) starting with this prefix will get a camera
-        attached.
-
-        prefinalize_callback: A function, setup(plant), that will be called
-        with the multibody plant before calling finalize.  This can be useful
-        for e.g. adding additional bodies/models to the simulation.
-
-        package_xmls: A list of filenames to be passed to
-        PackageMap.AddPackageXml().  This is useful if you need to add more
-        models to your path (e.g. from your current working directory).
+        scenario: A Scenario structure, populated using the `load_scenario` method.
 
         meshcat: If not None, then AddDefaultVisualization will be added to the subdiagram using this meshcat instance.
+
+        package_xmls: A list of package.xml file paths that will be passed to the parser, using Parser.AddPackageXml().
     """
+    if hardware:
+        return MakeHardwareStationInterface(
+            scenario=scenario, meshcat=meshcat, package_xmls=package_xmls
+        )
+
     builder = DiagramBuilder()
 
     # Create the multibody plant and scene graph.
@@ -579,8 +564,9 @@ def ApplyDriverConfigsInterface(
 
 def MakeHardwareStationInterface(
     scenario: Scenario,
-    meshcat=None,
-    package_xmls=[],
+    meshcat: Meshcat = None,
+    *,
+    package_xmls: typing.List[str] = [],
 ):
     builder = DiagramBuilder()
 

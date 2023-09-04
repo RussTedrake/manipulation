@@ -795,39 +795,42 @@ output_ports:
     controllers into a common framework.  In practice, in Drake, that means that
     we are assembling increasingly sophisticated block diagrams.</p>
 
+    <subsection><h1>HardwareStation</h1>
+
     <p>One of the best things about the block-diagram modeling paradigm is the
     power of abstraction and encapsulation.  We can assemble a
     <code>Diagram</code> that contains all of the components necessary to
     simulate our hardware platform and its environment, which we will refer to
-    affectionately as the "Manipulation Station".  All together,
-    the <code>ManipulationStation</code> system looks like this:</p>
+    affectionately as the "Hardware Station". The method <code>MakeHardwareStation</code> takes a YAML description of the scene and the robot hardware. For a yaml file describing the iiwa + WSG and some cameras, the resulting 
+    <code>HardwareStation</code> system looks like this:</p>
     
-    <div id="manipulation_station">
+    <div id="manipulation_station"/> <!-- deprecation shim -->
+    <div id="hardware_station">
       <script type="text/javascript">
       var sys = jsyaml.load(`
-name: ManipulationStation
+name: HardwareStation
 input_ports:
-- iiwa_position
-- iiwa_feedforward_torque (optional)
-- wsg_position
-- wsg_force_limit (optional)
+- iiwa.position
+- iiwa.feedforward_torque (optional)
+- wsg.position
+- wsg.force_limit (optional)
 output_ports:
-- iiwa_position_commanded
-- iiwa_position_measured
-- iiwa_velocity_estimated
-- iiwa_state_estimated
-- iiwa_torque_commanded
-- iiwa_torque_measured
-- iiwa_torque_external
-- wsg_state_measured
-- wsg_force_measured
-- camera_[NAME]_rgb_image
-- camera_[NAME]_depth_image
-- <b style="color:orange">camera_[NAME]_label_image</b>
+- iiwa.position_commanded
+- iiwa.position_measured
+- iiwa.velocity_estimated
+- iiwa.state_estimated
+- iiwa.torque_commanded
+- iiwa.torque_measured
+- iiwa.torque_external
+- wsg.state_measured
+- wsg.force_measured
+- camera_[NAME].rgb_image
+- camera_[NAME].depth_image
+- <b style="color:orange">camera_[NAME].label_image</b>
 - ...
-- camera_[NAME]_rgb_image
-- camera_[NAME]_depth_image
-- <b style="color:orange">camera_[NAME]_label_image</b>
+- camera_[NAME].rgb_image
+- camera_[NAME].depth_image
+- <b style="color:orange">camera_[NAME].label_image</b>
 - <b style="color:orange">query_object</b>
 - <b style="color:orange">contact_results</b>
 - <b style="color:orange">plant_continuous_state</b>
@@ -836,10 +839,12 @@ output_ports:
       </script>
     </div>
 
-    <example><h1>Manipulation station in the teleop demo</h1>
+    <p>The output ports labeled in in <b><span style="color:orange">orange</span></b> on the diagram above are "cheat ports" -- they are available in simulation, but cannot be available when running on the real robot (because they assume a ground-truth knowledge).</p>
+
+    <example><h1>Hardware station in the teleop demo</h1>
 
       <p>The teleop notebook in the first chapter used the
-        <code>MakeManipulationStation</code> interface to set up the simulation.
+        <code>MakeHardwareStation</code> interface to set up the simulation.
         Now you have a better sense for what is going on inside that subsystem!
         Here is the link if you want to take a look at that example again:</p>
   
@@ -849,56 +854,57 @@ output_ports:
 
     <example><h1>A bimanual manipulation station</h1>
       
-      <p>I've intentionally provided this version of the
-      <code>MakeManipulationStation</code> method in Python so that you can
-      easily customize it to your needs.  But even the version I've provided
-      should address many use cases.  Here is a simple example of setting up a
-      bimanual version of the manipulation station:</p>
+      <p>By adding a few more lines to the YAML file, we can use the same 
+      <code>MakeHardwareStation</code> method to construct a bimanual
+      station:</p>
 
       <script>document.write(notebook_link('robot', d=deepnote, link_text="",notebook='bimanual'))</script>
 
     </example>
     
-    <p>This diagram itself can then be used as a <code>System</code> in
-    additional diagrams, which can include our perception, planning, and,
-    higher-level control systems.  This model also defines the abstraction
-    between the simulation and the real hardware.  We offer an almost identical
-    system, the
-    <code>ManipulationStationHardwareInterface</code>.  If you replace this
-    directly in place of the <code>ManipulationStation</code>, then the same
-    code you've developed in simulation can be run directly on the real robot.
-    The ports that are available only in simulation, but not in reality, are
-    colored <b><span style="color:orange">orange</span></b> on the
-    <code>ManipulationStation</code> system.</p>
+    <p>If there are other robots/drivers that you'd like to simulate, you can
+    make local modifications to the <code>station.py</code> file directly, or
+    just ask me and I can probably add them quickly.</p>
+
+    </subsection>
+    <subsection><h1>HardwareStationInterface</h1>
+    <p>As you see in the examples, the <code>HardwareStation</code> diagram
+    itself is intended to be used as a <code>System</code> in additional
+    diagrams, which can include our perception, planning, and, higher-level
+    control systems.  This model also defines the abstraction between the
+    simulation and the real hardware.  By simply passing
+    <code>hardware=True</code> into the <code>MakeHardwareStation</code>
+    method, we instead construct an almost identical system, the
+    <code>HardwareStationInterface</code>.</p>
   
     <div>
       <script type="text/javascript">
       var sys = jsyaml.load(`
-name: ManipulationStationHardwareInterface
+name: HardwareStationInterface
 input_ports:
-- iiwa_position
-- iiwa_feedforward_torque
-- wsg_position
-- wsg_force_limit (optional)
+- iiwa.position
+- iiwa.feedforward_torque
+- wsg.position
+- wsg.force_limit (optional)
 output_ports:
-- iiwa_position_commanded
-- iiwa_position_measured
-- iiwa_velocity_estimated
-- iiwa_torque_commanded
-- iiwa_torque_measured
-- iiwa_torque_external
-- wsg_state_measured
-- wsg_force_measured
-- camera_[NAME]_rgb_image
-- camera_[NAME]_depth_image
+- iiwa.position_commanded
+- iiwa.position_measured
+- iiwa.velocity_estimated
+- iiwa.torque_commanded
+- iiwa.torque_measured
+- iiwa.torque_external
+- wsg.state_measured
+- wsg.force_measured
+- camera_[NAME].rgb_image
+- camera_[NAME].depth_image
 - ...
-- camera_[NAME]_rgb_image
-- camera_[NAME]_depth_image`);
+- camera_[NAME].rgb_image
+- camera_[NAME].depth_image`);
       document.write(system_html(sys, "https://drake.mit.edu/doxygen_cxx/classdrake_1_1examples_1_1manipulation__station_1_1_manipulation_station_hardware_interface.html"));
       </script>
     </div>    
   
-  <p>The <code>ManipulationStationHardwareInterface</code> is also a diagram,
+  <p>The <code>HardwareStationInterface</code> is also a diagram,
   but rather than being made up of the simulation components like
   <code>MultibodyPlant</code> and <code>SceneGraph</code>, it is made up of
   systems that perform network message passing to interface with the small
@@ -912,13 +918,35 @@ output_ports:
   the hardware interface on your machines, I've started putting together a list
   of drivers and bill of materials <a href="station.html">in the
   appendix</a>.</p>
+  </subsection>
   
+  <subsection><h1>HardwareStation stand-alone simulation</h1>
+  
+    <p>Using the <code>HardwareStation</code> workflow, it is easy to
+    transition from your development in simulation to running on the real
+    robot. One additional tool to support this workflow is the stand-alone
+    <code>hardware_sim</code> executable. This python script takes the same
+    YAML file as as input (via the command line), and starts up a simulation in
+    a separate process that acts just like the real robot hardware should...
+    sending and receiving the hardware side of the messages. This can be
+    valuable for testing that all of your logic still works with the message
+    passing layer adding some delay and non-determinism that we can neatly
+    avoid when running everything in a single process.</p>
+  
+    <pre>
+    <code class="bash">python3 drake/examples/hardware_sim/hardware_sim.py
+    --scenario_file=station.yaml --scenario_name=Name</code>
+    </pre>
+
+  </subsection>
+
+</section>
+  
+<section><h1>More HardwareStation examples</h1>
+
   <example><h1>The iiwa with an Allegro hand</h1>
 
-    <p>If you want to set up a simulation and controller with entirely
-    different hardware, then I hope you will be able to look at the
-    <code>MakeManipulationStation</code> code and adapt it to your needs. For
-    instance, here is a simple example of simulating the iiwa with the Allegro
+    <p>Here is a simple example of simulating the iiwa with the Allegro
     hand attached instead of the Schunk WSG gripper.</p>
 
     <script>document.write(notebook_link('robot', d=deepnote, link_text="",notebook='iiwa_with_allegro'))</script>
