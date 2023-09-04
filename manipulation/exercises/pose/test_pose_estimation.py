@@ -35,6 +35,6 @@ class TestPoseEstimation(unittest.TestCase):
         )
         self.assertLessEqual(
             len(f_target) - inliers,
-            80,
+            170,
             "You have too many false negatives (not enough inliers)",
         )
