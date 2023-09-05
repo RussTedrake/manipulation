@@ -91,7 +91,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
     Model Directives</a> which makes it very quick and easy to load multiple
     robots/objects from these different file formats into one simulation; you
     saw an example of this in the
-    <script>document.write(notebook_link('force', deepnote, "introduction chapter notebook"))</script>.</p>
+    <script>document.write(notebook_link('intro', deepnote, "introduction chapter notebook"))</script>.</p>
 
   </section>
 
@@ -959,7 +959,7 @@ output_ports:
 
     <exercise><h1>Role of Reflected Inertia</h1>
 
-      <p> For this exercise you will investigate the effect of reflected inertia on the joint-space dynamics of the robot, and how it affects simple position control laws. You will work exclusively in <script>document.write(notebook_link('reflected_inertia', deepnote['exercises/robot'], link_text='this notebook'))</script>. You will be asked to complete the following steps: </p>
+      <p> For this exercise you will investigate the effect of reflected inertia on the joint-space dynamics of the robot, and how it affects simple position control laws. You will work exclusively in <script>document.write(notebook_link('robot', d=deepnote, link_text='this notebook', notebook='reflected_inertia'))</script>. You will be asked to complete the following steps: </p>
 
       <ol type="a">
         <li> Derive the first-order state-space dynamics $\dot{\bx} = f(\bx, \bu)$ of a simple pendulum with a motor and gearbox. 
@@ -970,7 +970,7 @@ output_ports:
 
     <exercise><h1>Input and Output Ports on the Manipulation Station</h1>
 
-      <p> For this exercise you will investigate how a manipulation station is abstracted in Drake's system-level framework. You will work exclusively in <script>document.write(notebook_link('manipulation_station_io', deepnote['exercises/robot'], link_text='this notebook'))</script>. You will be asked to complete the following steps: </p>
+      <p> For this exercise you will investigate how a manipulation station is abstracted in Drake's system-level framework. You will work exclusively in <script>document.write(notebook_link('robot', d=deepnote, link_text='this notebook', notebook='manipulation_station_io'))</script>. You will be asked to complete the following steps: </p>
 
       <ol type="a">
         <li> Learn how to probe into inputs and output ports of the manipulation station and evaluate their contents.
@@ -983,7 +983,7 @@ output_ports:
 
     <exercise><h1>Direct Joint Teleop in Drake</h1>
 
-      <p> For this exercise you will implement a method for controlling the joints of a robot in Drake. You will work exclusively in <script>document.write(notebook_link('direct_joint_control', deepnote['exercises/robot'], link_text='this notebook'))</script>, and should use the <script>document.write(notebook_link('intro', deepnote, link_text='example notebook in chapter 1'))</script> as a reference. You will be asked to complete the following steps: </p>
+      <p> For this exercise you will implement a method for controlling the joints of a robot in Drake. You will work exclusively in <script>document.write(notebook_link('robot', d=deepnote, link_text='this notebook', notebook='direct_joint_control'))</script>, and should use the <script>document.write(notebook_link('intro', deepnote, link_text='example notebook in chapter 1'))</script> as a reference. You will be asked to complete the following steps: </p>
 
       <ol type="a">
         <li> Replace the teleop interface in the chapter 1 example with different Drake functions that allow for directly controlling the joints of the robot.</li>

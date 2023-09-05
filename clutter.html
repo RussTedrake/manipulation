@@ -1265,7 +1265,7 @@ output_ports:
         balanced for all bodies to be in equilibrium.</p>
 
         <p>To help you solve these problems, we have
-        <script>document.write(notebook_link('static_equilibrium', deepnote['exercises/clutter'], link_text = 'a notebook'))</script>
+        <script>document.write(notebook_link('clutter', d=deepnote, link_text = 'a notebook', notebook='static_equilibrium'))</script>
         to help you build intuition and test your answers. It lets you specify
         the configuration of the spheres and then uses the <a
         href="https://drake.mit.edu/doxygen_cxx/classdrake_1_1multibody_1_1_static_equilibrium_problem.html">StaticEquilbriumProblem</a>
@@ -1316,7 +1316,7 @@ output_ports:
 
     <exercise><h1>Normal Estimation from Depth</h1>
 
-      <p>For this exercise, you will investigate a slightly different approach to normal vector estimation. In particular, we can exploit the spatial structure that is already in a depth image to avoid computing nearest neighbors. You will work exclusively in <script>document.write(notebook_link('normal_estimation_depth', deepnote['exercises/clutter'], link_text='this notebook'))</script>. You will be asked to complete the following steps:</p>
+      <p>For this exercise, you will investigate a slightly different approach to normal vector estimation. In particular, we can exploit the spatial structure that is already in a depth image to avoid computing nearest neighbors. You will work exclusively in <script>document.write(notebook_link('clutter', d=deepnote, link_text='this notebook', notebook='normal_estimation_depth'))</script>. You will be asked to complete the following steps:</p>
       <ol type="a">
         <li> Implement a method to estimate normal vectors from a depth image,
         without computing nearest neighbors. </li>
@@ -1326,7 +1326,7 @@ output_ports:
     </exercise>
 
     <exercise><h1>Analytic Antipodal Grasping</h1>
-      <p>So far, we have used sampling-based methods to find antipodal grasps - but can we have find one analytically if we knew the equation of the object shape? For this exercise, you will analyze and implement a correct-by-construction method to find antipodal points using symbolic differentiation and MathematicalProgram. You will work exclusively in <script>document.write(notebook_link('analytic_antipodal_grasps', deepnote['exercises/clutter'], link_text='this notebook'))</script>. You will be asked to complete the following steps:</p>
+      <p>So far, we have used sampling-based methods to find antipodal grasps - but can we have find one analytically if we knew the equation of the object shape? For this exercise, you will analyze and implement a correct-by-construction method to find antipodal points using symbolic differentiation and MathematicalProgram. You will work exclusively in <script>document.write(notebook_link('clutter', deepnote, link_text='this notebook', notebook='analytic_antipodal_grasps'))</script>. You will be asked to complete the following steps:</p>
       <ol type="a">
         <li> Prove that antipodal points are critical points of an energy
         function defined on the shape. </li>
@@ -1345,7 +1345,7 @@ output_ports:
       alternative method for generating grasp candidates based on local
       curvature, similar to the one proposed in <elib>tenPas17</elib>. This
       exercise is
-      implementation-heavy, and you will work exclusively in <script>document.write(notebook_link('grasp_candidate', deepnote['exercises/clutter'], link_text='this notebook'))</script>.</p>
+      implementation-heavy, and you will work exclusively in <script>document.write(notebook_link('clutter', d=deepnote, link_text='this notebook', notebook='grasp_candidate'))</script>.</p>
       
     </exercise>    
 
@@ -1493,7 +1493,13 @@ output_ports:
     </exercise>   
     <exercise id="simulationTuning"><h1>Simulation Tuning</h1>
       <p>
-      For this exercise, you will explore how to use and debug a physics simulator. In particular, you will inspect the contact forces of two interpenetrating boxes and examine discontinuities that arise due to point contact modeling. You will learn to debug and engineer collision geometries and physical parameter tuning to enable a sliding-block simulation to reach a desired final state. You will work both in <script>document.write(notebook_link('simulation_tuning', deepnote['exercises/clutter'], link_text='this notebook'))</script> as well as some written problems inside. There are 8 subproblems in this notebook, some involve coding and others involve answering written questions -- remember to do them all! </p>
+      For this exercise, you will explore how to use and debug a physics simulator. In particular, you will inspect the
+      contact forces of two interpenetrating boxes and examine discontinuities that arise due to point contact modeling. You
+      will learn to debug and engineer collision geometries and physical parameter tuning to enable a sliding-block simulation
+      to reach a desired final state. You will work both in
+      <script>document.write(notebook_link('clutter', d = deepnote, link_text = 'this notebook', notebook = 'simulation_tuning'))</script>
+      as well as some written problems inside. There are 8 subproblems in this notebook, some involve coding and others
+      involve answering written questions -- remember to do them all! </p>
     </exercise>  
   </section>
  
