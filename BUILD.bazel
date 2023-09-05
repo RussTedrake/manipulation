@@ -5,8 +5,6 @@
 # Licensed under the BSD 3-Clause License. See LICENSE.TXT for details.
 
 load("//htmlbook/tools/html:defs.bzl", "rt_html_test")
-load("//htmlbook/tools/jupyter:defs.bzl", "rt_ipynb_test")
-load("//htmlbook/tools/python:defs.bzl", "rt_py_test")
 load("//htmlbook/tools/tidy:def.bzl", "html_tidy_test")
 
 exports_files(
@@ -38,17 +36,6 @@ rt_html_test(
     srcs = ["intro.html"],
 )
 
-rt_ipynb_test(
-    name = "intro",
-    srcs = ["intro.ipynb"],
-    deps = [
-      "//manipulation",
-      "//manipulation:meshcat_utils",
-      "//manipulation:scenarios",
-      "//manipulation:station",
-    ],
-)
-
 rt_html_test(
     srcs = ["robot.html"],
 )
@@ -71,26 +58,6 @@ rt_html_test(
 
 rt_html_test(
     srcs = ["deep_perception.html"],
-)
-
-# torchvision is trying to write to a temp directory.
-#rt_ipynb_test(
-#    name = "segmentation_inference",
-#    srcs = ["segmentation_inference.ipynb"],
-#    deps = ["//manipulation"],
-#    data = ["//data:clutter_maskrcnn_data"],
-#)
-
-rt_py_test(
-  name = "segmentation_data",
-    srcs = ["segmentation_data.py"],
-    data = ["//manipulation/models"],
-    args = ["--test"],
-    imports = [".."],
-    deps = [
-      "//manipulation",
-      "//manipulation:scenarios",
-    ],
 )
 
 rt_html_test(
