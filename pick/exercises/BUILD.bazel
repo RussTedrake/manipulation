@@ -7,8 +7,8 @@
 load("//htmlbook/tools/jupyter:defs.bzl", "rt_ipynb_test")
 
 rt_ipynb_test(
-    name = "planar_manipulator",
-    srcs = ["planar_manipulator.ipynb"],
+    name = "05_planar_manipulator",
+    srcs = ["05_planar_manipulator.ipynb"],
     deps = [
         "//manipulation",
             "//manipulation/exercises:grader",
@@ -18,8 +18,8 @@ rt_ipynb_test(
 )
 
 rt_ipynb_test(
-    name = "rigid_transforms",
-    srcs = ["rigid_transforms.ipynb"],
+    name = "07_rigid_transforms",
+    srcs = ["07_rigid_transforms.ipynb"],
     deps = [
         "//manipulation",
         "//manipulation/exercises:grader",
@@ -28,8 +28,8 @@ rt_ipynb_test(
 )
 
 rt_ipynb_test(
-    name = "robot_painter",
-    srcs = ["robot_painter.ipynb"],
+    name = "08_robot_painter",
+    srcs = ["08_robot_painter.ipynb"],
     deps = [
         "//manipulation",
         "//manipulation/exercises:grader",
@@ -40,8 +40,8 @@ rt_ipynb_test(
 )
 
 rt_ipynb_test(
-    name = "intro_to_qp",
-    srcs = ["intro_to_qp.ipynb"],
+    name = "09_intro_to_qp",
+    srcs = ["09_intro_to_qp.ipynb"],
     tags = ["requires-network"], # For gurobi
     deps = [
         "//manipulation",
@@ -51,8 +51,8 @@ rt_ipynb_test(
 )
 
 rt_ipynb_test(
-    name = "differential_ik_optimization",
-    srcs = ["differential_ik_optimization.ipynb"],
+    name = "10_differential_ik_optimization",
+    srcs = ["10_differential_ik_optimization.ipynb"],
     deps = [
         "//manipulation",
         "//manipulation/exercises:grader",
