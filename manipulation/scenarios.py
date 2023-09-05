@@ -65,6 +65,26 @@ ycb = [
 ]
 
 
+class ExtractBodyPose(LeafSystem):
+    def __init__(self, body_poses_output_port, body_index):
+        LeafSystem.__init__(self)
+        self.body_index = body_index
+        self.DeclareAbstractInputPort(
+            "poses",
+            body_poses_output_port.Allocate(),
+        )
+        self.DeclareAbstractOutputPort(
+            "pose",
+            lambda: AbstractValue.Make(RigidTransform()),
+            self.CalcOutput,
+        )
+
+    def CalcOutput(self, context, output):
+        poses = self.EvalAbstractInput(context, 0).get_value()
+        pose = poses[int(self.body_index)]
+        output.get_mutable_value().set(pose.rotation(), pose.translation())
+
+
 def AddIiwa(plant, collision_model="no_collision"):
     parser = Parser(plant)
     iiwa = parser.AddModelsFromUrl(
@@ -442,28 +462,11 @@ def AddRgbdSensors(
                     to_point_cloud.color_image_input_port(),
                 )
 
-                class ExtractBodyPose(LeafSystem):
-                    def __init__(self, body_index):
-                        LeafSystem.__init__(self)
-                        self.body_index = body_index
-                        self.DeclareAbstractInputPort(
-                            "poses",
-                            plant.get_body_poses_output_port().Allocate(),
-                        )
-                        self.DeclareAbstractOutputPort(
-                            "pose",
-                            lambda: AbstractValue.Make(RigidTransform()),
-                            self.CalcOutput,
-                        )
-
-                    def CalcOutput(self, context, output):
-                        poses = self.EvalAbstractInput(context, 0).get_value()
-                        pose = poses[int(self.body_index)]
-                        output.get_mutable_value().set(
-                            pose.rotation(), pose.translation()
-                        )
-
-                camera_pose = builder.AddSystem(ExtractBodyPose(body_index))
+                camera_pose = builder.AddSystem(
+                    ExtractBodyPose(
+                        plant.get_body_poses_output_port(), body_index
+                    )
+                )
                 builder.Connect(
                     plant.get_body_poses_output_port(),
                     camera_pose.get_input_port(),
