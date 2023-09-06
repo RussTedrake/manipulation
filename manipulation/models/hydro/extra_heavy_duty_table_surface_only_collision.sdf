@@ -1,0 +1,191 @@
+<?xml version="1.0"?>
+<sdf version="1.7">
+  <model name="extra_heavy_duty_table_surface_only_collision">
+    <!--
+    This model is identical to the extra heavy duty table in nearly
+    every respect except that the collision tags are present only for
+    the surface link. This leads to a large speedup in simulations
+    involving the table due to a decrease in number of collision
+    checks needed.
+    -->
+    <link name="link">
+      <inertial>
+        <mass>53.5</mass>
+        <!--
+        The spatial inertia values given below were derived based on the
+        equation for a cuboid:
+
+        https://en.wikipedia.org/wiki/List_of_moments_of_inertia#List_of_3D_inertia_tensors.
+
+        Obviously, the table is not a cuboid, meaning the inertia matrix is
+        imperfect. Having an accurate spatial inertia specification may be
+        important for us to know when / if a robot mounted on top of the
+        table will cause the table to tip over. It will also be necessary to
+        model what happens when a mobile robot bumps into the table.
+
+        TODO(lucy-tri): Compute a more accurate spatial inertia of this table.
+        -->
+        <inertia>
+          <ixx>5.177409</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>4.843753753</iyy>
+          <iyz>0</iyz>
+          <izz>4.843753753</izz>
+        </inertia>
+      </inertial>
+      <kinematic>0</kinematic>
+      <visual name="back_right_leg">
+        <pose>-0.33 -0.35 0.381 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.05 0.05 0.762</size>
+          </box>
+        </geometry>
+        <material>
+          <ambient>0.3 0.3 0.3 1</ambient>
+          <diffuse>0.7 0.7 0.7 1</diffuse>
+          <specular>0.01 0.01 0.01 1</specular>
+          <emissive>0 0 0 1</emissive>
+        </material>
+      </visual>
+      <visual name="front_left_leg">
+        <pose>0.33 0.35 0.381 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.05 0.05 0.762</size>
+          </box>
+        </geometry>
+        <material>
+          <ambient>0.3 0.3 0.3 1</ambient>
+          <diffuse>0.7 0.7 0.7 1</diffuse>
+          <specular>0.01 0.01 0.01 1</specular>
+          <emissive>0 0 0 1</emissive>
+        </material>
+      </visual>
+      <visual name="left_crossbar">
+        <pose>0.33 0 0.13335 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.05 0.662 0.05</size>
+          </box>
+        </geometry>
+        <material>
+          <ambient>0.3 0.3 0.3 1</ambient>
+          <diffuse>0.7 0.7 0.7 1</diffuse>
+          <specular>0.01 0.01 0.01 1</specular>
+          <emissive>0 0 0 1</emissive>
+        </material>
+      </visual>
+      <visual name="right_crossbar">
+        <pose>-0.33 0 0.13335 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.05 0.662 0.05</size>
+          </box>
+        </geometry>
+        <material>
+          <ambient>0.3 0.3 0.3 1</ambient>
+          <diffuse>0.7 0.7 0.7 1</diffuse>
+          <specular>0.01 0.01 0.01 1</specular>
+          <emissive>0 0 0 1</emissive>
+        </material>
+      </visual>
+      <visual name="back_left_leg">
+        <pose>-0.33 0.35 0.381 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.05 0.05 0.762</size>
+          </box>
+        </geometry>
+        <material>
+          <ambient>0.3 0.3 0.3 1</ambient>
+          <diffuse>0.7 0.7 0.7 1</diffuse>
+          <specular>0.01 0.01 0.01 1</specular>
+          <emissive>0 0 0 1</emissive>
+        </material>
+      </visual>
+      <visual name="front_right_leg">
+        <pose>0.33 -0.35 0.381 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.05 0.05 0.762</size>
+          </box>
+        </geometry>
+        <material>
+          <ambient>0.3 0.3 0.3 1</ambient>
+          <diffuse>0.7 0.7 0.7 1</diffuse>
+          <specular>0.01 0.01 0.01 1</specular>
+          <emissive>0 0 0 1</emissive>
+        </material>
+      </visual>
+      <visual name="back_crossbar">
+        <pose>0 0.35 0.13335 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.6112 0.05 0.05</size>
+          </box>
+        </geometry>
+        <material>
+          <ambient>0.3 0.3 0.3 1</ambient>
+          <diffuse>0.7 0.7 0.7 1</diffuse>
+          <specular>0.01 0.01 0.01 1</specular>
+          <emissive>0 0 0 1</emissive>
+        </material>
+      </visual>
+      <visual name="front_crossbar">
+        <pose>0 -0.35 0.13335 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.6112 0.05 0.05</size>
+          </box>
+        </geometry>
+        <material>
+          <ambient>0.3 0.3 0.3 1</ambient>
+          <diffuse>0.7 0.7 0.7 1</diffuse>
+          <specular>0.01 0.01 0.01 1</specular>
+          <emissive>0 0 0 1</emissive>
+        </material>
+      </visual>
+      <visual name="visual1">
+        <pose>0 0 0.736 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.7112 0.762 0.057</size>
+          </box>
+        </geometry>
+        <material>
+          <ambient>0.3 0.3 0.3 1</ambient>
+          <diffuse>0.7 0.7 0.7 1</diffuse>
+          <specular>0.01 0.01 0.01 1</specular>
+          <emissive>0 0 0 1</emissive>
+        </material>
+      </visual>
+      <collision name="surface">
+        <pose>0 0 0.736 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.7112 0.762 0.057</size>
+          </box>
+        </geometry>
+        <drake:proximity_properties>
+          <drake:compliant_hydroelastic/>
+          <drake:hydroelastic_modulus>1.0e7</drake:hydroelastic_modulus>
+        </drake:proximity_properties>
+      </collision>
+    </link>
+    <frame name="top_center">
+      <!--
+      TODO(eric.cousineau): @frame='link' is redundant, but not having it
+      causes RBT SDFormat parsing code to segfault. Remove this once RBT is
+      removed.
+      -->
+      <pose relative_to="link">0 0 0.7645 0 0 0</pose>
+    </frame>
+    <!--
+    N.B. This model used to have <static>true</static>, but this creates
+    issues in reusability with the current implementation of MBP parsing
+    (#12227).
+    -->
+  </model>
+</sdf>

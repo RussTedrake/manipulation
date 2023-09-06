@@ -7,18 +7,18 @@
 filegroup(
     name = "models",
     srcs = glob([
-        "*.sdf",
-        "*.urdf",
-        "*.yaml",
-        "*.xml",
+        "**/*.sdf",
+        "**/*.urdf",
+        "**/*.yaml",
+        "**/*.xml",
     ]),
     visibility = ["//visibility:public"],
 )
 
 exports_files(
     glob([
-        "*.sdf",
-        "*.urdf",
+        "**/*.sdf",
+        "**/*.urdf",
     ]),
     visibility = ["//visibility:public"],
 )

@@ -9,7 +9,7 @@ directives:
 
 - add_model:
     name: bin0
-    file: package://drake/examples/manipulation_station/models/bin.sdf
+    file: package://manipulation/hydro/bin.sdf
 
 - add_weld:
     parent: bin0_origin
@@ -24,7 +24,7 @@ directives:
 
 - add_model:
     name: bin1
-    file: package://drake/examples/manipulation_station/models/bin.sdf
+    file: package://manipulation/hydro/bin.sdf
 
 - add_weld:
     parent: bin1_origin
