@@ -60,21 +60,20 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       
   <p>In this chapter we're going to outfit your <a
   href="https://en.wikipedia.org/wiki/Mecha">mech</a>.  I want to make sure you
-  understand the robot hardware that we've selected for these notes, and how it
+  understand the robot hardware that we're using in these notes, and how it
   compares to the other hardware available today.  You should also come away
   with an understanding of how we simulate the robot and what commands you
   can send to the robot interface.</p>
     
   <section><h1>Robot description files</h1>
   
-    <p>Although we are going to focus primarily on one particular set of
-    hardware for the remainder of these notes, in this chapter I'll provide
-    software examples with a number of different robots. One of the great
-    things about modern robotics is that many of the tools we will develop over
-    the course of these notes are quite general, and can be transferred from
-    one robot to another easily. I could imagine a future version of these
-    notes where you really do get to build out your robot in this chapter, and
-    use your customized robot for the remaining chapters!</p>
+    <p>In the majority of the chapters, we'll make repeated use of just one or
+    two robot configurations. One of the great things about modern robotics is
+    that many of the tools we will develop over the course of these notes are
+    quite general, and can be transferred from one robot to another easily. I
+    could imagine a future version of these notes where you really do get to
+    build out your robot in this chapter, and use your customized robot for the
+    remaining chapters!</p>
     
     <p>The ability to easily simulate/control a variety of robots is made
     possible in part by the proliferation of common file formats for describing
@@ -115,9 +114,9 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
     <p>There is one particular requirement which, if we want our robot to
     satisfy, quickly winnows the field to only a few viable platforms: that
     requirement is joint-torque sensing and control.  Out of the
-    torque-controlled robots on the market, I've chosen to use the Kuka LBR
-    iiwa robot to use throughout these notes (I will try to use the lower case
-    "iiwa" to be <a
+    torque-controlled robots on the market, I've use the Kuka LBR iiwa robot
+    most often throughout these notes (I will try to use the lower case "iiwa"
+    to be <a
     href="https://www.kuka.com/en-us/products/robotics-systems/industrial-robots/lbr-iiwa">consistent
     with the manufacturer</a>, but it looks wrong to me every time!).  </p>
     
@@ -139,9 +138,9 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
     <subsection id="position-controlled"><h1>Position-controlled robots</h1>
 
       <figure>
-        <img width="35%" src="https://www.robots.com/images/robots/Universal/Universal_UR10_0002.jpg" />
-        <img width="55%" src="https://webshop.robotics.abb.com/media/catalog/product/d/u/dual_arm_yumi_14000_main.jpg" />
-        <figcaption>Two popular position controlled manipulators.  (Left) The UR10 from Universal Robotics.  (Right)The ABB Yumi.</figcaption>
+        <img height="200px" src="https://www.robots.com/images/robots/Universal/Universal_UR10_0002.jpg" />
+        <img height="200px" src="https://webshop.robotics.abb.com/media/catalog/product/d/u/dual_arm_yumi_14000_main.jpg" />
+        <figcaption>Two popular position controlled manipulators.  (Left) The UR10 from Universal Robotics. (Right) The ABB Yumi.</figcaption>
       </figure>
 
       <p>Most robot arms today are "position controlled" -- given a desired
@@ -911,8 +910,11 @@ output_ports:
   executables that talk to the individual hardware drivers.  If you dig under
   the covers, you will see that we use <a
   href="https://lcm-proj.github.io/">LCM</a> for this instead of ROS messages,
-  precisely because LCM is a lighter-weight dependency for our public
-  repository.  But many Drake developers/users use <a href="https://github.com/RobotLocomotion/drake-ros">Drake in a ROS/ROS2 ecosystem</a>.</p>
+  primarily because LCM is a lighter-weight dependency for our public
+  repository (also because multicast UDP is a better choice that TCP/IP for the
+  driver level interface).  But many Drake developers/users use <a
+  href="https://github.com/RobotLocomotion/drake-ros">Drake in a ROS/ROS2
+  ecosystem</a>.</p>
     
   <p>If you do have your own similar robot hardware available, and want to run
   the hardware interface on your machines, I've started putting together a list
@@ -930,8 +932,9 @@ output_ports:
     a separate process that acts just like the real robot hardware should...
     sending and receiving the hardware side of the messages. This can be
     valuable for testing that all of your logic still works with the message
-    passing layer adding some delay and non-determinism that we can neatly
-    avoid when running everything in a single process.</p>
+    passing layer adding some delay and non-determinism that we cleverly avoid
+    when we use <code>MakeHardwareStation(..., hardware=False)</code> in the
+    first stages of our development.</p>
   
     <pre>
     <code class="bash">python3 drake/examples/hardware_sim/hardware_sim.py
@@ -944,10 +947,16 @@ output_ports:
   
 <section><h1>More HardwareStation examples</h1>
 
+  <p>I love the projects that students put together for this class. To help
+  enable those projects (and your future projects, I hope), I will collect a
+  few more examples here of setting up the <code>HardwareStation</code> for
+  different hardware configurations. Expect this list to grow over time!</p>
+
   <example><h1>The iiwa with an Allegro hand</h1>
 
-    <p>Here is a simple example of simulating the iiwa with the Allegro
-    hand attached instead of the Schunk WSG gripper.</p>
+    <p>Here is a simple example of simulating the iiwa with the Allegro hand
+    attached instead of the Schunk WSG gripper. (Note that there are both left
+    and right versions of the Allegro hand available.)</p>
 
     <script>document.write(notebook_link('robot', d=deepnote, link_text="",notebook='iiwa_with_allegro'))</script>
 
