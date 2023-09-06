@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<!--
+Defines a model with a single planar joint with the default axes and no damping, connecting a massless "parent" to a massless "child".  This can be useful for adding planar joints from model directives.
+-->
+<sdf xmlns:drake="http://drake.mit.edu" version="1.10">
+  <world name="planar_joint_world">
+    <model name="planar_joint">
+      <link name="parent">
+        <inertial>
+          <mass>0</mass>
+          <inertia>
+            <ixx>0</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0</iyy>
+            <iyz>0</iyz>
+            <izz>0</izz>
+          </inertia>
+        </inertial>
+      </link>
+      <link name="child">
+        <inertial>
+          <mass>0</mass>
+          <inertia>
+            <ixx>0</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0</iyy>
+            <iyz>0</iyz>
+            <izz>0</izz>
+          </inertia>
+        </inertial>
+      </link>
+      <drake:joint name="planar_joint" type="planar">
+        <drake:parent>parent</drake:parent>
+        <drake:child>child</drake:child>
+        <drake:damping>0 0 0</drake:damping>
+      </drake:joint>
+    </model>
+  </world>
+</sdf>
