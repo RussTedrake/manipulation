@@ -19,13 +19,13 @@ rt_ipynb_test(
 )
 
 rt_ipynb_test(
-    name = "02_manipulation_station_io",
-    srcs = ["02_manipulation_station_io.ipynb"],
+    name = "02_hardware_station_io",
+    srcs = ["02_hardware_station_io.ipynb"],
     deps = [
         "//manipulation",
         "//manipulation/exercises:grader",
-        "//manipulation/exercises/robot:test_manipulation_io",
-        "//manipulation:scenarios",
+        "//manipulation/exercises/robot:test_hardware_station_io",
+        "//manipulation:station",
     ],
 )
 

@@ -13,8 +13,8 @@ rt_py_library(
 )
 
 rt_py_library(
-    name = "test_manipulation_io",
-    srcs = ["test_manipulation_io.py"],
+    name = "test_hardware_station_io",
+    srcs = ["test_hardware_station_io.py"],
     visibility = ["//visibility:public"],
 )
 

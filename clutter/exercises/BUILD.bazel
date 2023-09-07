@@ -57,6 +57,7 @@ rt_ipynb_test(
 rt_ipynb_test(
     name = "simulation_tuning",
     srcs = ["simulation_tuning.ipynb"],
+    timeout = "moderate",
     deps = [
         "//manipulation",
         "//manipulation/exercises:grader",
