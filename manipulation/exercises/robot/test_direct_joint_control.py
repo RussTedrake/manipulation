@@ -17,11 +17,10 @@ class TestDirectJointControl(unittest.TestCase):
 
         q_cmd = np.array([0.1, 0.2, 0.3])
         station, context = f(interactive=False, q_cmd=q_cmd)
-        self.assertIsNotNone(context, "Incorrect context")
+        station.ValidateContext(context)
 
-        station_context = station.GetMyContextFromRoot(context)
-        commanded_pos = station.GetOutputPort("iiwa_position_commanded").Eval(
-            station_context
+        commanded_pos = station.GetOutputPort("iiwa.position_commanded").Eval(
+            context
         )
 
         self.assertLessEqual(

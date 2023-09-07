@@ -14,7 +14,7 @@ rt_ipynb_test(
         "//manipulation/exercises:grader",
         "//manipulation/exercises/robot:test_direct_joint_control",
         "//manipulation:meshcat_utils",
-        "//manipulation:scenarios",
+        "//manipulation:station",
     ],
 )
 
