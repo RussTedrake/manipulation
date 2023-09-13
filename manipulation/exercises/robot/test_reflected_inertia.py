@@ -17,7 +17,7 @@ class TestSimplePendulumWithGearbox(unittest.TestCase):
         f = self.notebook_locals["pendulum_with_motor_dynamics"]
 
         # Don't use local p since students might have different params.
-        p = {"m": 1.0, "l": 0.5, "g": 9.81, "N": 160, "I": 3.46e-4}
+        p = {"m": 1.0, "l": 0.5, "g": 9.81, "N": 160, "I_M": 3.46e-4}
 
         f_target = np.array(
             [
