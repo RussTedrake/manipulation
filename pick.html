@@ -582,18 +582,14 @@ pose = plant.EvalBodyPoseInWorld(context, gripper)</pre></code>
     {}^A\omega^B \times {}^Bp^{B_A}_A \end{bmatrix} = \begin{bmatrix} {}^A
     \omega^{B} \\ {}^A\text{v}^B - {}^A\omega^B \times {}^Ap^{B}
     \end{bmatrix}.\end{equation}
-  </p></ul> </details>
+    </p></ul> </details>
 
-    <!--
-    <p>Why is it that we can get away with just three components for spatial
-    velocity, but not for rotations?  In short, this is because a three 
-    component vector has both a direction (which we use to denote the axis) and 
-    a magnitude.  Using the magnitude to denote an angle is degenerate because 
-    our representation should be periodic in $2\pi$, but using them for angular
-    velocities doesn't have this problem. Using sine of the angle resolves it,
-    but we also need to store the cosine; that's <a
-    href="https://en.wikipedia.org/w/index.php?title=Quaternions_and_spatial_rotation&section=14#The_hypersphere_of_rotations">precisely
-    what happens</a> in the unit quaternions!</p>  -->
+    <p>Why is it that we can get away with just three components for angular
+    velocity, but not for rotations?  Using the magnitude of an axis-angle
+    representation to denote an angle is degenerate because our representation
+    of angles should be periodic in $2\pi$, but using the magnitude of the
+    angular velocity is ok because angular velocities take values from $(-\inf,
+    \inf)$ without wrapping.</p>
 
     <p>There is one more velocity to be aware of: I'll use $v$ to denote the
     generalized velocity vector of the plant, which is closely related to the
