@@ -136,13 +136,13 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
     clear.</p>
 
     <p><img style="height:90px;float:left;margin-right:10px"
-    src="figures/frames.png"/> There are a few very special frames.
-    We use $W$ to denote the <i>world frame</i>.  We think about the world frame
-    in Drake using vehicle coordinates (positive $x$ to the front, positive $y$
-    to the <i>left</i>, and positive $z$ is up).  The other particularly special
-    frames are the <i>body frames</i>: every body in the multibody system has a
-    unique frame attached to it.  We'll typically use $B_i$ to denote the frame
-    for body $i$.</p>
+    src="figures/frames.png"/> There are a few very special frames. We use $W$
+    to denote the <i>world frame</i>.  We think about the world frame in Drake
+    using vehicle coordinates (positive $x$ to the front, positive $y$ to the
+    <i>left</i>, and positive $z$ is up).  The other particularly special
+    frames are the <i>body frames</i>: every body in the multibody physics
+    engine has a unique frame attached to it.  We'll typically use $B_i$ to
+    denote the frame for body $i$.</p>
 
     <p>Frames have a position, too -- it coincides with the frame origin.  So it
     is perfectly valid to write $^Wp^A_W$ to denote the position of point $A$
@@ -477,12 +477,16 @@ pose = plant.EvalBodyPoseInWorld(context, gripper)</pre></code>
         function?</p>
 
         <p>This gets into the subtle points of how we represent transforms, and
-        <a href="#3D_rotation">how we represent 3D rotations</a> in particular.  Although we use rotation matrices in our <code>RigidTransform</code> class, in order to make the spatial algebra efficient, we actually use unit quaternions in the <code>Context</code> in order to have a more compact vector representation.</p>
+        <a href="#3D_rotation">how we represent 3D rotations</a> in particular.
+        Although we use rotation matrices in our <code>RigidTransform</code>
+        class, in order to make the spatial algebra efficient, we actually use
+        unit quaternions in the configuration vector $q,$ and in the
+        <code>Context</code> in order to have a compact representation.</p>
 
         <p>As a result, for this example, the software implementation of the
         function $f_{kin}^B$ is precisely the function that converts the
-        position $\times$ unit quaternion representation into the position
-        $\times$ rotation matrix representation.</p>
+        position $\times$ unit quaternion representation into the pose
+        (position $\times$ rotation matrix) representation.</p>
       </example>
 
     </subsection>
@@ -592,16 +596,17 @@ pose = plant.EvalBodyPoseInWorld(context, gripper)</pre></code>
     what happens</a> in the unit quaternions!</p>  -->
 
     <p>There is one more velocity to be aware of: I'll use $v$ to denote the
-    generalized velocity vector of the plant.  While a spatial velocity $^AV^B$
-    is six components, a translational or angular velocity, $^B\text{v}^C$ or
-    $^B\omega^C$, is three components, the generalized velocity vector is whatever
-    size it needs to be to encode the time derivatives of the configuration
-    variables, $q$.  For the iiwa welded to the world frame, that means it has
-    seven components.  I've tried to be careful to typeset each of these v's
-    differently throughout the notes. Almost always the distinction is also
-    clear from the context.</p>
+    generalized velocity vector of the plant, which is closely related to the
+    time-derivative of $q$ (see below).  While a spatial velocity $^AV^B$ is
+    six components, a translational or angular velocity, $^B\text{v}^C$ or
+    $^B\omega^C$, is three components, the generalized velocity vector is
+    whatever size it needs to be to encode the time derivatives of the
+    configuration variables, $q$.  For the iiwa welded to the world frame, that
+    means it has seven components.  I've tried to be careful to typeset each of
+    these v's differently throughout the notes. Almost always the distinction
+    is also clear from the context.</p>
 
-    <example><h1>Don't assume $\dot{q} \equiv v$</h1>
+    <example id="qdot_vs_v"><h1>Don't assume $\dot{q} \equiv v$</h1>
     
       <p>The unit quaternion representation is four components, but these must
       form a "unit vector" of length 1.  Rotation matrices are 9 components, but
@@ -652,19 +657,22 @@ plant.num_velocities() = 6</pre></code></p>
     "analytic Jacobian", which refers to the explicit partial derivative of the
     forward kinematics (as written in \eqref{eq:jacobian}), and "geometric
     Jacobian" which replaces 3D rotations on the left-hand side with spatial
-    velocities.  In Drake's <code>MultibodyPlant</code>, we currently offer the geometric Jacobian versions via
+    velocities.  In Drake's <code>MultibodyPlant</code>, we currently offer the
+    geometric Jacobian versions via
     <ul>
       <li> <code>CalcJacobianAngularVelocity</code>,</li>
       <li><code>CalcJacobianTranslationalVelocity</code>, and</li>
       <li><code>CalcJacobianSpatialVelocity</code>,</li>
     </ul> with each taking an argument to specify whether you'd like the
     Jacobian with respect to $\dot{q}$ or $v$. If you really like the
-    analytical Jacobian, you could get it (much less efficiently) using our
+    analytical Jacobian, you could get it (much less efficiently) using Drake's
     support for automatic differentiation.</p>
 
     <example><h1>Kinematic Jacobians for pick and place</h1>
     
-      <p>Let's repeat the setup from above, but we'll print out the Jacobian of the gripper frame, measured from the world frame, expressed in the world frame.</p>
+      <p>Let's repeat the setup from above, but we'll print out the Jacobian of
+      the gripper frame, measured from the world frame, expressed in the world
+      frame.</p>
 
       <script>document.write(notebook_link('pick', d=deepnote, link_text="", notebook="jacobian"))</script>
 
