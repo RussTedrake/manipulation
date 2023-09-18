@@ -18,6 +18,8 @@ classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: BSD License"
 ]
+# TODO: This could be pulled from requirements.txt.  I probably want to
+# separate out dev dependencies from user dependencies first.
 dependencies = [
   "cloudpickle>=1.6.0",
   "drake>=1.21.0",
