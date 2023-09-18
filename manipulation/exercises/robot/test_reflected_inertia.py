@@ -18,6 +18,8 @@ class TestSimplePendulumWithGearbox(unittest.TestCase):
 
         # Don't use local p since students might have different params.
         p = {"m": 1.0, "l": 0.5, "g": 9.81, "N": 160, "I_m": 3.46e-4}
+        # Support both I and I_m (for backwards compatibility):
+        p["I"] = p["I_m"]
 
         f_target = np.array(
             [
