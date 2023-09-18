@@ -4,6 +4,32 @@ requires = [
     "wheel"
 ]
 build-backend = "setuptools.build_meta"
+
+[project]
+version = "2023.09.17"
+name = "manipulation"
+authors = [
+    {name = "Russ Tedrake", email = "russt@mit.edu"}
+]
+description = "MIT 6.421 - Robotic Manipulation"
+readme = "README.md"
+license = { file = "LICENSE.TXT" }
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: BSD License"
+]
+dependencies = [
+  "cloudpickle>=1.6.0",
+  "drake>=1.21.0",
+  "gradescope-utils>=0.4.0",
+  "mpld3>=0.5.1",
+  "timeout-decorator>=0.4.1"
+]
+requires-python = ">=3.8"
+
+[tool.setuptools]
+packages = ["manipulation"]
+
 [tool.black]
 line-length = 79
 include = '\.ipynb?$|\.pyi?$'
@@ -17,6 +43,7 @@ exclude = '''
   | dist
 )/
 '''
+
 [tool.isort]
 profile = "black"
 multi_line_output = 3
