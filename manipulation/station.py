@@ -71,7 +71,8 @@ class Scenario:
 
     # Simulator configuration (integrator and publisher parameters).
     simulator_config: SimulatorConfig = SimulatorConfig(
-        max_step_size=1e-3,
+        max_step_size=0.01,
+        use_error_control=False,
         accuracy=1.0e-2,
     )
 

@@ -11,7 +11,7 @@ rt_ipynb_test(
     srcs = ["pick.ipynb"],
     deps = [
       "//manipulation",
-      "//manipulation:scenarios",
+      "//manipulation:station",
     ],
 )
 
@@ -61,7 +61,7 @@ rt_ipynb_test(
     srcs = ["pseudoinverse.ipynb"],
     deps = [
       "//manipulation",
-      "//manipulation:scenarios",
+      "//manipulation:station",
     ],
 )
 

@@ -57,6 +57,6 @@ rt_ipynb_test(
         "//manipulation",
         "//manipulation/exercises:grader",
         "//manipulation/exercises/pick:test_differential_ik",
-        "//manipulation:scenarios",
+        "//manipulation:station",
     ],
 )

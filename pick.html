@@ -161,12 +161,12 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
 
     <p>Frames also have an orientation.  We'll use $R$ to denote a
     <i>rotation</i>, and follow the same notation, writing $^BR^A$ to denote
-    the rotation of frame $A$ measured from frame $B$.  Unlike vectors, pure
+    the orientation of frame $A$ measured from frame $B$.  Unlike vectors, pure
     rotations do not have an additional "expressed in" frame.</p>
 
     <p>A frame $F$ can be specified completely by a position and rotation
     measured from another frame.  Taken together, we call the position and
-    rotation a <a
+    orientation a <a
     href="https://drake.mit.edu/doxygen_cxx/group__multibody__spatial__pose.html">
     <i>spatial pose</i></a>, or just <i>pose</i>.  A <i>spatial transform</i>,
     or just <i>transform</i>, is the "verb form" of pose.  In Drake we use <a
@@ -588,8 +588,8 @@ pose = plant.EvalBodyPoseInWorld(context, gripper)</pre></code>
     velocity, but not for rotations?  Using the magnitude of an axis-angle
     representation to denote an angle is degenerate because our representation
     of angles should be periodic in $2\pi$, but using the magnitude of the
-    angular velocity is ok because angular velocities take values from $(-\inf,
-    \inf)$ without wrapping.</p>
+    angular velocity is ok because angular velocities take values from
+    $(-\infty, \infty)$ without wrapping.</p>
 
     <p>There is one more velocity to be aware of: I'll use $v$ to denote the
     generalized velocity vector of the plant, which is closely related to the
@@ -605,19 +605,21 @@ pose = plant.EvalBodyPoseInWorld(context, gripper)</pre></code>
     <example id="qdot_vs_v"><h1>Don't assume $\dot{q} \equiv v$</h1>
     
       <p>The unit quaternion representation is four components, but these must
-      form a "unit vector" of length 1.  Rotation matrices are 9 components, but
-      they must form an orthonormal matrix with $\det(R)=1$.  It's pretty great
-      that for <i>changes</i> in rotation, we can use an <i>unconstrained</i>
-      three component vector, what we've called the angular velocity vector,
-      $\omega$.  And you really should use it; getting rid of that constraint
-      makes both the math and the numerics better.</p>
+      form a "unit vector" of length 1.  Rotation matrices are 9 components,
+      but they must form an orthonormal matrix with $\det(R)=1$.  It's pretty
+      great that for the time derivative of rotation, we can use an
+      <i>unconstrained</i> three component vector, what we've called the
+      angular velocity vector, $\omega$.  And you really should use it; getting
+      rid of that constraint makes both the math and the numerics better.</p>
 
       <p>But there is one minor nuisance that this causes.  We tend to want to
       think of the generalized velocity as the time derivative of the
       generalized positions.  This works when we have only our iiwa in the
-      model, and it is welded to the world frame.  But we cannot assume this in
-      general; not when floating-base rotations are concerned.  As evidence,
-      here is a simple example that loads exactly one rigid body into the
+      model, and it is welded to the world frame, because all of the joints are
+      revolute joints with a single degree of freedom each.  But we cannot
+      assume this in general; when floating-base rotations part of the
+      generalized position. As evidence, here is a simple example that loads
+      exactly one rigid body into the
       <code>MultibodyPlant</code>, and then prints its
       <code>Context</code>.</p>
 
@@ -632,18 +634,22 @@ States:
     1 0 0 0 0 0 0 0 0 0 0 0 0
 
 plant.num_positions() = 7
-plant.num_velocities() = 6</pre></code></p>
+plant.num_velocities() = 6
+
+
+Position names: ['$world_base_link_qw', '$world_base_link_qx', '$world_base_link_qy', '$world_base_link_qz', '$world_base_link_x', '$world_base_link_y', '$world_base_link_z']
+Velocity names: ['$world_base_link_wx', '$world_base_link_wy', '$world_base_link_wz', '$world_base_link_vx', '$world_base_link_vy', '$world_base_link_vz']</pre></code></p>
 
       <p>You can see that this system has 13 total state variables.  7 of them
-      are positions, $q$; we use unit quaternions in the position vector.  But
-      we have just 6 velocities, $v$; we use angular velocities in the
-      velocity vector.  Clearly, if the length of the vectors don't even match,
-      we do <i>not</i> have $\dot{q} = v$.</p>
+      are positions, $q$, because we use unit quaternions in the position
+      vector.  But we have just 6 velocities, $v$; we use angular velocities in
+      the velocity vector.  Clearly, if the length of the vectors don't even
+      match, we do <i>not</i> have $\dot{q} = v$.</p>
 
-      <p>It's not really any harder; Drake provides the
-      <code>MultibodyPlant</code> methods <code>MapQDotToVelocity</code> and
-      <code>MapVelocityToQDot</code> to go back and forth between them.  But you
-      have to remember to use them!</p>
+      <p>It is not difficult to deal with this representational detail; Drake
+      provides the <code>MultibodyPlant</code> methods
+      <code>MapQDotToVelocity</code> and <code>MapVelocityToQDot</code> to go
+      back and forth between them.  But you have to remember to use them!</p>
 
     </example>
 
@@ -678,11 +684,10 @@ plant.num_velocities() = 6</pre></code></p>
 
   <section><h1>Differential inverse kinematics</h1>
     
-    <p>There is important structure in Eq \eqref{eq:jacobian}.  Make sure you
-    didn't miss it.  The relationship between joint velocities and end-effector
-    velocities is (configuration-dependent) linear: \begin{equation}V^G =
-    J^G(q)v.\end{equation}  Maybe this gives us what we need to produce changes
-    in gripper frame $G$?  If I have a desired gripper frame velocity $V^{G_d}$,
+    <p>The geometric Jacobian provides a linear relationship between
+    generalized velocity and spatial velocity: \begin{equation}V^G =
+    J^G(q)v.\end{equation} Can this gives us what we need to produce changes in
+    gripper frame $G$? If I have a desired gripper frame velocity $V^{G_d}$,
     then how about commanding a joint velocity $v = \left[J^G(q)\right]^{-1}
     V^{G_d}$?</p>
 
@@ -780,20 +785,21 @@ plant.num_velocities() = 6</pre></code></p>
         straight, (e.g. driving joint 2 and 4 close to zero).</p>
 
         <p>Another good way to find the singularities are to use your
-        pseudo-inverse controller to send gripper spatial velocity commands that
-        drive the gripper to the limits of the robot's workspace.  Try it and
-        see!  In fact, this is the common case, and one that we will work hard
-        to avoid.</p>
+        pseudo-inverse controller to send gripper spatial velocity commands
+        that drive the gripper to the limits of the robot's workspace.  Try it
+        and see!  In fact, this can happen easily in practice when using
+        end-effector commands, and we will work hard to avoid it.</p>
 
       </example>
 
       <p>Configurations $q$ for which $\rank(J(q_{iiwa})) < 6$ for a frame of
       interest (like our gripper frame $G$) are called <i>kinematic
-      singularities</i>.  Try to avoid going near them if you can!  The iiwa has
-      many virtues, but admittedly its kinematic workspace is not one of them.
-      Trust me, if you try to get a big Kuka to reach into a little kitchen sink
-      all day, every day, then you will spend a non-trivial amount of time
-      thinking about avoiding singularities.</p>
+      singularities</i>.  Try to avoid going near them if you are using
+      end-effector control!  The iiwa has many virtues, but admittedly its
+      kinematic workspace is not one of them. Trust me, if you try to get a big
+      Kuka to reach into a little kitchen sink all day, every day, then you
+      will spend a non-trivial amount of time thinking about avoiding
+      singularities.</p>
 
       <p>In practice, things can get a lot better if we stop bolting our robot
       base to a fixed location in the world.  Mobile bases add complexity, but
@@ -803,12 +809,15 @@ plant.num_velocities() = 6</pre></code></p>
 
         <p>A natural question when discussing singularities is whether they are
         somehow real, or whether they are somehow an artifact of the analysis.
-        Perhaps it is useful to look at an extremely simple case.</p>
+        Does the robot blow up? Does it get mechanically stuck? Or is it just
+        our math that is broken? Perhaps it is useful to look at an extremely
+        simple case.</p>
 
         <p>Imagine a two-link arm, where each link has length one.  Then the
         kinematics reduce to $$p^G = \begin{bmatrix} c_0 + c_{0+1} \\ s_0 +
         s_{0 + 1} \end{bmatrix},$$  where I've used the (very common) shorthard
-        $s_0$ for $\sin(q_0)$ and $s_{0+1}$ for $\sin(q_0+q_1)$, etc. The
+        $s_0$ for $\sin(q_0)$, $c_0$ for $\cos(q_0)$, $s_{0+1}$ for
+        $\sin(q_0+q_1),$ etc. The
         <i>translational</i> Jacobian is $$J^G(q) = \begin{bmatrix} -s_0 -
         s_{0+1} & -s_{0 + 1} \\ c_0 + c_{0 + 1} & c_{0 + 1} \end{bmatrix},$$
         and as expected, it loses rank when the arm is at full extension (e.g.
