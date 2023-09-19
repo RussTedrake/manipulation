@@ -1140,7 +1140,7 @@ plant.num_velocities() = 6</pre></code></p>
       optimization, we have a natural route to generalizing our approach to
       explicitly reason about the constraints.  The velocity constraints are the
       most straight-forward to add.  \begin{align} \min_v && \left|J^G(q)v -
-      V^{G_d}\right|^2_2, \\ \subjto && v_{min} \le v \le v_{max}. \nonumber
+      V^{G_d}\right|^2_2\,, \\ \subjto && v_{min} \le v \le v_{max}. \nonumber
       \end{align}  You can read this as "find me the joint velocities that
       achieve my desired gripper spatial velocity as closely as possible, but
       satisfy my joint velocity constraints."  The solution to this can be much
