@@ -12,10 +12,10 @@ class TestRobotPainter(unittest.TestCase):
     @weight(4)
     @timeout_decorator.timeout(1.0)
     def test_key_frames(self):
-        """compose_circualr_key_frames"""
+        """compose_circular_key_frames"""
         f = self.notebook_locals["compose_circular_key_frames"]
-        X_WC = self.notebook_locals["X_WorldCenter"]
-        X_WG = self.notebook_locals["X_WG"]
+        X_WC = self.notebook_locals["X_WCenter"]
+        X_WG = self.notebook_locals["X_WGinit"]
         radius = self.notebook_locals["radius"]
         thetas = self.notebook_locals["thetas"]
         # carry out computation
