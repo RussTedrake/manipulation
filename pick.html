@@ -946,7 +946,7 @@ Velocity names: ['$world_base_link_wx', '$world_base_link_wy', '$world_base_link
   
   </section>
 
-  <section><h1>A pick and place trajectory</h1>
+  <section id="pick_and_place_trajectory"><h1>A pick and place trajectory</h1>
   
     <p>We're getting close.  We know how to produce desired gripper poses, and
     we know how to change the gripper pose instantaneously using spatial
@@ -1545,6 +1545,20 @@ Velocity names: ['$world_base_link_wx', '$world_base_link_wy', '$world_base_link
       l_1, l_2, \theta(t)$ and $\dot\theta(t)$. </li>
     </ol>
   </exercise>
+
+  <exercise id="representing_rotations"><h1>Challenges with Representing of Rotations in 3D</h1></exercise>
+  <p>In the section on <a href="#3D_rotation">representing 3D rotations</a>, I mentioned that there is no one representation of 3D rotations that's best for everything. In this problem, you will explore some of the unexpected properties associated with a few of the most commonly used representations.</p>
+
+  <ol type="a">
+    <li><i>Roll-Pitch-Yaw:</i> One way we can represent a rotation is with a set of "roll-pitch-yaw" angles $(r,p,y)$. Refer to Drake's <a href="https://drake.mit.edu/doxygen_cxx/classdrake_1_1math_1_1_roll_pitch_yaw.html">RollPitchYaw</a> class for conventions on the ordering of these individual angle rotations into a single rotation matrix. Given that $p=-\pi/2$, compute a rotation matrix in terms of $r$ and $y$. In the resulting matrix, how does a change in $r$ compare to a change in $y$? What does this tell us about "roll-pitch-yaw" as a representation for rotations?<br /><br />
+    Hint: Try simplifying your solution using the <a href="https://en.wikipedia.org/wiki/List_of_trigonometric_identities#Angle_sum_and_difference_identities">angle sum trigonometric identities</a> $$\sin(\alpha+\beta)=\sin\alpha\cos\beta+\cos\alpha\sin\beta$$ $$\cos(\alpha+\beta)=\cos\alpha\cos\beta-\sin\alpha\sin\beta$$.</li>
+    <li><i>Axis-Angle:</i> Consider an orientation obtained by rotating a right-handed coordinate frame about its z-axis by an angle of $\pi/2$ radians. This rotation would result in the positive x-axis pointing in the direction where the positive y-axis was pointing before rotation. One way to represent this rotation is with the axis-angles vector $(0,0,\pi/2)$. (Recall that the vector describes the axis about which the rotation occurs, and its magnitude is the angle of rotation). This representation is not unique. Find two other sets of axis-angles that would give the same rotation.</li>
+    <li><i>Quaternion:</i> A unit quaternion is a set of four numbers $(w,x,y,z)$ such that $w^2+x^2+y^2+z^2=1$. Unit quaternions are an excellent way of representing orientations, since they don't suffer from singularities (unlike the roll-pitch-yaw and axis-angle representations). This makes them reliable for <a href="#pick_and_place_trajectory">interpolating orientations</a>, but unit quaternions still suffer from the "multiple representations" problem.<br /><br />
+    We can turn a unit quaternion $(w,x,y,z)$ into an axis-angle vector $(a_x,a_y,a_z)$ by computing $\theta=2\arccos(w)$, and then $$(a_x,a_y,a_z)=\left\{\begin{array}{ll} \displaystyle\frac{\theta}{\sin(\theta/2)}(x,y,z) & \theta\ne 0\\ (0,0,0) & \theta=0 \end{array}\right.$$ Show that for any unit quaternion $(w,x,y,z)$, $(-w,-x,-y,-z)$ represents the same orientation by converting to axis-angle form, and simplifying the resulting trigonometric expressions.<br /><br />
+    As it turns out, there are precisely two unit quaternions corresponding to each orientation!<br /><br />
+    Hint 1: $\arccos(-\alpha)=\pi-\arccos(\alpha)$ and $\sin(\pi-\beta)=\sin(\beta)$ for any $\alpha$ and $\beta$.<br />
+    Hint 2: Use the fact that for any angle $\theta$, $\theta\pm 2\pi$ represents the same orientation.</li>
+  </ol>
 
   </section>
 
