@@ -12,9 +12,9 @@ class TestRobotPainter(unittest.TestCase):
     @weight(4)
     @timeout_decorator.timeout(1.0)
     def test_key_frames(self):
-        """compose_circualr_key_frames"""
+        """compose_circular_key_frames"""
         f = self.notebook_locals["compose_circular_key_frames"]
-        X_WC = self.notebook_locals["X_WorldCenter"]
+        X_WC = self.notebook_locals["X_WCenter"]
         X_WG = self.notebook_locals["X_WG"]
         radius = self.notebook_locals["radius"]
         thetas = self.notebook_locals["thetas"]
@@ -29,7 +29,7 @@ class TestRobotPainter(unittest.TestCase):
                     frame_i.translation() - X_WG.translation()
                 )
                 self.assertLessEqual(
-                    dist, 1e-6, "first key frame position incorrenct!"
+                    dist, 1e-6, "first key frame position incorrect!"
                 )
             else:
                 # check if the radius is correct
@@ -38,7 +38,7 @@ class TestRobotPainter(unittest.TestCase):
                 self.assertLessEqual(
                     abs(radius - r_cur),
                     1e-6,
-                    "key frame positions incorrenct!",
+                    "key frame positions incorrect!",
                 )
 
                 # check if +z of each frame points toward the center
