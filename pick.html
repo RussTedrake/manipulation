@@ -762,12 +762,13 @@ Velocity names: ['$world_base_link_wx', '$world_base_link_wy', '$world_base_link
 
       <p>There is a simple check to understand when the pseudo-inverse can give
       an exact solution for any spatial velocity (achieving exactly the desired
-      spatial velocity): the Jacobian must be full <i>row</i>-rank.  In this
-      case, we need $\rank(J) = 6$. But assigning an integer rank to a matrix
-      doesn't tell the entire story; for a real robot with (noisy)
-      floating-point joint positions, as the matrix gets <i>close</i> to losing
-      rank, the (pseudo-)inverse starts to "blow-up".  A better metric, then,
-      is to watch the smallest <a
+      spatial velocity): the <i>rank</i> of the Jacobian must be equal to the
+      number of rows (sometimes called "full row rank").  In this case, we need
+      $\rank(J) = 6$. But assigning an integer rank to a matrix doesn't tell
+      the entire story; for a real robot with (noisy) floating-point joint
+      positions, as the matrix gets <i>close</i> to losing rank, the
+      (pseudo-)inverse starts to "blow-up".  A better metric, then, is to watch
+      the smallest <a
       href="https://en.wikipedia.org/wiki/Singular_value_decomposition">singular
       value</a>; as this approaches zero, the norm of the pseudo-inverse will
       approach infinity.</p>
@@ -1113,33 +1114,41 @@ Velocity names: ['$world_base_link_wx', '$world_base_link_wy', '$world_base_link
     <p>Since we know the limits of the iiwa, a better approach is to take these
     constraints into account at the level of our controller.  It's relatively
     straight-forward to take position, velocity, and acceleration constraints
-    into account; torques would require a full dynamics model so we won't worry
-    about them yet here.</p>
+    into account; torque constraints require a full dynamics model so we won't
+    worry about them yet here (but they <i>can</i> plug in naturally to this
+    framework).</p>
 
     <subsection><h1>Pseudo-inverse as an optimization</h1>
 
-      <p>I introduced the pseudo-inverse as having almost magical properties: it
-      returns an exact solution when one is available, or the best possible
+      <p>I introduced the pseudo-inverse as having almost magical properties:
+      it returns an exact solution when one is available, or the best possible
       solution (in the least-squares norm) when one is not.  These properties
       can all be understood by realizing that the pseudo-inverse is just the
-      optimal solution to a least-squares optimization problem: \begin{equation}
-      \min_v \left|J^G(q)v - V^{G_d}\right|^2_2. \end{equation}  When I write an
-      optimization of this form, I will refer to $v$ as the decision
-      variable(s), and I will use $v^*$ to denote the optimal solution (the
-      value of the decision variables that minimizes the cost).  Here we have
-      $$v^* = \left[ J^G(q) \right]^+V^{G_d}.$$</p>
+      optimal solution to a least-squares optimization problem:
+      \begin{equation} \min_v \left|J^G(q)v - V^{G_d}\right|^2_2.
+      \end{equation}  When I write an optimization of this form, I will refer
+      to $v$ as the decision variable(s), and I will use $v^*$ to denote the
+      optimal solution (the value of the decision variables that minimizes the
+      cost).  This particular optimization problem has a closed-form solution,
+      which just happens to be exactly what is provided by the pseudo-inverse:
+      $$v^* = \left[ J^G(q) \right]^+V^{G_d}.$$ More generally, we will expect
+      to employ numerical methods to solve optimization problems.</p>
 
       <p>Optimization is an incredibly rich topic, and we will put many tools
-      from optimization theory to use over the course of this text.  For a
-      beautiful rigorous but accessible treatment of convex optimization, I
-      highly recommend <elib>Boyd04a</elib>; it is free online and even reading
-      the first chapter can be incredibly valuable.  For a very short
-      introduction to using optimization in Drake, please take a look at the
-      tutorials on "Solving Mathematical Programs" linked from the Drake <a
-      href="http://drake.mit.edu">front page</a>.  I use the term "mathematical
-      program" almost synonymously with "optimization problem".  Mathematical
-      program is slightly more appropriate if we don't actually have an
-      objective; only constraints.</p>
+      from optimization to use over the course of this text.  For a beautiful
+      rigorous but accessible treatment of convex optimization, I highly
+      recommend <elib>Boyd04a</elib>; it is free online and even reading the
+      first chapter can be incredibly valuable.  For a very short introduction
+      to using optimization in Drake, please take a look at the
+      <script>document.write(notebook_link(
+        'tutorials',
+        d=drake_deepnote,
+        link_text='tutorials on MathematicalProgram',
+        notebook='mathematical_program',
+        workspace_id=drake_workspace_id))</script>.
+      I use the term "mathematical program" almost synonymously with
+      "optimization problem".  Mathematical program is perhaps slightly more
+      appropriate if we don't actually have an objective; only constraints.</p>
     
     </subsection>
 
@@ -1230,7 +1239,7 @@ Velocity names: ['$world_base_link_wx', '$world_base_link_wy', '$world_base_link
       <p>Denote $P(q)$ as an orthonormal basis for the kernel of a Jacobian $J$.
       Traditionally in robotics we implemented this using the pseudo-inverse: $P
       = (I - J^+J)$, but many linear algebra packages now provide methods to
-      obtain one more directly.  Adding $Pv \approx Pk(q_0 - q)$ as a secondary
+      obtain one more directly.  Adding $Pv \approx PK(q_0 - q)$ as a secondary
       objective can be accomplished with \begin{align}\min_{v_n} \quad &
       \left|J^G(q)v_n - V^{G_d}\right|^2_2 + \epsilon \left|P(q)\left(v_n -
       K(q_0 - q)\right)\right|^2_2, \\ \subjto \quad &
@@ -1247,8 +1256,8 @@ Velocity names: ['$world_base_link_wx', '$world_base_link_wy', '$world_base_link
 
       <p>There are more sophisticated methods if one wishes to establish a
       strict task prioritization in the presence of constraints (e.g.
-      <elib>Flacco15+Escande14</elib>), but for th simple prioritization we have
-      formulated here, the penalty method is quite reasonable.</p>
+      <elib>Flacco15+Escande14</elib>), but for the simple prioritization we
+      have formulated here, the penalty method is quite reasonable.</p>
 
     </subsection>
 
