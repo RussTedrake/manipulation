@@ -9,7 +9,7 @@ import numpy as np
 from IPython import get_ipython
 from pydrake.all import GetDrakePath
 from pydrake.common import GetDrakePath
-from pydrake.geometry import RenderLabel
+from pydrake.geometry.render import RenderLabel
 
 # Use a global variable here because some calls to IPython will actually case an
 # interpreter to be created.  This file needs to be imported BEFORE that
