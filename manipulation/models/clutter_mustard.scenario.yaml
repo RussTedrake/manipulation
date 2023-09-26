@@ -1,0 +1,51 @@
+
+directives:
+- add_directives:
+    file: package://manipulation/two_bins_w_cameras.dmd.yaml
+
+- add_frame:
+    name: mustard_origin
+    X_PF:
+        base_frame: world
+        rotation: !Rpy { deg: [-90.0, 0.0, -90.0 ]}
+        translation: [-0.05, -0.5, 0.09515]
+
+- add_model:
+    name: mustard
+    file: package://drake/manipulation/models/ycb/sdf/006_mustard_bottle.sdf
+
+- add_weld:
+    parent: mustard_origin
+    child: mustard::base_link_mustard
+
+# TODO(russt): re-org files to put these in two-bins.
+cameras:
+    camera0:
+        name: camera0
+        X_PB:
+            base_frame: camera0::base
+
+    camera1:
+        name: camera1
+        X_PB:
+            base_frame: camera1::base
+
+    camera2:
+        name: camera2
+        X_PB:
+            base_frame: camera2::base
+
+    camera3:
+        name: camera3
+        X_PB:
+            base_frame: camera3::base
+
+    camera4:
+        name: camera4
+        X_PB:
+            base_frame: camera4::base
+
+    camera5:
+        name: camera5
+        X_PB:
+            base_frame: camera5::base

@@ -1,4 +1,6 @@
 import dataclasses as dc
+import os
+import sys
 import typing
 
 import numpy as np
@@ -10,9 +12,14 @@ from pydrake.all import (
     ApplyMultibodyPlantConfig,
     ApplyVisualizationConfig,
     CameraConfig,
+    CameraInfo,
+    ClippingRange,
     Demultiplexer,
+    DepthRange,
+    DepthRenderCamera,
     DiagramBuilder,
     DrakeLcmParams,
+    GetScopedFrameByName,
     IiwaCommandSender,
     IiwaDriver,
     IiwaStatusReceiver,
@@ -20,6 +27,8 @@ from pydrake.all import (
     LcmPublisherSystem,
     LcmSubscriberSystem,
     MakeMultibodyStateToWsgStateSystem,
+    MakeRenderEngineVtk,
+    RenderEngineVtkParams,
     Meshcat,
     ModelDirective,
     ModelDirectives,
@@ -28,6 +37,9 @@ from pydrake.all import (
     Parser,
     PassThrough,
     ProcessModelDirectives,
+    RenderCameraCore,
+    RgbdSensor,
+    RigidTransform,
     SceneGraph,
     SchunkWsgDriver,
     SchunkWsgPositionController,
@@ -110,6 +122,7 @@ class Scenario:
     visualization: VisualizationConfig = VisualizationConfig()
 
 
+# TODO(russt): load from url (using packagemap).
 def load_scenario(*, filename=None, data=None, scenario_name=None):
     """Implements the command-line handling logic for scenario data.
     Returns a `Scenario` object loaded from the given input arguments.
@@ -321,6 +334,85 @@ def ApplyDriverConfigsSim(
         )
 
 
+# TODO(russt): Remove this in favor of the Drake version once LCM becomes
+# optional. https://github.com/RobotLocomotion/drake/issues/20055
+def ApplyCameraConfigSim(*, config, builder):
+    if not (config.rgb or config.depth):
+        return
+
+    plant = builder.GetMutableSubsystemByName("plant")
+    scene_graph = builder.GetMutableSubsystemByName("scene_graph")
+
+    if sys.platform == "linux" and os.getenv("DISPLAY") is None:
+        from pyvirtualdisplay import Display
+
+        virtual_display = Display(visible=0, size=(1400, 900))
+        virtual_display.start()
+
+    if not scene_graph.HasRenderer(config.renderer_name):
+        scene_graph.AddRenderer(
+            config.renderer_name, MakeRenderEngineVtk(RenderEngineVtkParams())
+        )
+
+    # frame names in local variables:
+    # P for parent frame, B for body frame, C for camera frame.
+
+    # Extract the camera extrinsics from the config struct.
+    P = (
+        GetScopedFrameByName(plant, config.X_PB.base_frame)
+        if config.X_PB.base_frame
+        else plant.world_frame()
+    )
+    X_PC = config.X_PB.GetDeterministicValue()
+
+    # convert mbp frame to geometry frame
+    body = P.body()
+    body_frame_id = plant.GetBodyFrameIdIfExists(body.index())
+    # assert body_frame_id.has_value()
+
+    X_BP = P.GetFixedPoseInBodyFrame()
+    X_BC = X_BP @ X_PC
+
+    # Extract camera intrinsics from the config struct.
+    color_camera, depth_camera = config.MakeCameras()
+
+    # Add the sensor system. I'm mostly ignoring configuration options here,
+    # since the parsing methods are buried in C++.
+    depth_camera = DepthRenderCamera(
+        RenderCameraCore(
+            config.renderer_name,
+            CameraInfo(width=640, height=480, fov_y=np.pi / 4.0),
+            ClippingRange(near=0.1, far=10.0),
+            RigidTransform(),
+        ),
+        DepthRange(0.1, 10.0),
+    )
+
+    camera_sys = builder.AddSystem(
+        RgbdSensor(
+            parent_id=body_frame_id,
+            X_PB=X_BC,
+            depth_camera=depth_camera,
+            show_window=False,
+        )
+    )
+    camera_sys.set_name(f"rgbd_sensor_{config.name}")
+    builder.Connect(
+        scene_graph.get_query_output_port(), camera_sys.get_input_port()
+    )
+
+    # TODO(russt): export output ports
+    builder.ExportOutput(
+        camera_sys.color_image_output_port(), f"{config.name}.rgb_image"
+    )
+    builder.ExportOutput(
+        camera_sys.depth_image_32F_output_port(), f"{config.name}.depth_image"
+    )
+    builder.ExportOutput(
+        camera_sys.label_image_output_port(), f"{config.name}.label_image"
+    )
+
+
 def MakeHardwareStation(
     scenario: Scenario,
     meshcat: Meshcat = None,
@@ -378,7 +470,9 @@ def MakeHardwareStation(
         builder=builder,
     )
 
-    # TODO(russt): Add scene cameras. https://github.com/RobotLocomotion/drake/issues/20055
+    # Add scene cameras.
+    for _, camera in scenario.cameras.items():
+        ApplyCameraConfigSim(config=camera, builder=builder)
 
     # Add visualization.
     ApplyVisualizationConfig(scenario.visualization, builder, meshcat=meshcat)
