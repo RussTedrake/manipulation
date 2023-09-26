@@ -1315,8 +1315,8 @@ output_ports:
     <exercise><h1>How many points do you need?</h1>
     
       <p>Consider the problem of point cloud registration with known
-      correspondences.  Points can be mapped back to a model of the original object to 
-      specify its position and orientation in the scene.  In most cases, we have far more points 
+      correspondences.  Scene points can be mapped to corresponding model points to 
+      specify the position and orientation of an object in the scene.  In most cases, we have far more points 
       than we have decision variables of the object's pose.  Therefore, treating each point 
       correspondence as an equality constraint would make the problem over-constrained.  
       This raises a natural question: 
@@ -1327,6 +1327,8 @@ output_ports:
           <li>What is the minimum number of points required to uniquely
       specify the pose of an object in 3D?  Provide a brief mathematical justification.</li>   
       </ol></p>
+
+      (HINT: How might your answers change if correspondences were unknown?)
 
       <!-- 2 points is sufficient in 2D.  3 in 3D.  The disconnect to our
       intuition (e.g. how many points required to specify a plane), is because
