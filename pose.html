@@ -161,8 +161,9 @@ output_ports:
       Drake actually supports multiple <a
       href="https://drake.mit.edu/doxygen_cxx/group__render__engines.html">rendering
       engines</a>; for the purposes of this class we will primarily use an
-      Vtk-based renderer that is suitable for real-time simulation. Drake can
-      also connect to high-end <a
+      OpenGL-based renderer (built on <a href="https://vtk.org/">VTK</a>) that
+      is suitable for real-time simulation. Drake can also connect to high-end
+      <a
       href="https://en.wikipedia.org/wiki/Physically_based_rendering">physically-based
       rendering (PBR)</a> engines which use ray tracing, such as the <a
       href="https://www.blender.org/features/rendering/">Cycles renderer
@@ -441,8 +442,8 @@ output_ports:
 
     <p>As a result, the point-cloud registration problem is simply an (inverse)
     kinematics problem.  We can write the model points and the scene points in a
-    common frame (here the world frame), $$p^{m_{c_i}} = X^O \: {}^Op^{m_{c_i}}
-    = X^C \: {}^Cp^{s_i},$$ leaving a single unknown transform, $X^O$, for which
+    common frame (here the world frame), $${}^W p^{m_{c_i}} = {}^W X^O \: {}^Op^{m_{c_i}}
+    = {}^W X^C \: {}^Cp^{s_i},$$ leaving a single unknown transform, $X^O$, for which
     we must solve.  In the previous chapter I argued for using differential
     kinematics instead of inverse kinematics; why is my story different here?
     Differential kinematics can still be useful for perception, for example if
