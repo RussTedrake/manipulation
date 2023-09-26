@@ -69,18 +69,24 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
   they will also form a baseline for the more sophisticated methods we will
   study.</p>
 
-  <p>The approach that we'll take here is very geometric.  This is in contrast
-  to, and very complimentary with, approaches that are more fundamentally driven
-  by data.  There is no question that deep learning has had an enormous impact
-  in perception -- it's fair to say that it has enabled the current surge in
-  manipulation advances -- and we will certainly cover it in these notes.  But
-  when I've heard colleagues say that "all perception these days is based on
-  deep learning", I can't help but cry foul.  There has been another surge of
-  progress in the last few years that has been happening in parallel: the
-  revolution in geometric reasoning, fueled by applications in autonomous
-  driving and virtual/augmented reality in addition to manipulation.  Most
-  advanced manipulation systems these days combine both "deep perception" and
-  "geometric perception".</p>
+  <p>The approach that we'll take in this chapter is based on geometry. Not all
+  perception systems these days use geometry explicitly; many deep learning
+  approaches learn more direct maps from pixels. But many deep learning
+  approaches <i>do</i> build heavily on geometry, and indeed the last few years
+  have also brought a revolution in geometry processing (dense reconstruction,
+  text to 3D, etc.). Some of this was fueled initially by applications in
+  autonomous driving and virtual/augmented reality in addition to manipulation,
+  which brought advanced sensors and fantastic new algorithms.
+  </p>
+
+  <p>So we will start with geometry because it can provide a solid foundation
+  for our explorations in perception. I must state one caveat -- we will use
+  "pose estimation" as our goal for this chapter because it is concrete and
+  immediately useful. But I would say that I try <i>not</i> to use explicit
+  pose estimation as a concept in our most advanced manipulation systems; in
+  addition to assuming known objects, accurately estimating the pose of an
+  object can be difficult (due to partial views and/or occlusions) and it is
+  often more than we actually need to achieve our manipulation goals.</p>
 
   <section><h1>Cameras and depth sensors</h1>
   
@@ -108,8 +114,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
     image at some framerate, play an important role.  But robotics makes heavy
     use of sensors that make an explicit measurement of the distance (between
     the camera and the world) or depth; sometimes in addition to color and
-    sometimes in lieu of color.  Admittedly, some researchers think we should
-    only rely on color images.</p>
+    sometimes in lieu of color.</p>
 
     <subsection><h1>Depth sensors</h1>
     
@@ -153,16 +158,19 @@ output_ports:
       <p>The signals and systems abstraction here is encapsulating a lot of
       complexity.  Inside the implementation of that system is a complete
       rendering engine, like one that you will find in high-end computer games.
-      Drake actually supports multiple rendering engines; for the purposes of
-      this class we will primarily use an OpenGL-based renderer that is suitable
-      for real-time simulation.  In our research we also use Drake's rendering
-      API to connect to high-end <a
+      Drake actually supports multiple <a
+      href="https://drake.mit.edu/doxygen_cxx/group__render__engines.html">rendering
+      engines</a>; for the purposes of this class we will primarily use an
+      Vtk-based renderer that is suitable for real-time simulation. Drake can
+      also connect to high-end <a
       href="https://en.wikipedia.org/wiki/Physically_based_rendering">physically-based
-      rendering (PBR)</a> based on ray tracing, such as the <a
+      rendering (PBR)</a> engines which use ray tracing, such as the <a
       href="https://www.blender.org/features/rendering/">Cycles renderer
-      provided by Blender</a>.  These are most useful when we are trying to
-      render higher quality images e.g. to <i>train</i> a deep perception
-      system; we will discuss them in the deep perception chapters.</p>
+      provided by Blender</a> (see the <a
+      href="https://github.com/RobotLocomotion/drake-blender">Drake-Blender
+      project</a>). These are potentially useful for rendering higher quality
+      images e.g. to <i>train</i> a deep perception system or make a beautiful
+      presentation.</p>
 
       <example class="drake"><h1>Simulating an RGB-D camera</h1>
 
@@ -192,22 +200,25 @@ output_ports:
 
       </example>
     
-      <p>In the <code>HardwareStation</code> diagram of the entire robot
-      system for class, the <code>RgbdSensors</code> have already been added,
-      and their output ports exposed as outputs for the station.</p>
+      <p>In the <code>HardwareStation</code> workflow, if cameras are declared
+      in the scenario data (e.g. Yaml description), then the
+      <code>RgbdSensors</code> are added automatically inside the
+      <code>HardwareStation</code> diagram, and their output ports exposed as
+      outputs (in order to match the true interface that we have with the
+      hardware).</p>
 
       <subsection><h1>Sensor noise and depth dropouts</h1>
 
         <p>Real depth sensors, of course, are far from ideal -- and errors in
-        depth returns are not simple Gaussian noise, but rather are dependent on
-        the lighting conditions, the surface normals of the object, and the
-        visual material properties of the object, among other things.  The color
-        channels are an approximation, too.  Even our high-end renderers can
-        only do as well as the geometries, materials and lighting sources that
-        we add to our scene, and it is very hard to capture all of the nuances
-        of a real environment.  We will examine real sensor data, and the gaps
-        between modeled sensors and real sensors, after we start understanding
-        some of the basic operations.</p>
+        depth returns are not simple Gaussian noise, but rather are dependent
+        on the lighting conditions, the surface normals of the object, and the
+        visual material properties of the object, among other things.  The
+        color channels are an approximation, too.  Even our high-end renderers
+        can only do well if we add sufficiently accurate geometries, materials
+        and lighting sources to our scene, and it is very hard to capture all
+        of the nuances of a real environment.  We will examine real sensor
+        data, and the gaps between modeled sensors and real sensors, after we
+        start understanding some of the basic operations.</p>
 
         <figure><img style="width:95%"
         src="data/Sweeney18a_fig3.png"/><figcaption>Real depth sensors are
@@ -257,10 +268,11 @@ output_ports:
     convert between these representations; though sometimes that conversion can
     be lossy. Examples include triangulated surface meshes and tetrahedral
     volumetric meshes, voxel/occupancy grids, and implicit representations of
-    geometry like the signed distance fields, which have become very popular
-    again recently as representations in deep learning for 3D
-    vision<elib>Park19+Mildenhall21</elib>. But the representations that we
-    will start with here are <i>depth images</i> and <i>point clouds</i>.</p>
+    geometry like the signed distance functions and Neural Radiance Fields
+    (NeRFs), which have become very popular again recently as representations
+    in deep learning for 3D vision<elib>Park19+Mildenhall21</elib>. But the
+    representations that we will start with here are <i>depth images</i> and
+    <i>point clouds</i>.</p>
 
     <p>The data returned by a depth camera takes the form of an image, where
     each pixel value is a single number that represents the distance between the
@@ -394,28 +406,31 @@ output_ports:
     <i>model points</i>, $m_i$, with their pose described in the object frame:
     $^OX^{m_i}.$ </p>
 
+    <todo>The hypothes.is comment is right, I should add a diagram w/ model and scene points.</todo>
+
     <p>Our second point cloud will be the <i>scene points</i>, $s_i$, that we
     obtain from our depth camera, transformed (via the camera intrinsics) into
     the camera coordinates, $^CX^{s_i}$.  I'll use $N_m$ and $N_s$ for the
     number of model and scene points, respectively.</p>  
       
     <p>Let us assume, for now, that we also know $X^C.$  Is this reasonable? In
-    the case of a wrist-mounted camera, this would amount to solving the forward
-    kinematics of the arm.  In an environment-mounted camera, this is about
-    knowing the pose of the cameras in the world.  Small errors in estimating
-    those poses, though, can lead to large artifacts in the estimated point
-    clouds.  We therefore take great care to perform <a
-    href="station.html">camera extrinsics calibration</a>; I've linked to our
-    calibration code in the <a href="station.html">appendix</a>.  Note that if
-    you have a mobile manipulation platform (an arm mounted on a moving base),
-    then all of these discussions still apply, but you likely will perform all
-    of your registration in the robot's frame instead of the world frame.</p>
+    the case of a wrist-mounted camera, this would amount to solving the
+    forward kinematics of the arm.  In an environment-mounted camera, this is
+    about knowing the pose of the cameras in the world.  Small errors in
+    estimating those poses, though, can lead to large artifacts in the
+    estimated point clouds.  We therefore take great care to perform <a
+    href="https://www.mathworks.com/help/vision/ug/camera-calibration.html">camera
+    extrinsics calibration</a>; I've linked to our calibration code in the <a
+    href="station.html">appendix</a>.  Note that if you have a mobile
+    manipulation platform (an arm mounted on a moving base), then all of these
+    discussions still apply, but you likely will perform all of your
+    registration in the robot's frame instead of the world frame.</p>
 
     <p>The second <b>major assumption</b> that we will make in this section is
-    "known correspondences". When I say "correspondence" here, I mean here that
-    for each point in the scene point cloud, we can identify it with a specific
+    "known correspondences". When I say "correspondence" here, I mean that for
+    each point in the scene point cloud, we can pair it with a specific
     point in the model point cloud; for instance, this might be the case if
-    each point had a unique color that we could perceive reliable through the
+    each point had a unique color that we could perceive reliably through the
     camera. This is <i>not</i> a reasonable assumption in practice, but it
     helps us get started.  To represent this mapping in our equations, I'll use
     a correspondence vector $c \in [1,N_m]^{N_s}$, where $c_i = j$ denotes that
@@ -424,7 +439,7 @@ output_ports:
     corresponds to some model point, but the converse is not true, and multiple
     scene points may correspond to the same model point.</p>
 
-    <p>As a result, the point cloud registration problem is simply an (inverse)
+    <p>As a result, the point-cloud registration problem is simply an (inverse)
     kinematics problem.  We can write the model points and the scene points in a
     common frame (here the world frame), $$p^{m_{c_i}} = X^O \: {}^Op^{m_{c_i}}
     = X^C \: {}^Cp^{s_i},$$ leaving a single unknown transform, $X^O$, for which
@@ -510,8 +525,8 @@ output_ports:
       <p>In the case with no noise in the measurements (e.g. the scene points
       are exactly the model points modified by a rotation matrix), then the
       minimum of the objective function already satisfies the constraint.  But
-      if you add just a little noise to the points, then this is no longer true,
-      and the constraint starts to play an important role.</p>
+      if you add just a little noise to the points, then this is no longer
+      true, and the constraint starts to play an important role.</p>
     </example>
 
     <p>The geometry should be roughly the same in 3D, though clearly in much
