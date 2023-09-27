@@ -1,0 +1,68 @@
+Clutter: &Clutter
+  directives: &ClutterDirectives
+  - add_directives:
+    file: package://manipulation/iiwa_and_wsg.dmd.yaml
+  - add_directives:
+    file: package://manipulation/two_bins_w_cameras.dmd.yaml
+
+  cameras:
+    camera0:
+      name: camera0
+      depth: True
+      X_PB:
+        base_frame: camera0::base
+
+    camera1:
+      name: camera1
+      depth: True
+      X_PB:
+        base_frame: camera1::base
+
+    camera2:
+      name: camera2
+      depth: True
+      X_PB:
+        base_frame: camera2::base
+
+    camera3:
+      name: camera3
+      depth: True
+      X_PB:
+        base_frame: camera3::base
+
+    camera4:
+      name: camera4
+      depth: True
+      X_PB:
+        base_frame: camera4::base
+
+    camera5:
+      name: camera5
+      depth: True
+      X_PB:
+        base_frame: camera5::base
+
+  model_drivers:
+      iiwa: !IiwaDriver
+        hand_model_name: wsg
+      wsg: !SchunkWsgDriver {}
+
+Mustard:
+  <<: *Clutter
+  directives:
+  - add_directives:
+      file: package://manipulation/iiwa_and_wsg.dmd.yaml
+  - add_directives:
+      file: package://manipulation/two_bins_w_cameras.dmd.yaml
+  - add_model:
+      name: mustard
+      file: package://manipulation/hydro/006_mustard_bottle.sdf
+      default_free_body_pose:
+          base_link_mustard:
+            # In Bin 1
+            #rotation: !Rpy { deg: [-90.0, 0.0, -90.0 ]}
+            #translation: [-0.05, -0.5, 0.09515]
+            # In Bin 2
+            translation: [0.55, 0.1, 0]
+            rotation: !Rpy { deg: [0, 0, 45]}
+

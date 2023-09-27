@@ -6,17 +6,18 @@ import typing
 import numpy as np
 
 from pydrake.all import (
+    AbstractValue,
     Adder,
     AddMultibodyPlant,
     ApplyLcmBusConfig,
     ApplyMultibodyPlantConfig,
     ApplyVisualizationConfig,
+    BaseField,
     CameraConfig,
     CameraInfo,
-    ClippingRange,
     Demultiplexer,
-    DepthRange,
-    DepthRenderCamera,
+    DepthImageToPointCloud,
+    Diagram,
     DiagramBuilder,
     DrakeLcmParams,
     GetScopedFrameByName,
@@ -24,20 +25,22 @@ from pydrake.all import (
     IiwaDriver,
     IiwaStatusReceiver,
     InverseDynamicsController,
+    LeafSystem,
     LcmPublisherSystem,
     LcmSubscriberSystem,
     MakeMultibodyStateToWsgStateSystem,
     MakeRenderEngineVtk,
     RenderEngineVtkParams,
     Meshcat,
+    MeshcatPointCloudVisualizer,
     ModelDirective,
     ModelDirectives,
     MultibodyPlant,
     MultibodyPlantConfig,
+    OutputPort,
     Parser,
     PassThrough,
     ProcessModelDirectives,
-    RenderCameraCore,
     RgbdSensor,
     RigidTransform,
     SceneGraph,
@@ -355,7 +358,7 @@ def ApplyCameraConfigSim(*, config, builder):
         )
 
     # frame names in local variables:
-    # P for parent frame, B for body frame, C for camera frame.
+    # P for parent frame, B for base frame, C for camera frame.
 
     # Extract the camera extrinsics from the config struct.
     P = (
@@ -375,18 +378,6 @@ def ApplyCameraConfigSim(*, config, builder):
 
     # Extract camera intrinsics from the config struct.
     color_camera, depth_camera = config.MakeCameras()
-
-    # Add the sensor system. I'm mostly ignoring configuration options here,
-    # since the parsing methods are buried in C++.
-    depth_camera = DepthRenderCamera(
-        RenderCameraCore(
-            config.renderer_name,
-            CameraInfo(width=640, height=480, fov_y=np.pi / 4.0),
-            ClippingRange(near=0.1, far=10.0),
-            RigidTransform(),
-        ),
-        DepthRange(0.1, 10.0),
-    )
 
     camera_sys = builder.AddSystem(
         RgbdSensor(
@@ -718,3 +709,127 @@ def MakeHardwareStationInterface(
     diagram = builder.Build()
     diagram.set_name("HardwareStationInterface")
     return diagram
+
+
+class ExtractPose(LeafSystem):
+    def __init__(
+        self, body_poses_output_port, body_index, X_BA=RigidTransform()
+    ):
+        LeafSystem.__init__(self)
+        self.body_index = body_index
+        self.DeclareAbstractInputPort(
+            "poses",
+            body_poses_output_port.Allocate(),
+        )
+        self.DeclareAbstractOutputPort(
+            "pose",
+            lambda: AbstractValue.Make(RigidTransform()),
+            self.CalcOutput,
+        )
+        self.X_BA = X_BA
+
+    def CalcOutput(self, context, output):
+        poses = self.EvalAbstractInput(context, 0).get_value()
+        pose = poses[int(self.body_index)] @ self.X_BA
+        output.get_mutable_value().set(pose.rotation(), pose.translation())
+
+
+def AddPointClouds(
+    *, scenario : Scenario, station : Diagram, builder : DiagramBuilder, poses_output_port : OutputPort=None, meshcat : Meshcat =None
+):
+    """
+    Adds one DepthImageToPointCloud system to the `builder` for each camera in `scenario`, and connects it to the respective camera station output ports.
+
+    Args:
+        scenario: A Scenario structure, populated using the `load_scenario` method.
+
+        station: A HardwareStation system (e.g. from MakeHardwareStation) that has already been added to `builder`.
+
+        builder: The DiagramBuilder containing `station` into which the new systems will be added.
+
+        poses_output_port: (optional) HardwareStation will have a body_poses output port iff it was created with `hardware=False`. Alternatively, one could create a MultibodyPositionsToGeometryPoses system to consume the position measurements; this optional input can be used to support that workflow.
+
+        meshcat: If not None, then a MeshcatPointCloudVisualizer will be added to the builder using this meshcat instance.
+    """
+    to_point_cloud = []
+    for _, config in scenario.cameras.items():
+        if not config.depth:
+            return
+
+        plant = station.GetSubsystemByName("plant")
+        # frame names in local variables:
+        # P for parent frame, B for base frame, C for camera frame.
+
+        # Extract the camera extrinsics from the config struct.
+        P = (
+            GetScopedFrameByName(plant, config.X_PB.base_frame)
+            if config.X_PB.base_frame
+            else plant.world_frame()
+        )
+        X_PC = config.X_PB.GetDeterministicValue()
+
+        # convert mbp frame to geometry frame
+        body = P.body()
+        plant.GetBodyFrameIdIfExists(body.index())
+        # assert body_frame_id.has_value()
+
+        X_BP = P.GetFixedPoseInBodyFrame()
+        X_BC = X_BP @ X_PC
+
+        intrinsics = CameraInfo(
+            config.width,
+            config.height,
+            config.focal_x(),
+            config.focal_y(),
+            config.principal_point()[0],
+            config.principal_point()[1],
+        )
+
+        to_point_cloud.append(
+            builder.AddSystem(
+                DepthImageToPointCloud(
+                    camera_info=intrinsics,
+                    fields=BaseField.kXYZs | BaseField.kRGBs,
+                )
+            )
+        )
+        to_point_cloud[-1].set_name(f"{config.name}.point_cloud")
+
+        builder.Connect(
+            station.GetOutputPort(f"{config.name}.depth_image"),
+            to_point_cloud[-1].depth_image_input_port(),
+        )
+        builder.Connect(
+            station.GetOutputPort(f"{config.name}.rgb_image"),
+            to_point_cloud[-1].color_image_input_port(),
+        )
+
+        if poses_output_port is None:
+            # Note: this is a cheat port; it will only work in single process
+            # mode.
+            poses_output_port = station.GetOutputPort("body_poses")
+
+        camera_pose = builder.AddSystem(
+            ExtractPose(poses_output_port, body.index(), X_BC)
+        )
+        camera_pose.set_name(f"{config.name}.pose")
+        builder.Connect(
+            poses_output_port,
+            camera_pose.get_input_port(),
+        )
+        builder.Connect(
+            camera_pose.get_output_port(),
+            to_point_cloud[-1].GetInputPort("camera_pose"),
+        )
+
+        if meshcat:
+            # Send the point cloud to meshcat for visualization, too.
+            point_cloud_visualizer = builder.AddSystem(
+                MeshcatPointCloudVisualizer(meshcat, f"{config.name}.cloud")
+            )
+            builder.Connect(
+                to_point_cloud[-1].point_cloud_output_port(),
+                point_cloud_visualizer.cloud_input_port(),
+            )
+
+    return to_point_cloud

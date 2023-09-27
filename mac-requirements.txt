@@ -163,10 +163,6 @@ ptyprocess==0.7.0
     # via pexpect
 pure-eval==0.2.2
     # via stack-data
-pycodestyle==2.6.0
-    # via -r htmlbook/mac-requirements.in
-pydocstyle==5.1.1
-    # via -r htmlbook/mac-requirements.in
 pyflakes==3.0.1
     # via autoflake
 pygments==2.8.1
@@ -195,8 +191,10 @@ requests==2.25.1
     # via
     #   -r htmlbook/mac-requirements.in
     #   -r mac-requirements.in
-scipy==1.10.0
-    # via -r mac-requirements.in
+scipy==1.11.2
+    # via
+    #   -c htmlbook/mac-constraints.txt
+    #   -r mac-requirements.in
 six==1.15.0
     # via
     #   bleach
@@ -204,8 +202,6 @@ six==1.15.0
     #   jsonschema
     #   protobuf
     #   python-dateutil
-snowballstemmer==2.1.0
-    # via pydocstyle
 soupsieve==2.2
     # via beautifulsoup4
 stable-baselines3==1.8.0
