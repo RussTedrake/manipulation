@@ -11,6 +11,7 @@ filegroup(
         "**/*.urdf",
         "**/*.yaml",
         "**/*.xml",
+        "**/*.obj",
     ]),
     visibility = ["//visibility:public"],
 )

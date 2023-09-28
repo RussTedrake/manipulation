@@ -36,6 +36,7 @@ rt_ipynb_test(
         "//manipulation",
         "//manipulation:icp",
         "//manipulation:scenarios",
+        "//manipulation:station",
         "//manipulation/exercises:grader",
         "//manipulation/exercises/pose:test_pose_estimation",
     ],

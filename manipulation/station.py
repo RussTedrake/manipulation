@@ -126,7 +126,9 @@ class Scenario:
 
 
 # TODO(russt): load from url (using packagemap).
-def load_scenario(*, filename=None, data=None, scenario_name=None):
+def load_scenario(
+    *, filename=None, data=None, scenario_name=None, defaults=Scenario()
+):
     """Implements the command-line handling logic for scenario data.
     Returns a `Scenario` object loaded from the given input arguments.
 
@@ -140,16 +142,23 @@ def load_scenario(*, filename=None, data=None, scenario_name=None):
         scenario_name (optional): The name of the scenario/child to load from
             the yaml file. If None, then the entire file is loaded.
     """
-    result = Scenario()
+    result = defaults
     if filename:
         result = yaml_load_typed(
             schema=Scenario,
             filename=filename,
             child_name=scenario_name,
             defaults=result,
+            retain_map_defaults=True,
         )
     if data:
-        result = yaml_load_typed(schema=Scenario, data=data, defaults=result)
+        result = yaml_load_typed(
+            schema=Scenario,
+            data=data,
+            child_name=scenario_name,
+            defaults=result,
+            retain_map_defaults=True,
+        )
     return result
 
 
@@ -479,7 +488,7 @@ def MakeHardwareStation(
     builder.ExportOutput(sim_plant.get_body_poses_output_port(), "body_poses")
 
     diagram = builder.Build()
-    diagram.set_name("HardwareStation")
+    diagram.set_name("station")
     return diagram
 
 
@@ -735,7 +744,12 @@ class ExtractPose(LeafSystem):
 
 
 def AddPointClouds(
-    *, scenario : Scenario, station : Diagram, builder : DiagramBuilder, poses_output_port : OutputPort=None, meshcat : Meshcat =None
+    *,
+    scenario: Scenario,
+    station: Diagram,
+    builder: DiagramBuilder,
+    poses_output_port: OutputPort = None,
+    meshcat: Meshcat = None,
 ):
     """
     Adds one DepthImageToPointCloud system to the `builder` for each camera in `scenario`, and connects it to the respective camera station output ports.

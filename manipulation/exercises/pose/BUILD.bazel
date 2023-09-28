@@ -9,7 +9,6 @@ load("//htmlbook/tools/python:defs.bzl", "rt_py_library")
 rt_py_library(
     name = "test_pose_estimation",
     srcs = ["test_pose_estimation.py"],
-    data = ["pcl_filtered.npy"],
     visibility = ["//visibility:public"],
     deps = ["//manipulation"],
 )

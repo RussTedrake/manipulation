@@ -4,7 +4,8 @@ recursive-include manipulation *.npy
 recursive-include manipulation *.sdf
 recursive-include manipulation *.urdf
 recursive-include manipulation *.xml
-recursive-include manipulation *.yaml 
+recursive-include manipulation *.yaml
+recursive-include manipulation *.obj
 
 # Exclude specific files and directories
 exclude *.egg-info/**
