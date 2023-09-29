@@ -21,6 +21,7 @@
     "foundation_models"
   ],
   "other_potential_chapters": [ 
+    "imitation learning / behavior cloning",
     "(learned) visual representations (autoencoders, dense descriptors, tcc, etc)",
     "underactuated (maybe dexterous?)",
     "belief-space planning (draft in underactuated)",
