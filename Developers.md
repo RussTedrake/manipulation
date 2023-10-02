@@ -45,6 +45,11 @@ If you would like to `bazel` to use a local installation of drake, you can set
 the `DRAKE_INSTALL_DIR` environment variable. Otherwise it will look in
 `/opt/drake`.
 
+You might need to install [tidy](https://www.html-tidy.org/):
+```bash
+sudo apt install tidy
+```
+
 
 ## To update the pip wheels
 
