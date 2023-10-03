@@ -221,8 +221,8 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       \left[f^{B_p}_{\text{name}}\right]_C \end{bmatrix}.\end{equation}
       $F^{B_p}_{\text{name},C}$ is the named spatial force applied to a point,
       or frame origin, $B_p$, expressed in frame $C$. The form with the
-      parentheses is preferred in Drake, but is a verbose for my taste here in
-      the notes.  The name is optional, and the expressed in frame, if
+      parentheses is preferred in Drake, but is a bit too verbose for my taste
+      here in the notes.  The name is optional, and the expressed in frame, if
       unspecified, is the world frame. For forces in particular, it is
       recommended that we include the body, $B$, that the force is being
       applied to in the symbol for the point $B_p$, especially since we will
@@ -244,7 +244,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       as a force
       <i>and</i> a torque applied at a different point on the body.</p>
 
-      <p>Spatial forces fit neatly into our spatial algebra:
+      <p id="spatial_force_algebra">Spatial forces fit neatly into our spatial algebra:
       <ul>
         <li>Spatial forces add when they are applied to the same body in the
         same frame, e.g.: \begin{equation}F^{B_p}_{\text{total},C}
@@ -603,7 +603,20 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
 
   </section>
 
+  <section><h1>Contact simulation</h1>
 
+    <p>Static equilibrium problems provide a nice view into a few of the
+    complexities of contact simulation. But things get a lot more interesting
+    when the robot and/or objects in the scene start moving!</p>
+
+    <p>More coming soon!</p>
+    
+    <todo>Why is multibody plant discrete time?</todo>
+    <todo>Stiff differential equations / choosing your time step</todo>
+    <todo>What makes a fast simulator?</todo>
+
+    <todo>Call out to Drake's soft sim.</todo>
+  </section>
 
   <section><h1>Model-based grasp selection</h1>
 
