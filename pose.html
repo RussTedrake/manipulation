@@ -1581,9 +1581,9 @@ output_ports:
 
   <exercise id="sdf"><h1>Composing Signed Distance Functions (SDFs)</h1>
 
-    <p>In this problem we will explore signed distance functions and their composition! As a reminder, the signed distance function of a set gives the minimum distance of a point p to the boundary of that set, where the sign of the value is based on whether the point p is inside or outside the boundary. Points that are on the interior of the boundary are negative. and points that are on the exterior of the boundary are positive.</p>
+    <p>In this problem we will explore signed distance functions and their composition! As a reminder, the signed distance function of a set gives the minimum distance of a point $p$ to the boundary of that set, where the sign of the value is based on whether the point $p$ is inside or outside the boundary. Points that are on the interior of the boundary are negative. and points that are on the exterior of the boundary are positive.</p>
 
-       <p>For a 2D example, consider the green box visualized below. The center of the box, at the origin, has a signed distance value of -1, since it is distance one from any of the edges of the box and it lies on the interior of the box. Points along the perimeter of the box have a signed distance value of 0. Any points outside the box have a signed distance value of +d where d is the smallest distance between that bound and the perimeter of the box.</p>
+       <p>For a 2D example, consider the green box visualized below. The center of the box, at the origin, has a signed distance value of -1, since it is distance one from any of the edges of the box and it lies on the interior of the box. Points along the perimeter of the box have a signed distance value of 0. Any points outside the box have a signed distance value of $+d$ where $d$ is the smallest distance between that point and the perimeter of the box.</p>
 
     <figure>
       <img style="width:25%", src="figures/exercises/sdf_box.png"/>
@@ -1596,13 +1596,13 @@ output_ports:
     </figure>
 
     <ol type="a">
-      <li> First, lets consider a new region defined as the union of red object and the blue object. Let $\phi_{r \cup b}(p)$ be the signed distance value of a point p to this new boundary. Compute: $\phi_{r \cup b}(p_{0}), \phi_{r \cup b}(p_{1}), \phi_{r \cup b}(p_{2})$. </li>
+      <li> First, lets consider a new region defined as the union of red object and the blue object. Let $\phi_{r \cup b}(p)$ be the signed distance value of a point $p$ to this new boundary. Compute: $\phi_{r \cup b}(p_{0}), \phi_{r \cup b}(p_{1}), \phi_{r \cup b}(p_{2})$. </li>
 
-      <li> Next, lets consider a new region defined as the intersection of the red object and the blue object (hence the purple object). Let $\phi_{r \cap b}(p)$ be the signed distance value of a point p to this new boundary. Compute: $\phi_{r \cap b}(p_{0}), \phi_{r \cap b}(p_{1}), \phi_{r \cap b}(p_{2})$. </li>
+      <li> Next, lets consider a new region defined as the intersection of the red object and the blue object (hence the purple object). Let $\phi_{r \cap b}(p)$ be the signed distance value of a point $p$ to this new boundary. Compute: $\phi_{r \cap b}(p_{0}), \phi_{r \cap b}(p_{1}), \phi_{r \cap b}(p_{2})$. </li>
 
-      <li> Using your experience from part (a), write an expression for computing the signed distance value for any point p in our 2D space to the <b>union</b> of the red and blue objects. Your expression should be in terms of $\phi_r(p)$ and $\phi_b(p)$. We encourage you to think in terms of cases based on what region the point is in. HINT: Write a case statement that cases on the 4 regions, then try to reduce it to 2 cases with a clean math expression.</li>
+      <li> Using your experience from part (a), write an expression for computing the signed distance value for any point $p$ in our 2D space to the <b>union</b> of the red and blue objects. Your expression should be in terms of $\phi_r(p)$ and $\phi_b(p)$. We encourage you to think in terms of cases based on what region the point is in. HINT: Write a case statement that cases on the 4 regions, then try to reduce it to 2 cases with a clean math expression.</li>
 
-      <li> Using your experience from part (b), write an analogous expression for computing the signed distance value to the <b>intersection</b> of the red and blue objects (i.e. the purple region). Your expression should be in terms of $\phi_r(p)$ and $\phi_b(p)$, and it can be written considering only 2 cases.</li>
+      <li> Using your experience from part (b), write an analogous expression for computing the signed distance value for any point $p$ to the <b>intersection</b> of the red and blue objects (i.e. the purple region). Your expression should be in terms of $\phi_r(p)$ and $\phi_b(p)$, and it can be written considering only 2 cases.</li>
     </ol>
 
     <p>One incorrect method to compute the SDF value for the union of two objects is to simply take the minimum of the SDF value for each of the objects. (It is worth taking a minute to convince yourself why this method is incorrect!). While this method can produce the incorrect distance, it will produce a value with the correct sign (again, convince yourself this is true!). <br/>
