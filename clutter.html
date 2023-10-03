@@ -449,19 +449,30 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       </figure>
 
       <p>In order to achieve static equilibrium, we require that all of the
-      forces and torques on the brick be in balance.  This is a simple
-      manifestation of the equations $$\tau_g(q) = - \sum_i J^T_i(q)
-      f^{c_i},$$ because the configuration $q$ is the $x,z, \theta$ position
-      and orientation of the brick; we have three equations and three
-      unknowns: \begin{gather*} 0 = \sum_i f^{c_i}_{W_x} \\ -mg = -\sum_i
-      f^{c_i}_{W_z} \\ 0 = \sum_i \left[ \left[ p^{C_i} - p^{B_{cm}}
-      \right] \times f^{c_i} \right]_{W_y}.\end{gather*}  The last equation
-      represents the torque balance, taken around the center of mass of the
-      brick which I've call $p^{B_{cm}}$.  Torque about $\theta$ corresponds
-      to the $y$ component of the cross product.  The torque balance ensures
-      that $f^{c_1}_{W_z} = f^{c_2}_{W_z}$ assuming the center of
-      mass is in the middle of the box; force balance in $z$ set them equal
-      to $\frac{mg}{2}$.</p>    
+      forces and torques on the brick be in balance. We have three forcesto
+      consider: $F_{g}, F_1,$ and $F_2$, named using shorthand for gravity,
+      contact 1, and contact 2, respectively. The gravity vector is most
+      naturally described in the world frame, applied to the body at the center
+      of mass: $$F_{g, W}^B = \begin{bmatrix} 0, 0, 0, 0, 0, -mg
+      \end{bmatrix}^T.$$ The contact forces are most naturally described in the
+      contact frames; for instance we know that $$f_{1, C_1,z}^{B_{c_1}} \ge
+      0,$$ because the force cannot pull on the ground. To write the force
+      balance equation, we need to use our spatial algebra to express all of
+      the spatial forces in the same frame, and apply them at the same
+      point.</p>
+
+      <p>For instance, if we are to transform contact force 1, we can first
+      change the frame: $$F_{1,B}^{B_{c_1}} = {}^B R^{C_1}
+      F_{1,C_{1}}^{B_{c_1}}.$$ Then we can change the point at which it's
+      applied: $$f_{1,B}^B = f_{1,B}^{B_{c_1}}, \qquad \tau_{1,B}^B =
+      \tau_{1,B}^{B_{C_1}} + {}^Bp_B^{B_{C_1}} \times f_{1,B}^{B_{c_1}}.$$ We
+      can now solve for the force balance: $$F_{1,B}^B + F_{2,B}^B + F_{g,B}^B
+      = 0,$$ which is six equations in 3D (or only three in 2D). The
+      translational components tell me that $$f_{1,B}^B + f_{2,B}^B =
+      \begin{bmatrix}0 \\ 0 \\ mg\end{bmatrix},$$ but it's the <i>torque</i>
+      component in $y$ that tells me that $f_{1,B_z}$ and $f_{2,B_z}$ must be
+      equal if the center of mass is equally distance from the two contact
+      points.</p>
       
       <p>We haven't said anything about the horizontal
       forces yet, except that they must balance. Let's develop that
