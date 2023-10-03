@@ -15,6 +15,7 @@ rt_ipynb_test(
     deps = [
         "//manipulation",
         "//manipulation:scenarios",
+        "//manipulation:station",
     ],
 )
 

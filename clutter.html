@@ -60,13 +60,6 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
 
   <todo>Consider moving / teaching this BEFORE geometric pose estimation.  It could actually be nice to introduce cameras / point clouds with this material instead of with pose estimation.</todo>
 
-  <p>Our initial study of geometric perception gave us some powerful tools, but
-  also revealed some major limitations.  In the next chapter, we will begin
-  applying techniques from deep learning to perception.  Spoiler alert: those
-  methods are going to be insatiable in their hunger for data. So before we get
-  there, I'd like to take a brief excursion into a nice subproblem that might
-  help us feed that need.</p>
-
   <p>In this chapter we'll consider the simplest version of the bin picking
   problem: the robot has a bin full of random objects and simply needs to move
   those objects from one bin to the other.  We'll be agnostic about what those
@@ -89,34 +82,30 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
     <p>If our goal is to test a diversity of bin picking situations, then the
     first task is to figure out how to generate diverse simulations.  How
     should we populate the bin full of objects?  So far we've set up each
-    simulation by carefully setting the initial positions (in the Context) for
-    each of the objects, but that approach won't scale.</p>
-
-    <p>So far we've used robot description files (e.g., URDF, SDF, MJCF, or
-    Model Directives) to parse into the MultibodyPlant; those were sufficient
-    for setting up the bins, cameras, and the robot which can be welded in
-    fixed positions.  But generating distributions over objects and object
-    initial conditions is more advanced, and we need an algorithm for that.</p>
+    simulation by carefully setting the initial positions (in the
+    <code>Context</code>) for each of the objects, but that approach won't
+    scale.</p>
 
     <subsection><h1>Falling things</h1>
 
       <p>In the real world, we would probably just dump the random objects into
       the bin.  That's a decent strategy for simulation, too.  We can roughly
       expect our simulation to faithfully implement multibody physics as long
-      as our initial conditions (and time step) are reasonable; the physics
-      isn't well defined if we initialize the Context with multiple objects
-      occupying the same physical space.  The simplest and most common way to
-      avoid this is to generate a random number of objects in random poses,
-      with their vertical positions staggered so that they trivially start out
-      of penetration.</p>
+      as our initial conditions (and time step) are reasonable; but the physics
+      isn't well defined if we initialize the <code>Context</code> with
+      multiple objects occupying the same physical space.  The simplest and
+      most common way to avoid this is to generate a random number of objects
+      in random poses, with their vertical positions staggered so that they
+      trivially start out of penetration.</p>
 
       <p>If you look for them, you can find animations of large numbers of
       falling objects in the demo reels for most advanced multibody simulators.
-      (These demos are actually a bit of a gimmick; the simulations may look
-      realistic to us, but they are often not very physically accurate.) For
-      our purposes the falling dynamics themselves are not the focus. We just
-      want the state of the objects where they are done falling as initial
-      conditions for our manipulation system.</p>
+      (These demos can potentially be a bit misleading; it's relatively easy to
+      make a simulation which lots of objects falling that looks relatively
+      good from a distance, but if you zoom in and look closely you'll often
+      find many anomalies.) For our purposes the falling dynamics themselves
+      are not the focus. We just want the state of the objects when they are
+      done falling as initial conditions for our manipulation system.</p>
 
       <todo>maybe cite the falling things paper, but make it clear that the idea
       is not new?</todo></p>
@@ -125,17 +114,19 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
 
         <p>Here is the 2D case.  I've added many instances of our favorite red
         foam brick to the plant.  Note that it's possible to write highly
-        optimized 2D simulators; that's not what I've done here.  Rather, I've
-        added a planar joint connecting each brick to the world, and run our
-        full 3D simulator.  The planar joint has three degrees of freedom.  I've
-        oriented them here to be $x$, $z$, and $\theta$ to constrain the
-        objects to the $xz$ plane.</p>
+        optimized simulators that take advantage of physics being restricted to
+        2D; that's not what I've done here.  Rather, I've added a planar joint
+        connecting each brick to the world, and run our full 3D simulator.  The
+        planar joint has three degrees of freedom.  I've oriented them here to
+        be $x$, $z$, and $\theta$ to constrain the objects to the $xz$
+        plane.</p>
 
-        <p>I've set the initial positions for each object in the Context to be
-        uniformly distributed over the horizontal position, uniformly rotated,
-        and staggered every 0.1m in their initial vertical position.  We only
-        have to simulate for a little more than a second for the bricks to come
-        to rest and give us our intended "initial conditions".</p>
+        <p>I've set the initial positions for each object in the
+        <code>Context</code> to be uniformly distributed over the horizontal
+        position, uniformly rotated, and staggered every 0.1m in their initial
+        vertical position.  We only have to simulate for a little more than a
+        second for the bricks to come to rest and give us our intended "initial
+        conditions".</p>
 
         <script>document.write(notebook_link('clutter', deepnote, "", "falling_things"))</script>
   
@@ -178,45 +169,103 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       environments, for example, then you won't be as happy with a solution
       that drops refrigerators, toasters, and stools from uniformly random
       i.i.d. poses.  In those cases, authoring reasonable distributions gets
-      much more interesting; we will revisit the topic of generative scene
-      models <elib>Izatt20</elib> later in the notes.</p>
+      much more interesting <elib>Izatt20</elib>; we will revisit the topic of
+      generative scene models later in the notes.</p>
 
     </subsection>
 
-    <subsection><h1>Static equilibrium with frictional contact</h1>
+  </section>
 
-      <p>Even in the case of bins, we should try to think critically about
-      whether dropping objects from a height is really the best solution.  Given
-      our discussion in the last chapter about writing optimizations with
-      non-penetration constraints, I hope you are already asking yourself: why
-      not use those constraints again here?  Let's explore that idea a bit
-      further.</p>
+  <section><h1>Static equilibrium with frictional contact</h1>
+
+    <p>Although the examples above are conceptually very simple, there is
+    actually a lot going on in the physics engine to make all of this work.
+    To appreciate a few of the details, let's explore the easiest case -- the
+    (static) mechanics once all of the objects have come to rest.</p>
+
+    <p>I won't dive into a full discussion of multibody dynamics nor multibody
+    simulation, though I do have more notes <a
+    href="http://underactuated.mit.edu/multibody.html">available here</a>. What
+    is important to understand is that the familiar $f=ma$ takes a particular
+    form when we write it down in terms of the generalized positions, $q$, and
+    velocities, $v$: $$M(q)\dot{v} + C(q,v)v = \tau_g(q) + \sum_i
+    J^T_i(q)F^{c_i}.$$  We already understand the generalized positions, $q$,
+    and velocities, $v$. The left side of the equation is just a generalization
+    of "mass times acceleration", with the mass matrix, $M$, and the Coriolis
+    terms $C$. The right hand side is the sum of the (generalized) forces, with
+    $\tau_g(q)$ capturing the terms due to gravity, and $F^{c_i}$ is the
+    spatial force due to the $i$th contact.  $J_i(q)$ is the $i$th "contact
+    Jacobian" -- it is the Jacobian that maps from the generalized velocities
+    to the spatial velocity of the $i$th contact frame.</p>
+
+    <p>Our interest here is in finding (stable) steady-state solutions to
+    these differential equations that can serve as good initial conditions
+    for our simulation.  At steady-state we have $v=\dot{v}=0$, and
+    conveniently all of the terms on the left-hand side of the equations are
+    zero.  This leaves us with just the force-balance equations $$\tau_g(q) =
+    - \sum_i J^T_i(q) F^{c_i}.$$</p>
+
+    <subsection id="spatial_force"><h1>Spatial force</h1>
+
+      <p>Before we proceed, let's be a little more careful about our force
+      notation, and define it's spatial algebra. Often we think of forces as a
+      three-element vector (with components for $x$, $y$, and $z$) applied to a
+      rigid body at some point.  More generally, we will define a six-component
+      vector for <a
+      href="https://drake.mit.edu/doxygen_cxx/group__multibody__spatial__vectors.html"><i>spatial
+      force</i></a>, using the monogram notation:
+      \begin{equation}F^{B_p}_{{\text{name}},C} = \begin{bmatrix}
+      \tau^{B_p}_{\text{name},C} \\ f^{B_p}_{\text{name},C} \end{bmatrix} \quad
+      \text{ or, if you prefer } \quad \left[F^{B_p}_{\text{name}}\right]_C =
+      \begin{bmatrix} \left[\tau^{B_p}_{\text{name}}\right]_C \\
+      \left[f^{B_p}_{\text{name}}\right]_C \end{bmatrix}.\end{equation}
+      $F^{B_p}_{\text{name},C}$ is the named spatial force applied to a point,
+      or frame origin, $B_p$, expressed in frame $C$. The form with the
+      parentheses is preferred in Drake, but is a verbose for my taste here in
+      the notes.  The name is optional, and the expressed in frame, if
+      unspecified, is the world frame. For forces in particular, it is
+      recommended that we include the body, $B$, that the force is being
+      applied to in the symbol for the point $B_p$, especially since we will
+      often have equal and opposite forces. In code, we write
+      <code>Fname_Bp_C</code>.</p>
+      
+      <p>Like spatial velocity, spatial forces have a rotational component and
+      a translational component; $\tau^{B_p}_C \in \Re^3$ is the <i>torque</i>
+      (on body $B$ applied at point $p$ expressed in frame $C$), and
+      $f^{B_p}_C \in \Re^3$ is the translational or Cartesian force. A
+      spatial force is also commonly referred to as a <a
+      href="https://en.wikipedia.org/wiki/Screw_theory#Wrench">wrench</a>. If
+      you find it strange to think of forces as having a rotational
+      component, then think of it this way: the world might only impart
+      Cartesian forces at the points of contact, but we often want to
+      summarize the combined effect of many Cartesian forces applied to
+      different points into one common frame. To do this, we represent the
+      equivalent effect of each Cartesian force at the point of application
+      as a force
+      <i>and</i> a torque applied at a different point on the body.</p>
+
+      <p>Spatial forces fit neatly into our spatial algebra:
+      <ul>
+        <li>Spatial forces add when they are applied to the same body in the
+        same frame, e.g.: \begin{equation}F^{B_p}_{\text{total},C}
+        = \sum_i F^{B_p}_{i,C} .\end{equation}</li>
+        <li>Shifting a spatial force from one application point, $B_p$, to
+        another point, $B_q$, uses the cross product: \begin{equation} f^{B_q}_C
+        = f^{B_p}_C, \qquad \tau^{B_q}_C = \tau^{B_p}_C + {}^{B_q}p^{B_p}_C
+        \times f^{B_p}_C.\label{eq:spatial_force_shift}\end{equation}</li>
+        <li>As with all spatial vectors, rotations can be used to change
+        between the "expressed-in" frames: \begin{equation} f^{B_p}_D = {}^DR^C
+        f^{B_p}_C, \qquad \tau^{B_p}_D = {}^DR^C
+        \tau^{B_p}_C.\end{equation}</li>
+      </ul>
+      </p>
   
-      <p>I won't dive into a full discussion of multibody dynamics nor
-      multibody simulation, though I do have more notes <a
-      href="http://underactuated.mit.edu/multibody.html">available here</a>.
-      What is important to understand here is that the equations of motion of
-      our multibody system are described by differential equations of the form:
-      $$M(q)\dot{v} + C(q,v)v = \tau_g(q) + \sum_i J^T_i(q)f^{c_i}.$$  We
-      already understand the generalized positions, $q$, and velocities, $v$.
-      The left side of the equation is just a generalization of "mass times
-      acceleration", with the mass matrix, $M$, and the Coriolis terms $C$. The
-      right hand side is the sum of the (generalized) forces, with $\tau_g(q)$
-      capturing the terms due to gravity, and $f^{c_i}$ is the <a
-      href="https://drake.mit.edu/doxygen_cxx/group__multibody__spatial__vectors.html">spatial
-      force</a> due to the $i$th contact.  $J_i(q)$ is the $i$th "contact
-      Jacobian" -- it is the Jacobian that maps from the generalized velocities
-      to the spatial velocity of the $i$th contact frame.</p>
+    </subsection>
 
-      <p>Our interest here is in finding (stable) steady-state solutions to
-      these differential equations that can serve as good initial conditions
-      for our simulation.  At steady-state we have $v=\dot{v}=0$, and
-      conveniently all of the terms on the left-hand side of the equations are
-      zero.  This leaves us with just the force-balance equations $$\tau_g(q) =
-      - \sum_i J^T_i(q) f^{c_i}.$$  But we still need to understand where the
+    <subsection><h1>Collision geometry</h1>
+
+      <p>Now that we have our notation, we next need to understand where the
       contact forces come from.</p>
-
-      <subsubsection><h1>Collision geometry</h1>
 
       <p>Geometry engines for robotics, like <code>SceneGraph</code> in
       <drake></drake>, distinguish between a few different <a
@@ -237,297 +286,324 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       use much simpler geometry (like boxes, spheres, and cylinders).  These
       simpler geometries make the physics engine faster and more robust.</p>
 
-      <p>For subtle reasons we will explore below, in addition to simplifying
-      the geometry, we sometimes over-parameterize the collision geometry in
-      order to make the numerics more robust.  For example, when we simulate
-      the red brick, we actually use <i>nine</i> collision geometries for
-      the one body.</p>
+    <!--
+    <p>For subtle reasons we will explore below, in addition to simplifying
+    the geometry, we sometimes over-parameterize the collision geometry in
+    order to make the numerics more robust.  For example, when we simulate
+    the red brick, we actually use <i>nine</i> collision geometries for
+    the one body.</p>
 
-      <figure><img style="width:50%"
-      src="data/foam_brick_contact_geometry.png"/><figcaption>The (exaggerated)
-      contact geometry used for robust simulation of boxes.  We add contact
-      "points" (epsilon radius spheres) to each corner, and have a slightly
-      inset box for the remaining contacts.  <a
-      href="data/foam_brick_contact_geometry.html">Here</a> is the interactive
-      version.</figcaption></figure>
+    <figure><img style="width:50%"
+    src="data/foam_brick_contact_geometry.png"/><figcaption>The (exaggerated)
+    contact geometry used for robust simulation of boxes.  We add contact
+    "points" (epsilon radius spheres) to each corner, and have a slightly
+    inset box for the remaining contacts.  <a
+    href="data/foam_brick_contact_geometry.html">Here</a> is the interactive
+    version.</figcaption></figure>
+    -->
+
+    <example><h1>Collision geometry inspector</h1>
     
-      <example><h1>Collision geometry inspector</h1>
+      <p>Drake's has a very useful <code>ModelVisualizer</code> tool that
+      publishes by the illustration and collision geometry roles to Meshcat
+      (see, for example, the Drake <script>document.write(notebook_link(
+        'tutorials',
+        d=drake_deepnote,
+        link_text='tutorial on authoring multibody simulations',
+        notebook='authoring_multibody_simulation',
+        workspace_id=drake_workspace_id))
+      </script>). This is very useful for designing new models, but also for 
+      understanding the contact geometry of existing models.</p>
+
+      <p>We used this tool before, when we were visualizing the various robot
+      models. Go ahead and try it again; navigate in the meshcat controls to
+      <code>Scene > drake > proximity</code> and check the box to enable
+      visualizing the geometries with the proximity role.</p>
+
+      <script>document.write(notebook_link('robot', d=deepnote, link_text="", notebook='inspector'))</script>
       
-        <p>Drake's has a very useful <code>ModelVisualizer</code> tool that
-        publishes by the illustration and collision geometry roles to Meshcat
-        (see, for example, the Drake <script>document.write(notebook_link(
-          'tutorials',
-          d=drake_deepnote,
-          link_text='tutorial on authoring multibody simulations',
-          notebook='authoring_multibody_simulation',
-          workspace_id=drake_workspace_id))
-        </script>). This is very useful for designing new models, but also for 
-        understanding the contact geometry of existing models.</p>
+      <figure>
+        <img width="50%"" src="figures/ur3e_collision_geo.png"/>
+        <figcaption>Visualizing the visual and collision geometries for the
+        UR3e.</figcaption>
+      </figure>
 
-      </example>
+    </example>
 
-      <p>SceneGraph also implements the concept of a <a
-      href="https://drake.mit.edu/doxygen_cxx/classdrake_1_1geometry_1_1_collision_filter_declaration.html">collision
-      filter</a>.  It can be important to specify that, for instance, the iiwa
-      geometry at link 5 cannot collide with the geometry in links 4 or 6.
-      Specifying that some collisions should be ignored not only speeds up the
-      computation, but it also facilitates the use of simplified collision
-      geometry for links.  It would be extremely hard to approximate link 4 and
-      5 accurately with spheres, and cylinders if I had to make sure that those
-      spheres and cylinders did not overlap in any feasible joint angle.  The
-      default collision filter settings should work fine for most applications,
-      but you can tweak them if you like.</p>
+    <p>SceneGraph also implements the concept of a <a
+    href="https://drake.mit.edu/doxygen_cxx/classdrake_1_1geometry_1_1_collision_filter_declaration.html">collision
+    filter</a>.  It can be important to specify that, for instance, the iiwa
+    geometry at link 5 cannot collide with the geometry in links 4 or 6.
+    Specifying that some collisions should be ignored not only speeds up the
+    computation, but it also facilitates the use of simplified collision
+    geometry for links.  It would be extremely hard to approximate link 4 and
+    5 accurately with spheres, and cylinders if I had to make sure that those
+    spheres and cylinders did not overlap in any feasible joint angle.  The
+    default collision filter settings should work fine for most applications,
+    but you can tweak them if you like.</p>
 
-      <p>So where do the contact forces, $f^{c_i}$, come from?  There is
-      potentially an equal and opposite contact force for every <i>pair</i> of
-      collision geometries that are not filtered out by the collision filter.
-      In <code>SceneGraph</code>, the <a
-      href="https://drake.mit.edu/doxygen_cxx/classdrake_1_1geometry_1_1_scene_graph_inspector.html#a79b84ada25718e2a38fd2d13adb4d839"><code>GetCollisionCandidates</code></a>
-      method returns them all.  We'll take to calling the two bodies in a collision pair "body A" and "body B".</p>
+    <p>So where do the contact forces, $f^{c_i}$, come from?  There is
+    potentially an equal and opposite contact (spatial) force for every
+    <i>pair</i> of collision geometries that are not filtered out by the
+    collision filter. In <code>SceneGraph</code>, the <a
+    href="https://drake.mit.edu/doxygen_cxx/classdrake_1_1geometry_1_1_scene_graph_inspector.html#a79b84ada25718e2a38fd2d13adb4d839"><code>GetCollisionCandidates</code></a>
+    method returns them all.  We'll take to calling the two bodies in a collision pair "body A" and "body B".</p>
 
-    </subsubsection>
+  </subsection>
 
-    <subsubsection><h1>The Contact Frame</h1>
+  <subsection><h1>Contact forces between bodies in collision</h1>
 
-      <p>We still need to decide the magnitude and direction of these spatial
-      forces, and to do this we need to specify the
-      <i>contact frame</i> in which the spatial force is to be applied.  For
-      instance, we <a
-      href="https://drake.mit.edu/doxygen_cxx/classdrake_1_1multibody_1_1_point_pair_contact_info.html">might
-      use</a> $C_B$ to denote a contact frame on body $B$, with the forces
-      applied at the origin of the frame.</p>
+    <p>In our mathematical models, two bodies would never occupy the same
+    region of space, but in a simulation using numerical integration, this can
+    rarely be avoided completely. Most simulators summarize the contact forces
+    between two bodies that are in collision -- either touching or overlapping
+    -- as Cartesian forces at one or more contact points. It's easy to
+    underestimate this step!</p>
 
-      <p>Most simulators summarize the contact between two bodies as a
-      translational force (e.g. zero torque) at one or more contact points. Our
-      convention will be to align the positive $z$ axis with the "contact
-      normal", with positive forces resisting penetration. Defining this normal
-      can be deceptively complicated.  For instance, what is the normal at the
-      corner of a box?  Taking the normal as a (<a
-      href="https://en.wikipedia.org/wiki/Subderivative">sub-</a>)gradient of
-      the signed-distance function for the collision geometry provides a
-      reliable definition that will extend to the distance between two bodies
-      and into generalized coordinates. The $x$ and $y$ axes of the contact
-      frame are any orthogonal basis for the tangential coordinates.  You can
-      find additional figures and explanations <a
-      href="https://underactuated.csail.mit.edu/multibody.html#contact">here</a>.</p>
-
-      <example><h1>Brick on a half-plane</h1>
-
-        <p>Let's work through these details on a simple example -- our foam
-        brick sitting on the ground.  The ground is welded to the world, so has
-        no degrees of freedom; we can ignore the forces applied to the ground
-        and focus on the forces applied to the brick.</p>
-
-        <p>Where are the contact forces and contact frames?  If we used only
-        box-on-box geometry, then the locations of the contact forces are
-        ambiguous during this "face-on-face" contact; this is even more true in
-        3D (where three forces would be sufficient).  But by adding extra
-        contact spheres to the corners of our box, we are telling the physics
-        engine that we specifically want contact forces at each of the corners
-        (and all four of the corners in 3D).  I've labeled the frames $C_1$ and
-        $C_2$ in the sketch below.</p>
-
-        <figure>
-          <img src="data/brick_on_half_plane.jpg" width=50%/>
-        </figure>
-
-        <p>In order to achieve static equilibrium, we require that all of the
-        forces and torques on the brick be in balance.  This is a simple
-        manifestation of the equations $$\tau_g(q) = - \sum_i J^T_i(q)
-        f^{c_i},$$ because the configuration $q$ is the $x,z, \theta$ position
-        and orientation of the brick; we have three equations and three
-        unknowns: \begin{gather*} 0 = \sum_i f^{c_i}_{C_{i,x}} \\ -mg = -\sum_i
-        f^{c_i}_{C_{i,z}} \\ 0 = \sum_i \left[ \left[ p^{C_i} - p^{B_{cm}}
-        \right] \times f^{c_i} \right]_{W_y}.\end{gather*}  The last equation
-        represents the torque balance, taken around the center of mass of the
-        brick which I've call $p^{B_{cm}}$.  Torque about $\theta$ corresponds
-        to the $y$ component of the cross product.  The torque balance ensures
-        that $f^{c_1}_{C_{1,z}} = f^{c_2}_{C_{2,z}}$ assuming the center of
-        mass is in the middle of the box; force balance in $z$ set them equal
-        to $\frac{mg}{2}$.  We haven't said anything about the horizontal
-        forces yet ($0$ is a reasonable solution here). Let's develop that
-        next.</p>
-
-      </example>
-      
-    </subsubsection>
-
-    <subsubsection><h1>The (Coulomb) Friction Cone</h1>
-
-      <p>Now the rules governing contact forces can begin to take shape.  First
-      and foremost, we demand that there is no force at a distance. Using
-      $\phi_i(q)$ to denote the distance between two bodies in configuration
-      $q$, we have $$\phi(q) > 0 \Rightarrow f^{c_i} = 0.$$  Second, we demand
-      that the normal force only resists penetration; bodies are never pulled
-      into contact: $$f^{c_i}_{C_z} \ge 0.$$  In <i>rigid</i> contact models, we
-      solve for the smallest normal force enforces the non-penetration
-      constraint (this is known as the principle of least constraint).  In
-      <i>soft</i> contact models, we define the force to be a function of the
-      penetration depth and velocity.</p>  <todo>Citations</todo>
-
-      <todo>Need figures here</todo>
-
-      <p>Forces in the tangential directions are due to friction.  The most
-      commonly used model of friction is Coulomb friction, which states that
-      $$|f^{c_i}_{C_{x,y}}|_2 \le \mu f^{c_i}_{C_z},$$ with $\mu$ a
-      non-negative scalar <i>coefficient of friction</i>.  Typically we define
-      both a $\mu_{static}$, which is applied when the tangential velocity is
-      zero, and $\mu_{dynamic}$, applied when the tangential velocity is
-      non-zero. In the Coulomb friction model, the tangential contact force is
-      the force within this friction cone which produces maximum dissipation.
-      </p>
-
-      <p>Taken together, the geometry of these constraints forms a <a
-      href="https://en.wikipedia.org/wiki/Convex_cone">cone</a> of admissable
-      contact forces.  It is famously known as the "friction cone", and we will
-      refer to it often.</p>
-
-      <p>It's a bit strange for us to write that the forces are in some set.
-      Surely the world will pick just one force to apply? It can't apply all
-      forces in a set.  The friction cone specifies the range of possible
-      forces; under the Coulomb friction model we say that the one force that
-      will be picked is the force inside this set that will successfully resist
-      relative motion in the contact x-y frame. If no force inside the friction
-      cone can completely resist the motion, then we have sliding, and we say
-      that the force that the world will apply is the force inside the friction
-      cone of <i>maximal dissipation</i>. For the conic friction cone, this
-      will be pointed in the direction opposite of the sliding velocity. So
-      even though the world will indeed "pick" one force from the friction cone
-      to apply, it can still be meaningful to reason about the set of possible
-      forces that could be applied because those denote the set of possible
-      opposing forces that friction can perfectly resist. For instance, a brick
-      under gravity will not move if we can exactly oppose the force of gravity
-      with a force inside the friction cone.</p>
-
-      <example><h1>Brick on an inclined half-plane</h1>
-
-        <p>If we take our last example, but tilt the table to an angle relative
-        to gravity, then the horizontal forces start becoming important.
-        Before going through the equations, let's check your intuition.  Will
-        the magnitude of the forces on the two corners stay the same in this
-        configuration?  Or will there be more contact force on the lower
-        corner?</p>
-
-        <figure>
-          <img src="data/brick_incline.jpg" width=50%/>
-        </figure>
-
-        <p>In the illustration above, you'll notice that the contact frames
-        have rotated so that the $z$ axis is aligned with the contact normals.
-        I've sketched two possible friction cones (dark green and lighter
-        green), corresponding to two different coefficients of friction.  We
-        can tell immediately by inspection that the smaller value of $\mu$
-        (corresponding to the darker green) cannot produce contact forces that
-        will completely counteract gravity (the friction cone does not contain
-        the vertical line).  In this case, the box will slide and no static
-        equilibrium exists in this configuration.</p>
-
-        <p>If we increase the coefficient of (static) friction to the range
-        corresponding to the lighter green, then we can find contact forces
-        that produce an equilibrium.  Indeed, for this problem, we need some
-        amount of friction to even have an equilibrium (we'll explore this in
-        the <a href="#static_equilibrium">exercises</a>).  We also need for the
-        vertical projection of the center of mass onto the ramp to land between
-        the two contact points, otherwise the brick will tumble over the bottom
-        edge.  We can see this by writing our same force/torque balance
-        equations.  We can write them in body frame, B, assuming the center of
-        mass in the center of the brick and the brick has length $l$ and height
-        $h$:\begin{gather*} f^{c_1}_{B_x} + f^{c_2}_{B_x} = - mg\sin\gamma \\
-        f^{c_1}_{B_z}  + f^{c_2}_{B_z} = mg\cos\gamma \\ -h f^{c_1}_{B_x} + l
-        f^{c_1}_{B_z} = h f^{c_2}_{B_x} + l f^{c_2}_{B_z} \\ f^{c_1}_{B_z} \ge
-        0, \quad f^{c_2}_{B_z} \ge 0 \\ |f^{c_1}_{B_x}| \le \mu f^{c_1}_{B_z},
-        \quad |f^{c_2}_{B_x}| \le \mu f^{c_2}_{B_z} \end{gather*} </p>
-
-        <p>So, are the magnitude of the contact forces the same or different?
-        Substituting the first equation into the third reveals $$f^{c_2}_{B_z}
-        = f^{c_1}_{B_z} + \frac{mgh}{l}\sin\gamma.$$</p>
-      
-      </example>
-
-
-    </subsubsection>
-
-    <subsubsection><h1>Static equilibrium as an optimization problem</h1>
-
-      <p>Rather than dropping objects from a random height, perhaps we can
-      initialize our simulations using optimization to find the initial
-      conditions that are already in static equilibrium.  In <drake></drake>,
-      the
-      <a
-      href="https://drake.mit.edu/doxygen_cxx/classdrake_1_1multibody_1_1_static_equilibrium_problem.html"><code>StaticEquilbriumProblem</code></a>
-      collects all of the constraints we enumerated above into an optimization
-      problem: \begin{align*} \find_q \quad \subjto \quad& \tau_g(q) = - \sum_i
-      J^T_i(q) f^{c_i} & \\ & f^{c_i}_{C_z} \ge 0 & \forall i, \\ &
-      |f^{c_i}_{C_{x,y}}|_2 \le \mu f^{c_i}_{C_z} & \forall i, \\ & \phi_i(q)
-      \ge 0 & \forall i, \\ & \phi(q) = 0 \textbf{ or } f^{c_i}_{C_z} = 0
-      &\forall i, \\ & \text{joint limits}.\end{align*} This is a nonlinear
-      optimization problem: it includes the nonconvex non-penetration
-      constraints we discussed in the last chapter.  The second-to-last
-      constraints (a logical or) is particularly interesting; constraints of
-      the form $x \ge 0, y \ge 0, x =0 \textbf{ or } y = 0$ are known as
-      complementarity constraints, and are often written as $x \ge 0, y \ge 0,
-      xy = 0$.  We can make the problem easier for the nonlinear optimization
-      solver by relaxing the equality to $0 \le \phi(q) f^{c_i}_{C_z} \le
-      \text{tol}$, which provides a proper gradient for the optimizer to follow
-      at the cost of allowing some force at a distance.</p>  
-      
-      <p>It's easy to add additional costs and constraints; for initial
-      conditions we might use an objective that keeps $q$ close to an initial
-      configuration-space sample.</p>
-
-      <example><h1>Tall Towers</h1></example>
-
-      <p>So how well does it work?  </p>  <todo>finish this...</todo>
-
-    </subsubsection>
-
-    </subsection>
-
-  </section>
-
-  <section><h1>A few of the nuances of simulating contact</h1>
-    
     <example><h1>Contact force inspector</h1>
     
       <p>I've created a simple GUI that allows you to pick any two primitive
-      geometry types and inspect the contact information that is computed when
-      those object are put into penetration.  There is a lot of information
-      displayed there!  Take a minute to make sure you understand the colors,
-      and the information provided in the textbox display.
+      geometry types and inspect the (single) point contact information that is
+      computed when those object are put into penetration.  There is a lot of
+      information displayed there!  Take a minute to make sure you understand
+      the colors, and the information provided in the textbox display.
       </p>
 
       <script>document.write(notebook_link('clutter', deepnote, '', 'contact_inspector'))</script>
 
     </example>
 
-    <p>When I play with the GUI above, I feel almost overwhelmed.  First,
-    overwhelmed by the sheer number of cases that we have to get right in the
-    code; it's unfortunately extremely common for open-source tools to have
-    bugs in here.  But second, overwhelmed by the sense that we are asking the
-    wrong question.  Asking to summarize the forces between two bodies in deep
+    <p>First, let's appreciate the sheer number of cases that we have to get
+    right in the code; it's unfortunately extremely common for open-source
+    tools to have bugs in here. But I think this gui also makes it pretty
+    apparent that asking to summarize the forces between two bodies in deep
     penetration with a single Cartesian force applied at a point is fraught
-    with peril.  As you move the objects, you will find many discontinuities;
+    with peril. As you move the objects, you will find many discontinuities;
     this is a common reason why you sometimes see rigid body simulations
     "explode".  It might seem natural to try to use multiple contact points
     instead of a single contact point to summarize the forces, and some
     simulators do, but it is very hard to write an algorithm that only depends
-    on the current configurations of the geometry which applies forces
-    consistently from one time step to the next with these approaches.</p>
+    on the current configurations of the geometry which selects contact points
+    consistently from one time step to the next.</p>
 
-    <p>I currently feel that the only fundamental way to get around these
-    numerical issues is to start reasoning about the entire volume of
-    penetration.  The Drake developers have recently proposed a version of
-    this that we believe we can make computationally tractable enough to be
-    viable for real-time simulation <elib>Elandt19</elib>, and are working
-    hard to bring this into full service in Drake.  You will find many
-    references to "hydroelastic" contact throughout the code.  We hope to turn
-    it on by default soon.</p>
+    <p>One of the innovations in Drake which makes it particularly good at simulating complex contact situations is that we have moved away from point contact models. When we enable <a href="https://drake.mit.edu/doxygen_cxx/group__hydroelastic__user__guide.html">hydroelastic contact in Drake</a>, the spatial forces between two penetrating bodies are computed by taking an integral over a "hydroelastic surface" which generalizes the notion of a contact patch <elib>Elandt19</elib>. As of this writing, you still have to "opt-in" to using hydroelastic in Drake (see <script>document.write(notebook_link(
+      'tutorials',
+      d=drake_deepnote,
+      link_text='this tutorial on hydroelastic',
+      notebook='hydroelastic_contact_basics',
+      workspace_id=drake_workspace_id))
+    </script>); I'm working to use it in all of my examples in these notes.</p>
 
-    <todo>Add the hydroelastic skittles video here.  https://youtu.be/5-k2Pc6OmzE</todo>
+    <todo>More about hydroelastic here.  Show some of the nice videos.
+    https://youtu.be/5-k2Pc6OmzE</todo>
 
-    <p>In the mean time, we can make simulations robust by carefully curating the contact geometry...</p>
+  </subsection>
+
+  <subsection><h1>The Contact Frame</h1>
+
+    <p>We still need to decide the magnitude and direction of these spatial
+    forces, and to do this we need to specify the
+    <i>contact frame</i> in which the spatial force is to be applied.  For
+    instance, we <a
+    href="https://drake.mit.edu/doxygen_cxx/classdrake_1_1multibody_1_1_point_pair_contact_info.html">might
+    use</a> $C_B$ to denote a contact frame on body $B$, with the forces
+    applied at the origin of the frame.</p>
+
+    <p>Although I strongly advocate for using the hydroelastic contact model in
+    your simulations, for the purposes of exposition, let's think about the
+    point contact model here. If the collision engine produces a number of
+    contact point locations, how should we define the frames?</p>
+    
+    <p>Our convention will be to align the positive $z$ axis with the "contact
+    normal", with positive forces resisting penetration. Defining this normal
+    also requires care.  For instance, what is the normal at the corner of a
+    box?  Taking the normal as a (<a
+    href="https://en.wikipedia.org/wiki/Subderivative">sub-</a>)gradient of the
+    signed-distance function between two bodies provides a reliable definition
+    that will extend into generalized coordinates. The $x$ and $y$ axes of the
+    contact frame are any orthogonal basis for the tangential coordinates.  You
+    can find additional figures and explanations <a
+    href="https://underactuated.csail.mit.edu/multibody.html#contact">here</a>.</p>
+
+    <example><h1>Brick on a half-plane</h1>
+
+      <p>Let's work through these details on a simple example -- our foam
+      brick sitting on the ground.  The ground is welded to the world, so has
+      no degrees of freedom; we can ignore the forces applied to the ground
+      and focus on the forces applied to the brick.</p>
+
+      <p>Where are the contact forces and contact frames?  If we used only
+      box-on-box geometry, then the choice of contact force location is not
+      unique during this "face-on-face" contact; this is even more true in 3D
+      (where three forces would be sufficient). Let's assume for a moment
+      that our contact engine determines two points of contact -- one at each
+      corner of the box. (In order to help the contact engine make robust
+      choices when we are using point contact models, we sometimes actually
+      <a href="data/foam_brick_contact_geometry.html">annotate the boxes with
+      small sphere collision geometries in the eight corners</a>; this is not
+      needed when using hydroelastic contact.) I've labeled the frames $C_1$
+      and $C_2$ in the sketch below.</p>
+
+      <figure>
+        <img src="data/brick_on_half_plane.jpg" width=50%/>
+      </figure>
+
+      <p>In order to achieve static equilibrium, we require that all of the
+      forces and torques on the brick be in balance.  This is a simple
+      manifestation of the equations $$\tau_g(q) = - \sum_i J^T_i(q)
+      f^{c_i},$$ because the configuration $q$ is the $x,z, \theta$ position
+      and orientation of the brick; we have three equations and three
+      unknowns: \begin{gather*} 0 = \sum_i f^{c_i}_{W_x} \\ -mg = -\sum_i
+      f^{c_i}_{W_z} \\ 0 = \sum_i \left[ \left[ p^{C_i} - p^{B_{cm}}
+      \right] \times f^{c_i} \right]_{W_y}.\end{gather*}  The last equation
+      represents the torque balance, taken around the center of mass of the
+      brick which I've call $p^{B_{cm}}$.  Torque about $\theta$ corresponds
+      to the $y$ component of the cross product.  The torque balance ensures
+      that $f^{c_1}_{W_z} = f^{c_2}_{W_z}$ assuming the center of
+      mass is in the middle of the box; force balance in $z$ set them equal
+      to $\frac{mg}{2}$.</p>    
+      
+      <p>We haven't said anything about the horizontal
+      forces yet, except that they must balance. Let's develop that
+      next.</p>
+
+    </example>
+    
+  </subsection>
+
+  <subsection><h1>The (Coulomb) Friction Cone</h1>
+
+    <p>Now the rules governing contact forces can begin to take shape.  First
+    and foremost, we demand that there is no force at a distance. Using
+    $\phi_i(q)$ to denote the distance between two bodies in configuration
+    $q$, we have $$\phi(q) > 0 \Rightarrow f^{c_i} = 0.$$  Second, we demand
+    that the normal force only resists penetration; bodies are never pulled
+    into contact: $$f^{c_i}_{C_z} \ge 0.$$  In <i>rigid</i> contact models, we
+    solve for the smallest normal force enforces the non-penetration
+    constraint (this is known as the principle of least constraint).  In
+    <i>soft</i> contact models, we define the force to be a function of the
+    penetration depth and velocity.</p>  <todo>Citations</todo>
+
+    <todo>Need figures here</todo>
+
+    <p>Forces in the tangential directions are due to friction.  The most
+    commonly used model of friction is Coulomb friction, which states that
+    $$|f^{c_i}_{C_{x,y}}|_2 \le \mu f^{c_i}_{C_z},$$ with $\mu$ a
+    non-negative scalar <i>coefficient of friction</i>.  Typically we define
+    both a $\mu_{static}$, which is applied when the tangential velocity is
+    zero, and $\mu_{dynamic}$, applied when the tangential velocity is
+    non-zero. In the Coulomb friction model, the tangential contact force is
+    the force within this friction cone which produces maximum dissipation.
+    </p>
+
+    <p>Taken together, the geometry of these constraints forms a <a
+    href="https://en.wikipedia.org/wiki/Convex_cone">cone</a> of admissable
+    contact forces.  It is famously known as the "friction cone", and we will
+    refer to it often.</p>
+
+    <p>It's a bit strange for us to write that the forces are in some set.
+    Surely the world will pick just one force to apply? It can't apply all
+    forces in a set.  The friction cone specifies the range of possible
+    forces; under the Coulomb friction model we say that the one force that
+    will be picked is the force inside this set that will successfully resist
+    relative motion in the contact x-y frame. If no force inside the friction
+    cone can completely resist the motion, then we have sliding, and we say
+    that the force that the world will apply is the force inside the friction
+    cone of <i>maximal dissipation</i>. For the conic friction cone, this
+    will be pointed in the direction opposite of the sliding velocity. So
+    even though the world will indeed "pick" one force from the friction cone
+    to apply, it can still be meaningful to reason about the set of possible
+    forces that could be applied because those denote the set of possible
+    opposing forces that friction can perfectly resist. For instance, a brick
+    under gravity will not move if we can exactly oppose the force of gravity
+    with a force inside the friction cone.</p>
+
+    <example><h1>Brick on an inclined half-plane</h1>
+
+      <p>If we take our last example, but tilt the table to an angle relative
+      to gravity, then the horizontal forces start becoming important.
+      Before going through the equations, let's check your intuition.  Will
+      the magnitude of the forces on the two corners stay the same in this
+      configuration?  Or will there be more contact force on the lower
+      corner?</p>
+
+      <figure>
+        <img src="data/brick_incline.jpg" width=50%/>
+      </figure>
+
+      <p>In the illustration above, you'll notice that the contact frames
+      have rotated so that the $z$ axis is aligned with the contact normals.
+      I've sketched two possible friction cones (dark green and lighter
+      green), corresponding to two different coefficients of friction.  We
+      can tell immediately by inspection that the smaller value of $\mu$
+      (corresponding to the darker green) cannot produce contact forces that
+      will completely counteract gravity (the friction cone does not contain
+      the vertical line).  In this case, the box will slide and no static
+      equilibrium exists in this configuration.</p>
+
+      <p>If we increase the coefficient of (static) friction to the range
+      corresponding to the lighter green, then we can find contact forces
+      that produce an equilibrium.  Indeed, for this problem, we need some
+      amount of friction to even have an equilibrium (we'll explore this in
+      the <a href="#static_equilibrium">exercises</a>).  We also need for the
+      vertical projection of the center of mass onto the ramp to land between
+      the two contact points, otherwise the brick will tumble over the bottom
+      edge.  We can see this by writing our same force/torque balance
+      equations.  We can write them in body frame, B, assuming the center of
+      mass in the center of the brick and the brick has length $l$ and height
+      $h$:\begin{gather*} f^{c_1}_{B_x} + f^{c_2}_{B_x} = - mg\sin\gamma \\
+      f^{c_1}_{B_z}  + f^{c_2}_{B_z} = mg\cos\gamma \\ -h f^{c_1}_{B_x} + l
+      f^{c_1}_{B_z} = h f^{c_2}_{B_x} + l f^{c_2}_{B_z} \\ f^{c_1}_{B_z} \ge
+      0, \quad f^{c_2}_{B_z} \ge 0 \\ |f^{c_1}_{B_x}| \le \mu f^{c_1}_{B_z},
+      \quad |f^{c_2}_{B_x}| \le \mu f^{c_2}_{B_z} \end{gather*} </p>
+
+      <p>So, are the magnitude of the contact forces the same or different?
+      Substituting the first equation into the third reveals $$f^{c_2}_{B_z}
+      = f^{c_1}_{B_z} + \frac{mgh}{l}\sin\gamma.$$</p>
+    
+    </example>
+
+  </subsection>
+
+
+
+  <subsection><h1>Static equilibrium as an optimization problem</h1>
+
+    <p>Rather than dropping objects from a random height, perhaps we can
+    initialize our simulations using optimization to find the initial
+    conditions that are already in static equilibrium.  In <drake></drake>,
+    the
+    <a
+    href="https://drake.mit.edu/doxygen_cxx/classdrake_1_1multibody_1_1_static_equilibrium_problem.html"><code>StaticEquilbriumProblem</code></a>
+    collects all of the constraints we enumerated above into an optimization
+    problem: \begin{align*} \find_q \quad \subjto \quad& \tau_g(q) = - \sum_i
+    J^T_i(q) f^{c_i} & \\ & f^{c_i}_{C_z} \ge 0 & \forall i, \\ &
+    |f^{c_i}_{C_{x,y}}|_2 \le \mu f^{c_i}_{C_z} & \forall i, \\ & \phi_i(q)
+    \ge 0 & \forall i, \\ & \phi(q) = 0 \textbf{ or } f^{c_i}_{C_z} = 0
+    &\forall i, \\ & \text{joint limits}.\end{align*} This is a nonlinear
+    optimization problem: it includes the nonconvex non-penetration
+    constraints we discussed in the last chapter.  The second-to-last
+    constraints (a logical or) is particularly interesting; constraints of
+    the form $x \ge 0, y \ge 0, x =0 \textbf{ or } y = 0$ are known as
+    complementarity constraints, and are often written as $x \ge 0, y \ge 0,
+    xy = 0$.  We can make the problem easier for the nonlinear optimization
+    solver by relaxing the equality to $0 \le \phi(q) f^{c_i}_{C_z} \le
+    \text{tol}$, which provides a proper gradient for the optimizer to follow
+    at the cost of allowing some force at a distance.</p>  
+    
+    <p>It's easy to add additional costs and constraints; for initial
+    conditions we might use an objective that keeps $q$ close to an initial
+    configuration-space sample.</p>
+
+    <example><h1>Tall Towers</h1></example>
+
+    <p>So how well does it work?  </p>  <todo>finish this...</todo>
+
+    </subsection>
 
   </section>
+
+
 
   <section><h1>Model-based grasp selection</h1>
 
@@ -535,69 +611,11 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
     decades in robotics, with an original focus on thinking of a (potentially
     dexterous) hand interacting with a known object.
     <elib>Prattichizzo08</elib> is an excellent survey of that literature; I
-    will summarize just a few of the key ideas here. To do it, let's start by
-    extended our spatial algebra to include forces.</p>
+    will summarize just a few of the key ideas here.</p>
 
-    <subsection id="spatial_force"><h1>Spatial force</h1>
-
-      <p>In our discussion of contact forces above, we started by thinking of a
-      force as a three-element vector (with components for $x$, $y$, and $z$)
-      applied to a rigid body at some point.  More generally, we will define a
-      six-component vector for <a
-      href="https://drake.mit.edu/doxygen_cxx/group__multibody__spatial__vectors.html"><i>spatial
-      force</i></a>: \begin{equation}F^{B_p}_{{\text{name}},C} =
-      \begin{bmatrix} \tau^{B_p}_{\text{name},C} \\ f^{B_p}_{\text{name},C}
-      \end{bmatrix} \quad \text{ or } \quad
-      \left[F^{B_p}_{\text{name}}\right]_C = \begin{bmatrix}
-      \left[\tau^{B_p}_{\text{name}}\right]_C \\
-      \left[f^{B_p}_{\text{name}}\right]_C \end{bmatrix}.\end{equation}
-      $F^{B_p}_{\text{name},C}$ is the named spatial force applied to a point,
-      or frame origin, $B_p$, expressed in frame $C$. The form with the
-      parentheses is preferred in Drake, but is a verbose for my taste here in
-      the notes.  The name is optional, and the expressed in frame, if
-      unspecified, is the world frame. For forces in particular, it is
-      recommended that we include the body, $B$, that the force is being
-      applied to in the symbol for the point $B_p$, especially since we will
-      often have equal and opposite forces. In code, we write
-      <code>Fname_Bp_C</code>.</p>
-      
-      <p>Like spatial velocity, spatial forces have a rotational component and
-      a translational component; $\tau^{B_p}_C \in \Re^3$ is the <i>torque</i>
-      (on body $B$ applied at point $p$ expressed in frame $C$), and $f^{B_p}_C
-      \in \Re^3$ is the translational or Cartesian force. A spatial force is
-      also commonly referred to as a <a
-      href="https://en.wikipedia.org/wiki/Screw_theory#Wrench">wrench</a>.  If
-      you find it strange to think of forces as having a rotational component,
-      then think of it this way: the world might only impart Cartesian forces
-      at the points of contact, but we want to summarize the combined effect of
-      many Cartesian forces applied to different points into one common frame.
-      To do this, we represent the equivalent effect of each Cartesian force at
-      the point of application as a force + torque applied at a different point
-      on the body.</p>
-
-      <p>Spatial forces fit neatly into our spatial algebra:
-      <ul>
-        <li>Spatial forces add when they are applied to the same body in the
-        same frame, e.g.: \begin{equation}F^{B_p}_{\text{total},C}
-        = \sum_i F^{B_p}_{i,C} .\end{equation}</li>
-        <li>Shifting a spatial force from one application point, $B_p$, to
-        another point, $B_q$, uses the cross product: \begin{equation} f^{B_q}_C
-        = f^{B_p}_C, \qquad \tau^{B_q}_C = \tau^{B_p}_C + {}^{B_q}p^{B_p}_C
-        \times f^{B_p}_C.\label{eq:spatial_force_shift}\end{equation}</li>
-        <li>As with all spatial vectors, rotations can be used to change
-        between the "expressed-in" frames: \begin{equation} f^{B_p}_D = {}^DR^C
-        f^{B_p}_C, \qquad \tau^{B_p}_D = {}^DR^C
-        \tau^{B_p}_C.\end{equation}</li>
-      </ul>
-      </p>
-
-      <p>Now we are starting to have the vocabulary to provide one answer to
-      the question: what makes a good grasp?  If the goal of a grasp is to
-      stabilize an object in the hand, then a good grasp can be one that is
-      able to resist disturbances described as an "adversarial" wrench applied
-      to the body.</p>
-
-    </subsection>
+    <p>If the goal of a grasp is to stabilize an object in the hand, then one
+    definition of a "good grasp" is be one that is able to resist
+    disturbances described by an "adversarial" wrench applied to the body.</p>
 
     <subsection><h1>The contact wrench cone</h1>
 

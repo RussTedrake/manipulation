@@ -11,6 +11,8 @@ import numpy as np
 from pydrake.all import (
     AbstractValue,
     Adder,
+    AddContactMaterial,
+    AddCompliantHydroelasticProperties,
     AddMultibodyPlantSceneGraph,
     BallRpyJoint,
     BaseField,
@@ -38,6 +40,7 @@ from pydrake.all import (
     Parser,
     PassThrough,
     PrismaticJoint,
+    ProximityProperties,
     RenderCameraCore,
     RenderEngineVtkParams,
     RevoluteJoint,
@@ -252,34 +255,14 @@ def AddShape(plant, shape, name, mass=1, mu=1, color=[0.5, 0.5, 0.9, 1.0]):
         ),
     )
     if plant.geometry_source_is_registered():
-        if isinstance(shape, Box):
-            plant.RegisterCollisionGeometry(
-                body,
-                RigidTransform(),
-                Box(
-                    shape.width() - 0.001,
-                    shape.depth() - 0.001,
-                    shape.height() - 0.001,
-                ),
-                name,
-                CoulombFriction(mu, mu),
-            )
-            i = 0
-            for x in [-shape.width() / 2.0, shape.width() / 2.0]:
-                for y in [-shape.depth() / 2.0, shape.depth() / 2.0]:
-                    for z in [-shape.height() / 2.0, shape.height() / 2.0]:
-                        plant.RegisterCollisionGeometry(
-                            body,
-                            RigidTransform([x, y, z]),
-                            Sphere(radius=1e-7),
-                            f"contact_sphere{i}",
-                            CoulombFriction(mu, mu),
-                        )
-                        i += 1
-        else:
-            plant.RegisterCollisionGeometry(
-                body, RigidTransform(), shape, name, CoulombFriction(mu, mu)
-            )
+        proximity_properties = ProximityProperties()
+        AddContactMaterial(
+            1e4, 1e7, CoulombFriction(mu, mu), proximity_properties
+        )
+        AddCompliantHydroelasticProperties(0.01, 1e8, proximity_properties)
+        plant.RegisterCollisionGeometry(
+            body, RigidTransform(), shape, name, proximity_properties
+        )
 
         plant.RegisterVisualGeometry(
             body, RigidTransform(), shape, name, color
