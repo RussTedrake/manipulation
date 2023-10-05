@@ -83,5 +83,6 @@ rt_ipynb_test(
       "//manipulation:meshcat_utils",
       "//manipulation:pick",
       "//manipulation:scenarios",
+      "//manipulation:station",
     ],
 )
