@@ -12,7 +12,7 @@ directives:
 
 - add_model:
     name: mustard
-    file: package://drake/manipulation/models/ycb/sdf/006_mustard_bottle.sdf
+    file: package://manipulation/hydro/006_mustard_bottle.sdf
 
 - add_weld:
     parent: mustard_origin
