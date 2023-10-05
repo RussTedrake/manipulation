@@ -1,36 +1,57 @@
-[build-system]
-requires = [
-    "setuptools>=42",
-    "wheel"
-]
-build-backend = "setuptools.build_meta"
-
-[project]
-version = "2023.09.28"
+[tool.poetry]
 name = "manipulation"
-authors = [
-    {name = "Russ Tedrake", email = "russt@mit.edu"}
-]
+version = "2023.10.04"
 description = "MIT 6.421 - Robotic Manipulation"
+authors = ["Russ Tedrake <russt@mit.edu>"]
+license = "BSD License"
 readme = "README.md"
-license = { file = "LICENSE.TXT" }
 classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: BSD License"
 ]
-# TODO: This could be pulled from requirements.txt.  I probably want to
-# separate out dev dependencies from user dependencies first.
-dependencies = [
-  "cloudpickle>=1.6.0",
-  "drake>=1.21.0",
-  "gradescope-utils>=0.4.0",
-  "mpld3>=0.5.1",
-  "timeout-decorator>=0.4.1"
+include = [
+    "LICENSE.txt",
+    "README.md",
+    "pyproject.toml",
+    "manipulation/**/*.py",
+    "manipulation/**/*.npy",
+    "manipulation/**/*.sdf",
+    "manipulation/**/*.urdf",
+    "manipulation/**/*.xml",
+    "manipulation/**/*.yaml",
+    "manipulation/**/*.obj"
 ]
-requires-python = ">=3.8"
+exclude = [
+    "*.egg-info/**",
+    "**/__pycache__/**",
+    "**/*.bazel",
+    "**/test/**",
+    "bazel-*",
+    "htmlbook/**",
+    "data/**",
+    "solutions/**",
+    "figures/**"
+]
 
-[tool.setuptools]
-packages = ["manipulation"]
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[[tool.poetry.source]]
+name = "drake-nightly"
+url = "https://drake-packages.csail.mit.edu/whl/nightly/"
+priority = "secondary"
+
+[tool.poetry.dependencies]
+python = ">=3.8"
+cloudpickle = ">=1.6.0"
+drake = { version = ">=0.0.20241004", source = "drake-nightly" }
+gradescope-utils = ">=0.4.0"
+mpld3 = ">=0.5.1"
+timeout-decorator = ">=0.4.1"
+
+[tool.poetry.dev-dependencies]
+# Add any development-specific dependencies here.
 
 [tool.black]
 line-length = 79
