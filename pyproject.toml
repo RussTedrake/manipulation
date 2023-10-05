@@ -1,6 +1,7 @@
 [tool.poetry]
 name = "manipulation"
-version = "2023.10.04"
+# Using e.g. 2023.10.4.post1 if I need to rerelease on the same day.
+version = "2023.10.4.post1"
 description = "MIT 6.421 - Robotic Manipulation"
 authors = ["Russ Tedrake <russt@mit.edu>"]
 license = "BSD License"
@@ -40,12 +41,12 @@ build-backend = "poetry.core.masonry.api"
 [[tool.poetry.source]]
 name = "drake-nightly"
 url = "https://drake-packages.csail.mit.edu/whl/nightly/"
-priority = "secondary"
+priority = "explicit"
 
 [tool.poetry.dependencies]
 python = ">=3.8"
 cloudpickle = ">=1.6.0"
-drake = { version = ">=0.0.20241004", source = "drake-nightly" }
+drake = { version = "==0.0.20231004", source = "drake-nightly" }
 gradescope-utils = ">=0.4.0"
 mpld3 = ">=0.5.1"
 timeout-decorator = ">=0.4.1"

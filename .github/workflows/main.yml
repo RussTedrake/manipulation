@@ -141,7 +141,7 @@ jobs:
         run: |
           apt-get update -o APT::Acquire::Retries=4 -qq
           apt-get install -o APT::Acquire::Retries=4 -o Dpkg::Use-Pty=0 -qy --no-install-recommends python3-pip git xvfb
-          pip3 install manipulation
+          pip3 install manipulation --extra-index-url https://drake-packages.csail.mit.edu/whl/nightly/
         shell: bash
       - name: checkout
         uses: actions/checkout@v2
