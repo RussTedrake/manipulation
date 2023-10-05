@@ -25,6 +25,7 @@ rt_ipynb_test(
     data = ["//manipulation/models"],
     deps = [
         "//manipulation",
+        "//manipulation:scenarios",
     ],
 )
 
