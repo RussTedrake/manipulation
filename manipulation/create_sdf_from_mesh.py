@@ -104,6 +104,7 @@ def perform_convex_decomposition(
         )
     except Exception as e:
         logging.error(f"Problem performing decomposition: {e}")
+        exit(1)
     if not isinstance(convex_pieces, list):
         convex_pieces = [convex_pieces]
 
