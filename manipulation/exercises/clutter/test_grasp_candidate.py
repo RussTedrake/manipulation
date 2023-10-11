@@ -39,12 +39,20 @@ class TestGraspCandidate(unittest.TestCase):
         kdtree = KDTree(pcd.xyzs().T)
         f = self.notebook_locals["compute_darboux_frame"]
 
+        # NOTE!
+        # You can rotate about the y-axis by 180 degrees and still
+        # get the correct answer.
+
         for i in range(4):
             index = test_indices[i]
             RT = f(index, pcd, kdtree)
             RT_desired = RigidTransform(X_lst_target[i])
+            alt = X_lst_target[i].copy()
+            alt[:, [0, 2]] = -alt[:, [0, 2]]
+            RT_desired_alt = RigidTransform(alt)
             self.assertTrue(
-                RT.IsNearlyEqualTo(RT_desired, 0.1),
+                RT.IsNearlyEqualTo(RT_desired, 0.1)
+                or RT.IsNearlyEqualTo(RT_desired_alt, 0.1),
                 "Your transform doesn't match the expected transform",
             )
 
@@ -56,10 +64,15 @@ class TestGraspCandidate(unittest.TestCase):
             [+0.03674694, -0.88056642, -0.47249594, +0.00884530],
             [+0.93758428, +0.19399482, -0.28862041, -0.00240727],
             [+0.34581122, -0.43239886, +0.83273393, +0.19118717]]))
+        RT_desired_alt = RigidTransform(np.array([  # noqa
+            [-0.03674694, -0.88056642, +0.47249594, +0.00884530],
+            [-0.93758428, +0.19399482, +0.28862041, -0.00240727],
+            [-0.34581122, -0.43239886, -0.83273393, +0.19118717]]))
         # yapf: enable
 
         self.assertTrue(
-            RT.IsNearlyEqualTo(RT_desired, 0.01),
+            RT.IsNearlyEqualTo(RT_desired, 0.01)
+            or RT.IsNearlyEqualTo(RT_desired_alt, 0.01),
             "Did you forget to sort the eigenvalues, "
             "or handle improper rotations?",
         )
