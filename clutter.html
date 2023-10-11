@@ -1156,10 +1156,14 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
     high-level behaviors (often called "task level") in a way that integrates
     seamlessly with the high-rate low-level controls?</p>
 
-    <p>There are a few important programming paradigms here.  Broadly speaking, I would categorize them into three bins:
+    <p>There are a few important programming paradigms for authoring the
+    task-level behavior.  Broadly speaking, I would categorize them into three
+    bins:
       <ul>
         <li>Procedural code (in a separate thread) passes messages/events to a
-        module that lives in the main robot/simulation thread.</li>
+        module that lives in the main robot/simulation thread. This is
+        relatively common in a multi-process message-passing ecosystem like
+        ROS.</li>
         <li>Task-level "policies" can be authored directly as e.g. finite state
         machines (FSMs) or "behavior trees", which get evaluated directly in
         the robot/simulation loop.</li>
@@ -1194,6 +1198,33 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
     belief space and task-and-motion planning, which we will cover in later
     parts of the notes. 
     </p>
+
+    <p>Until very recently, task-level planners are based primarily on search.
+    There is a long history of AI planning as search.  STRIPS, PDDL, ... ICAPS
+    planners (GraphPlan, FastForward, FastDownward, ...).  Heuristic search.
+    Importantly, the specifications are object oriented.</p>
+
+    <p>In late 2022, of course, a new approach to task "planning" exploded onto
+    the scene with the rise of large language models (LLMs). It quickly became
+    clear that the most powerful language models like GPT4 are capable of
+    producing highly nontrivial plans from very limited natural language
+    specifications. Careful prompting can be used to guide the LLM to produce
+    actions that the robot is is able to perform, and it seems that LLMs are
+    particularly good and <a href="https://code-as-policies.github.io/">writing
+    python code</a> <elib>Liang23</elib>. At the time of this writing, their is
+    still a challenge in automating a depiction of the current environment as
+    perceived from the robot cameras/sensors into a natural language prompt,
+    but it seems that this is only a matter of time. Word is that the rolling
+    release of <a
+    href="https://openai.com/research/gpt-4v-system-card">GPT-4V(ision)</a>
+    works amazingly well in this capacity.</p>
+
+    <p>An informal consensus is that language models make simple planning
+    problems extraordinarily easy. Importantly, while a search-based planner
+    might exploit missing requirements / constraints in your specification, the
+    LLMs output very reasonable plans, using "common sense" to fill in the
+    gaps. But there are still limits to what today's LLMs can achieve in the
+    way of long-horizon task planning with multi-step reasoning.</p>
 
     <p>For the purposes of clutter clearing in the systems framework, taking
     the second approach: writing the task-level behavior "policy" as a simple
@@ -1632,6 +1663,12 @@ PhD thesis, Institut für Informatik der Technischen Universität München, <spa
 <span class="author">Rodney A. Brooks</span>, 
 <span class="title">"Intelligence without representation"</span>, 
 <span class="publisher">Artificial Intelligence</span>, vol. 47, pp. 139-159, <span class="year">1991</span>.
+
+</li><br>
+<li id=Liang23>
+<span class="author">Jacky Liang and Wenlong Huang and Fei Xia and Peng Xu and Karol Hausman and Brian Ichter and Pete Florence and Andy Zeng</span>, 
+<span class="title">"Code as policies: Language model programs for embodied control"</span>, 
+<span class="publisher">2023 IEEE International Conference on Robotics and Automation (ICRA)</span> , pp. 9493--9500, <span class="year">2023</span>.
 
 </li><br>
 <li id=Colledanchise18>
