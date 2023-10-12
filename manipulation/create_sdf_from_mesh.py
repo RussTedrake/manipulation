@@ -38,7 +38,7 @@ def calc_mesh_com_and_inertia(
             moment_of_inertia: The moment of inertia of shape (3,3).
     """
     if not mesh.is_watertight:
-        logging.warn(
+        logging.warning(
             "The mesh is not watertight. This might lead to incorrect center of mass "
             + "and moment of inertia computations. However, in practice the values are "
             + "often reasonable regardless."
@@ -68,7 +68,7 @@ def perform_convex_decomposition(
     """Given a mesh, performs a convex decomposition of it with VHACD. The resulting
     convex parts are saved in a subfolder named `<mesh_filename>_parts`.
 
-    NOTE: The current implementation requires trimesh<=3.23.5. See
+    NOTE: The current implementation requires trimesh>3.23.5. See
     https://github.com/mikedh/trimesh/issues/2045.
 
     Args:
@@ -99,9 +99,7 @@ def perform_convex_decomposition(
         + "complicated meshes. If this runs too long, try decreasing --resolution."
     )
     try:
-        convex_pieces = trimesh.decomposition.convex_decomposition(
-            mesh, **kwargs
-        )
+        convex_pieces = mesh.convex_decomposition(**kwargs)
     except Exception as e:
         logging.error(f"Problem performing decomposition: {e}")
         exit(1)
@@ -144,7 +142,7 @@ def create_sdf_from_mesh(
     mu_static: Union[float, None],
     preview_with_trimesh: bool,
     **kwargs,
-):
+) -> None:
     """Given a mesh, creates an SDFormat file in the same directory that:
     - Uses the mesh as its visual geometry
     - Performs a convex decomposition of the mesh, and uses those pieces
@@ -173,6 +171,7 @@ def create_sdf_from_mesh(
         mu_static (Union[float, None]): The coefficient of static friction.
         preview_with_trimesh (bool): Whether to open (and block on) a window to preview
         the decomposition.
+        **kwargs: The VHACD arguments.
     """
     # Construct SDF path
     dir_path = mesh_path.parent
@@ -268,7 +267,7 @@ def create_sdf_from_mesh(
             )
             mu_static_item.text = f"{mu_static:.3f}"
 
-    logging.info(f"Writing SDF to {sdf_path}.")
+    logging.info(f"Writing SDF to {sdf_path}")
     ET.ElementTree(root_item).write(sdf_path, pretty_print=True)
 
 
@@ -338,16 +337,35 @@ if __name__ == "__main__":
         help="VHACD voxel resolution.",
     )
     parser.add_argument(
-        "--maxhulls",
+        "--maxConvexHulls",
         type=int,
-        default=100,
+        default=64,
         help="VHACD maximum number of convex hulls/ mesh pieces.",
     )
     parser.add_argument(
-        "--minVolumePerCH",
+        "--minimumVolumePercentErrorAllowed",
         type=float,
-        default=0.001,
-        help="VHACD minimum convex hull volume.",
+        default=1.0,
+        help="VHACD minimum allowed volume percentage error.",
+    )
+    parser.add_argument(
+        "--maxRecursionDepth",
+        type=int,
+        default=10,
+        help="VHACD maximum recursion depth.",
+    )
+    parser.add_argument(
+        "--no_shrinkWrap",
+        action="store_true",
+        help="Whether or not to shrinkwrap the voxel positions to the source mesh on "
+        + "output.",
+    )
+    parser.add_argument(
+        "--fillMode",
+        type=str,
+        default="flood",
+        choices=["flood", "raycast", "surface"],
+        help="VHACD maximum recursion depth.",
     )
     parser.add_argument(
         "--maxNumVerticesPerCH",
@@ -356,10 +374,16 @@ if __name__ == "__main__":
         help="VHACD maximum number of triangles per convex hull.",
     )
     parser.add_argument(
-        "--pca",
+        "--no_asyncACD",
         action="store_true",
-        help="Whether to normalize the mesh with PCA before performing the VHACD "
-        + "convex decomposition.",
+        help="Whether or not to run VHACD asynchronously, taking advantage of "
+        + "additional cores.",
+    )
+    parser.add_argument(
+        "--minEdgeLength",
+        type=int,
+        default=2,
+        help="VHACD minimum voxel patch edge length.",
     )
     parser.add_argument(
         "--preview",
@@ -435,8 +459,12 @@ if __name__ == "__main__":
         mu_static=mu_static,
         preview_with_trimesh=args.preview,
         resolution=args.resolution,
-        maxhulls=args.maxhulls,
+        maxConvexHulls=args.maxConvexHulls,
+        minimumVolumePercentErrorAllowed=args.minimumVolumePercentErrorAllowed,
+        maxRecursionDepth=args.maxRecursionDepth,
+        shrinkWrap=not args.no_shrinkWrap,
+        fillMode=args.fillMode,
         maxNumVerticesPerCH=args.maxNumVerticesPerCH,
-        minVolumePerCH=args.minVolumePerCH,
-        pca=args.pca,
+        asyncACD=not args.no_asyncACD,
+        minEdgeLength=args.minEdgeLength,
     )
