@@ -1199,43 +1199,76 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
     parts of the notes. 
     </p>
 
-    <p>Until very recently, task-level planners are based primarily on search.
-    There is a long history of AI planning as search.  STRIPS, PDDL, ... ICAPS
-    planners (GraphPlan, FastForward, FastDownward, ...).  Heuristic search.
-    Importantly, the specifications are object oriented.</p>
+    <subsection><h1>Task planning</h1>
 
-    <p>In late 2022, of course, a new approach to task "planning" exploded onto
-    the scene with the rise of large language models (LLMs). It quickly became
-    clear that the most powerful language models like GPT4 are capable of
-    producing highly nontrivial plans from very limited natural language
-    specifications. Careful prompting can be used to guide the LLM to produce
-    actions that the robot is is able to perform, and it seems that LLMs are
-    particularly good and <a href="https://code-as-policies.github.io/">writing
-    python code</a> <elib>Liang23</elib>. At the time of this writing, their is
-    still a challenge in automating a depiction of the current environment as
-    perceived from the robot cameras/sensors into a natural language prompt,
-    but it seems that this is only a matter of time. Word is that the rolling
-    release of <a
-    href="https://openai.com/research/gpt-4v-system-card">GPT-4V(ision)</a>
-    works amazingly well in this capacity.</p>
+      <p>Task-level planners are based primarily on search. There is a long
+      history of AI planning as search. STRIPS <elib>Fikes71</elib> was perhaps
+      the earliest, and most famous representation (and algorithm) for
+      describing planning problems using an initial state, a goal state, and a
+      set of actions with pre-conditions and effects.  Temporal logic (e.g.
+      linear temporal logic (LTL), metric temporal logic (MTL), signal temporal
+      logic (STL)) enables the specification to include complex goals or
+      constraints that evolve over time, such as "event A should eventually
+      happen after event B". The planning domain definition language (PDDL)
+      <elib>Aeronautiques98+Haslum19</elib> extended the STRIPS representation
+      to include more expressive features such as typed variables, conditional
+      effects, and (even temporal logic) quantifiers, and served as the
+      specification language for a long-running and highly influential series
+      of <a href="https://www.icaps-conference.org/competitions/">ICAPS
+      planning competitions</a>. These planning competitions gave rise to a
+      number of highly effective planning algorithms such as GraphPlan
+      <elib>Blum97</elib>, HSP <elib>Bonet01</elib>, Fast-Forward
+      <elib>Hoffmann01</elib>, and FastDownward <elib>Helmert06</elib>. These
+      planners demonstrated the power of "heurstic search", and strongly
+      leverage the object-oriented nature of the specification to use
+      factorization as a strong heuristic.</p>
 
-    <p>An informal consensus is that language models make simple planning
-    problems extraordinarily easy. Importantly, while a search-based planner
-    might exploit missing requirements / constraints in your specification, the
-    LLMs output very reasonable plans, using "common sense" to fill in the
-    gaps. But there are still limits to what today's LLMs can achieve in the
-    way of long-horizon task planning with multi-step reasoning.</p>
+    </subsection>
 
-    <p>For the purposes of clutter clearing in the systems framework, taking
-    the second approach: writing the task-level behavior "policy" as a simple
-    state machine will work nicely.</p>
+    <subsection><h1>Large Language Models</h1>
 
-    <example><h1>A simple state machine for "clutter clearing"</h1>
+      <p>In late 2022, of course, a new approach to task "planning" exploded
+      onto the scene with the rise of large language models (LLMs). It quickly
+      became clear that the most powerful language models like GPT4 are capable
+      of producing highly nontrivial plans from very limited natural language
+      specifications. Careful prompting can be used to guide the LLM to produce
+      actions that the robot is is able to perform, and it seems that LLMs are
+      particularly good and writing python code. Using Python, it's even
+      possible to prompt the LLM to <a
+      href="https://code-as-policies.github.io/">generate a policy</a> rather
+      than just a plan <elib>Liang23</elib>. At the time of this writing, their
+      is still a challenge in automating a depiction of the current environment
+      as perceived from the robot cameras/sensors into a natural language
+      prompt, but it seems that this is only a matter of time. Word is that the
+      rolling release of <a
+      href="https://openai.com/research/gpt-4v-system-card">GPT-4V(ision)</a>
+      works amazingly well in this capacity.</p>
 
-      <todo>Draw the simple state machine diagram here, and write a minimal
-      system that implements it.</todo>
+      <p>An informal consensus is that language models make simple planning
+      problems extraordinarily easy. Importantly, while a search-based planner
+      might exploit missing requirements / constraints in your specification,
+      the LLMs output very reasonable plans, using "common sense" to fill in
+      the gaps. There are still limits to what today's LLMs can achieve in the
+      way of long-horizon task planning with multi-step reasoning, but clever
+      prompt engineering can lead to impressive results <elib>Yao23</elib>.</p>
 
-    </example>
+      <todo>example?</todo>
+    </subsection>
+
+    <subsection><h1>A simple state machine for "clutter clearing"</h1>
+
+      <p>For the purposes of clutter clearing in the systems framework, taking
+      the second approach: writing the task-level behavior "policy" as a simple
+      state machine will work nicely.</p>
+
+      <example><h1>A simple state machine for "clutter clearing"</h1>
+
+        <todo>Draw the simple state machine diagram here, and write a minimal
+        system that implements it.</todo>
+
+      </example>
+
+    </subsection>
 
   </section>
 
@@ -1665,10 +1698,58 @@ PhD thesis, Institut für Informatik der Technischen Universität München, <spa
 <span class="publisher">Artificial Intelligence</span>, vol. 47, pp. 139-159, <span class="year">1991</span>.
 
 </li><br>
+<li id=Fikes71>
+<span class="author">Richard E Fikes and Nils J Nilsson</span>, 
+<span class="title">"STRIPS: A new approach to the application of theorem proving to problem solving"</span>, 
+<span class="publisher">Artificial intelligence</span>, vol. 2, no. 3-4, pp. 189--208, <span class="year">1971</span>.
+
+</li><br>
+<li id=Aeronautiques98>
+<span class="author">Constructions Aeronautiques and Adele Howe and Craig Knoblock and ISI Drew McDermott and Ashwin Ram and Manuela Veloso and Daniel Weld and David Wilkins SRI and Anthony Barrett and Dave Christianson and others</span>, 
+<span class="title">"{PDDL}| the planning domain definition language"</span>, 
+<span class="publisher">Technical Report, Tech. Rep.</span>, <span class="year">1998</span>.
+
+</li><br>
+<li id=Haslum19>
+<span class="author">Patrik Haslum and Nir Lipovetzky and Daniele Magazzeni and Christian Muise and Ronald Brachman and Francesca Rossi and Peter Stone</span>, 
+<span class="title">"An introduction to the planning domain definition language"</span>, Springer
+, vol. 13, <span class="year">2019</span>.
+
+</li><br>
+<li id=Blum97>
+<span class="author">Avrim L Blum and Merrick L Furst</span>, 
+<span class="title">"Fast planning through planning graph analysis"</span>, 
+<span class="publisher">Artificial intelligence</span>, vol. 90, no. 1-2, pp. 281--300, <span class="year">1997</span>.
+
+</li><br>
+<li id=Bonet01>
+<span class="author">Blai Bonet and H{\'e}ctor Geffner</span>, 
+<span class="title">"Planning as heuristic search"</span>, 
+<span class="publisher">Artificial Intelligence</span>, vol. 129, no. 1-2, pp. 5--33, <span class="year">2001</span>.
+
+</li><br>
+<li id=Hoffmann01>
+<span class="author">Jörg Hoffmann</span>, 
+<span class="title">"FF: The fast-forward planning system"</span>, 
+<span class="publisher">AI magazine</span>, vol. 22, no. 3, pp. 57--57, <span class="year">2001</span>.
+
+</li><br>
+<li id=Helmert06>
+<span class="author">Malte Helmert</span>, 
+<span class="title">"The fast downward planning system"</span>, 
+<span class="publisher">Journal of Artificial Intelligence Research</span>, vol. 26, pp. 191--246, <span class="year">2006</span>.
+
+</li><br>
 <li id=Liang23>
 <span class="author">Jacky Liang and Wenlong Huang and Fei Xia and Peng Xu and Karol Hausman and Brian Ichter and Pete Florence and Andy Zeng</span>, 
 <span class="title">"Code as policies: Language model programs for embodied control"</span>, 
 <span class="publisher">2023 IEEE International Conference on Robotics and Automation (ICRA)</span> , pp. 9493--9500, <span class="year">2023</span>.
+
+</li><br>
+<li id=Yao23>
+<span class="author">Shunyu Yao and Dian Yu and Jeffrey Zhao and Izhak Shafran and Thomas L Griffiths and Yuan Cao and Karthik Narasimhan</span>, 
+<span class="title">"Tree of thoughts: Deliberate problem solving with large language models"</span>, 
+<span class="publisher">arXiv preprint arXiv:2305.10601</span>, <span class="year">2023</span>.
 
 </li><br>
 <li id=Colledanchise18>
