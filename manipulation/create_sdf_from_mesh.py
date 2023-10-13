@@ -68,7 +68,7 @@ def perform_convex_decomposition(
     """Given a mesh, performs a convex decomposition of it with VHACD. The resulting
     convex parts are saved in a subfolder named `<mesh_filename>_parts`.
 
-    NOTE: The current implementation requires trimesh>3.23.5. See
+    NOTE: The current implementation requires trimesh>=4.0.0. See
     https://github.com/mikedh/trimesh/issues/2045.
 
     Args:
