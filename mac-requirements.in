@@ -1,0 +1,20 @@
+-r htmlbook/mac-requirements.in
+-c htmlbook/mac-constraints.txt
+black[jupyter]
+cloudpickle==2.2.1  # needs to be pinned for stored files to remain compatible.
+gradescope-utils>=0.4
+lxml>=4.9.2 # seems to be needed on python 3.11
+mpld3>=0.5.6 # for matplotlib>=3.5.0
+#nevergrad>=0.4.3; platform_machine == 'x86_64'
+pillow>=9.5.0
+psutil
+#pymcubes>=0.1  # was causing a numpy mismatch on python3.10 (forcing numpy 1.21.6 to be installed, somehow)
+pyproject-autoflake
+pyzmq>=25.0.0 # seems to be needed on python 3.11
+requests>=2.25
+scipy
+stable-baselines3>=1.7.0
+timeout-decorator>=0.5
+torch>=2.0.1  
+#torchvision
+trimesh[easy,recommend]>=4.0.0
