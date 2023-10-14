@@ -57,19 +57,15 @@ apt-get update -qq || (sleep 15; apt-get update -qq)
 
 apt-get install -o APT::Acquire::Retries=4 -o Dpkg::Use-Pty=0 -qy \
   --no-install-recommends $(cat <<EOF
+g++
 graphviz
-jupyter
 jupyter-nbconvert
 jupyter-notebook
-libsm6
-libglib2.0-0
-libx11-6
 locales
 python3
 python3-pip
 tidy
 wget
-g++
 unzip
 zlib1g-dev
 EOF
@@ -84,6 +80,7 @@ if [[ -z "${LANG:-}" && -z "${LC_ALL:-}" ]]; then
   echo 'WARNING: LANG and LC_ALL environment variables are NOT set. Please export LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8.' >&2
 fi
 
+# This should match drake/setup/ubuntu/source_distribution/install_bazel.sh
 dpkg_install_from_wget() {
   package="$1"
   version="$2"
@@ -124,6 +121,6 @@ dpkg_install_from_wget() {
 }
 
 dpkg_install_from_wget \
-  bazel 6.1.1 \
-  https://releases.bazel.build/6.1.1/release/bazel_6.1.1-linux-x86_64.deb \
-  a90246165f0972629506132975a7c5d5aecd42453e03e0f88e175a33601cdf70
+  bazel 6.3.1 \
+  https://github.com/bazelbuild/bazel/releases/download/6.3.1/bazel_6.3.1-linux-x86_64.deb \
+  2772e6aad3f12f9ddce83032d4f52aac9da141ca4191ced1471a1b6d5adb6da7
