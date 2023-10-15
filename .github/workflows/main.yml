@@ -154,8 +154,8 @@ jobs:
         # installed drake.
         run: |
           ./setup/ubuntu/22.04/install_prereqs.sh
-          # pip3 install -r requirements.txt
-          truncate -s0 requirements.txt 
+          pip3 install -r requirements.txt  # poetry does not publish dependency groups https://github.com/python-poetry/poetry/issues/6727
+          truncate -s0 requirements.txt
           sed -i '/PYTHONNOUSERSITE/d' .bazelrc
           git apply setup/pip_ci.patch
           ( cd htmlbook && git apply workflows/ci/pip_ci.patch )
