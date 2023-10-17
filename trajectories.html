@@ -736,7 +736,12 @@ ik.AddPositionConstraint(
       into an unconstrained problem, then using a simple but fast
       gradient-based solver<elib>Toussaint14</elib>. Augmented-Lagrangian-based
       approaches appear to be the most popular and successful these days; I
-      hope to provide a nice implementation in Drake soon!</p>
+      hope to provide a nice implementation in Drake soon! But one does have to
+      be careful in comparing these different solvers -- SNOPT may declare
+      failure if it cannot optimize the cost and satisfy constraints to the
+      default tolerances (around 1e-6), while an Augmented-Lagrangian approach
+      will never report failure and will rarely aim for this level of accuracy.
+      </p>
 
       <p>When kinematic trajectory optimizations succeed, they are an
       incredibly satisfying solution to the motion planning problem. They give
