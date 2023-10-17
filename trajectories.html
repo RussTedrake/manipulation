@@ -174,20 +174,21 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       homotopy methods) with impressive results on difficult kinematics
       problems.</p>
 
-      <p>While the algebraic-geometry methods are mostly targeted for offline
-      global analysis, they are not designed for fast real-time inverse
-      kinematics solutions needed in a control loop.  The most popular tool
-      these days for real-time inverse kinematics for six- or seven-DOF
-      manipulators is a tool called "IKFast", described in Section 4.1
-      of <elib>Diankov10</elib>, that gained popularity because of its effective
-      open-source implementation.  Rather than focus on completeness, IKFast
-      uses a number of approximations to provide fast and numerically robust
-      solutions to the "easy" kinematics problems.  It leverages the fact that a
-      six-DOF pose constraint on a six-DOF manipulator has a "closed-form"
-      solution with a finite number of joint space configurations that produce
-      the same end-effector pose, and for seven-DOF manipulators it adds a layer
-      of sampling in the last degree of freedom on top of the six-DOF
-      solver.</p>
+      <p>The kinematics algorithms based on algebraic geometry have
+      traditionally been targeted for offline global analysis, and are often
+      not designed for fast real-time inverse kinematics solutions needed in a
+      control loop.  The most popular tool these days for real-time inverse
+      kinematics for six- or seven-DOF manipulators is a tool called "IKFast",
+      described in Section 4.1 of <elib>Diankov10</elib>, that gained
+      popularity because of its effective open-source implementation.  Rather
+      than focus on completeness, IKFast uses a number of approximations to
+      provide fast and numerically robust solutions to the "easy" kinematics
+      problems.  It leverages the fact that a six-DOF pose constraint on a
+      six-DOF manipulator has a "closed-form" solution (for most serial-chain
+      robot arms) with a finite number of joint space configurations that
+      produce the same end-effector pose, and for seven-DOF manipulators it
+      adds a layer of sampling in the last degree of freedom on top of the
+      six-DOF solver.</p>
 
       <todo>add an example of calling (or implementing something equivalent to)
       IKFast and/or Bertini. looks like bertini 2 has python bindings (but not
@@ -196,10 +197,10 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       <p>These explicit solutions are important to understand because they
       provide deep insight into the equations, and because they can be fast
       enough to use inside a more sophisticated solution approach.  But the
-      solutions don't provide the rich specification I advocated for above; in
-      particular, they break down once we have inequality constraints instead
-      of equality constraints.  For those richer specifications, we will turn
-      to optimization.</p>
+      solutions don't immediately provide the rich specification I advocated
+      for above; in particular, they break down once we have inequality
+      constraints instead of equality constraints.  For those richer
+      specifications, we will turn to optimization.</p>
 
     </subsection>
 
@@ -323,17 +324,18 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
 
       <example><h1>Grasp the cylinder</h1>
       
-        <p>Let's use IK to grasp a cylinder (call it a hand rail).  Suppose it
-        doesn't matter where along the cylinder we grasp, nor the orientation
-        at which we grasp it.  Then we should write the IK problem using
-        only the minimal version of those constraints.</p>
+        <p>Let's use IK to grasp a cylinder. You can think of it as a hand
+        rail, if you prefer.  Suppose it doesn't matter where along the
+        cylinder we grasp, nor the orientation at which we grasp it.  Then we
+        should write the IK problem using only the minimal version of those
+        constraints.</p>
 
         <p>In the notebook, I've coded up one version of this.  I've put the
         cylinder's pose on the sliders now, so you can move it around the
         workspace, and watch how the IK solver decides to position the robot.
         In particular, if you move the cylinder in $\pm y$, you'll see that the
         robot doesn't try to follow... until the hand gets to the end of the
-        cylinder.  Very nice!</p>
+        cylinder. Very nice!</p>
 
         <figure>
             <img width="30%" src="data/grasp_cylinder_1.png"/>
@@ -487,8 +489,8 @@ ik.AddPositionConstraint(
       <elib>Trutman22</elib> solves the narrow version of the problem (just
       end-effector poses and joint limits) using convex optimization via a
       hierarchy of semi-definite programming relaxations; it would be very
-      interesting to understand how well this approach works the larger family
-      of costs and constraints.</p>
+      interesting to understand how well this approach works with the larger
+      family of costs and constraints.</p>
 
     </subsection>
 
@@ -527,7 +529,7 @@ ik.AddPositionConstraint(
       to the trajectory planning we'll do in the next section.  Imagine if the
       task requires us not only to pick up the object in clutter, but also to
       place the object carefully in clutter as well. In this case, a good grasp
-      is finds a pose for the hand relative to the object that
+      involves a pose for the hand relative to the object that
       <i>simultaneously optimizes</i> both the pick configuration and the place
       configuration. This is actually quite natural to do with inverse
       kinematics; one can formulate an optimization problem with decision
@@ -575,9 +577,9 @@ ik.AddPositionConstraint(
 
     <subsection><h1>Trajectory parameterizations</h1>
     
-      <p>The interesting question, then, becomes how to do we actually
+      <p>The interesting question, then, becomes how do we actually
       parameterize the trajectory $q(t)$ with a parameter vector $\alpha$?
-      These says, you might think that $q_\alpha(t)$ could be a neural network
+      These days, you might think that $q_\alpha(t)$ could be a neural network
       that takes $t$ as an input, offers $q$ as an output, and uses $\alpha$ to
       represent the weights and biases of the network. Of course you could, but
       for inputs with a scalar input like this, we often take much simpler and
