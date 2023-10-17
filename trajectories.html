@@ -481,7 +481,7 @@ ik.AddPositionConstraint(
       we support, then we can begin to make progress.
       </p>
 
-      <p>Drake provide an implementation of the <a
+      <p>Drake provides an implementation of the <a
       href="https://drake.mit.edu/doxygen_cxx/classdrake_1_1multibody_1_1_global_inverse_kinematics.html">GlobalInverseKinematics</a>
       approach described in <elib>Dai17</elib> using mixed-integer convex
       optimization. The solution times are on the order of a few seconds; it
@@ -524,26 +524,23 @@ ik.AddPositionConstraint(
       Furthermore, if the IK problem returns infeasible, we should reject the
       sample.</p>
 
-      <p>There is a quite nice extension of this idea that becomes quite
-      natural once we take the optimization view, and it is a nice transition
-      to the trajectory planning we'll do in the next section.  Imagine if the
-      task requires us not only to pick up the object in clutter, but also to
-      place the object carefully in clutter as well. In this case, a good grasp
+      <p>There is a quite nice extension of this idea that becomes natural once
+      we take the optimization view, and it is a nice transition to the
+      trajectory planning we'll do in the next section.  Imagine if the task
+      requires us not only to pick up the object in clutter, but also to place
+      the object carefully in clutter as well. In this case, a good grasp
       involves a pose for the hand relative to the object that
       <i>simultaneously optimizes</i> both the pick configuration and the place
-      configuration. This is actually quite natural to do with inverse
-      kinematics; one can formulate an optimization problem with decision
+      configuration. One can formulate an optimization problem with decision
       variables for both $q_{pick}$ and $q_{place}$, with constraints enforcing
-      that ${}^OX^{G_{pick}} = {}^OX^{G_{place}}$.</p> 
-      
-      <todo>Simple code example here</todo>
-
-      <p>Once we add in all of our other rich costs and constraints, this
-      becomes a quite sophisticated approach. In the <a
+      that ${}^OX^{G_{pick}} = {}^OX^{G_{place}}$. Of course we can still add
+      in all of our other rich costs and constraints, In the <a
       href="pose.html#tri_dishloading">dish-loading project at TRI</a>, this
       approach proved to be very important. Both picking up a mug in the sink
       and placing it in the dishwasher rack are highly constrained, so we
       needed the simultaneous optimization to find successful grasps.</p>
+      
+      <todo>Simple code example here</todo>
 
     </subsection>
 
@@ -557,15 +554,16 @@ ik.AddPositionConstraint(
     then you are well on your way to understanding kinematic trajectory
     optimization. Rather than solving multiple inverse kinematics problems
     independently, the basic idea now is to solve for a sequence of joint
-    angles in the same optimization. Even better, let us define a parameterized
-    joint trajectory, $q_\alpha(t)$, where $\alpha$ are parameters. Then a
-    simple extension to our inverse kinematics problem would be to write
-    something like \begin{align} \min_{\alpha,T} & \quad T, \\ \subjto &\quad
-    X^{G_{start}} = f_{kin}(q_\alpha(0)),\\ & \quad X^{G_{goal}} =
-    f_{kin}(q_\alpha(T)), \\ & \quad \forall t , \quad
+    angles simultaneously in a single optimization. Even better, let us define
+    a parameterized joint trajectory, $q_\alpha(t)$, where $\alpha$ are
+    parameters. Then a simple extension to our inverse kinematics problem would
+    be to write something like \begin{align} \min_{\alpha,T} & \quad T, \\
+    \subjto &\quad X^{G_{start}} = f_{kin}(q_\alpha(0)),\\ & \quad X^{G_{goal}}
+    = f_{kin}(q_\alpha(T)), \\ & \quad \forall t , \quad
     \left|\dot{q}_\alpha(t)\right| \le v_{max} \label{eq:vel_limits}.
-    \end{align} I read this as "find a trajectory, $q(t)$ for $t \in [0, T]$,
-    that moves the gripper from the start to the goal in minimum time".</p>
+    \end{align} I read this as "find a trajectory, $q_\alpha(t)$ for $t \in
+    [0, T]$, that moves the gripper from the start to the goal in minimum
+    time".</p>
     
     <p>The last equation, (\ref{eq:vel_limits}), represents velocity limits;
     this is the only way we are telling the optimizer that the robot cannot
@@ -588,13 +586,13 @@ ik.AddPositionConstraint(
       <p>There are many ways one can parameterize a trajectory with
       polynomials. For example in <i>dynamic</i> motion planning, <a
       href="https://underactuated.csail.mit.edu/trajopt.html#direct_collocation">direct
-      collocation methods</a> uses <a
+      collocation methods</a> use <a
       href="https://drake.mit.edu/doxygen_cxx/classdrake_1_1trajectories_1_1_piecewise_polynomial.html">piecewise-cubic
       polynomials</a> to represent the state trajectory, and the <a
       href="https://underactuated.csail.mit.edu/trajopt.html#pseudo-spectral">pseudo-spectral
       methods</a> use Lagrange polynomials. In each case, the choice of basis
       functions is made so that algorithm can leverage a particular property of
-      the basis. In dynamic motion planning, a great deal of focus is on the integration accuracy of the dynamic equations to ensure that we obtain feasible solutions to the dynamic constraints..</p>
+      the basis. In dynamic motion planning, a great deal of focus is on the integration accuracy of the dynamic equations to ensure that we obtain feasible solutions to the dynamic constraints.</p>
 
       <p>When we are planning the motions of our fully-actuated robot arms, we
       typically worry less about dynamic feasibility, and focus instead on the
@@ -603,8 +601,8 @@ ik.AddPositionConstraint(
       href="https://drake.mit.edu/doxygen_cxx/classdrake_1_1trajectories_1_1_bspline_trajectory.html">B-spline
       trajectory</a> parameterization has a few particularly nice properties
       that we can leverage here:
-      <ul><li>The derivative of a B-spline is still a B-spline (of one less
-      degree), with coefficients that are linear in the original
+      <ul><li>The derivative of a B-spline is still a B-spline (the degree is
+      reduced by one), with coefficients that are linear in the original
       coefficients.</li><li>The bases themselves are non-negative and sparse.
       This gives the coefficients of the B-spline polynomial, which are
       referred to as the <i>control points</i>, a strong geometric
@@ -616,11 +614,11 @@ ik.AddPositionConstraint(
       parameterized trajectories, but use the convex hull property to ensure
       that limits on the joint positions and any of its derivatives are
       satisfied $\forall t\in [0,T]$ using <i>linear</i> constraints.  This
-      sort of guarantee is much more costly to obtain using most other
+      sort of guarantee would be much more costly to obtain using most other
       polynomial bases.</p>
       
       <todo>Write up the B-spline math here; and clean up the Drake
-      notation/implementation in the process. In particular, I want to purse
+      notation/implementation in the process. In particular, I want to purge
       the use of symbolic from KinematicTrajectoryOptimization. My
       `RussTedrake/drake:bsplinebasis_derivatives` branch has a start at
       getting analytical derivatives for the trajopt workflow. </todo>
@@ -731,7 +729,7 @@ ik.AddPositionConstraint(
       <elib>Ratliff09a</elib>, STOMP <elib>Kalakrishnan11a</elib>, and
       KOMO<elib>Toussaint17</elib>.</p>
       
-      <p>KOMO, for instance, is one of a wave of trajectory optimization
+      <p>KOMO, for instance, is one of a handful of trajectory optimization
       techniques that use the <a
       href="https://en.wikipedia.org/wiki/Augmented_Lagrangian_method">Augmented
       Lagrangian method</a> of transcribing a constrained optimization problem
@@ -751,26 +749,32 @@ ik.AddPositionConstraint(
 
       <example><h1>Local minima in collision-free trajectory optimization</h1>
         <p>Consider the extremely simple example of finding the shortest path
-        from the start (blue star) to the goal (green star) in the image above,
-        avoiding collisions with the red box. Avoiding even the complexity of
-        B-splines, we can write an extremely simple optimization of the form:
-        \begin{aligned} \min_{q_0, ..., q_N} \quad & \sum_{n=0}^{N-1} | q_{n+1}
-        - q_n|_2^2 & \\ \text{subject to} \quad & q_0 = q_{start} \\ & q_N =
-        q_{goal} \\ & |q_n|_1 \ge 1 & \forall n, \end{aligned} where the last
-        line is the collision-avoidance constraint saying that each sample
-        point has to be <i>outside</i> of the $\ell_1$-ball.
+        for a point robot moving from the start (blue circle) to the goal
+        (green circle) in the image below, avoiding collisions with the red
+        box. Avoiding even the complexity of B-splines, we can write an
+        optimization of the form: \begin{aligned} \min_{q_0, ..., q_N} \quad &
+        \sum_{n=0}^{N-1} | q_{n+1} - q_n|_2^2 & \\ \text{subject to} \quad &
+        q_0 = q_{start} \\ & q_N = q_{goal} \\ & |q_n|_1 \ge 1 & \forall n,
+        \end{aligned} where the last line is the collision-avoidance constraint
+        saying that each sample point has to be <i>outside</i> of the
+        $\ell_1$-ball (my convenient choice for the geometry of the red box).
+        Alternatively, we can write a slightly more advanced constraint to
+        maintain that each <i></i>line segment</i> is outside of the obstacle
+        (rather than just the vertices). Here are some possible solutions to this optimization problem:
         </p>
         
         <figure>
-          <img height="200" src="data/redbox_shortest_path.png">
+          <img height="250" src="data/redbox_shortest_path.png"/>
+          <img height="250" src="data/redbox_shortest_path_local_minima.png"/>
         </figure>
-        <todo>Turn that into an animation like the ICP where the initial condition changes</todo>
+        <todo>Fix meshcat line width.</todo>
           
-        <p>Once a nonlinear solver is
-        considering paths that go right around the obstacle, it is very
-        unlikely to find a solution that goes left around the obstacle, because
-        the solution would have to get worse (violate the collision constraint)
-        before it gets better.</p> 
+        <p>The solution on the left is the (global) minimum for the problem;
+        the solution on the right is clearly a local minima. Once a nonlinear
+        solver is considering paths that go right around the obstacle, it is
+        very unlikely to find a solution that goes left around the obstacle,
+        because the solution would have to get worse (violate the collision
+        constraint) before it gets better.</p> 
 
         <todo>Make a version of this with B-splines</todo>
       </example>
