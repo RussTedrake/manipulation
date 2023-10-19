@@ -125,6 +125,11 @@ class Scenario:
     visualization: VisualizationConfig = VisualizationConfig()
 
 
+@dc.dataclass
+class Directives:
+    directives: typing.List[ModelDirective] = dc.field(default_factory=list)
+
+
 # TODO(russt): load from url (using packagemap).
 def load_scenario(
     *, filename=None, data=None, scenario_name=None, defaults=Scenario()
@@ -160,6 +165,30 @@ def load_scenario(
             retain_map_defaults=True,
         )
     return result
+
+
+def add_directives(
+    scenario,
+    *,
+    filename=None,
+    data=None,
+    scenario_name=None,
+):
+    d = Directives()
+    if filename:
+        d = yaml_load_typed(
+            schema=Directives,
+            filename=filename,
+            child_name=scenario_name,
+        )
+    if data:
+        d = yaml_load_typed(
+            schema=Directives,
+            data=data,
+            child_name=scenario_name,
+        )
+    scenario.directives.extend(d.directives)
+    return scenario
 
 
 # TODO(russt): Use the c++ version pending https://github.com/RobotLocomotion/drake/issues/20055
@@ -765,7 +794,7 @@ def AddPointClouds(
 
         meshcat: If not None, then a MeshcatPointCloudVisualizer will be added to the builder using this meshcat instance.
     """
-    to_point_cloud = []
+    to_point_cloud = dict()
     for _, config in scenario.cameras.items():
         if not config.depth:
             return
@@ -799,23 +828,21 @@ def AddPointClouds(
             config.principal_point()[1],
         )
 
-        to_point_cloud.append(
-            builder.AddSystem(
-                DepthImageToPointCloud(
-                    camera_info=intrinsics,
-                    fields=BaseField.kXYZs | BaseField.kRGBs,
-                )
+        to_point_cloud[config.name] = builder.AddSystem(
+            DepthImageToPointCloud(
+                camera_info=intrinsics,
+                fields=BaseField.kXYZs | BaseField.kRGBs,
             )
         )
-        to_point_cloud[-1].set_name(f"{config.name}.point_cloud")
+        to_point_cloud[config.name].set_name(f"{config.name}.point_cloud")
 
         builder.Connect(
             station.GetOutputPort(f"{config.name}.depth_image"),
-            to_point_cloud[-1].depth_image_input_port(),
+            to_point_cloud[config.name].depth_image_input_port(),
         )
         builder.Connect(
             station.GetOutputPort(f"{config.name}.rgb_image"),
-            to_point_cloud[-1].color_image_input_port(),
+            to_point_cloud[config.name].color_image_input_port(),
         )
 
         if poses_output_port is None:
@@ -833,7 +860,7 @@ def AddPointClouds(
         )
         builder.Connect(
             camera_pose.get_output_port(),
-            to_point_cloud[-1].GetInputPort("camera_pose"),
+            to_point_cloud[config.name].GetInputPort("camera_pose"),
         )
 
         if meshcat:
@@ -842,7 +869,7 @@ def AddPointClouds(
                 MeshcatPointCloudVisualizer(meshcat, f"{config.name}.cloud")
             )
             builder.Connect(
-                to_point_cloud[-1].point_cloud_output_port(),
+                to_point_cloud[config.name].point_cloud_output_port(),
                 point_cloud_visualizer.cloud_input_port(),
             )
 

@@ -25,6 +25,7 @@ rt_ipynb_test(
     data = ["//manipulation/models"],
     deps = [
         "//manipulation",
+        "//manipulation:scenarios",
     ],
 )
 
@@ -83,5 +84,6 @@ rt_ipynb_test(
       "//manipulation:meshcat_utils",
       "//manipulation:pick",
       "//manipulation:scenarios",
+      "//manipulation:station",
     ],
 )

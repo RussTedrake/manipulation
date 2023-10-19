@@ -50,7 +50,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
 <table style="width:100%;" pdf="no"><tr style="width:100%">
   <td style="width:33%;text-align:left;"><a class="previous_chapter" href=pose.html>Previous Chapter</a></td>
   <td style="width:33%;text-align:center;"><a href=index.html>Table of contents</a></td>
-  <td style="width:33%;text-align:right;"><a class="next_chapter" href=mobile.html>Next Chapter</a></td>
+  <td style="width:33%;text-align:right;"><a class="next_chapter" href=trajectories.html>Next Chapter</a></td>
 </tr></table>
 
 <script type="text/javascript">document.write(notebook_header('clutter'))
@@ -360,19 +360,6 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
     -- as Cartesian forces at one or more contact points. It's easy to
     underestimate this step!</p>
 
-    <example><h1>Contact force inspector</h1>
-    
-      <p>I've created a simple GUI that allows you to pick any two primitive
-      geometry types and inspect the (single) point contact information that is
-      computed when those object are put into penetration.  There is a lot of
-      information displayed there!  Take a minute to make sure you understand
-      the colors, and the information provided in the textbox display.
-      </p>
-
-      <script>document.write(notebook_link('clutter', deepnote, '', 'contact_inspector'))</script>
-
-    </example>
-
     <p>First, let's appreciate the sheer number of cases that we have to get
     right in the code; it's unfortunately extremely common for open-source
     tools to have bugs in here. But I think this gui also makes it pretty
@@ -395,7 +382,20 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
     </script>); I'm working to use it in all of my examples in these notes.</p>
 
     <todo>More about hydroelastic here.  Show some of the nice videos.
-    https://youtu.be/5-k2Pc6OmzE</todo>
+      https://youtu.be/5-k2Pc6OmzE</todo>
+
+    <example><h1>Contact force inspector</h1>
+        
+      <p>I've created a simple GUI that allows you to pick any two primitive
+      geometry types and inspect the hydroelastic contact information that is
+      computed when those object are put into penetration.
+      </p>
+
+      <script>document.write(notebook_link('clutter', deepnote, '', 'contact_inspector'))</script>
+
+    </example>
+
+
 
   </subsection>
 
@@ -499,7 +499,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
 
     <p>Forces in the tangential directions are due to friction.  The most
     commonly used model of friction is Coulomb friction, which states that
-    $$|f^{c_i}_{C_{x,y}}|_2 \le \mu f^{c_i}_{C_z},$$ with $\mu$ a
+    $$\sqrt{{f^{c_i}_{C_x}}^2 + {f^{c_i}_{C_y}}^2} \le \mu f^{c_i}_{C_z},$$ with $\mu$ a
     non-negative scalar <i>coefficient of friction</i>.  Typically we define
     both a $\mu_{static}$, which is applied when the tangential velocity is
     zero, and $\mu_{dynamic}$, applied when the tangential velocity is
@@ -553,24 +553,25 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       equilibrium exists in this configuration.</p>
 
       <p>If we increase the coefficient of (static) friction to the range
-      corresponding to the lighter green, then we can find contact forces
-      that produce an equilibrium.  Indeed, for this problem, we need some
-      amount of friction to even have an equilibrium (we'll explore this in
-      the <a href="#static_equilibrium">exercises</a>).  We also need for the
-      vertical projection of the center of mass onto the ramp to land between
-      the two contact points, otherwise the brick will tumble over the bottom
-      edge.  We can see this by writing our same force/torque balance
-      equations.  We can write them in body frame, B, assuming the center of
-      mass in the center of the brick and the brick has length $l$ and height
-      $h$:\begin{gather*} f^{c_1}_{B_x} + f^{c_2}_{B_x} = - mg\sin\gamma \\
-      f^{c_1}_{B_z}  + f^{c_2}_{B_z} = mg\cos\gamma \\ -h f^{c_1}_{B_x} + l
-      f^{c_1}_{B_z} = h f^{c_2}_{B_x} + l f^{c_2}_{B_z} \\ f^{c_1}_{B_z} \ge
-      0, \quad f^{c_2}_{B_z} \ge 0 \\ |f^{c_1}_{B_x}| \le \mu f^{c_1}_{B_z},
-      \quad |f^{c_2}_{B_x}| \le \mu f^{c_2}_{B_z} \end{gather*} </p>
+      corresponding to the lighter green, then we can find contact forces that
+      produce an equilibrium.  Indeed, for this problem, we need some amount of
+      friction to even have an equilibrium (we'll explore this in the <a
+      href="#static_equilibrium">exercises</a>).  We also need for the vertical
+      projection of the center of mass onto the ramp to land between the two
+      contact points, otherwise the brick will tumble over the bottom edge.  We
+      can see this by writing our same force/torque balance equations.  We can
+      write them applied at and expressed in body frame, B, assuming the center
+      of mass in the center of the brick and the brick has length $l$ and
+      height $h$:\begin{gather*} f^{B}_{1, B_x} + f^{B}_{2, B_x} =
+      -mg\sin\gamma \\ f^{B}_{1,B_z}  + f^{B}_{2,B_z} = mg\cos\gamma \\ -h
+      f^{B}_{1,B_x} + l f^{B}_{1,B_z} = h f^{B}_{2,B_x} + l f^{B}_{2, B_z} \\
+      f^{B}_{1, B_z} \ge 0, \quad f^{B}_{2, B_z} \ge 0 \\ |f^{B}_{1, B_x}| \le
+      \mu f^{B}_{1, B_z}, \quad |f^{B}_{2, B_x}| \le \mu f^{B}_{2, B_z}
+      \end{gather*} </p>
 
       <p>So, are the magnitude of the contact forces the same or different?
-      Substituting the first equation into the third reveals $$f^{c_2}_{B_z}
-      = f^{c_1}_{B_z} + \frac{mgh}{l}\sin\gamma.$$</p>
+      Substituting the first equation into the third reveals $$f^{B}_{2, B_z}
+      = f^{B}_{1, B_z} + \frac{mgh}{l}\sin\gamma.$$</p>
     
     </example>
 
@@ -666,7 +667,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       \left(f^{C}_{C_x}\right)^2 + \left(f^{C}_{C_y}\right)^2 } \le \mu
       f^C_{C_z} \right\}.\end{equation}</p>
 
-      <p>The spatial algebra for spatial forces can be applied directly to the
+      <p id="wrench_cone_algebra">The spatial algebra for spatial forces can be applied directly to the
       wrench cones:
         <ul>
           <li>For addition of wrenches applied at the same point and expressed
@@ -700,7 +701,10 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
         help your intuition about these wrench cones. I have a box that fixed
         in space and only subjected to contact forces (no gravity is
         illustrated here); I've drawn the friction cone at the point of contact
-        and at the center of the body.</p>
+        and at the center of the body. Note that I've intentionally disabled
+        hydroelastic contact for this example -- the forces are computed using
+        only a single contact point between each collision pair -- to simplify
+        the interpretation.</p>
         
         <p>There is one major caveat: the wrench cone lines in $\Re^6$, but I
         can only draw cones in $\Re^3$. So I've made the (standard) choice to
@@ -734,7 +738,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
         sum of these two sets) they can resist all pure torques applied at the
         body frame. This intuition is largely correct, but this is also where
         the projection of the 6d cone onto two 3d cones becomes a bit
-        misleading.there are some wrenches that cannot be resisted by this
+        misleading. There are some wrenches that cannot be resisted by this
         grasp. Specifically, if I were to visualize the wrench cone at the
         point directly between the two contact points, we would see that the
         wrench cones <i>do not include</i> torques applied directly along the
@@ -742,12 +746,10 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
         torsional friction, are unable to resist torques about that axis.</p>
 
         <p>In practice, the gripper model that we use in our simulation
-        workflow has multiple contact points places along the round surface of
-        the gripper; even though each of them alone has no torsional friction
-        the net wrench from these multiple points of contact provides some
-        amount of wrench in the axis between the fingers. The exact amount one
-        gets will be proportional to how hard the gripper is squeezing the
-        object.</p>
+        workflow uses hydroelastic contact, which simulates a contact patch and
+        <i>can</i> produce torsional friction -- so we can resist moments
+        around this axis. The exact amount one gets will be proportional to how
+        hard the gripper is squeezing the object.</p>
 
       </example>
 
@@ -787,26 +789,20 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
 
     </subsection>
 
+    <todo>Alternative grasp metrics...</todo>
+
   </section>
 
   <section><h1>Grasp selection from point clouds</h1>
 
     <p>Rather than looking into the bin of objects, trying to recognize
-    specific objects and estimate their pose, the newer approach to grasp
-    selection that has proven incredibly useful for bin picking is to just look
-    for graspable areas directly on the (unsegmented) point cloud. Some of the
-    most visible proponents of this approach are
-    <elib>tenPas17+Mahler17+Zeng18</elib>.  If you look at those references,
-    you'll see that they all use learning to somehow decide where in the point
-    cloud to grasp.  And I <b>do</b> think learning has a lot to offer in terms
-    of choosing good grasps -- it's a nice and natural learning formulation and
-    there is significant information besides just what appears in the
-    immediate sensor returns that can contribute to deciding where to grasp. But
-    often you will see that underlying those learning approaches is an approach
-    to selecting grasps based on geometry alone, if only to produce the original
-    training data.  I also think that the community doesn't regularly
-    acknowledge just how well the purely geometric approaches still work.  I'd
-    like to discuss those first.</p>
+    specific objects and estimate their pose, let's consider an approach where
+    we simply look for graspable areas directly on the (unsegmented) point
+    cloud. These very geometric approaches to grasp selection can work very
+    well in practice, and can also be used in simulation to train a
+    deep-learning-based grasp selection system that can work very well in the
+    real world and even deal with partial views and occlusions
+    <elib>tenPas17+Mahler17+Zeng18</elib>.</p>
 
     <subsection><h1>Point cloud pre-processing</h1>
     
@@ -1160,10 +1156,14 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
     high-level behaviors (often called "task level") in a way that integrates
     seamlessly with the high-rate low-level controls?</p>
 
-    <p>There are a few important programming paradigms here.  Broadly speaking, I would categorize them into three bins:
+    <p>There are a few important programming paradigms for authoring the
+    task-level behavior.  Broadly speaking, I would categorize them into three
+    bins:
       <ul>
         <li>Procedural code (in a separate thread) passes messages/events to a
-        module that lives in the main robot/simulation thread.</li>
+        module that lives in the main robot/simulation thread. This is
+        relatively common in a multi-process message-passing ecosystem like
+        ROS.</li>
         <li>Task-level "policies" can be authored directly as e.g. finite state
         machines (FSMs) or "behavior trees", which get evaluated directly in
         the robot/simulation loop.</li>
@@ -1199,16 +1199,81 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
     parts of the notes. 
     </p>
 
-    <p>For the purposes of clutter clearing in the systems framework, taking
-    the second approach: writing the task-level behavior "policy" as a simple
-    state machine will work nicely.</p>
+    <subsection><h1>State Machines and Behavior Trees</h1>
+    
+    </subsection>
 
-    <example><h1>A simple state machine for "clutter clearing"</h1>
+    <subsection><h1>Task planning</h1>
 
-      <todo>Draw the simple state machine diagram here, and write a minimal
-      system that implements it.</todo>
+      <p>Task-level planners are based primarily on search. There is a long
+      history of AI planning as search. STRIPS <elib>Fikes71</elib> was perhaps
+      the earliest, and most famous representation (and algorithm) for
+      describing planning problems using an initial state, a goal state, and a
+      set of actions with pre-conditions and effects.  Temporal logic (e.g.
+      linear temporal logic (LTL), metric temporal logic (MTL), signal temporal
+      logic (STL)) enables the specification to include complex goals or
+      constraints that evolve over time, such as "event A should eventually
+      happen after event B". The planning domain definition language (PDDL)
+      <elib>Aeronautiques98+Haslum19</elib> extended the STRIPS representation
+      to include more expressive features such as typed variables, conditional
+      effects, and (even temporal logic) quantifiers, and served as the
+      specification language for a long-running and highly influential series
+      of <a href="https://www.icaps-conference.org/competitions/">ICAPS
+      planning competitions</a>. These planning competitions gave rise to a
+      number of highly effective planning algorithms such as GraphPlan
+      <elib>Blum97</elib>, HSP <elib>Bonet01</elib>, Fast-Forward
+      <elib>Hoffmann01</elib>, and FastDownward <elib>Helmert06</elib>. These
+      planners demonstrated the power of "heurstic search", and strongly
+      leverage the object-oriented nature of the specification to use
+      factorization as a strong heuristic.</p>
 
-    </example>
+    </subsection>
+
+    <subsection><h1>Large Language Models</h1>
+
+      <p>In late 2022, of course, a new approach to task "planning" exploded
+      onto the scene with the rise of large language models (LLMs). It quickly
+      became clear that the most powerful language models like GPT4 are capable
+      of producing highly nontrivial plans from very limited natural language
+      specifications. Careful prompting can be used to guide the LLM to produce
+      actions that the robot is is able to perform, and it seems that LLMs are
+      particularly good and writing python code. Using Python, it's even
+      possible to prompt the LLM to <a
+      href="https://code-as-policies.github.io/">generate a policy</a> rather
+      than just a plan <elib>Liang23</elib>. At the time of this writing, their
+      is still a challenge in automating a depiction of the current environment
+      as perceived from the robot cameras/sensors into a natural language
+      prompt, but it seems that this is only a matter of time. Word is that the
+      rolling release of <a
+      href="https://openai.com/research/gpt-4v-system-card">GPT-4V(ision)</a>
+      works amazingly well in this capacity.</p>
+
+      <p>An informal consensus is that language models make simple planning
+      problems extraordinarily easy. Importantly, while a search-based planner
+      might exploit missing requirements / constraints in your specification,
+      the LLMs output very reasonable plans, using "common sense" to fill in
+      the gaps. There are still limits to what today's LLMs can achieve in the
+      way of long-horizon task planning with multi-step reasoning, but clever
+      prompt engineering can lead to impressive results <elib>Yao23</elib>.</p>
+
+      <todo>example?</todo>
+    </subsection>
+
+    <subsection><h1>A simple state machine for "clutter clearing"</h1>
+
+      <p>For the purposes of clutter clearing in the systems framework, taking
+      the second approach: writing the task-level behavior "policy" as a simple
+      state machine will work nicely.</p>
+
+      <example><h1>A simple state machine for "clutter clearing"</h1>
+
+        <figure><img width="90%" src="figures/clutter_clearing_fsm.svg"/></figure>
+
+        <todo>Show minimal LeafSystem that implements it.</todo>
+
+      </example>
+
+    </subsection>
 
   </section>
 
@@ -1637,6 +1702,60 @@ PhD thesis, Institut für Informatik der Technischen Universität München, <spa
 <span class="publisher">Artificial Intelligence</span>, vol. 47, pp. 139-159, <span class="year">1991</span>.
 
 </li><br>
+<li id=Fikes71>
+<span class="author">Richard E Fikes and Nils J Nilsson</span>, 
+<span class="title">"STRIPS: A new approach to the application of theorem proving to problem solving"</span>, 
+<span class="publisher">Artificial intelligence</span>, vol. 2, no. 3-4, pp. 189--208, <span class="year">1971</span>.
+
+</li><br>
+<li id=Aeronautiques98>
+<span class="author">Constructions Aeronautiques and Adele Howe and Craig Knoblock and ISI Drew McDermott and Ashwin Ram and Manuela Veloso and Daniel Weld and David Wilkins SRI and Anthony Barrett and Dave Christianson and others</span>, 
+<span class="title">"{PDDL}| the planning domain definition language"</span>, 
+<span class="publisher">Technical Report, Tech. Rep.</span>, <span class="year">1998</span>.
+
+</li><br>
+<li id=Haslum19>
+<span class="author">Patrik Haslum and Nir Lipovetzky and Daniele Magazzeni and Christian Muise and Ronald Brachman and Francesca Rossi and Peter Stone</span>, 
+<span class="title">"An introduction to the planning domain definition language"</span>, Springer
+, vol. 13, <span class="year">2019</span>.
+
+</li><br>
+<li id=Blum97>
+<span class="author">Avrim L Blum and Merrick L Furst</span>, 
+<span class="title">"Fast planning through planning graph analysis"</span>, 
+<span class="publisher">Artificial intelligence</span>, vol. 90, no. 1-2, pp. 281--300, <span class="year">1997</span>.
+
+</li><br>
+<li id=Bonet01>
+<span class="author">Blai Bonet and H{\'e}ctor Geffner</span>, 
+<span class="title">"Planning as heuristic search"</span>, 
+<span class="publisher">Artificial Intelligence</span>, vol. 129, no. 1-2, pp. 5--33, <span class="year">2001</span>.
+
+</li><br>
+<li id=Hoffmann01>
+<span class="author">Jörg Hoffmann</span>, 
+<span class="title">"FF: The fast-forward planning system"</span>, 
+<span class="publisher">AI magazine</span>, vol. 22, no. 3, pp. 57--57, <span class="year">2001</span>.
+
+</li><br>
+<li id=Helmert06>
+<span class="author">Malte Helmert</span>, 
+<span class="title">"The fast downward planning system"</span>, 
+<span class="publisher">Journal of Artificial Intelligence Research</span>, vol. 26, pp. 191--246, <span class="year">2006</span>.
+
+</li><br>
+<li id=Liang23>
+<span class="author">Jacky Liang and Wenlong Huang and Fei Xia and Peng Xu and Karol Hausman and Brian Ichter and Pete Florence and Andy Zeng</span>, 
+<span class="title">"Code as policies: Language model programs for embodied control"</span>, 
+<span class="publisher">2023 IEEE International Conference on Robotics and Automation (ICRA)</span> , pp. 9493--9500, <span class="year">2023</span>.
+
+</li><br>
+<li id=Yao23>
+<span class="author">Shunyu Yao and Dian Yu and Jeffrey Zhao and Izhak Shafran and Thomas L Griffiths and Yuan Cao and Karthik Narasimhan</span>, 
+<span class="title">"Tree of thoughts: Deliberate problem solving with large language models"</span>, 
+<span class="publisher">arXiv preprint arXiv:2305.10601</span>, <span class="year">2023</span>.
+
+</li><br>
 <li id=Colledanchise18>
 <span class="author">Michele Colledanchise and Petter Ogren</span>, 
 <span class="title">"Behavior trees in robotics and AI: An introduction"</span>, CRC Press
@@ -1650,7 +1769,7 @@ PhD thesis, Institut für Informatik der Technischen Universität München, <spa
 <table style="width:100%;" pdf="no"><tr style="width:100%">
   <td style="width:33%;text-align:left;"><a class="previous_chapter" href=pose.html>Previous Chapter</a></td>
   <td style="width:33%;text-align:center;"><a href=index.html>Table of contents</a></td>
-  <td style="width:33%;text-align:right;"><a class="next_chapter" href=mobile.html>Next Chapter</a></td>
+  <td style="width:33%;text-align:right;"><a class="next_chapter" href=trajectories.html>Next Chapter</a></td>
 </tr></table>
 
 <div id="footer" pdf="no">

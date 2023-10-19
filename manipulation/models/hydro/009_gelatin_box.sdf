@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+<sdf version="1.7">
+  <model name="009_gelatin_box">
+    <!--
+    Axes:
+      +X - Left, when facing front (larger dimension)
+      +Y - Towards Bottom (smaller dimension)
+      +Z - Towards Front (with label)
+    Origin:
+      (0, 0, 0) at the center of the box.
+  -->
+    <!--
+    The inertial properties were calculated from the mass and dimensions given
+    with the YCB dataset. The gelatin box is treated as a constant density box,
+    which matches the collision shape.
+  -->
+    <link name="base_link_gelatin">
+      <inertial>
+        <mass>0.097000</mass>
+        <inertia>
+          <ixx>0.000050</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0.000072</iyy>
+          <iyz>0</iyz>
+          <izz>0.000108</izz>
+        </inertia>
+      </inertial>
+      <visual name="base_link_gelatin">
+        <pose>-0.0029 0.024 -0.015 -0.0085 -0.002 1.34</pose>
+        <geometry>
+          <mesh>
+            <uri>package://drake_models/ycb/meshes/009_gelatin_box_textured.obj</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <collision name="box_collision">
+        <geometry>
+          <box>
+            <size>0.08700 0.0700 0.026000</size>
+          </box>
+        </geometry>
+        <drake:proximity_properties>
+          <drake:compliant_hydroelastic/>
+          <drake:hydroelastic_modulus>1.0e8</drake:hydroelastic_modulus>
+        </drake:proximity_properties>
+      </collision>
+    </link>
+  </model>
+</sdf>

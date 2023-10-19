@@ -3,9 +3,9 @@
 black[jupyter]
 gradescope-utils>=0.4.0
 mpld3>=0.5.1
-nevergrad>=0.4.3
+#nevergrad>=0.4.3
 psutil
-PyMCubes>=0.0.9
+#PyMCubes>=0.0.9
 pyproject-autoflake
 stable-baselines3>=1.8.0
 cloudpickle==2.2.1  # needs to be pinned for stored files to remain compatible.
@@ -14,6 +14,6 @@ timeout-decorator>=0.4.1
 # upgrade to 1.13 blocked by https://stackoverflow.com/questions/74394695/how-does-one-fix-when-torch-cant-find-cuda-error-version-libcublaslt-so-11-no
 # in my case, the logic in 
 #  _preload_cuda_deps()
-# matches an nvidia sudirectory in nvidia_cudnn_cu11 instead of the intended nvidia_cublas-cu11
+# matches an nvidia subdirectory in nvidia_cudnn_cu11 instead of the intended nvidia_cublas-cu11
 torch<1.13.0,<2.0.0
 #torchvision>=0.13.1

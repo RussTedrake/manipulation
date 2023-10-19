@@ -3,8 +3,8 @@
 <html>
 
   <head>
-    <title>Ch. 7 - Motion Planning</title>
-    <meta name="Ch. 7 - Motion Planning" content="text/html; charset=utf-8;" />
+    <title>Ch. 6 - Motion Planning</title>
+    <meta name="Ch. 6 - Motion Planning" content="text/html; charset=utf-8;" />
     <link rel="canonical" href="http://manipulation.csail.mit.edu/trajectories.html" />
 
     <script src="https://hypothes.is/embed.js" async></script>
@@ -48,15 +48,15 @@ at MIT</a>. They will be updated throughout the Fall 2023 semester.  <!-- <a
 href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos are available on YouTube</a>.--></p> 
 
 <table style="width:100%;" pdf="no"><tr style="width:100%">
-  <td style="width:33%;text-align:left;"><a class="previous_chapter" href=mobile.html>Previous Chapter</a></td>
+  <td style="width:33%;text-align:left;"><a class="previous_chapter" href=clutter.html>Previous Chapter</a></td>
   <td style="width:33%;text-align:center;"><a href=index.html>Table of contents</a></td>
-  <td style="width:33%;text-align:right;"><a class="next_chapter" href=force.html>Next Chapter</a></td>
+  <td style="width:33%;text-align:right;"><a class="next_chapter" href=mobile.html>Next Chapter</a></td>
 </tr></table>
 
 <script type="text/javascript">document.write(notebook_header('trajectories'))
 </script>
 <!-- EVERYTHING ABOVE THIS LINE IS OVERWRITTEN BY THE INSTALL SCRIPT -->
-<chapter style="counter-reset: chapter 6"><h1>Motion Planning</h1>
+<chapter style="counter-reset: chapter 5"><h1>Motion Planning</h1>
 
   <p>There are a few more essential skills that we need in our toolbox.  In this
   chapter, we will explore some of the powerful methods of kinematic trajectory
@@ -174,20 +174,21 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       homotopy methods) with impressive results on difficult kinematics
       problems.</p>
 
-      <p>While the algebraic-geometry methods are mostly targeted for offline
-      global analysis, they are not designed for fast real-time inverse
-      kinematics solutions needed in a control loop.  The most popular tool
-      these days for real-time inverse kinematics for six- or seven-DOF
-      manipulators is a tool called "IKFast", described in Section 4.1
-      of <elib>Diankov10</elib>, that gained popularity because of its effective
-      open-source implementation.  Rather than focus on completeness, IKFast
-      uses a number of approximations to provide fast and numerically robust
-      solutions to the "easy" kinematics problems.  It leverages the fact that a
-      six-DOF pose constraint on a six-DOF manipulator has a "closed-form"
-      solution with a finite number of joint space configurations that produce
-      the same end-effector pose, and for seven-DOF manipulators it adds a layer
-      of sampling in the last degree of freedom on top of the six-DOF
-      solver.</p>
+      <p>The kinematics algorithms based on algebraic geometry have
+      traditionally been targeted for offline global analysis, and are often
+      not designed for fast real-time inverse kinematics solutions needed in a
+      control loop.  The most popular tool these days for real-time inverse
+      kinematics for six- or seven-DOF manipulators is a tool called "IKFast",
+      described in Section 4.1 of <elib>Diankov10</elib>, that gained
+      popularity because of its effective open-source implementation.  Rather
+      than focus on completeness, IKFast uses a number of approximations to
+      provide fast and numerically robust solutions to the "easy" kinematics
+      problems.  It leverages the fact that a six-DOF pose constraint on a
+      six-DOF manipulator has a "closed-form" solution (for most serial-chain
+      robot arms) with a finite number of joint space configurations that
+      produce the same end-effector pose, and for seven-DOF manipulators it
+      adds a layer of sampling in the last degree of freedom on top of the
+      six-DOF solver.</p>
 
       <todo>add an example of calling (or implementing something equivalent to)
       IKFast and/or Bertini. looks like bertini 2 has python bindings (but not
@@ -196,10 +197,10 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       <p>These explicit solutions are important to understand because they
       provide deep insight into the equations, and because they can be fast
       enough to use inside a more sophisticated solution approach.  But the
-      solutions don't provide the rich specification I advocated for above; in
-      particular, they break down once we have inequality constraints instead
-      of equality constraints.  For those richer specifications, we will turn
-      to optimization.</p>
+      solutions don't immediately provide the rich specification I advocated
+      for above; in particular, they break down once we have inequality
+      constraints instead of equality constraints.  For those richer
+      specifications, we will turn to optimization.</p>
 
     </subsection>
 
@@ -323,17 +324,18 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
 
       <example><h1>Grasp the cylinder</h1>
       
-        <p>Let's use IK to grasp a cylinder (call it a hand rail).  Suppose it
-        doesn't matter where along the cylinder we grasp, nor the orientation
-        at which we grasp it.  Then we should write the IK problem using
-        only the minimal version of those constraints.</p>
+        <p>Let's use IK to grasp a cylinder. You can think of it as a hand
+        rail, if you prefer.  Suppose it doesn't matter where along the
+        cylinder we grasp, nor the orientation at which we grasp it.  Then we
+        should write the IK problem using only the minimal version of those
+        constraints.</p>
 
         <p>In the notebook, I've coded up one version of this.  I've put the
         cylinder's pose on the sliders now, so you can move it around the
         workspace, and watch how the IK solver decides to position the robot.
         In particular, if you move the cylinder in $\pm y$, you'll see that the
         robot doesn't try to follow... until the hand gets to the end of the
-        cylinder.  Very nice!</p>
+        cylinder. Very nice!</p>
 
         <figure>
             <img width="30%" src="data/grasp_cylinder_1.png"/>
@@ -479,7 +481,7 @@ ik.AddPositionConstraint(
       we support, then we can begin to make progress.
       </p>
 
-      <p>Drake provide an implementation of the <a
+      <p>Drake provides an implementation of the <a
       href="https://drake.mit.edu/doxygen_cxx/classdrake_1_1multibody_1_1_global_inverse_kinematics.html">GlobalInverseKinematics</a>
       approach described in <elib>Dai17</elib> using mixed-integer convex
       optimization. The solution times are on the order of a few seconds; it
@@ -487,8 +489,8 @@ ik.AddPositionConstraint(
       <elib>Trutman22</elib> solves the narrow version of the problem (just
       end-effector poses and joint limits) using convex optimization via a
       hierarchy of semi-definite programming relaxations; it would be very
-      interesting to understand how well this approach works the larger family
-      of costs and constraints.</p>
+      interesting to understand how well this approach works with the larger
+      family of costs and constraints.</p>
 
     </subsection>
 
@@ -522,26 +524,23 @@ ik.AddPositionConstraint(
       Furthermore, if the IK problem returns infeasible, we should reject the
       sample.</p>
 
-      <p>There is a quite nice extension of this idea that becomes quite
-      natural once we take the optimization view, and it is a nice transition
-      to the trajectory planning we'll do in the next section.  Imagine if the
-      task requires us not only to pick up the object in clutter, but also to
-      place the object carefully in clutter as well. In this case, a good grasp
-      is finds a pose for the hand relative to the object that
+      <p>There is a quite nice extension of this idea that becomes natural once
+      we take the optimization view, and it is a nice transition to the
+      trajectory planning we'll do in the next section.  Imagine if the task
+      requires us not only to pick up the object in clutter, but also to place
+      the object carefully in clutter as well. In this case, a good grasp
+      involves a pose for the hand relative to the object that
       <i>simultaneously optimizes</i> both the pick configuration and the place
-      configuration. This is actually quite natural to do with inverse
-      kinematics; one can formulate an optimization problem with decision
+      configuration. One can formulate an optimization problem with decision
       variables for both $q_{pick}$ and $q_{place}$, with constraints enforcing
-      that ${}^OX^{G_{pick}} = {}^OX^{G_{place}}$.</p> 
-      
-      <todo>Simple code example here</todo>
-
-      <p>Once we add in all of our other rich costs and constraints, this
-      becomes a quite sophisticated approach. In the <a
+      that ${}^OX^{G_{pick}} = {}^OX^{G_{place}}$. Of course we can still add
+      in all of our other rich costs and constraints, In the <a
       href="pose.html#tri_dishloading">dish-loading project at TRI</a>, this
       approach proved to be very important. Both picking up a mug in the sink
       and placing it in the dishwasher rack are highly constrained, so we
       needed the simultaneous optimization to find successful grasps.</p>
+      
+      <todo>Simple code example here</todo>
 
     </subsection>
 
@@ -555,15 +554,16 @@ ik.AddPositionConstraint(
     then you are well on your way to understanding kinematic trajectory
     optimization. Rather than solving multiple inverse kinematics problems
     independently, the basic idea now is to solve for a sequence of joint
-    angles in the same optimization. Even better, let us define a parameterized
-    joint trajectory, $q_\alpha(t)$, where $\alpha$ are parameters. Then a
-    simple extension to our inverse kinematics problem would be to write
-    something like \begin{align} \min_{\alpha,T} & \quad T, \\ \subjto &\quad
-    X^{G_{start}} = f_{kin}(q_\alpha(0)),\\ & \quad X^{G_{goal}} =
-    f_{kin}(q_\alpha(T)), \\ & \quad \forall t , \quad
+    angles simultaneously in a single optimization. Even better, let us define
+    a parameterized joint trajectory, $q_\alpha(t)$, where $\alpha$ are
+    parameters. Then a simple extension to our inverse kinematics problem would
+    be to write something like \begin{align} \min_{\alpha,T} & \quad T, \\
+    \subjto &\quad X^{G_{start}} = f_{kin}(q_\alpha(0)),\\ & \quad X^{G_{goal}}
+    = f_{kin}(q_\alpha(T)), \\ & \quad \forall t , \quad
     \left|\dot{q}_\alpha(t)\right| \le v_{max} \label{eq:vel_limits}.
-    \end{align} I read this as "find a trajectory, $q(t)$ for $t \in [0, T]$,
-    that moves the gripper from the start to the goal in minimum time".</p>
+    \end{align} I read this as "find a trajectory, $q_\alpha(t)$ for $t \in
+    [0, T]$, that moves the gripper from the start to the goal in minimum
+    time".</p>
     
     <p>The last equation, (\ref{eq:vel_limits}), represents velocity limits;
     this is the only way we are telling the optimizer that the robot cannot
@@ -575,9 +575,9 @@ ik.AddPositionConstraint(
 
     <subsection><h1>Trajectory parameterizations</h1>
     
-      <p>The interesting question, then, becomes how to do we actually
+      <p>The interesting question, then, becomes how do we actually
       parameterize the trajectory $q(t)$ with a parameter vector $\alpha$?
-      These says, you might think that $q_\alpha(t)$ could be a neural network
+      These days, you might think that $q_\alpha(t)$ could be a neural network
       that takes $t$ as an input, offers $q$ as an output, and uses $\alpha$ to
       represent the weights and biases of the network. Of course you could, but
       for inputs with a scalar input like this, we often take much simpler and
@@ -586,13 +586,13 @@ ik.AddPositionConstraint(
       <p>There are many ways one can parameterize a trajectory with
       polynomials. For example in <i>dynamic</i> motion planning, <a
       href="https://underactuated.csail.mit.edu/trajopt.html#direct_collocation">direct
-      collocation methods</a> uses <a
+      collocation methods</a> use <a
       href="https://drake.mit.edu/doxygen_cxx/classdrake_1_1trajectories_1_1_piecewise_polynomial.html">piecewise-cubic
       polynomials</a> to represent the state trajectory, and the <a
       href="https://underactuated.csail.mit.edu/trajopt.html#pseudo-spectral">pseudo-spectral
       methods</a> use Lagrange polynomials. In each case, the choice of basis
       functions is made so that algorithm can leverage a particular property of
-      the basis. In dynamic motion planning, a great deal of focus is on the integration accuracy of the dynamic equations to ensure that we obtain feasible solutions to the dynamic constraints..</p>
+      the basis. In dynamic motion planning, a great deal of focus is on the integration accuracy of the dynamic equations to ensure that we obtain feasible solutions to the dynamic constraints.</p>
 
       <p>When we are planning the motions of our fully-actuated robot arms, we
       typically worry less about dynamic feasibility, and focus instead on the
@@ -601,8 +601,8 @@ ik.AddPositionConstraint(
       href="https://drake.mit.edu/doxygen_cxx/classdrake_1_1trajectories_1_1_bspline_trajectory.html">B-spline
       trajectory</a> parameterization has a few particularly nice properties
       that we can leverage here:
-      <ul><li>The derivative of a B-spline is still a B-spline (of one less
-      degree), with coefficients that are linear in the original
+      <ul><li>The derivative of a B-spline is still a B-spline (the degree is
+      reduced by one), with coefficients that are linear in the original
       coefficients.</li><li>The bases themselves are non-negative and sparse.
       This gives the coefficients of the B-spline polynomial, which are
       referred to as the <i>control points</i>, a strong geometric
@@ -614,11 +614,11 @@ ik.AddPositionConstraint(
       parameterized trajectories, but use the convex hull property to ensure
       that limits on the joint positions and any of its derivatives are
       satisfied $\forall t\in [0,T]$ using <i>linear</i> constraints.  This
-      sort of guarantee is much more costly to obtain using most other
+      sort of guarantee would be much more costly to obtain using most other
       polynomial bases.</p>
       
       <todo>Write up the B-spline math here; and clean up the Drake
-      notation/implementation in the process. In particular, I want to purse
+      notation/implementation in the process. In particular, I want to purge
       the use of symbolic from KinematicTrajectoryOptimization. My
       `RussTedrake/drake:bsplinebasis_derivatives` branch has a start at
       getting analytical derivatives for the trajopt workflow. </todo>
@@ -629,7 +629,7 @@ ik.AddPositionConstraint(
       href="https://en.wikipedia.org/wiki/B%C3%A9zier_curve">B&eacute;zier
       curves</a>. But the "B" in "B-spline" actually just stands for "basis"
       (no, I'm not kidding) and "<a
-      href="https://en.wikipedia.org/wiki/Composite_B%C3%A9zier_curve">B&eacute;zier-splines</a>"
+      href="https://en.wikipedia.org/wiki/Composite_B%C3%A9zier_curve">B&eacute;zier splines</a>"
       are slightly different.
       </p>
       
@@ -665,7 +665,7 @@ ik.AddPositionConstraint(
 
       <p>One of the most interesting set of constraints that we can add to our
       kinematic trajectory optimization problem is the <a
-      href="https://drake.mit.edu/doxygen_cxx/classdrake_1_1multibody_1_1_minimum_distance_constraint.html">MinimumDistanceConstraint</a>;
+      href="https://drake.mit.edu/doxygen_cxx/classdrake_1_1multibody_1_1_minimum_distance_lower_bound_constraint.html">MinimumDistanceLowerBoundConstraint</a>;
       when the minimum distance between all potential collision pairs is
       greater than zero then we have avoided collisions. Please note, though,
       that these collision constraints can only be enforced at discrete
@@ -729,14 +729,19 @@ ik.AddPositionConstraint(
       <elib>Ratliff09a</elib>, STOMP <elib>Kalakrishnan11a</elib>, and
       KOMO<elib>Toussaint17</elib>.</p>
       
-      <p>KOMO, for instance, is one of a wave of trajectory optimization
+      <p>KOMO, for instance, is one of a handful of trajectory optimization
       techniques that use the <a
       href="https://en.wikipedia.org/wiki/Augmented_Lagrangian_method">Augmented
       Lagrangian method</a> of transcribing a constrained optimization problem
       into an unconstrained problem, then using a simple but fast
       gradient-based solver<elib>Toussaint14</elib>. Augmented-Lagrangian-based
       approaches appear to be the most popular and successful these days; I
-      hope to provide a nice implementation in Drake soon!</p>
+      hope to provide a nice implementation in Drake soon! But one does have to
+      be careful in comparing these different solvers -- SNOPT may declare
+      failure if it cannot optimize the cost and satisfy constraints to the
+      default tolerances (around 1e-6), while an Augmented-Lagrangian approach
+      will never report failure and will rarely aim for this level of accuracy.
+      </p>
 
       <p>When kinematic trajectory optimizations succeed, they are an
       incredibly satisfying solution to the motion planning problem. They give
@@ -749,26 +754,32 @@ ik.AddPositionConstraint(
 
       <example><h1>Local minima in collision-free trajectory optimization</h1>
         <p>Consider the extremely simple example of finding the shortest path
-        from the start (blue star) to the goal (green star) in the image above,
-        avoiding collisions with the red box. Avoiding even the complexity of
-        B-splines, we can write an extremely simple optimization of the form:
-        \begin{aligned} \min_{q_0, ..., q_N} \quad & \sum_{n=0}^{N-1} | q_{n+1}
-        - q_n|_2^2 & \\ \text{subject to} \quad & q_0 = q_{start} \\ & q_N =
-        q_{goal} \\ & |q_n|_1 \ge 1 & \forall n, \end{aligned} where the last
-        line is the collision-avoidance constraint saying that each sample
-        point has to be <i>outside</i> of the $\ell_1$-ball.
+        for a point robot moving from the start (blue circle) to the goal
+        (green circle) in the image below, avoiding collisions with the red
+        box. Avoiding even the complexity of B-splines, we can write an
+        optimization of the form: \begin{aligned} \min_{q_0, ..., q_N} \quad &
+        \sum_{n=0}^{N-1} | q_{n+1} - q_n|_2^2 & \\ \text{subject to} \quad &
+        q_0 = q_{start} \\ & q_N = q_{goal} \\ & |q_n|_1 \ge 1 & \forall n,
+        \end{aligned} where the last line is the collision-avoidance constraint
+        saying that each sample point has to be <i>outside</i> of the
+        $\ell_1$-ball (my convenient choice for the geometry of the red box).
+        Alternatively, we can write a slightly more advanced constraint to
+        maintain that each <i></i>line segment</i> is outside of the obstacle
+        (rather than just the vertices). Here are some possible solutions to this optimization problem:
         </p>
         
         <figure>
-          <img height="200" src="data/redbox_shortest_path.png">
+          <img height="250" src="data/redbox_shortest_path.png"/>
+          <img height="250" src="data/redbox_shortest_path_local_minima.png"/>
         </figure>
-        <todo>Turn that into an animation like the ICP where the initial condition changes</todo>
+        <todo>Fix meshcat line width.</todo>
           
-        <p>Once a nonlinear solver is
-        considering paths that go right around the obstacle, it is very
-        unlikely to find a solution that goes left around the obstacle, because
-        the solution would have to get worse (violate the collision constraint)
-        before it gets better.</p> 
+        <p>The solution on the left is the (global) minimum for the problem;
+        the solution on the right is clearly a local minima. Once a nonlinear
+        solver is considering paths that go right around the obstacle, it is
+        very unlikely to find a solution that goes left around the obstacle,
+        because the solution would have to get worse (violate the collision
+        constraint) before it gets better.</p> 
 
         <todo>Make a version of this with B-splines</todo>
       </example>
@@ -781,6 +792,15 @@ ik.AddPositionConstraint(
 
   <section><h1>Sampling-based motion planning</h1>
 
+    <p>My aim is to have a complete draft of this section soon! In the mean
+      time, I strongly recommend the book by Steve LaValle<elib>LaValle06</elib>,
+      and checking out the <a href="https://ompl.kavrakilab.org/">Open Motion
+      Planning Library</a>. We have strong implementations of the most common
+      sampling-based algorithms</a> in Drake which are optimized for our
+      collision engines, and <a
+      href="https://github.com/RobotLocomotion/drake/issues/14431">hope to make
+      them publicly available soon</a>.</p>
+  
     <figure>
       <img height="200" class="invisible_on_hover" src="data/h5chess-static.gif"/>
       <img height="200" src="data/h5chess.gif">
@@ -795,11 +815,6 @@ ik.AddPositionConstraint(
       James Kuffner</a> (hover over the image to animate). These are kinematically complex and quite high dimensional.</figcaption>
     </figure>
 
-    <p>The <a href="https://ompl.kavrakilab.org/">Open Motion Planning
-    Library</a>. We have our <a
-    href="https://github.com/RobotLocomotion/drake/issues/14431">own
-    implementations in Drake</a>
-        that are optimized for our collision engines.</p>
 
     <subsection><h1>Rapidly-exploring random trees (RRT)</h1>
     
@@ -822,14 +837,345 @@ ik.AddPositionConstraint(
 
     <subsection><h1>Post-processing</h1>
 
-      <p><a
+      <p>Short-cutting, <a
       href="https://github.com/RobotLocomotion/drake/issues/11827">anytime
       b-spline smoother</a></p>
 
     </subsection>
 
+    <subsection><h1>Sampling-based planning in practice</h1>
+    
+      <p>There are many optimizations and heuristics which can dramatically
+      improve the effectiveness of these methods... (optimized collision
+      checking, weighted Euclidean distances, ...)</p>
+    
+    </subsection>
+
   </section>
 
+  <section id="gcs"><h1>Graphs of Convex Sets (GCS)</h1>
+
+    <p>Trajectory optimization techniques allow for rich specifications of
+    costs and constraints, including derivative constraints on continuous
+    curves, and can scale to high-dimensional configuration spaces, but they
+    are fundamentally based on local (gradient-based) optimization and suffer
+    from local mimima. Sampling-based planners reason more globally and provide
+    a notion of (probabilistic) <i>completeness</i>, but struggle to
+    accommodate derivative constraints on continuous curves and struggle in
+    high dimensions. Is there any way to get the best of both worlds?</p>
+
+    <p>My students and I have been working on new approach to motion planning
+    that attempts to bridge this gap. It builds on a general optimization
+    framework for mixing continuous optimization and combinatorial optimization
+    (e.g. on a graph), which we call "Graphs of Convex Sets" (GCS)
+    <elib>Marcucci21</elib>.</p>
+
+    <p>To motivate it, let's think about why the PRM struggles to handle
+    continuous curvature constraints. During the roadmap construction phase, we
+    do a lot of work with the collision checker to certify that straight line
+    segments connecting two vertices are collision free (at least up to some
+    sampling resolution). Then, in the online query phase, we search the
+    discrete graph to find a (discontinuous) piecewise-linear shortest path
+    from the start to the goal. Once we go to smooth that path or approximate
+    it with a continuous curve, there is no guarantee that this path is still
+    collision free, and it certainly might not be the shortest path. Because
+    our offline roadmap construction only considered line segments, it didn't
+    leave any room for online optimization. This becomes even more of a concern
+    when we bring in dynamics -- paths that are kinematically feasible might
+    not be feasible once we have dynamic constraints, but for a number of
+    reasons kino-dynamic sampling-based motion planning <todo>citation</todo>
+    has not been as successful as the purely kinematic sampling-based
+    planning.</p>
+
+    <todo>Add a PRM => GCS plot here.</todo>
+
+    <p>A relatively small change to the PRM workflow is this: every time we
+    pick a sample, rather than just adding the configuration-space point to the
+    graph, let's expand that point into a (convex) region in configuration
+    space. We'll happily pay some offline computation in order to find nice big
+    regions, because the payoff for the online query phase is significant.
+    First, we can make much sparser graphs -- a small number of regions can
+    cover a big portion of configuration space, which also allows us to scale
+    to higher dimensions. But perhaps more importantly, now we have the
+    flexibility to optimize online over continuous curves, so long as they stay
+    inside the convex regions. This requires a generalization of the graph
+    search algorithm which can jointly optimize the discrete path through the
+    graph along with the parameters of the continuous curves; this is exactly
+    the generalization that GCS provides.</p>
+
+    <subsection><h1>Convex decomposition of (collision-free) configuration
+    space</h1>
+
+      <p>Let's start by taking the analogy with the PRM seriously. If we sample
+      a collision-free point in the configuration space, then what is the right
+      way to inflate that point into a convex region?</p>
+
+      <p>The answer is simpler when we are dealing with convex geometries. In
+      my view, it is reasonable to approximate the geometry of a robot with
+      convex shapes in the Euclidean space, $\Re^3.$ Even though many robots
+      (like the iiwa) have nonconvex mesh geometries, we can often approximate
+      them nicely as the union of simpler convex geometries; sometimes these
+      are primitives like cylinders and spheres, alternatively we can perform a
+      convex decomposition directly on the mesh. But even when the geometries
+      are convex in the Euclidean space, it is generally <i>unreasonable</i> to
+      treat them as convex in the configuration space.</p>
+      
+      <p>There are a few exceptions. If your configuration space only involves
+      translations, or if your robot geometry is invariant to rotations (e.g. a
+      point robot or a spherical robot), then the configuration space will
+      still be convex; this was one of the first key observations that cemented
+      the notion of configuration space as a core mathematical object in
+      robotics <elib>Lozano-Perez90</elib>. This can work for a mobile robot
+      (even a quadrotor approximated by a sphere). In this case, one can easily
+      compute the minimum Euclidean distance between any pairs of convex bodies
+      at the sample point, and for instance, inflate the point into a sphere of
+      the appropriate radius <elib>Shkolnik11a</elib>. In order to find bigger
+      regions, we have made heavy use of the Iterative Region Inflation by
+      Semidefinite Program (IRIS) algorithm introduced in <elib>Deits14</elib>
+      and <a
+      href="https://drake.mit.edu/doxygen_cxx/group__geometry__optimization.html#gafd8111a93cb3461e05bec3477ee736f6">implemented
+      in Drake</a>. This algorithm alternates between finding separating
+      hyperplanes and finding the maximum volume contained ellipse to "inflate"
+      the region to locally maximize (an efficient approximation of) the volume
+      of the region.</p>
+
+      <p>It is possible to extend the IRIS algorithm to find large convex regions in the more general (nonconvex) configuration space. We've done it in two ways:
+      <ul>
+        <li><b>Using nonlinear programming (NP)</b>. In the IRIS-NP algorithm
+        <elib>Petersen23a</elib> (<a
+        href="https://drake.mit.edu/doxygen_cxx/group__geometry__optimization.html#ga3a51e0fec449a0abcf498f78a2a390a8">implemented
+        in Drake</a>), we replace the convex optimization for finding the
+        closest collision with a nonlinear optimization solver like SNOPT. We
+        randomly sample potential collisions in order to make the algorithm
+        probabilistically sound; in practice this algorithm is relatively fast
+        but does not <i>guarantee</i> that the region is completely collision
+        free.
+        </li>
+        <li><b>Using algebraic kinematics + sums-of-squares optimization</b>.
+        Leveraging the idea that the kinematics of most of our robots can be
+        expressed using (rational) polynomials, we can use tools from
+        polynomial optimization to search for rigorous certificates of
+        non-collision  <elib>Dai23</elib> (<a
+        href="https://drake.mit.edu/doxygen_cxx/classdrake_1_1geometry_1_1optimization_1_1_cspace_free_polytope.html">implemented
+        in Drake</a>). This method tends to be slower, but the results are
+        sound. The one sacrifice that we have to make here is that we find
+        convex regions in the <a
+        href="http://underactuated.mit.edu/lyapunov.html#stereographic">stereographic
+        projection</a> coordinates of the original space. In practice, this represents a slight warping of the coordinate system (and consequently a trajectory length) over the region.</li>
+      </ul></p>
+
+      <todo>visualizations and examples!</todo>
+
+      <p>If we were to continue to follow the analogy with the PRM, then we
+      could imagine performing a convex decomposition of the space by sampling
+      at random, rejecting samples that are either in collision or in an
+      existing IRIS region, and then inflating any remaining samples. But in
+      fact, we can do much better than this -- we can cover a larger percentage
+      of the configuration free space with the same number of regions, or
+      alternatively cover a similar volume with less regions. Our current best
+      algorithm for performing this convex decomposition proceeds by computing
+      a "minimum clique cover" of the "visibility graph"
+      <elib>Werner23</elib> (Drake version <a
+      href="https://github.com/RobotLocomotion/drake/issues/20372">coming
+      soon</a>!).</p>
+
+      <p>In practice, it seems practical to try to compute a quite dense
+      covering of the configuration space for 7-DOF manipulators, and even up
+      to say 10 degrees of freedom. But for higher dimensions, I think that
+      trying to cover every nook and cranny of the configuration space is a
+      false goal. I strongly prefer the idea of intializing the clique-cover
+      algorithm with sample points that represent the "important" regions of
+      your configuration space. Sometimes we do this by manual seeding (via
+      calls to inverse kinematics), or alternatively, we can do it by examing
+      the solutions the come from teleop demonstrations, from another planner
+      (that can generate plans, but without the same guarantees), or even from
+      a reinforcement learning policy.</p>
+    
+    </subsection>
+
+    <subsection><h1>Graphs of Convex Sets</h1>
+    
+      <p>The GCS framework was originally introduced in
+      <elib>Marcucci21</elib>, and we have a mature <a
+      href="https://drake.mit.edu/doxygen_cxx/classdrake_1_1geometry_1_1optimization_1_1_graph_of_convex_sets.html">implementation
+      in Drake</a>. It is a general optimization framework for combining
+      combinatorial optimizations, like graph search, with continuous
+      optimizations, like the kinematic trajectory optimization we studied
+      above. GCS can provide a continuous extension to any "network flow"
+      optimization, but for motion planning, the first problem we are
+      interested in is shortest paths on a graph.</p>
+
+      <p>Consider the very classical problem of finding the (weighted) shortest
+      path from a source, $s$, to a target, $t,$ on a graph, pictured on the
+      left. The problem is described by a set of vertices, a set of
+      (potentially directed) edges, and the cost of traversing each edge.
+      <figure>
+      <img width="49%" src="figures/shortest_path.svg"/>
+      <img width="49%" src="figures/shortest_path_between_convex_sets.svg"/>
+      </figure>
+      GCS provides a simple, but powerful generalization to this problem:
+      whenever we visit a vertex in the graph, we are also allowed to pick one
+      element out of a convex set associated with that vertex. Edge lengths are
+      allowed to be convex functions of the continuous variables in the
+      corresponding sets, and we can also write convex constraints on the edges
+      (which must be satisfied by any solution path).
+      </p>
+
+      <p>The shortest path problem on a graph of convex sets can encode
+      problems that are NP-Hard, but these can be formulated as a mixed-integer
+      convex optimization (MICP). What makes the framework so powerful is that
+      this MICP has a very strong and efficient <i>convex relaxation</i>;
+      meaning that if you relax the binary variables to continuous variables
+      you get (nearly) the solution to the original MICP.  This means that you
+      can solve GCS problems to global optimality orders of magnitude faster
+      than previous transcriptions. But in practice, we find that <i>solving
+      only the convex relaxation</i> (plus a little rounding) is almost always
+      sufficient to recover the optimal solution. Nowadays, we almost never
+      solve the full MICP in our robotics applications of GCS.</p>
+      
+      <details><summary>Expand this if you want a <i>few</i> more details about
+      how/why it works.</summary>
+      <p>A very standard approach to tightening any convex relaxation is to
+      multiply constraints together. Typically, this can increase the number of
+      constraints dramatically, and increase the complexity of the problem
+      (e.g. multiplying linear constraints results in quadratic constraints,
+      which are more challenging to deal with). They key observations that make
+      GCS so effective are: <ul>
+        <li>we only need to multiply a small number of constraints together to
+        see a huge improvement, due to the natural sparsity pattern introduced
+        by the graph, and</li>
+        <li>using the machinery of perspective functions <elib
+        part="2.3.3">Boyd04a</elib>, multiplying the binary variables times the
+        convex costs and constraints can be done without (significantly)
+        increasing the complexity class of the optimization.</li>
+      </ul> The GCS formulation has many nice properties. For instance, our
+      convex relaxation is guaranteed to be tight in the case when all of the
+      sets are points, reducing the problem back to the classical shortest path
+      on a discrete graph. <elib>Marcucci21</elib> has all of the
+      details!</p></details>
+
+    </subsection>
+
+    <subsection><h1>GCS (Kinematic) Trajectory Optimization</h1>
+    
+      <p>We have a convex decomposition of our configuration space, and we have
+      the (general purpose) GCS machinery. What remains is to transcribe the
+      motion planning problem into a GCS. We first presented the transcription
+      I'll describe here in the paper "Motion planning around obstacles with
+      convex optimization" <elib>Marcucci22</elib>. Since we've already spent
+      time in this chapter talking about the inherent nonconvexity of the
+      motion planning problem, you can see why we like this title! It should be
+      slightly surprising that we can use convex optimization to effectively
+      solve these problems to global optimality.</p>
+
+      <p>IRIS regions provide convex sets that describe feasible <i>points</i>
+      in configuration space. But we want feasible <i>paths</i> in
+      configuration space. But if we have two points in the same IRIS region,
+      then we know that the straight line connecting them is also guaranteed to
+      be collision free. When points lie in the intersection of two IRIS
+      regions, then they can connect continuous paths through multiple
+      regions. This is the essence of our transcription.</p>
+
+      <p>What this implies is that for each visit to a vertex in the GCS, then
+      we want to pick <i>two points</i> in an IRIS region, so that the path
+      lies in the region. So the convex sets in the GCS are not the IRIS
+      regions themselves, they are the set with $2n$ variables for an
+      $n$-dimensional configuration space where the first $n$ and the last $n$
+      are both in the IRIS region. In set notation, we'd say it's the Cartesian
+      product of the set with itself. We form undirected edges between these
+      sets iff the IRIS regions intersect, and we put a constraint on the edge
+      saying that the second point one set must be equal to the first point in
+      the second set.</p>
+
+      <p>We can generalize this significantly. Rather than just putting a line
+      segment in each set, we can use the convex hull property of Bezier curves
+      to guarantee that an entire continuous path of fixed degree lies inside
+      the set. Using the derivative properties of the Bezier curves, we can add
+      convex constraints on the velocities (e.g. velocity limits), and
+      guarantee that the curves are smooth even at the intersections between
+      regions. To define these velocities, though, we need to know something
+      about the rate at which we are traversing the path, so we also introduce
+      the time-scaling parameterization, much like we did in the kinematic
+      trajectory optimization above, with time scaling parameters in each
+      convex set.</p>
+
+      <p>The result is a fairly rich trajectory optimization framework that
+      encodes many (but admittedly not all) of the costs and constraints that
+      we want for trajectory optimization in the GCS convex optimization
+      framework. For instance, we can write trajectory optimizations of the
+      form: \begin{align} \min \quad & a T + b \int_0^T |\dot{q}(t)|_2 \,dt + c
+      \int_0^T |\dot{q}(t)|_2^2 \,dt \nonumber \\ \text{s.t.} \quad & q \in
+      \mathcal{C}^\eta, \label{continuity} \\ & q(t) \in \bigcup_{i \in
+      \mathcal{I}} \mathcal{Q}_i, \label{noncollision} && \forall t \in [0,T],
+      \\ & \dot q(t) \in \mathcal{D}, && \forall t \in [0,T], \label{velocity}
+      \\ & T \in [T_{min}, T_{max}], \nonumber \\ & q(0) = q_0, \ q(T) = q_T,
+      \nonumber \\ & \dot q(0) = \dot q_0, \ \dot q(T) = \dot q_T.
+      \nonumber\end{align} Here $a$ is the weight of the total duration
+      objective, $b$ is the weight of the path length objective, and $c$ is the
+      weight of the "path energy" objective. (\ref{continuity}) constrains the
+      curves to be continuous up to degree $\eta$, (\ref{noncollision}) says
+      that the entire path (not only at sampled points) is inside the union of
+      the convex sets (e.g. the IRIS regions), and (\ref{velocity}) captures
+      velocity constraints (again for all $t$, not just at sample points). You
+      can find the <a
+      href="https://drake.mit.edu/doxygen_cxx/classdrake_1_1planning_1_1trajectory__optimization_1_1_gcs_trajectory_optimization.html">implementation
+      in Drake here</a>.</p>
+      
+      <p>Nonconvex trajectory optimization can, of course, consume richer costs
+      and constraints, but does not have the global optimization and
+      completeness elements that GCS can provide. (Of course, there are natural
+      nonconvex generalizations of GCS; we've focused first on the convex
+      optimization versions in order to make sure we deeply understand these
+      transcriptions.) We are constantly adding more costs and constraints into
+      the GCS Trajectory Optimization framework -- some seemingly nonconvex
+      constraints actually have an exact convex reformulation, others have nice
+      convex approximations. If you need something that's not supported, don't
+      be shy in <a
+      href="https://stackoverflow.com/questions/tagged/drake">asking about
+      it</a>.</p>
+
+      <todo>Lots more examples</todo>
+
+    </subsection>
+
+    <subsection><h1>Variations and Extensions</h1>
+    
+      <p>Fast path planning (FPP) <elib>Marcucci23</elib>. Many motion planning
+      instances don't need the full power of GCS; heuristic approximations can
+      often find very good solutions. Rather than solving the full GCS problem,
+      considering the discrete and continuous variables simultaneously, FPP
+      alternates between solving the discrete and continuous problems to find a
+      local minima. FPP is (typically) faster than
+      <code>GcsTrajectoryOptimization</code>, and by virtue of using
+      alternations, it can handle constraints on the derivatives (e.g.
+      acceleration constraints) which <code>GcsTrajectoryOptimization</code>
+      cannot handle. However, FPP is more limited on the class of convex
+      sets/constraints that it can support. (Drake implementation <a href="https://github.com/RobotLocomotion/drake/issues/20388">coming
+      soon</a>!)</p>
+
+      <p>GCS on a manifold including for mobile manipulation
+      <elib>Cohn23</elib>, and for bimanual manipulation
+      <elib>Cohn23a</elib>.</p>
+
+      <p>GCS with dynamic constraints. For discrete-time systems described by
+      piecewise-affine dynamics and convex objectives and constraints, GCS
+      provides the strongest formulations to date<elib>Marcucci21</elib>. It is
+      also possible to reason more directly about continuous dynamic
+      constraints over continuous curves (more coming soon!).</p>
+
+      <p>Planning through contact (coming soon!).</p>
+
+      <p>Planning under uncertainty (coming soon!).</p>
+
+      <p>Task and motion planning (coming soon!). <elib>Kurtz23</elib> showed a
+      natural transcription from temporal logic to GCS.</p>
+
+      <p>GCS as a (feedback) policy (coming soon!).</p>
+    
+    </subsection>
+
+  </section>
+  
   <section id="topp"><h1>Time-optimal path parameterizations</h1>
 
     <todo>Finish these! Boyd's paper a bit more clear about the writing of the
@@ -954,10 +1300,6 @@ ik.AddPositionConstraint(
 
   </section>
 
-  <section><h1>Graphs of Convex Sets</h1>
-
-  </section>
-
   <section><h1>Exercises</h1>
     <exercise><h1>Door Opening</h1>
       <p> For this exercise, you will implement a optimization-based inverse kinematics solver to open a cupboard door. You will work exclusively in <script>document.write(notebook_link('trajectories', d=deepnote, link_text='this notebook', notebook='door_opening'))</script>. You will be asked to complete the following steps: </p>
@@ -1075,11 +1417,89 @@ PhD thesis, Carnegie Mellon University, August, <span class="year">2010</span>.
 , <span class="year">2014</span>.
 
 </li><br>
+<li id=Marcucci21>
+<span class="author">Tobia Marcucci and Jack Umenberger and Pablo A. Parrilo and Russ Tedrake</span>, 
+<span class="title">"Shortest Paths in Graphs of Convex Sets"</span>, 
+<span class="publisher">arXiv preprint</span>, <span class="year">2023</span>.
+[&nbsp;<a href="http://groups.csail.mit.edu/robotics-center/public_papers/Marcucci21.pdf">link</a>&nbsp;]
+
+</li><br>
+<li id=Lozano-Perez90>
+<span class="author">Tomas Lozano-Perez</span>, 
+<span class="title">"Spatial planning: A configuration space approach"</span>, Springer
+, <span class="year">1990</span>.
+
+</li><br>
+<li id=Shkolnik11a>
+<span class="author">Alexander Shkolnik and Russ Tedrake</span>, 
+<span class="title">"Sample-Based Planning with Volumes in Configuration Space"</span>, 
+<span class="publisher">arXiv:1109.3145v1 [cs.RO]</span>, <span class="year">2011</span>.
+
+</li><br>
+<li id=Deits14>
+<span class="author">Robin L H Deits and Russ Tedrake</span>, 
+<span class="title">"Computing Large Convex Regions of Obstacle-Free Space through Semidefinite Programming"</span>, 
+<span class="publisher">Proceedings of the Eleventh International Workshop on the Algorithmic Foundations of Robotics (WAFR 2014)</span> , <span class="year">2014</span>.
+[&nbsp;<a href="http://groups.csail.mit.edu/robotics-center/public_papers/Deits14.pdf">link</a>&nbsp;]
+
+</li><br>
+<li id=Petersen23a>
+<span class="author">Mark Petersen and Russ Tedrake</span>, 
+<span class="title">"Growing convex collision-free regions in configuration space using nonlinear programming"</span>, 
+<span class="publisher">arXiv preprint arXiv:2303.14737</span>, <span class="year">2023</span>.
+
+</li><br>
+<li id=Dai23>
+<span class="author">Hongkai Dai* and Alexandre Amice* and Peter Werner and Annan Zhang and Russ Tedrake</span>, 
+<span class="title">"Certified Polyhedral Decompositions of Collision-Free Configuration Space"</span>, 
+<span class="publisher">Under review</span>, February, <span class="year">2023</span>.
+[&nbsp;<a href="http://groups.csail.mit.edu/robotics-center/public_papers/Dai23.pdf">link</a>&nbsp;]
+
+</li><br>
+<li id=Werner23>
+<span class="author">Peter Werner and Alexandre Amice and Tobia Marcucci and Daniela Rus and Russ Tedrake</span>, 
+<span class="title">"Approximating Robot Configuration Spaces with few Convex Sets using Clique Covers of Visibility Graphs"</span>, 
+, <span class="year">2023</span>.
+[&nbsp;<a href="http://groups.csail.mit.edu/robotics-center/public_papers/Werner23.pdf">link</a>&nbsp;]
+
+</li><br>
+<li id=Boyd04a>
+<span class="author">Stephen Boyd and Lieven Vandenberghe</span>, 
+<span class="title">"Convex Optimization"</span>, Cambridge University Press
+, <span class="year">2004</span>.
+
+</li><br>
 <li id=Marcucci22>
 <span class="author">Tobia Marcucci and Mark Petersen and David von Wrangel and Russ Tedrake</span>, 
 <span class="title">"Motion Planning around Obstacles with Convex Optimization"</span>, 
 , <span class="year">2022</span>.
 [&nbsp;<a href="http://groups.csail.mit.edu/robotics-center/public_papers/Marcucci22.pdf">link</a>&nbsp;]
+
+</li><br>
+<li id=Marcucci23>
+<span class="author">Tobia Marcucci and Parth Nobel and Russ Tedrake and Stephen Boyd</span>, 
+<span class="title">"Fast Path Planning Through Large Collections of Safe Boxes"</span>, 
+<span class="publisher">arXiv preprint arXiv:2305.01072</span>, <span class="year">2023</span>.
+
+</li><br>
+<li id=Cohn23>
+<span class="author">Thomas Cohn and Mark Petersen and Max Simchowitz and Russ Tedrake</span>, 
+<span class="title">"Non-Euclidean Motion Planning with Graphs of Geodesically-Convex Sets"</span>, 
+<span class="publisher">Robotics: Science and Systems</span> , <span class="year">2023</span>.
+[&nbsp;<a href="http://groups.csail.mit.edu/robotics-center/public_papers/Cohn23.pdf">link</a>&nbsp;]
+
+</li><br>
+<li id=Cohn23a>
+<span class="author">Thomas Cohn and Seiji Shaw and Max Simchowitz and Russ Tedrake</span>, 
+<span class="title">"Constrained Bimanual Planning with Analytic Inverse Kinematics"</span>, 
+<span class="publisher">arXiv preprint arXiv:2309.08770</span>, <span class="year">2023</span>.
+[&nbsp;<a href="http://groups.csail.mit.edu/robotics-center/public_papers/Cohn23a.pdf">link</a>&nbsp;]
+
+</li><br>
+<li id=Kurtz23>
+<span class="author">Vince Kurtz and Hai Lin</span>, 
+<span class="title">"Temporal Logic Motion Planning with Convex Optimization via Graphs of Convex Sets"</span>, 
+<span class="publisher">arXiv preprint arXiv:2301.07773</span>, <span class="year">2023</span>.
 
 </li><br>
 <li id=Bobrow85>
@@ -1124,21 +1544,14 @@ PhD thesis, Carnegie Mellon University, August, <span class="year">2010</span>.
 <span class="publisher">Int. Journal of Robotics Research</span>, vol. 30, pp. 846--894, June, <span class="year">2011</span>.
 
 </li><br>
-<li id=Deits14>
-<span class="author">Robin L H Deits and Russ Tedrake</span>, 
-<span class="title">"Computing Large Convex Regions of Obstacle-Free Space through Semidefinite Programming"</span>, 
-<span class="publisher">Proceedings of the Eleventh International Workshop on the Algorithmic Foundations of Robotics (WAFR 2014)</span> , <span class="year">2014</span>.
-[&nbsp;<a href="http://groups.csail.mit.edu/robotics-center/public_papers/Deits14.pdf">link</a>&nbsp;]
-
-</li><br>
 </ol>
 </section><p/>
 </div>
 
 <table style="width:100%;" pdf="no"><tr style="width:100%">
-  <td style="width:33%;text-align:left;"><a class="previous_chapter" href=mobile.html>Previous Chapter</a></td>
+  <td style="width:33%;text-align:left;"><a class="previous_chapter" href=clutter.html>Previous Chapter</a></td>
   <td style="width:33%;text-align:center;"><a href=index.html>Table of contents</a></td>
-  <td style="width:33%;text-align:right;"><a class="next_chapter" href=force.html>Next Chapter</a></td>
+  <td style="width:33%;text-align:right;"><a class="next_chapter" href=mobile.html>Next Chapter</a></td>
 </tr></table>
 
 <div id="footer" pdf="no">

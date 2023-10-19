@@ -29,7 +29,7 @@ from pydrake.all import (
 )
 
 from manipulation.scenarios import AddRgbdSensor, ycb
-from manipulation.utils import colorize_labels
+from manipulation.utils import colorize_labels, ConfigureParser
 
 parser = argparse.ArgumentParser(
     description="Install ToC and Navigation into book html files."
@@ -77,8 +77,9 @@ def generate_image(image_num):
 directives:
 - add_model:
     name: object{object_num}
-    file: package://drake/manipulation/models/ycb/sdf/{this_object}
+    file: package://manipulation/hydro/{this_object}
 """
+        ConfigureParser(parser)
         instance = parser.AddModelsFromString(directives, ".dmd.yaml")[0]
 
         frame_id = plant.GetBodyFrameIdOrThrow(

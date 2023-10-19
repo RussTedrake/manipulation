@@ -3,17 +3,14 @@ directives:
 - add_directives:
     file: package://manipulation/two_bins_w_cameras.dmd.yaml
 
-- add_frame:
-    name: mustard_origin
-    X_PF:
-        base_frame: world
-        rotation: !Rpy { deg: [-90.0, 0.0, -90.0 ]}
-        translation: [-0.05, -0.5, 0.09515]
-
 - add_model:
     name: mustard
-    file: package://drake/manipulation/models/ycb/sdf/006_mustard_bottle.sdf
+    file: package://manipulation/hydro/006_mustard_bottle.sdf
 
 - add_weld:
-    parent: mustard_origin
+    parent: world
     child: mustard::base_link_mustard
+    X_PC:
+        # In Bin 1
+        rotation: !Rpy { deg: [0, 0, 45]}
+        translation: [-0.05, -0.5, 0]    

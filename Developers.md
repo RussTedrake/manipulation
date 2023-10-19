@@ -1,3 +1,20 @@
+## To update poetry
+```
+poetry lock
+poetry export --without-hashes --with dev > requirements.txt
+sed -i '' 's/matplotlib==3.7.3 ; python_version >= "3.8"/matplotlib==3.5.1 ; sys_platform == "linux"\nmatplotlib==3.7.3 ; sys_platform == "darwin"/' requirements.txt
+```
+on linux, remove the `''` in the sed command.
+```
+maybe 
+```
+poetry install
+```
+Note that the requirements.txt file is only used now for bazel.
+Hopefully [direct poetry
+support](https://github.com/bazelbuild/rules_python/issues/340) will land soon, or I can use [rules_python_poetry](https://github.com/AndrewGuenther/rules_python_poetry) directly; but it looks like it will still require poetry to fix [their issue](# https://github.com/python-poetry/poetry-plugin-export/issues/176).
+
+
 ## To install the pre-commit hooks
 
 ```
@@ -27,13 +44,11 @@ the `DRAKE_INSTALL_DIR` environment variable. Otherwise it will look in
 Note: This should really only happen when drake publishes new wheels (since I'm
 testing on drake master, not on the drake release).
 
-Update the version number in `pyproject.toml`, and the drake version, then from the
-root directory, run:
+Update the version number in `pyproject.toml`, and the drake version, then from
+the root directory, run:
 ```
-python3 -m pip install --upgrade build twine
 rm -rf dist/*
-python3 -m build
-python3 -m twine upload dist/* -u __token__
+poetry publish --build
 ```
 
 ## Tips for developers
