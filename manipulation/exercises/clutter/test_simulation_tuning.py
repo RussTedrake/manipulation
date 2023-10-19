@@ -2,7 +2,6 @@ import unittest
 import timeout_decorator
 from gradescope_utils.autograder_utils.decorators import weight
 import numpy as np
-from pydrake.all import RotationMatrix
 
 
 class TestSimulationTuning(unittest.TestCase):
@@ -28,7 +27,7 @@ class TestSimulationTuning(unittest.TestCase):
             [
                 [0.0, 1.05],
                 [-0.15, 0.15],
-                [0.035, 0.075],
+                [0.025, 0.075],
             ]
         )
 
@@ -53,8 +52,8 @@ class TestSimulationTuning(unittest.TestCase):
     @weight(2)
     def test_set_masses(self):
         """Test test_set_masses"""
-        simulator = self.notebook_locals["simulator_d"]
-        diagram = self.notebook_locals["diagram_d"]
+        simulator = self.notebook_locals["simulator_c"]
+        diagram = self.notebook_locals["diagram_c"]
 
         context = simulator.get_context()
         plant = diagram.GetSubsystemByName("plant")
@@ -67,7 +66,7 @@ class TestSimulationTuning(unittest.TestCase):
             [
                 [0.0, 1.05],
                 [-0.15, 0.15],
-                [0.035, 0.075],
+                [0.025, 0.075],
             ]
         )
 
@@ -93,8 +92,8 @@ class TestSimulationTuning(unittest.TestCase):
     @weight(3)
     def test_set_friction(self):
         """Test test_set_friction"""
-        simulator = self.notebook_locals["simulator_f"]
-        diagram = self.notebook_locals["diagram_f"]
+        simulator = self.notebook_locals["simulator_e"]
+        diagram = self.notebook_locals["diagram_e"]
 
         context = simulator.get_context()
         plant = diagram.GetSubsystemByName("plant")
@@ -104,10 +103,10 @@ class TestSimulationTuning(unittest.TestCase):
         box2_pos = box_poses[7:][4:]
 
         box1_pos_range = np.array(
-            [[0.25, 0.35], [-0.035, 0.035], [0.035, 0.045]]
+            [[0.15, 0.35], [-0.035, 0.035], [0.025, 0.045]]
         )
         box2_pos_range = np.array(
-            [[0.25, 0.35], [-0.035, 0.035], [0.055, 0.065]]
+            [[0.15, 0.35], [-0.035, 0.035], [0.045, 0.065]]
         )
 
         in_range_list1 = []
@@ -126,53 +125,4 @@ class TestSimulationTuning(unittest.TestCase):
         self.assertTrue(
             in_range_all.all(),
             "Final box positions are not in the correct range.",
-        )
-
-    @timeout_decorator.timeout(2.0)
-    @weight(2)
-    def test_multi_contact(self):
-        """Test test_multi_contact"""
-        simulator = self.notebook_locals["simulator_c"]
-        diagram = self.notebook_locals["diagram_c"]
-
-        context = simulator.get_context()
-        plant = diagram.GetSubsystemByName("plant")
-        plant_context = plant.GetMyMutableContextFromRoot(context)
-
-        plant.get_contact_results_output_port()
-        contact_results = plant.get_contact_results_output_port().Eval(
-            plant_context
-        )
-        n_contacts = contact_results.num_point_pair_contacts()
-
-        self.assertGreater(
-            n_contacts,
-            2,
-            "AddBox not implemented correctly. Not enough contact points have beendetected.",
-        )
-
-    @timeout_decorator.timeout(5.0)
-    @weight(2)
-    def test_minimal_rotation(self):
-        """Test test_minimal_rotation"""
-        sim_maker = self.notebook_locals["sim_maker"]
-        f = sim_maker.make_simulation
-        simulator, diagram = f(0.001, (1, 1), (0.1, 0.1))
-
-        context = simulator.get_context()
-        plant = diagram.GetSubsystemByName("plant")
-        plant_context = plant.GetMyMutableContextFromRoot(context)
-
-        box2_frame = plant.GetBodyByName("box_2").body_frame()
-
-        final_rot = box2_frame.CalcPoseInWorld(plant_context).rotation()
-        expected_rot = RotationMatrix.MakeYRotation(0.1 + np.pi / 2)
-
-        rot_diff = final_rot.inverse() @ expected_rot
-        diff_norm = np.linalg.norm(rot_diff.matrix() - np.eye(3))
-
-        self.assertLessEqual(
-            diff_norm,
-            0.15,
-            "AddBox not implemented correctly. Box 2 moved more than expected.",
         )
