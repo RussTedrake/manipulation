@@ -849,7 +849,7 @@ ik.AddPositionConstraint(
 
   </section>
 
-  <section><h1>Graphs of Convex Sets (GCS)</h1>
+  <section id="gcs"><h1>Graphs of Convex Sets (GCS)</h1>
 
     <p>Trajectory optimization techniques allow for rich specifications of
     costs and constraints, including derivative constraints on continuous
@@ -991,18 +991,146 @@ ik.AddPositionConstraint(
 
     <subsection><h1>Graphs of Convex Sets</h1>
     
-      <p>The original GCS paper <elib>Marcucci21</elib>. <a
-      href="https://drake.mit.edu/doxygen_cxx/classdrake_1_1geometry_1_1optimization_1_1_graph_of_convex_sets.html">Implementation
-      in Drake</a>.</p>
+      <p>The GCS framework was originally introduced in
+      <elib>Marcucci21</elib>, and we have a mature <a
+      href="https://drake.mit.edu/doxygen_cxx/classdrake_1_1geometry_1_1optimization_1_1_graph_of_convex_sets.html">implementation
+      in Drake</a>. It is a general optimization framework for combining
+      combinatorial optimizations, like graph search, with continuous
+      optimizations, like the kinematic trajectory optimization we studied
+      above. GCS can provide a continuous extension to any "network flow"
+      optimization, but for motion planning, the first problem we are
+      interested in is shortest paths on a graph.</p>
+
+      <p>Consider the very classical problem of finding the (weighted) shortest
+      path from a source, $s$, to a target, $t,$ on a graph, pictured on the
+      left. The problem is described by a set of vertices, a set of
+      (potentially directed) edges, and the cost of traversing each edge.
+      <figure>
+      <img width="49%" src="figures/shortest_path.svg"/>
+      <img width="49%" src="figures/shortest_path_between_convex_sets.svg"/>
+      </figure>
+      GCS provides a simple, but powerful generalization to this problem:
+      whenever we visit a vertex in the graph, we are also allowed to pick one
+      element out of a convex set associated with that vertex. Edge lengths are
+      allowed to be convex functions of the continuous variables in the
+      corresponding sets, and we can also write convex constraints on the edges
+      (which must be satisfied by any solution path).
+      </p>
+
+      <p>The shortest path problem on a graph of convex sets can encode
+      problems that are NP-Hard, but these can be formulated as a mixed-integer
+      convex optimization (MICP). What makes the framework so powerful is that
+      this MICP has a very strong and efficient <i>convex relaxation</i>;
+      meaning that if you relax the binary variables to continuous variables
+      you get (nearly) the solution to the original MICP.  This means that you
+      can solve GCS problems to global optimality orders of magnitude faster
+      than previous transcriptions. But in practice, we find that <i>solving
+      only the convex relaxation</i> (plus a little rounding) is almost always
+      sufficient to recover the optimal solution. Nowadays, we almost never
+      solve the full MICP in our robotics applications of GCS.</p>
+      
+      <details><summary>Expand this if you want a <i>few</i> more details about
+      how/why it works.</summary>
+      <p>A very standard approach to tightening any convex relaxation is to
+      multiply constraints together. Typically, this can increase the number of
+      constraints dramatically, and increase the complexity of the problem
+      (e.g. multiplying linear constraints results in quadratic constraints,
+      which are more challenging to deal with). They key observations that make
+      GCS so effective are: <ul>
+        <li>we only need to multiply a small number of constraints together to
+        see a huge improvement, due to the natural sparsity pattern introduced
+        by the graph, and</li>
+        <li>using the machinery of perspective functions <elib
+        part="2.3.3">Boyd04a</elib>, multiplying the binary variables times the
+        convex costs and constraints can be done without (significantly)
+        increasing the complexity class of the optimization.</li>
+      </ul> The GCS formulation has many nice properties. For instance, our
+      convex relaxation is guaranteed to be tight in the case when all of the
+      sets are points, reducing the problem back to the classical shortest path
+      on a discrete graph. <elib>Marcucci21</elib> has all of the
+      details!</p></details>
 
     </subsection>
 
     <subsection><h1>GCS (Kinematic) Trajectory Optimization</h1>
     
-      <p>Motion planning around obstacles with convex optimization
-      <elib>Marcucci22</elib>. <a
-      href="https://drake.mit.edu/doxygen_cxx/classdrake_1_1planning_1_1trajectory__optimization_1_1_gcs_trajectory_optimization.html">Implementation
-      in Drake</a>.</p>
+      <p>We have a convex decomposition of our configuration space, and we have
+      the (general purpose) GCS machinery. What remains is to transcribe the
+      motion planning problem into a GCS. We first presented the transcription
+      I'll describe here in the paper "Motion planning around obstacles with
+      convex optimization" <elib>Marcucci22</elib>. Since we've already spent
+      time in this chapter talking about the inherent nonconvexity of the
+      motion planning problem, you can see why we like this title! It should be
+      slightly surprising that we can use convex optimization to effectively
+      solve these problems to global optimality.</p>
+
+      <p>IRIS regions provide convex sets that describe feasible <i>points</i>
+      in configuration space. But we want feasible <i>paths</i> in
+      configuration space. But if we have two points in the same IRIS region,
+      then we know that the straight line connecting them is also guaranteed to
+      be collision free. When points lie in the intersection of two IRIS
+      regions, then they can connect continuous paths through multiple
+      regions. This is the essence of our transcription.</p>
+
+      <p>What this implies is that for each visit to a vertex in the GCS, then
+      we want to pick <i>two points</i> in an IRIS region, so that the path
+      lies in the region. So the convex sets in the GCS are not the IRIS
+      regions themselves, they are the set with $2n$ variables for an
+      $n$-dimensional configuration space where the first $n$ and the last $n$
+      are both in the IRIS region. In set notation, we'd say it's the Cartesian
+      product of the set with itself. We form undirected edges between these
+      sets iff the IRIS regions intersect, and we put a constraint on the edge
+      saying that the second point one set must be equal to the first point in
+      the second set.</p>
+
+      <p>We can generalize this significantly. Rather than just putting a line
+      segment in each set, we can use the convex hull property of Bezier curves
+      to guarantee that an entire continuous path of fixed degree lies inside
+      the set. Using the derivative properties of the Bezier curves, we can add
+      convex constraints on the velocities (e.g. velocity limits), and
+      guarantee that the curves are smooth even at the intersections between
+      regions. To define these velocities, though, we need to know something
+      about the rate at which we are traversing the path, so we also introduce
+      the time-scaling parameterization, much like we did in the kinematic
+      trajectory optimization above, with time scaling parameters in each
+      convex set.</p>
+
+      <p>The result is a fairly rich trajectory optimization framework that
+      encodes many (but admittedly not all) of the costs and constraints that
+      we want for trajectory optimization in the GCS convex optimization
+      framework. For instance, we can write trajectory optimizations of the
+      form: \begin{align} \min \quad & a T + b \int_0^T |\dot{q}(t)|_2 \,dt + c
+      \int_0^T |\dot{q}(t)|_2^2 \,dt \nonumber \\ \text{s.t.} \quad & q \in
+      \mathcal{C}^\eta, \label{continuity} \\ & q(t) \in \bigcup_{i \in
+      \mathcal{I}} \mathcal{Q}_i, \label{noncollision} && \forall t \in [0,T],
+      \\ & \dot q(t) \in \mathcal{D}, && \forall t \in [0,T], \label{velocity}
+      \\ & T \in [T_{min}, T_{max}], \nonumber \\ & q(0) = q_0, \ q(T) = q_T,
+      \nonumber \\ & \dot q(0) = \dot q_0, \ \dot q(T) = \dot q_T.
+      \nonumber\end{align} Here $a$ is the weight of the total duration
+      objective, $b$ is the weight of the path length objective, and $c$ is the
+      weight of the "path energy" objective. (\ref{continuity}) constrains the
+      curves to be continuous up to degree $\eta$, (\ref{noncollision}) says
+      that the entire path (not only at sampled points) is inside the union of
+      the convex sets (e.g. the IRIS regions), and (\ref{velocity}) captures
+      velocity constraints (again for all $t$, not just at sample points). You
+      can find the <a
+      href="https://drake.mit.edu/doxygen_cxx/classdrake_1_1planning_1_1trajectory__optimization_1_1_gcs_trajectory_optimization.html">implementation
+      in Drake here</a>.</p>
+      
+      <p>Nonconvex trajectory optimization can, of course, consume richer costs
+      and constraints, but does not have the global optimization and
+      completeness elements that GCS can provide. (Of course, there are natural
+      nonconvex generalizations of GCS; we've focused first on the convex
+      optimization versions in order to make sure we deeply understand these
+      transcriptions.) We are constantly adding more costs and constraints into
+      the GCS Trajectory Optimization framework -- some seemingly nonconvex
+      constraints actually have an exact convex reformulation, others have nice
+      convex approximations. If you need something that's not supported, don't
+      be shy in <a
+      href="https://stackoverflow.com/questions/tagged/drake">asking about
+      it</a>.</p>
+
+      <todo>Lots more examples</todo>
 
     </subsection>
 
@@ -1329,6 +1457,12 @@ PhD thesis, Carnegie Mellon University, August, <span class="year">2010</span>.
 <span class="title">"Approximating Robot Configuration Spaces with few Convex Sets using Clique Covers of Visibility Graphs"</span>, 
 , <span class="year">2023</span>.
 [&nbsp;<a href="http://groups.csail.mit.edu/robotics-center/public_papers/Werner23.pdf">link</a>&nbsp;]
+
+</li><br>
+<li id=Boyd04a>
+<span class="author">Stephen Boyd and Lieven Vandenberghe</span>, 
+<span class="title">"Convex Optimization"</span>, Cambridge University Press
+, <span class="year">2004</span>.
 
 </li><br>
 <li id=Marcucci22>
