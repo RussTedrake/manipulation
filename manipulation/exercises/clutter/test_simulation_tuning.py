@@ -23,13 +23,7 @@ class TestSimulationTuning(unittest.TestCase):
         box1_pos = box_poses[:7][4:]
         box2_pos = box_poses[7:][4:]
 
-        box_pos_range = np.array(
-            [
-                [0.0, 1.05],
-                [-0.15, 0.15],
-                [0.025, 0.075],
-            ]
-        )
+        box_pos_range = np.array([[0.0, 1.0], [-0.1, 0.1], [0.03, 0.07]])
 
         in_range_list1 = []
         in_range_list2 = []
@@ -62,22 +56,21 @@ class TestSimulationTuning(unittest.TestCase):
         box1_pos = box_poses[:7][4:]
         box2_pos = box_poses[7:][4:]
 
-        box_pos_range = np.array(
-            [
-                [0.0, 1.05],
-                [-0.15, 0.15],
-                [0.025, 0.075],
-            ]
+        box1_pos_range = np.array(
+            [[0.01, 0.035], [-0.025, 0.025], [0.0475, 0.0675]]
+        )
+        box2_pos_range = np.array(
+            [[0.20, 0.23], [-0.025, 0.025], [0.0275, 0.05]]
         )
 
         in_range_list1 = []
         in_range_list2 = []
         for i in range(3):
             in_range_1 = (
-                box_pos_range[i, 0] < box1_pos[i] < box_pos_range[i, 1]
+                box1_pos_range[i, 0] < box1_pos[i] < box1_pos_range[i, 1]
             )
             in_range_2 = (
-                box_pos_range[i, 0] < box2_pos[i] < box_pos_range[i, 1]
+                box2_pos_range[i, 0] < box2_pos[i] < box2_pos_range[i, 1]
             )
             in_range_list1.append(in_range_1)
             in_range_list2.append(in_range_2)
@@ -103,10 +96,10 @@ class TestSimulationTuning(unittest.TestCase):
         box2_pos = box_poses[7:][4:]
 
         box1_pos_range = np.array(
-            [[0.15, 0.35], [-0.035, 0.035], [0.025, 0.045]]
+            [[0.2, 0.3], [-0.025, 0.025], [0.025, 0.0375]]
         )
         box2_pos_range = np.array(
-            [[0.15, 0.35], [-0.035, 0.035], [0.045, 0.065]]
+            [[0.2, 0.3], [-0.025, 0.025], [0.0475, 0.06]]
         )
 
         in_range_list1 = []
