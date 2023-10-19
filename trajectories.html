@@ -629,7 +629,7 @@ ik.AddPositionConstraint(
       href="https://en.wikipedia.org/wiki/B%C3%A9zier_curve">B&eacute;zier
       curves</a>. But the "B" in "B-spline" actually just stands for "basis"
       (no, I'm not kidding) and "<a
-      href="https://en.wikipedia.org/wiki/Composite_B%C3%A9zier_curve">B&eacute;zier-splines</a>"
+      href="https://en.wikipedia.org/wiki/Composite_B%C3%A9zier_curve">B&eacute;zier splines</a>"
       are slightly different.
       </p>
       
@@ -792,6 +792,15 @@ ik.AddPositionConstraint(
 
   <section><h1>Sampling-based motion planning</h1>
 
+    <p>My aim is to have a complete draft of this section soon! In the mean
+      time, I strongly recommend the book by Steve LaValle<elib>LaValle06</elib>,
+      and checking out the <a href="https://ompl.kavrakilab.org/">Open Motion
+      Planning Library</a>. We have strong implementations of the most common
+      sampling-based algorithms</a> in Drake which are optimized for our
+      collision engines, and <a
+      href="https://github.com/RobotLocomotion/drake/issues/14431">hope to make
+      them publicly available soon</a>.</p>
+  
     <figure>
       <img height="200" class="invisible_on_hover" src="data/h5chess-static.gif"/>
       <img height="200" src="data/h5chess.gif">
@@ -806,11 +815,6 @@ ik.AddPositionConstraint(
       James Kuffner</a> (hover over the image to animate). These are kinematically complex and quite high dimensional.</figcaption>
     </figure>
 
-    <p>The <a href="https://ompl.kavrakilab.org/">Open Motion Planning
-    Library</a>. We have our <a
-    href="https://github.com/RobotLocomotion/drake/issues/14431">own
-    implementations in Drake</a>
-        that are optimized for our collision engines.</p>
 
     <subsection><h1>Rapidly-exploring random trees (RRT)</h1>
     
