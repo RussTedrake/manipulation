@@ -1,6 +1,6 @@
 #!/bin/bash
 
-docker pull robotlocomotion/drake:focal
+docker pull robotlocomotion/drake:jammy
 docker build -f setup/docker/Dockerfile -t russtedrake/manipulation:latest .
 docker push russtedrake/manipulation:latest
 docker build -f setup/docker/Dockerfile -t russtedrake/manipulation:$(git rev-parse --short HEAD) .
