@@ -53,7 +53,7 @@ gradescope-utils = ">=0.4.0"
 mpld3  = ">=0.5.6"
 nevergrad = ">=0.4.3"  # TODO: avoid expensive bayesian optimization dep
 psutil = ">=5.9.*"
-stable-baselines3 = "^1.8.0"
+stable-baselines3 = ">=2.0.0"
 timeout-decorator = ">=0.4.1"
 #torch = ">=2.0.1"
 #pymcubes = ">=0.0.9"

@@ -16,7 +16,6 @@ rt_py_library(
     visibility = ["//visibility:public"],
     deps = [
       "//manipulation",
-      "//manipulation:drake_gym",
       "//manipulation:scenarios",
     ]
 )

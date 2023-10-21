@@ -24,13 +24,6 @@ rt_py_library(
 )
 
 rt_py_library(
-    name = "drake_gym",
-    srcs = ["drake_gym.py"],
-    imports = [".."],
-    visibility = ["//visibility:public"],
-)
-
-rt_py_library(
     name = "mustard_depth_camera_example",
     srcs = ["mustard_depth_camera_example.py"],
     imports = [".."],
@@ -88,7 +81,6 @@ rt_py_test(
     srcs = ["test/test_gym.py"],
     imports = [".."],
     deps = [
-      "drake_gym",
       "//manipulation/envs:box_flipup",
       "manipulation",
       "scenarios",
