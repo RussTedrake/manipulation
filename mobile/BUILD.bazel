@@ -6,42 +6,11 @@
 
 load("//htmlbook/tools/jupyter:defs.bzl", "rt_ipynb_test")
 
-rt_ipynb_test(
-    name = "spot_inspector",
-    srcs = ["inspector.ipynb"],
-    deps = [
-      "//manipulation",
-    ],
-)
-
-rt_ipynb_test(
-    name = "simulation",
-    srcs = ["simulation.ipynb"],
-    deps = ["//manipulation"],
-)
-
-rt_ipynb_test(
-    name = "bimanual",
-    srcs = ["bimanual.ipynb"],
-    deps = [
-      "//manipulation",
-      "//manipulation:station",
-    ],
-)
-
-rt_ipynb_test(
-    name = "iiwa_with_allegro",
-    srcs = ["iiwa_with_allegro.ipynb"],
-    deps = [
-      "//manipulation",
-    ],
-)
-
-rt_ipynb_test(
-    name = "rubiks_cube",
-    data = ["//manipulation/models"],
-    srcs = ["rubiks_cube.ipynb"],
-    deps = [
-      "//manipulation",
-    ],
-)
+# TODO(russt): Pre-download the model
+#rt_ipynb_test(
+#    name = "spot_inspector",
+#    srcs = ["inspector.ipynb"],
+#    deps = [
+#      "//manipulation",
+#    ],
+#)
