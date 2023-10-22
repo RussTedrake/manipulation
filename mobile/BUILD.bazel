@@ -1,0 +1,47 @@
+# -*- mode: python -*-
+# vi: set ft=python :
+
+# Copyright 2020-2023 Massachusetts Institute of Technology.
+# Licensed under the BSD 3-Clause License. See LICENSE.TXT for details.
+
+load("//htmlbook/tools/jupyter:defs.bzl", "rt_ipynb_test")
+
+rt_ipynb_test(
+    name = "spot_inspector",
+    srcs = ["inspector.ipynb"],
+    deps = [
+      "//manipulation",
+    ],
+)
+
+rt_ipynb_test(
+    name = "simulation",
+    srcs = ["simulation.ipynb"],
+    deps = ["//manipulation"],
+)
+
+rt_ipynb_test(
+    name = "bimanual",
+    srcs = ["bimanual.ipynb"],
+    deps = [
+      "//manipulation",
+      "//manipulation:station",
+    ],
+)
+
+rt_ipynb_test(
+    name = "iiwa_with_allegro",
+    srcs = ["iiwa_with_allegro.ipynb"],
+    deps = [
+      "//manipulation",
+    ],
+)
+
+rt_ipynb_test(
+    name = "rubiks_cube",
+    data = ["//manipulation/models"],
+    srcs = ["rubiks_cube.ipynb"],
+    deps = [
+      "//manipulation",
+    ],
+)
