@@ -624,4 +624,29 @@
     <child link="arm_link_fngr"/>
     <limit effort="1000" lower="-1.57" upper="0.0" velocity="1000.00"/>
   </joint>
+  <drake:collision_filter_group name="group_front_right_upper_leg">
+    <drake:member link="body"/>
+    <drake:member link="front_right_upper_leg"/>
+    <drake:ignored_collision_filter_group name="group_front_right_upper_leg"/>
+  </drake:collision_filter_group>  
+  <drake:collision_filter_group name="group_front_left_upper_leg">
+    <drake:member link="body"/>
+    <drake:member link="front_left_upper_leg"/>
+    <drake:ignored_collision_filter_group name="group_front_left_upper_leg"/>
+  </drake:collision_filter_group>
+  <drake:collision_filter_group name="group_rear_left_upper_leg">
+    <drake:member link="body"/>
+    <drake:member link="rear_left_upper_leg"/>
+    <drake:ignored_collision_filter_group name="group_rear_left_upper_leg"/>
+  </drake:collision_filter_group>
+  <drake:collision_filter_group name="group_rear_right_upper_leg">
+    <drake:member link="body"/>
+    <drake:member link="rear_right_upper_leg"/>
+    <drake:ignored_collision_filter_group name="group_rear_right_upper_leg"/>
+  </drake:collision_filter_group>
+   <drake:collision_filter_group name="group_arm_link_sh1">
+    <drake:member link="arm_link_sh0"/>
+    <drake:member link="arm_link_hr0"/>
+    <drake:ignored_collision_filter_group name="group_arm_link_sh1"/>
+  </drake:collision_filter_group>
 </robot>
