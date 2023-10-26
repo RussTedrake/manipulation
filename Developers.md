@@ -72,15 +72,3 @@ import sys
 sys.path.append('/home/russt/drake-install/lib/python3.6/site-packages')
 sys.path.append('/home/russt/manipulation')
 ```
-
-## Add or update python packages
-
-Add the package and version requirements to the following files:
-- jammy-requirements.in
-- focal-requirements.in
-- mac-requirements.in
-
-Then run:
-```bash
-bash htmlbook/requirements.sh
-```
