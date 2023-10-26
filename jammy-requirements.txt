@@ -35,6 +35,8 @@ cloudpickle==2.2.1
     #   -r jammy-requirements.in
     #   gym
     #   stable-baselines3
+colorlog==6.7.0
+    # via trimesh
 cycler==0.11.0
     # via matplotlib
 cython==3.0.3
@@ -65,6 +67,10 @@ jedi==0.18.2
     # via ipython
 jinja2==3.1.2
     # via mpld3
+jsonschema==4.19.1
+    # via trimesh
+jsonschema-specifications==2023.7.1
+    # via jsonschema
 kiwisolver==1.4.4
     # via matplotlib
 lazy-loader==0.3
@@ -100,31 +106,21 @@ mypy-extensions==1.0.0
     # via black
 mysql-connector-python==8.0.32
     # via -r htmlbook/jammy-requirements.in
-numpy==1.24.2
-    # via
 networkx==3.1
     # via
     #   scikit-image
     #   trimesh
-nevergrad==0.6.0
-    # via -r jammy-requirements.in
 numpy==1.24.2
     # via
-    #   bayesian-optimization
-    #   cma
     #   embreex
     #   gym
     #   imageio
     #   mapbox-earcut
     #   matplotlib
-    #   pandas
     #   meshio
-    #   nevergrad
     #   pandas
-    #   pymcubes
     #   python-fcl
     #   scikit-image
-    #   scikit-learn
     #   scipy
     #   shapely
     #   stable-baselines3
@@ -175,12 +171,9 @@ pyglet==1.5.27
     #   glooey
     #   trimesh
 pygments==2.14.0
-    # via ipython
     # via
     #   ipython
     #   rich
-pymcubes==0.1.4
-    # via -r jammy-requirements.in
 pyparsing==3.0.9
     # via matplotlib
 pyproject-autoflake==1.0.2
@@ -201,7 +194,6 @@ referencing==0.30.2
     #   jsonschema
     #   jsonschema-specifications
 requests==2.28.2
-    # via -r htmlbook/jammy-requirements.in
     # via
     #   -r htmlbook/jammy-requirements.in
     #   trimesh
@@ -215,14 +207,9 @@ rtree==1.0.1
     # via trimesh
 scikit-image==0.22.0
     # via trimesh
-scikit-learn==1.2.2
-    # via bayesian-optimization
 scipy==1.10.1
     # via
-    #   bayesian-optimization
-    #   pymcubes
     #   scikit-image
-    #   scikit-learn
     #   trimesh
 shapely==2.0.2
     # via trimesh
@@ -242,8 +229,6 @@ svg-path==6.3
     # via trimesh
 sympy==1.12
     # via trimesh
-threadpoolctl==3.1.0
-    # via scikit-learn
 tifffile==2023.9.26
     # via scikit-image
 timeout-decorator==0.5.0
@@ -271,9 +256,7 @@ trimesh[easy,recommend]==4.0.0
 typeguard==3.0.2
     # via signature-dispatch
 typing-extensions==4.5.0
-    # via torch
     # via
-    #   nevergrad
     #   torch
     #   typeguard
 urllib3==1.26.15
