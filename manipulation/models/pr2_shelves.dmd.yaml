@@ -1,0 +1,83 @@
+# Model directive for iiwa with sphere collision and welded gripper
+directives:
+
+# Add iiwa
+- add_model:
+    name: pr2
+    file: package://manipulation/pr2_collision_fixed.urdf
+
+# Add shelves
+- add_model:
+    name: shelves_1
+    file: package://drake/examples/manipulation_station/models/shelves.sdf
+
+- add_frame:
+    name: shelf_1_origin
+    X_PF:
+      base_frame: world
+      translation: [0.55, 0, 1.396706]
+      rotation: !Rpy { deg: [0, 0, 0] }
+
+- add_weld:
+    parent: shelf_1_origin
+    child: shelves_1::shelves_body
+
+- add_model:
+    name: shelves_2
+    file: package://drake/examples/manipulation_station/models/shelves.sdf
+
+- add_frame:
+    name: shelf_2_origin
+    X_PF:
+      base_frame: world
+      translation: [0, 0.85, 1.396706]
+      rotation: !Rpy { deg: [0, 0, 90] }
+
+- add_weld:
+    parent: shelf_2_origin
+    child: shelves_2::shelves_body
+
+- add_model:
+    name: shelves_3
+    file: package://drake/examples/manipulation_station/models/shelves.sdf
+
+- add_frame:
+    name: shelf_3_origin
+    X_PF:
+      base_frame: world
+      translation: [-0.55, 0, 1.396706]
+      rotation: !Rpy { deg: [0, 0, 180] }
+
+- add_weld:
+    parent: shelf_3_origin
+    child: shelves_3::shelves_body
+
+- add_model:
+    name: shelves_4
+    file: package://drake/examples/manipulation_station/models/shelves.sdf
+
+- add_frame:
+    name: shelf_4_origin
+    X_PF:
+      base_frame: world
+      translation: [0, -0.85, 1.396706]
+      rotation: !Rpy { deg: [0, 0, -90] }
+
+- add_weld:
+    parent: shelf_4_origin
+    child: shelves_4::shelves_body
+
+# Add table
+- add_model:
+    name: table
+    file: package://drake/examples/manipulation_station/models/table_wide.sdf
+
+- add_frame:
+    name: table_origin
+    X_PF:
+      base_frame: world
+      translation: [0, 0, 0.996706]
+
+- add_weld:
+    parent: table_origin
+    child: table::table_body
