@@ -15,7 +15,7 @@ directives:
     child: iiwa::iiwa_link_0
 - add_model:
     name: wsg
-    file: package://drake/manipulation/models/wsg_50_description/sdf/schunk_wsg_50_no_tip.sdf
+    file: package://manipulation/hydro/schunk_wsg_50_with_tip.sdf
 - add_weld:
     parent: iiwa::iiwa_link_7
     child: wsg::body
@@ -32,7 +32,7 @@ directives:
         translation: [0.3257, 0, -0.0127]
 - add_model:
     name: cupboard
-    file: package://drake/examples/manipulation_station/models/cupboard.sdf
+    file: package://manipulation/hydro/cupboard.sdf
 - add_weld:
     parent: world
     child: cupboard::cupboard_body
@@ -66,3 +66,7 @@ directives:
     X_PC:
         translation: [0.786258, -0.048422, 1.043315]
         rotation: !Rpy { deg: [150.0, 1.3, 88]}
+model_drivers:
+    iiwa: !IiwaDriver
+      hand_model_name: wsg
+    wsg: !SchunkWsgDriver {}
