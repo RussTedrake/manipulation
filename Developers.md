@@ -31,6 +31,11 @@ pre-commit install
 
 ## To Run the Unit Tests
 
+Install the prerequisites:
+```bash
+bash setup/.../install_prereqs.sh
+```
+
 Make sure that you have done a recursive checkout in this repository, or have run
 
 ```bash
@@ -44,7 +49,6 @@ bazel test //...
 If you would like to `bazel` to use a local installation of drake, you can set
 the `DRAKE_INSTALL_DIR` environment variable. Otherwise it will look in
 `/opt/drake`.
-
 
 ## To update the pip wheels
 

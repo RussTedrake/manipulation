@@ -76,6 +76,16 @@ rt_py_library(
 )
 
 rt_py_test(
+    name = "test_create_sdf_from_mesh",
+    srcs = [
+        "test/test_create_sdf_from_mesh.py",
+        "//manipulation:create_sdf_from_mesh.py",
+    ],
+    imports = [".."],
+    deps = ["manipulation"],
+)
+
+rt_py_test(
     name = "test_gym",
     data = ["//manipulation:models"],
     srcs = ["test/test_gym.py"],
