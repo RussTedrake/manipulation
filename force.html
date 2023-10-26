@@ -61,7 +61,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
     
   <p>Over the last few chapters, we've developed a great initial toolkit for
   perceiving objects (or piles of objects) in a scene, planning grasps, and
-  moving the arm to grasp. In the last chapter, we started designing motion
+  moving the arm to grasp. In the last chapters, we started designing motion
   planning strategies that could produce beautiful smooth joint trajectories
   for the robot that could move it quickly from one grasp to the next. As our
   desired trajectories get closer to the dynamic limits of the robot, then the
@@ -211,12 +211,14 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
     [0, -mg]^T$, $u$ is the control input vector, and $f^{F_c}$ is the
     Cartesian contact force applied to the finger, $F$, at $c$.</p>
 
-    <p>Just to make the notation clear, I've used $f^{F_c}$ above to denote
-    force <i>applied to the finger</i>, $F$, at point $c$. If we want to denote
-    the same force <i>applied to the box</i>, $B$, at point $c$, then we'll
-    denote it as $f^{B_c}$. Naturally, we have $f^{F_c} = - f^{B_c}$, because
-    the forces must be equal and opposite. If we're not careful about this
-    notation, the signs can get confusing below.</p>
+    <p>This chapter will make heavy use of our <a
+    href="clutter.html#spatial_force">spatial force notation</a>.  To make sure
+    it's clear, I've used $f^{F_c}$ above to denote force <i>applied to the
+    finger</i>, $F$, at point $c$. If we want to denote the same force
+    <i>applied to the box</i>, $B$, at point $c$, then we'll denote it as
+    $f^{B_c}$. Naturally, we have $f^{F_c} = - f^{B_c}$, because the forces
+    must be equal and opposite. If we're not careful about this notation, the
+    signs will definitely get confusing below.</p>
 
     <subsection><h1>Trajectory tracking</h1>
     
@@ -244,25 +246,68 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       integral term will "wind-up", sending larger and larger commands to the
       robot until some fault is reached.</p>
       
-      <p>PD/PID control can be incredibly effective; it assumes almost nothing
+      <p>PD control can be incredibly effective; it assumes almost nothing
       about the dynamics of the robot. But this assumption is also a
-      limitation; if we do know something about the dynamics of the robot than
+      limitation; if we do know something about the dynamics of the robot then
       we can achieve better tracking performance. To make that clear, let's
-      write the closed-loop dynamics under PD control...</p>
+      write the closed-loop dynamics of the $z$ position of our robot finger
+      under PD control:$$m \ddot{z} = -mg + k_p (z_d - z) + k_d (\dot{z}_d -
+      \dot{z}).$$ Here is a sample roll-out when we command a sinusoidal
+      trajectory, $z_d(t)$, and start the finger slightly off the trajectory in
+      $z$ and $\dot{z}$:
+      <figure>
+        <img width="70%" src="figures/force/pd.svg"/>
+      </figure>
+      The actual trajectory does track the desired trajectory, but it will
+      have some persistent errors. Even if the desired trajectory was a
+      constant, $\dot{z}_d = 0$, we would expect to have a steady-state error,
+      $\tilde{z} = z_d - z$, obtained informally by setting $\dot{z} = \ddot{z}
+      = 0$: $$\tilde{z} = z_d - z = \frac{1}{k_p}mg.$$ In this configuration,
+      the restoring force from the PD controller is exactly balancing the
+      perturbation force from gravity, and is not doing anything to drive the
+      error further towards zero.</p>
 
-      <p>Gravity compensation...  For reasons that will become clear soon, this
-      controller is available in Drake as the <a
-      href="https://github.com/RobotLocomotion/drake/pull/18272">JointStiffnessController</a>.</p>
+      <p>Looking at the equations, it seems clear that we can do better if we
+      inform the controller about the gravity term. This is commonly referred
+      to as "gravity compensation". For reasons that will become clear soon,
+      the gravity compensation + PD controller is available in Drake as the <a
+      href="https://github.com/RobotLocomotion/drake/pull/18272">JointStiffnessController</a>,
+      $$u = -\tau_g + K_p (q_d - q) + K_d (\dot{q}_d - \dot{q}).$$ For the $z$
+      axis of our point finger, this results in the closed-loop dynamics: $$m
+      \ddot{z} = k_p (z_d - z) + k_d (\dot{z}_d - \dot{z}).$$  This controller
+      has no steady-state error, and tracks better in practice:</p>
+      <figure>
+        <img width="70%" src="figures/force/stiffness.svg"/>
+      </figure>
+      </p>
 
-      <p>Inverse dynamics control...</p>
-
+      <p>Although the steady-state error is gone, we can still see errors when
+      tracking a more complicated desired trajectory. There is one more
+      relevant piece of information, however, which we have access to, but
+      which we have not yet given to our controller: $\ddot{q}_d(t)$. Let's
+      write our controller access in a subtly different form: $$u = -\tau_g +
+      m\left[\ddot{q}_d + K_p (q_d - q) + K_d (\dot{q}_d - \dot{q}) \right].$$
+      The general form of this controller is available in Drake as the <a
+      href="https://drake.mit.edu/doxygen_cxx/classdrake_1_1systems_1_1controllers_1_1_inverse_dynamics_controller.html">InverseDynamicsController</a>.
+      Two things changed here; in addition to adding the feed-forward
+      acceleration term into the controller, we also multiplied the PD terms by
+      the mass. Combined, this has the result that the closed-loop error
+      dynamics simplifies to $$\ddot{\tilde{z}} + k_d \dot{\tilde{z}} + k_p
+      \tilde{z} = 0,$$ which may be familiar to you as a simple
+      mass-spring-damper model. Given reasonable choices for $k_p$ and $k_d$,
+      the error dynamics converge nicely to zero, giving us our best tracking
+      performance yet:
+      <figure>
+        <img width="70%" src="figures/force/inverse_dynamics.svg"/>
+      </figure>
+      </p>
+    
       <example><h1>Trajectory tracking for the point mass</h1>
 
-        <p>I've put together an extremely simple example to show the differences in tracking performance for the point mass using each of these control strategies.</p>
+        <p>I've put the code to generate these simple plots into a notebook so
+        that you can play around with them yourself:</p>
 
         <script>document.write(notebook_link('force', d = deepnote, link_text = "", notebook = "tracking"))</script>
-
-        <todo>insert the figure here</todo>
 
       </example>
 
@@ -270,10 +315,16 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
 
     <subsection><h1>(Direct) force control</h1>
 
-      <p>In the case of direct force control, we implement a low-level
-      controller that accepts the desired contact forces and produces
-      generalized force inputs to the robot that try to make the actual contact
-      forces match the desired.</p>
+      <p>Things get more interesting when we start making contact (in our
+      example, it means our finger starts contacting the box). In this case,
+      controlling the position / velocity / acceleration of the finger might
+      not be the only goal. We might also want to control the interaction
+      forces that we are applying to the box.</p>
+      
+      <p>In the simplest case, let's not try to regulate the finger position at
+      all, but instead implement a low-level controller that accepts the
+      desired contact forces and produces generalized force inputs to the robot
+      that try to make the actual contact forces match the desired.</p>
       
       <div>
         <script type="text/javascript">
@@ -289,10 +340,10 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       we need the desired contact force, $f^{F_c}_{desired}$.  In general, we
       will need the robot's state (though in the immediate example, the
       dynamics of our point mass are not state dependent).  But we also need to
-      either (1) measure the robot accelerations (which we've repeatedly tried
-      to avoid), (2) assume the robot accelerations are zero, or (3) provide a
-      measurement of the contact force so that we can regulate it with
-      feedback.</p>
+      either (1) measure the robot accelerations (which we've try to avoid,
+      since they are often noisy measurements), (2) assume the robot
+      accelerations are zero, or (3) provide a measurement of the contact force
+      so that we can regulate it with feedback.</p>
       
       <p>Let's consider the case where the robot is already in contact with the
       box.  Let's also assume for a moment that the accelerations are (nearly)
