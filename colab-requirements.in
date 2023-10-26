@@ -1,9 +1,0 @@
-#
-# Assembles requirements for running the manipulation source on colab.
-
--c htmlbook/colab-constraints-colab.txt
-pyngrok>=4.2.2
-pyvirtualdisplay>=1.3.2
-# colab's install is inconsistent (and makes warnings for my pip)
-#    albumentations 0.1.12 has requirement imgaug<0.2.7,>=0.2.5, but you'll #    have imgaug 0.2.9 which is incompatible.
-imgaug<0.2.7 

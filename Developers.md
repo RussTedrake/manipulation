@@ -2,18 +2,25 @@
 ```
 poetry lock
 poetry export --without-hashes --with dev > requirements.txt
-sed -i '' 's/matplotlib==3.7.3 ; python_version >= "3.8"/matplotlib==3.5.1 ; sys_platform == "linux"\nmatplotlib==3.7.3 ; sys_platform == "darwin"/' requirements.txt
+sed 's/matplotlib==3.7.3 ; python_version >= "3.8"/matplotlib==3.5.1 ; sys_platform == "linux"\nmatplotlib==3.7.3 ; sys_platform == "darwin"/' requirements.txt > requirements.txt.tmp && mv requirements.txt.tmp requirements.txt
+awk '
+/torch==[0-9]+\.[0-9]+\.[0-9]+ ; python_version >= "3.8"/ {
+    version=$1; sub(/^torch==/, "", version); sub(/ ;.*/, "", version);
+    print "--find-links https://download.pytorch.org/whl/torch_stable.html";
+    print "torch==" version "+cpu ; python_version >= \"3.8\" and sys_platform == \"linux\"";
+    print "torch==" version " ; python_version >= \"3.8\" and sys_platform == \"darwin\"";
+    next;
+}
+1' requirements.txt > requirements.txt.tmp && mv requirements.txt.tmp requirements.txt
 ```
-on linux, remove the `''` in the sed command.
-```
-maybe 
+One may want to also run
 ```
 poetry install
 ```
-Note that the requirements.txt file is only used now for bazel.
-Hopefully [direct poetry
+- Note that the requirements.txt file is only used now for bazel and docker.
+- Hopefully [direct poetry
 support](https://github.com/bazelbuild/rules_python/issues/340) will land soon, or I can use [rules_python_poetry](https://github.com/AndrewGuenther/rules_python_poetry) directly; but it looks like it will still require poetry to fix [their issue](# https://github.com/python-poetry/poetry-plugin-export/issues/176).
-
+- The awk command forces [torch to be cpu-only for bazel](https://drakedevelopers.slack.com/archives/C2PMBJVAN/p1697855405335329).
 
 ## To install the pre-commit hooks
 

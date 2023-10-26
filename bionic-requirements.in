@@ -1,8 +1,0 @@
-# Note: runtime bionic requirements are located in setup.cfg
--r htmlbook/bionic-requirements.in
--c htmlbook/bionic-constraints.txt
--c htmlbook/colab-constraints-ubuntu.txt
-bleach>=3.3.0 # github issued a security concern.  this requirement comes from nbconvert (via open3d)
-# //exercises/rl:policy_gradient hit a scipy/numpy mismatch bug.
-# hard-code scipy version for now:
-scipy==1.5.3
