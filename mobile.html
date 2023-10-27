@@ -78,24 +78,153 @@ discover (manipulate?) the world!</a></p>
 
 <section><h1>A New Cast of Characters</h1>
 
+
+
+</section>
+
+<section><h1>What's different about perception?</h1>
+
+  <subsection><h1>Partial views / active perception</h1>
+  
+    <p>We discussed some of the technical challenges that come with having only
+    partial views of the objects that you wish to manipulate <a
+    href="pose.html#partial_views">in the geometric perception chapter</a>. In
+    the table-top manipulation setting, we can typically put cameras looking
+    onto the table from all external angles, but our views can still be
+    occluded in clutter.</p>
+
+    <p>When you're a mobile robot, we typically don't assume that you can fully
+    instrument your environment to the same extent. Typically we try to work
+    with only robot-mounted sensors, such as head-mounted cameras. Our <a
+    href="clutter.html#antipodal">antipodal grasping strategy</a> won't work
+    out of the box if we only see one side of each object.</p>
+
+    <p>The primary solution to this problem is to use machine learning. If you
+    only see one half of a mustard bottle, then the instantaneous sensor
+    readings simply don't contain enough information to plan a grasp;
+    somehow we must infer something about what the back of the object looks
+    like (aka "shape completion", though it need not be done explicitly). The
+    reason that you would have a good guess at what the back half of the
+    mustard bottle looks like is because you've interacted with mustard bottles
+    before -- it is the statistics of the objects you've interacted with that
+    provides the missing information. So learning isn't just a convenience
+    here, it's fundamental. We'll discuss learning-based perception soon!</p>
+
+    <p>There is another mitigation, though, that is often available to a mobile
+    manipulator. Now that the cameras (and all of the sensors) are mobile, we
+    can actively move them in order to gather information / reduce uncertainty.
+    There is a rich literature for "active perception" and "planning under
+    uncertainty". [More to come]
+    </p>
+  
+  </subsection>
+
+  <subsection><h1>Unknown (potentially dynamic) environments</h1>
+
+    <p>For table-top manipulation, we started by assuming known objects and
+    then discussed approaches (such as antipodal grasping) that could work on
+    unknown objects. But throughout that discussion, we always assumed that we
+    new the geometry and location of the table / bins! For instance, we
+    actively cropped away the point cloud returns that hit the known
+    environment and left only points associated with the objects. That's a very
+    reasonable thing to do when your robot is bolted to the table, but we need
+    to relax that assumption once we go mobile, and start interacting with more
+    diverse / less known environments.</p>
+
+    <p>One <i>could</i> try to model everything in the environment. We could do
+    object detection to recognize the table, and pose estimation (possibly
+    shape estimation) to fit a parametric table model to the observations. But
+    that's a difficult road to travel, especially in diverse and expansive
+    scenes. Is there an analogy to the antipodal grasping for objects that can
+    similarly reduce our need for explicit modeling of the environment?</p>
+
+    <p>We'd like to have a representation of the environment that does not
+    require explicit object models, that supports the types of queries we need
+    for motion planning (for instance, fast collision detection and
+    minimum-distance computations), which we can update efficiently from our
+    raw sensor data, and which scale well to large scenes. Raw, merged point
+    clouds, for instance, are easy to update and don't require a model, but
+    would not be ideal for fast planning queries.</p>
+
+    <p>Voxel grids are a geometry representation that meets (almost all of) the
+    our desiderata -- we actually used them already in order to efficiently
+    down-sample a point cloud. In this representation we discretize some finite
+    volume of 3D space into a grid of fixed-size cubes; let's say 1 cm$^3.$ We
+    mark each of these cubes as either occupied or unoccupied (or more
+    generally, we can have a probability of being occupied). Then, for
+    collision-free motion planning, we treat the occupied cubes as collision
+    geometry to be avoided. Many collision queries with voxel grids can be fast
+    (and are easily parallelized). In particular the sphere-on-voxel collision
+    query can be very fast, which is one of the reasons that you see a number
+    of collision geometries in the Drake models that are approximate with
+    densely packed spheres. <todo>Figure</todo> Updating a voxel grid with
+    points clouds is also efficient. In order to scale voxel representations to
+    have both fine resolution and to be able to represent very large scenes, we
+    can make use of clever data structures.</p>
+
+    <example><h1>Octomap</h1>
+    
+      <p>One particularly nice and efficient implementation of voxel grids at
+      scale for robotics is an algorithm / software package called Octomap
+      <elib>Hornung13</elib>...</p>
+    </example>
+
+    <p>Segmenting the visual scene into objects vs environment these days is
+    best done with machine learning; we'll implement segmentation pipelines soon.</p>
+
+  </subsection>
+
+  <subsection><h1>Robot state estimation</h1>
+
+    <p>The biggest difference that comes up in perception for a mobile
+    manipulator is the need to estimate not only the state of the environment,
+    but the state of the robot. For instance, in our point cloud processing
+    algorithms so far, we have tacitly assumed that we know ${}^WX^C$, the pose
+    of the camera in the world. We could potentially invest in elaborote
+    calibration procedures, using known shapes and patterns, in order to
+    estimate (offline) these camera extrinsics. We've also take the kinematics
+    of the robot to be known -- this is a pretty reasonable assumption when the
+    robot is bolted to the table and all of the transforms between the world
+    and the end-effector are measured directly with high-accuracy encoders. But
+    these assumptions break down once the robot has a mobile base.</p>
+
+    <p>State estimation for mobile robots has a strong history;
+    <elib>Thrun05</elib> is the canonical reference. Often these algorithms are
+    based on (approximate) recursive Bayesian filtering, or the closely related
+    smoothing algorithms <elib>Kaess08</elib>. Typically our mobile bases are
+    instrumented with range sensors and/or cameras in addition to the wheel
+    encoders and inertial measurement units (IMUs). The state estimation
+    pipeline fuses these noisy measurements together into a consistent
+    estimate. Indeed, one of the biggest lessons in mobile robots is the wheel
+    odometry alone is almost always insufficient for estimation; real wheels
+    slip and visual/range measurements provide an essential and independent set
+    of measurements.</p>
+
+    <p>Of all of the things that have changed since <elib>Thrun05</elib> was
+    written, I would say that the biggest change has been the shift from a
+    heavy dependence on range-based sensors / depth-cameras towards
+    increasingly powerful estimation algorithm which use only RGB cameras. This
+    is due to advances in visual-inertial odometry<elib>Scaramuzza11</elib>,
+    monocular depth estimation<elib>Ming21</elib>, and dense 3D reconstruction
+    / structure from motion<elib>Mildenhall21+Kerbl23</elib>, to name a
+    few.</p>
+  </subsection>
+
+</section>
+
+<section><h1>What's different about motion planning?</h1>
+
+
+</section>
+
+<section><h1>What's different about simulation / the tasks?</h1>
+
 </section>
 
 <section><h1>Navigation</h1>
 
 </section>
 
-<section><h1>Motion Planning</h1>
-
-</section>
-
-<section><h1>Perception</h1>
-
-
-</section>
-
-<section><h1>The Open World!</h1>
-
-</section>
 
 <section><h1>Exercises</h1>
   <exercise><h1>Adding Object Models</h1>
@@ -117,7 +246,54 @@ discover (manipulate?) the world!</a></p>
 </chapter>
 <!-- EVERYTHING BELOW THIS LINE IS OVERWRITTEN BY THE INSTALL SCRIPT -->
 
-<div id="references"></div>
+<div id="references"><section><h1>References</h1>
+<ol>
+
+<li id=Hornung13>
+<span class="author">Armin Hornung and Kai M. Wurm and Maren Bennewitz and Cyrill  Stachniss and Wolfram Burgard</span>, 
+<span class="title">"{OctoMap}: An Efficient Probabilistic {3D} Mapping Framework Based   on Octrees"</span>, 
+<span class="publisher">Autonomous Robots</span>, <span class="year">2013</span>.
+
+</li><br>
+<li id=Thrun05>
+<span class="author">S. Thrun and W. Burgard and D. Fox</span>, 
+<span class="title">"Probabilistic Robotics"</span>, MIT Press
+, <span class="year">2005</span>.
+
+</li><br>
+<li id=Kaess08>
+<span class="author">M. Kaess and A. Ranganathan and F. Dellaert</span>, 
+<span class="title">"i{SAM}: Incremental Smoothing and Mapping"</span>, 
+<span class="publisher">IEEE Transactions on Robotics</span>, vol. 24, no. 6, pp. 1365-1378, <span class="year">2008</span>.
+
+</li><br>
+<li id=Scaramuzza11>
+<span class="author">Davide Scaramuzza and Friedrich Fraundorfer</span>, 
+<span class="title">"Visual odometry [tutorial]"</span>, 
+<span class="publisher">Robotics \& Automation Magazine, IEEE</span>, vol. 18, no. 4, pp. 80--92, <span class="year">2011</span>.
+
+</li><br>
+<li id=Ming21>
+<span class="author">Yue Ming and Xuyang Meng and Chunxiao Fan and Hui Yu</span>, 
+<span class="title">"Deep learning for monocular depth estimation: A review"</span>, 
+<span class="publisher">Neurocomputing</span>, vol. 438, pp. 14--33, <span class="year">2021</span>.
+
+</li><br>
+<li id=Mildenhall21>
+<span class="author">Ben Mildenhall and Pratul P Srinivasan and Matthew Tancik and Jonathan T Barron and Ravi Ramamoorthi and Ren Ng</span>, 
+<span class="title">"Nerf: Representing scenes as neural radiance fields for view synthesis"</span>, 
+<span class="publisher">Communications of the ACM</span>, vol. 65, no. 1, pp. 99--106, <span class="year">2021</span>.
+
+</li><br>
+<li id=Kerbl23>
+<span class="author">Bernhard Kerbl and Georgios Kopanas and Thomas Leimkuhler and George Drettakis</span>, 
+<span class="title">"3d gaussian splatting for real-time radiance field rendering"</span>, 
+<span class="publisher">ACM Transactions on Graphics (ToG)</span>, vol. 42, no. 4, pp. 1--14, <span class="year">2023</span>.
+
+</li><br>
+</ol>
+</section><p/>
+</div>
 
 <table style="width:100%;" pdf="no"><tr style="width:100%">
   <td style="width:33%;text-align:left;"><a class="previous_chapter" href=trajectories.html>Previous Chapter</a></td>
