@@ -167,6 +167,8 @@ discover (manipulate?) the world!</a></p>
       <p>One particularly nice and efficient implementation of voxel grids at
       scale for robotics is an algorithm / software package called Octomap
       <elib>Hornung13</elib>...</p>
+
+      <todo>multi-resolution, efficient collision queries, efficient ray cast, probabilistic updating, including for free space</todo>
     </example>
 
     <p>Segmenting the visual scene into objects vs environment these days is
@@ -200,28 +202,177 @@ discover (manipulate?) the world!</a></p>
     slip and visual/range measurements provide an essential and independent set
     of measurements.</p>
 
-    <p>Of all of the things that have changed since <elib>Thrun05</elib> was
-    written, I would say that the biggest change has been the shift from a
-    heavy dependence on range-based sensors / depth-cameras towards
-    increasingly powerful estimation algorithm which use only RGB cameras. This
-    is due to advances in visual-inertial odometry<elib>Scaramuzza11</elib>,
-    monocular depth estimation<elib>Ming21</elib>, and dense 3D reconstruction
-    / structure from motion<elib>Mildenhall21+Kerbl23</elib>, to name a
-    few.</p>
+    <p>Many things have changed since <elib>Thrun05</elib> was written.
+    Range-based sensors (lidar and depth cameras) have improved dramatically in
+    range, accuracy, and framerate, making the methods dramatically more
+    effective.</p> 
+
+    <example><h1>Simulating range sensors in Drake</h1>
+    
+    </example>
+    
+    <p>Perhaps the biggest change, though, has been
+    the shift from a heavy dependence on range-based sensors / depth-cameras
+    towards increasingly powerful estimation algorithm which use only RGB
+    cameras. This is due to advances in visual-inertial
+    odometry<elib>Scaramuzza11</elib>, monocular depth
+    estimation<elib>Ming21</elib>, and dense 3D reconstruction / structure from
+    motion<elib>Mildenhall21+Kerbl23</elib>, to name a few.</p>
   </subsection>
 
 </section>
 
 <section><h1>What's different about motion planning?</h1>
 
+  <p>Let's start with an example of perhaps the simplest (given our toolbox so
+  far) to build ourselves a mobile manipulator.</p>
+
+  <example><h1>iiwa on a prismatic base</h1>
+  
+    <p>Let's take the iiwa model and add a few degrees of freedom to the base.
+    Rather than welding link 0 to the world, let's insert three prismatic
+    joints (connected by invisible, massless links) corresponding to motion in
+    $x$, $y$, and $z$. I'll allow $x$ and $y$ to be unbounded, but will set
+    modest joint limits on $z$. The first joint of the iiwa already rotates
+    around the base $z$ axis; I'll just remove the joint limits so that it can
+    rotate continuously. Simple changes, and now I have the essence of a mobile
+    robot.</p>
+
+    <p>Code coming soon...</p>
+
+  </example>
+
+  <p>Now let's ask: how do I have to change my motion planning tools to work
+  with this version of the iiwa? The answer is: not much! Our motion planning
+  tools were all quite general, and work with basically any kinematic robot
+  configuration. The mobile base that we've added here just adds a few more
+  joints to that kinematic tree, but otherwise fits directly into the
+  framework.</p>
+
+  <p>One possible consideration is that we have increased the number of degrees
+  of freedom (here from 7 to 10). Trajectory optimization algorithms, by
+  virtue(?) of being local to a trajectory, scale easily to high-dimensional
+  problems, so this is no problem. Sampling-based planners struggle more with
+  dimension, but RRTs should be fine in 10 dimensions. PRMs can definitely work
+  in 10 dimensions, too, but probably require an efficient implementation and
+  are starting to reach their limits.</p>
+
+  <p>Another consideration which may be new for the mobile base is the
+  existence of a continuous joint (rotations around the $z$ axis do not have
+  joint limits). These can require some care in the planning stack. In a
+  sampling-based planner, typically the distance metric and extend operations
+  are adapted to consider edges that can wrap around $2\pi$. Nonconvex
+  trajectory optimization doesn't require algorithmic modifications, per se,
+  but does potentially suffer from local minima. For <a
+  href="trajectories.html#gcs">trajectory optimization with Graphs of Convex
+  Sets</a>, one simply needs to take care that the IRIS regions operate in a
+  local coordinate system and don't have a domain wider than $\pi$ in any
+  wrapping joint<elib>Cohn23</elib>. Failure to address this properly can
+  result in slightly absurd plans which take the long way around; <a
+  href="https://ggcs-anonymous-submission.github.io/meshcat/1CL-4CR/trajopt.html">here's
+  an example</a> of kinematic trajectory optimization finding a suboptimal
+  solution to navigating between the shelves, from <elib>Cohn23</elib>.</p>
+
+  <p>What happens if instead of implementing the mobile manipulator using
+  prismatic joints, we're going to use wheels or legs? As we'll see, some
+  wheeled robots (and most legged robots) can provide our prismatic joints
+  abstraction directly, but others add constraints that we must consider during
+  motion planning.</p>
+
+  <subsection><h1>Wheeled robots</h1>
+
+    <p>Even though real wheels do slip, we typically do motion planning with
+    the no-slip assumption, then use feedback control to follow the planned
+    path <elib part="Ch. 49">Siciliano16</elib>.</p>
+
+    <subsubsection><h1>Holonomic drives</h1>
+
+      <example><h1>Mecanum drive kinematics</h1></example>
+      <example><h1>Simulating mecanum wheels in Drake</h1></example>
+    
+    </subsubsection>
+
+    <subsubsection><h1>Nonholonomic drives</h1>
+
+      <p>Differential drive, Dubins car, Reeds-Shepp.</p>
+
+      <example><h1>Differential drive kinematics</h1></example>
+    
+    </subsubsection>
+
+  </subsection>
+
+  <subsection><h1>Legged robots</h1>
+      
+    <p>If your job is to do the planning and control for the legs of a robot,
+    then there is a <a href="https://underactuated.mit.edu">rich literature for
+    you to explore</a>. But if you are using a legged robot like <a
+    href="https://bostondynamics.com/products/spot/">Spot</a> to perform mobile
+    manipulation, and you're using the API provided by Boston Dynamics, then
+    (fortunately or unfortunately) you don't get to dive into the low-level
+    control of the legs. In fact, Spot provides an API that to first order
+    treats the legged platform as a holonomic base. (There are secondary
+    considerations, like the fact that the robots center of mass is limited by
+    dynamic constraints, and may deviate from your requested trajectory in
+    order to maintain balance).</p>
+
+    <example><h1>Mobile manipulation with Spot</h1>
+    
+    </example>
+
+    <p>Of course, things get much more interesting when you are performing
+    mobile manipulation on rough or intermitted terrain; this is where the
+    legged platform really shines!</p>
+
+  </subsection>
 
 </section>
 
-<section><h1>What's different about simulation / the tasks?</h1>
+<section><h1>What's different about simulation?</h1>
+
+  <p>Mobile manipulation encourages us to expand the scope of our simulation,
+  in addition to our autonomy algorithms. Rather than simulating a few objects
+  on a table top, now we start asking about simulating the robot in a more
+  expansive environment.</p>
+
+  <p>When I've used the term "simulation" so far in these notes, I've been
+  focusing mostly on the enabling technologies, like the physics engine and the
+  the rendering engine. In robotics today, there are only a handful of
+  mainstream simulators which people are using, such as NVidia Isaac/Omniverse,
+  MuJoCo, and Drake. (PyBullet was very popular but is no longer
+  actively maintained.) But there is another crop of tools which call
+  themselves "simulators" that build upon these engines (and/or more
+  traditional engines from computer games like Unity or Unreal) and offer
+  higher-level abstractions. I think of these as content aggregators, and feel
+  that they serve a very important role.</p>
+
+  <example><h1>Sapien</h1></example>
+  <example><h1>Behavior 1K</h1></example>
+  <example><h1>Habitat 3.0</h1></example>
+  <!--<example><h1>ThreeDWorld</h1></example>-->
+
+  <p>For my part, I hope that the problems specifications and assets from these
+  tools can be imported easily enough into Drake that we can use not only our
+  simulation engine, but also our perception, planning, and control tools to
+  solve them. We are gradually building out or support for loading from other
+  formats, or translating from other formats in order to facilitate this.</p>
 
 </section>
 
 <section><h1>Navigation</h1>
+
+  <p>Most of the ideas we've covered in this chapter so far can be considered
+  relatively modest extensions to our existing manipulation toolbox. But there
+  are some important problem associated with navigating a mobile robot that
+  really don't come up in table-top manipulation.</p>
+
+  <subsection><h1>Mapping (in addition to localization)</h1>
+  
+  </subsection>
+
+  <subsection><h1>Identifying traversable terrain</h1>
+  
+  </subsection>
 
 </section>
 
@@ -289,6 +440,19 @@ discover (manipulate?) the world!</a></p>
 <span class="author">Bernhard Kerbl and Georgios Kopanas and Thomas Leimkuhler and George Drettakis</span>, 
 <span class="title">"3d gaussian splatting for real-time radiance field rendering"</span>, 
 <span class="publisher">ACM Transactions on Graphics (ToG)</span>, vol. 42, no. 4, pp. 1--14, <span class="year">2023</span>.
+
+</li><br>
+<li id=Cohn23>
+<span class="author">Thomas Cohn and Mark Petersen and Max Simchowitz and Russ Tedrake</span>, 
+<span class="title">"Non-Euclidean Motion Planning with Graphs of Geodesically-Convex Sets"</span>, 
+<span class="publisher">Robotics: Science and Systems</span> , <span class="year">2023</span>.
+[&nbsp;<a href="http://groups.csail.mit.edu/robotics-center/public_papers/Cohn23.pdf">link</a>&nbsp;]
+
+</li><br>
+<li id=Siciliano16>
+<span class="author">Bruno Siciliano and Oussama Khatib</span>, 
+<span class="title">"Springer handbook of robotics"</span>, Springer
+, <span class="year">2016</span>.
 
 </li><br>
 </ol>
