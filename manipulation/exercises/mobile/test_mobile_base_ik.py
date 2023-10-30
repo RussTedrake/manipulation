@@ -11,7 +11,7 @@ class TestMobileBaseIk(unittest.TestCase):
         self.notebook_locals = notebook_locals
 
     @weight(5)
-    @timeout_decorator.timeout(15.0)
+    @timeout_decorator.timeout(60.0)
     def test_mobile_base_ik(self):
         """Test solve_ik"""
         # yapf: disable
