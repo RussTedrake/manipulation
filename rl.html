@@ -85,24 +85,27 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
     widely varying levels of quality and sophistication.  But there is one
     standard that has clearly won out as the default interface with which one
     should wrap up their simulator in order to connect to a variety of RL
-    algorithms: the <a href="https://www.gymlibrary.dev/">Gym</a>.</p>
+    algorithms: the <a href="https://gymnasium.farama.org/">Gymnasium</a>
+    (which is often still called "Gym" for short).</p>
 
-    <p>It's worth taking a minute to appreciate the difference in the OpenAI
-    Gym <a href="https://www.gymlibrary.dev/">Environments</a>
-    (<code>gym.Env</code>) interface and the Drake System interface; I think it
-    is very telling.  My goal (in Drake), is to present you with a rich and
-    beautiful interface to express and optimize dynamical systems, to expose
-    and exploit all possible structure in the governing equations.  The goal in
-    Gym is to expose the absolute minimal details, so that it's possible to
-    easily wrap every possible system under the same common interface (it doesn't matter if it's a robot, an Atari game, or
-    even a <a href="https://github.com/facebookresearch/CompilerGym">compiler</a>). Almost
-    by definition, you can wrap any Drake system as a Gym Environment.</p>  
+    <p>It's worth taking a minute to appreciate the difference in the 
+    Gymnasium <a href="https://gymnasium.farama.org/api/env/">Environments</a>
+    (<code>gymnasium.Env</code>) interface and the Drake System interface; I
+    think it is very telling.  My goal (in Drake), is to present you with a
+    rich and beautiful interface to express and optimize dynamical systems, to
+    expose and exploit all possible structure in the governing equations.  The
+    goal in Gym is to expose the absolute minimal details, so that it's
+    possible to easily wrap every possible system under the same common
+    interface (it doesn't matter if it's a robot, an Atari game, or even a <a
+    href="https://github.com/facebookresearch/CompilerGym">compiler</a>).
+    Almost by definition, you can wrap any Drake system as a Gym
+    environment.</p>  
 
     <example id="drake_gym">
-      <h1>Using a Drake simulation as an OpenAI Gym Environment</h1>
+      <h1>Using a Drake simulation as an Gym environment</h1>
     
-      <p>An OpenAI Gym Environment is an incredibly simple wrapper around
-      simulators which offers a <a
+      <p>A Gym environment is an incredibly simple wrapper around simulators
+      which offers a <a
       href="https://github.com/openai/gym/blob/6a04d49722724677610e36c1f92908e72f51da0c/gym/core.py#L35">very
       basic interface</a>, most notably consisting of <code>reset()</code>,
       <code>step()</code>, <code>render()</code>. The
@@ -111,16 +114,16 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       </p>
 
       <p>You can wrap any Drake simulation in an OpenAI gym environment, using 
-      <pre><code class="python">from manipulation.drake_gym import DrakeGymEnv</code></pre>
+      <pre><code class="python">from pydrake.gym import DrakeGymEnv</code></pre>
       The <a
-      href="https://github.com/RussTedrake/manipulation/blob/master/manipulation/drake_gym.py"><code>DrakeGym</code>
+      href="https://drake.mit.edu/pydrake/pydrake.gym.html?highlight=drakegym#pydrake.gym.DrakeGymEnv"><code>DrakeGymEnv</code>
       constructor</a> takes a <code>Simulator</code> as well as an input port
       to associate with the actions, an output port to associate with the
       observations, etc. For the reward, you can implement it as a simple function of the <code>Simulator</code>
       <code>Context</code>, or as another output port.
       </p>
 
-      <p><code>DrakeGym</code> is built around a <code>Simulator</code>
+      <p><code>DrakeGymEnv</code> is built around a <code>Simulator</code>
       (not just a <code>System</code>) or a function that produces a random
       <code>Simulator</code> because you might want to control the integrator
       parameters or have each rollout contain the same robot in a different
@@ -167,12 +170,12 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
     on the other hand, has made itself somewhat intentionally obscure, perhaps
     partly out of arrogance.  that is perhaps the more bitter lesson.  -->
 
-    <p>The OpenAI Gym provides an interface for RL environments, but doesn't
+    <p>Gymnasium provides an interface for RL environments, but doesn't
     provide the implementation of the actual RL algorithms.  There are a large
     number of popular repositories for the algorithms, too.  As of this
     writing, I would recommend <a
     href="https://stable-baselines3.readthedocs.io/en/master/index.html">Stable
-    Baselines 3</a>: it provides a very nice and thoughfully-documented set of
+    Baselines 3</a>: it provides a very nice and thoughtfully-documented set of
     implementations in PyTorch.</p>
 
     <!--

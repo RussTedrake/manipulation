@@ -58,12 +58,406 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
 <!-- EVERYTHING ABOVE THIS LINE IS OVERWRITTEN BY THE INSTALL SCRIPT -->
 <chapter style="counter-reset: chapter 6"><h1>Mobile Manipulation</h1>
 
-<p>Coming soon!</p>
+<p>So far we've focused primarily on table-top manipulation. You can bring
+many interesting objects / challenges to your robot that is fixed to the table,
+and this will continue to keep us busy for many chapters to come. But before we
+get too much further, I'd like to stop and ask -- what happens if the robot
+also has wheels (or legs!)?</p>
+
+<p>Many of the technical challenges in "mobile manipulation" are the same
+challenges we've been discussing for table-top manipulation. But there some
+challenges that are new, or at least are more urgent in the mobile setting.
+Describing those challenges, and some solutions, is my primary goal for this
+chapter.</p>
+
+<p>Most importantly, add mobility to our manipulators can often help us
+increase the scope of our ambitions for our robots. Now we can think about
+robots moving through houses and accomplishing diverse tasks. It's time to send
+our creations out <a href="https://www.youtube.com/watch?v=WnTKllDbu5o">to
+discover (manipulate?) the world!</a></p>
+
+<section><h1>A New Cast of Characters</h1>
+
+
+
+</section>
+
+<section><h1>What's different about perception?</h1>
+
+  <subsection><h1>Partial views / active perception</h1>
+  
+    <p>We discussed some of the technical challenges that come with having only
+    partial views of the objects that you wish to manipulate <a
+    href="pose.html#partial_views">in the geometric perception chapter</a>. In
+    the table-top manipulation setting, we can typically put cameras looking
+    onto the table from all external angles, but our views can still be
+    occluded in clutter.</p>
+
+    <p>When you're a mobile robot, we typically don't assume that you can fully
+    instrument your environment to the same extent. Typically we try to work
+    with only robot-mounted sensors, such as head-mounted cameras. Our <a
+    href="clutter.html#antipodal">antipodal grasping strategy</a> won't work
+    out of the box if we only see one side of each object.</p>
+
+    <p>The primary solution to this problem is to use machine learning. If you
+    only see one half of a mustard bottle, then the instantaneous sensor
+    readings simply don't contain enough information to plan a grasp;
+    somehow we must infer something about what the back of the object looks
+    like (aka "shape completion", though it need not be done explicitly). The
+    reason that you would have a good guess at what the back half of the
+    mustard bottle looks like is because you've interacted with mustard bottles
+    before -- it is the statistics of the objects you've interacted with that
+    provides the missing information. So learning isn't just a convenience
+    here, it's fundamental. We'll discuss learning-based perception soon!</p>
+
+    <p>There is another mitigation, though, that is often available to a mobile
+    manipulator. Now that the cameras (and all of the sensors) are mobile, we
+    can actively move them in order to gather information / reduce uncertainty.
+    There is a rich literature for "active perception" and "planning under
+    uncertainty". [More to come]
+    </p>
+  
+  </subsection>
+
+  <subsection><h1>Unknown (potentially dynamic) environments</h1>
+
+    <p>For table-top manipulation, we started by assuming known objects and
+    then discussed approaches (such as antipodal grasping) that could work on
+    unknown objects. But throughout that discussion, we always assumed that we
+    new the geometry and location of the table / bins! For instance, we
+    actively cropped away the point cloud returns that hit the known
+    environment and left only points associated with the objects. That's a very
+    reasonable thing to do when your robot is bolted to the table, but we need
+    to relax that assumption once we go mobile, and start interacting with more
+    diverse / less known environments.</p>
+
+    <p>One <i>could</i> try to model everything in the environment. We could do
+    object detection to recognize the table, and pose estimation (possibly
+    shape estimation) to fit a parametric table model to the observations. But
+    that's a difficult road to travel, especially in diverse and expansive
+    scenes. Is there an analogy to the antipodal grasping for objects that can
+    similarly reduce our need for explicit modeling of the environment?</p>
+
+    <p>We'd like to have a representation of the environment that does not
+    require explicit object models, that supports the types of queries we need
+    for motion planning (for instance, fast collision detection and
+    minimum-distance computations), which we can update efficiently from our
+    raw sensor data, and which scale well to large scenes. Raw, merged point
+    clouds, for instance, are easy to update and don't require a model, but
+    would not be ideal for fast planning queries.</p>
+
+    <p>Voxel grids are a geometry representation that meets (almost all of) the
+    our desiderata -- we actually used them already in order to efficiently
+    down-sample a point cloud. In this representation we discretize some finite
+    volume of 3D space into a grid of fixed-size cubes; let's say 1 cm$^3.$ We
+    mark each of these cubes as either occupied or unoccupied (or more
+    generally, we can have a probability of being occupied). Then, for
+    collision-free motion planning, we treat the occupied cubes as collision
+    geometry to be avoided. Many collision queries with voxel grids can be fast
+    (and are easily parallelized). In particular the sphere-on-voxel collision
+    query can be very fast, which is one of the reasons that you see a number
+    of collision geometries in the Drake models that are approximate with
+    densely packed spheres. <todo>Figure</todo> Updating a voxel grid with
+    points clouds is also efficient. In order to scale voxel representations to
+    have both fine resolution and to be able to represent very large scenes, we
+    can make use of clever data structures.</p>
+
+    <example><h1>Octomap</h1>
+    
+      <p>One particularly nice and efficient implementation of voxel grids at
+      scale for robotics is an algorithm / software package called Octomap
+      <elib>Hornung13</elib>...</p>
+
+      <todo>multi-resolution, efficient collision queries, efficient ray cast, probabilistic updating, including for free space</todo>
+    </example>
+
+    <p>Segmenting the visual scene into objects vs environment these days is
+    best done with machine learning; we'll implement segmentation pipelines soon.</p>
+
+  </subsection>
+
+  <subsection><h1>Robot state estimation</h1>
+
+    <p>The biggest difference that comes up in perception for a mobile
+    manipulator is the need to estimate not only the state of the environment,
+    but the state of the robot. For instance, in our point cloud processing
+    algorithms so far, we have tacitly assumed that we know ${}^WX^C$, the pose
+    of the camera in the world. We could potentially invest in elaborote
+    calibration procedures, using known shapes and patterns, in order to
+    estimate (offline) these camera extrinsics. We've also take the kinematics
+    of the robot to be known -- this is a pretty reasonable assumption when the
+    robot is bolted to the table and all of the transforms between the world
+    and the end-effector are measured directly with high-accuracy encoders. But
+    these assumptions break down once the robot has a mobile base.</p>
+
+    <p>State estimation for mobile robots has a strong history;
+    <elib>Thrun05</elib> is the canonical reference. Often these algorithms are
+    based on (approximate) recursive Bayesian filtering, or the closely related
+    smoothing algorithms <elib>Kaess08</elib>. Typically our mobile bases are
+    instrumented with range sensors and/or cameras in addition to the wheel
+    encoders and inertial measurement units (IMUs). The state estimation
+    pipeline fuses these noisy measurements together into a consistent
+    estimate. Indeed, one of the biggest lessons in mobile robots is the wheel
+    odometry alone is almost always insufficient for estimation; real wheels
+    slip and visual/range measurements provide an essential and independent set
+    of measurements.</p>
+
+    <p>Many things have changed since <elib>Thrun05</elib> was written.
+    Range-based sensors (lidar and depth cameras) have improved dramatically in
+    range, accuracy, and framerate, making the methods dramatically more
+    effective.</p> 
+
+    <example><h1>Simulating range sensors in Drake</h1>
+    
+    </example>
+    
+    <p>Perhaps the biggest change, though, has been
+    the shift from a heavy dependence on range-based sensors / depth-cameras
+    towards increasingly powerful estimation algorithm which use only RGB
+    cameras. This is due to advances in visual-inertial
+    odometry<elib>Scaramuzza11</elib>, monocular depth
+    estimation<elib>Ming21</elib>, and dense 3D reconstruction / structure from
+    motion<elib>Mildenhall21+Kerbl23</elib>, to name a few.</p>
+  </subsection>
+
+</section>
+
+<section><h1>What's different about motion planning?</h1>
+
+  <p>Let's start with an example of perhaps the simplest (given our toolbox so
+  far) to build ourselves a mobile manipulator.</p>
+
+  <example><h1>iiwa on a prismatic base</h1>
+  
+    <p>Let's take the iiwa model and add a few degrees of freedom to the base.
+    Rather than welding link 0 to the world, let's insert three prismatic
+    joints (connected by invisible, massless links) corresponding to motion in
+    $x$, $y$, and $z$. I'll allow $x$ and $y$ to be unbounded, but will set
+    modest joint limits on $z$. The first joint of the iiwa already rotates
+    around the base $z$ axis; I'll just remove the joint limits so that it can
+    rotate continuously. Simple changes, and now I have the essence of a mobile
+    robot.</p>
+
+    <p>Code coming soon...</p>
+
+  </example>
+
+  <p>Now let's ask: how do I have to change my motion planning tools to work
+  with this version of the iiwa? The answer is: not much! Our motion planning
+  tools were all quite general, and work with basically any kinematic robot
+  configuration. The mobile base that we've added here just adds a few more
+  joints to that kinematic tree, but otherwise fits directly into the
+  framework.</p>
+
+  <p>One possible consideration is that we have increased the number of degrees
+  of freedom (here from 7 to 10). Trajectory optimization algorithms, by
+  virtue(?) of being local to a trajectory, scale easily to high-dimensional
+  problems, so this is no problem. Sampling-based planners struggle more with
+  dimension, but RRTs should be fine in 10 dimensions. PRMs can definitely work
+  in 10 dimensions, too, but probably require an efficient implementation and
+  are starting to reach their limits.</p>
+
+  <p>Another consideration which may be new for the mobile base is the
+  existence of a continuous joint (rotations around the $z$ axis do not have
+  joint limits). These can require some care in the planning stack. In a
+  sampling-based planner, typically the distance metric and extend operations
+  are adapted to consider edges that can wrap around $2\pi$. Nonconvex
+  trajectory optimization doesn't require algorithmic modifications, per se,
+  but does potentially suffer from local minima. For <a
+  href="trajectories.html#gcs">trajectory optimization with Graphs of Convex
+  Sets</a>, one simply needs to take care that the IRIS regions operate in a
+  local coordinate system and don't have a domain wider than $\pi$ in any
+  wrapping joint<elib>Cohn23</elib>. Failure to address this properly can
+  result in slightly absurd plans which take the long way around; <a
+  href="https://ggcs-anonymous-submission.github.io/meshcat/1CL-4CR/trajopt.html">here's
+  an example</a> of kinematic trajectory optimization finding a suboptimal
+  solution to navigating between the shelves, from <elib>Cohn23</elib>.</p>
+
+  <p>What happens if instead of implementing the mobile manipulator using
+  prismatic joints, we're going to use wheels or legs? As we'll see, some
+  wheeled robots (and most legged robots) can provide our prismatic joints
+  abstraction directly, but others add constraints that we must consider during
+  motion planning.</p>
+
+  <subsection><h1>Wheeled robots</h1>
+
+    <p>Even though real wheels do slip, we typically do motion planning with
+    the no-slip assumption, then use feedback control to follow the planned
+    path <elib part="Ch. 49">Siciliano16</elib>.</p>
+
+    <subsubsection><h1>Holonomic drives</h1>
+
+      <example><h1>Mecanum drive kinematics</h1></example>
+      <example><h1>Simulating mecanum wheels in Drake</h1></example>
+    
+    </subsubsection>
+
+    <subsubsection><h1>Nonholonomic drives</h1>
+
+      <p>Differential drive, Dubins car, Reeds-Shepp.</p>
+
+      <example><h1>Differential drive kinematics</h1></example>
+    
+    </subsubsection>
+
+  </subsection>
+
+  <subsection><h1>Legged robots</h1>
+      
+    <p>If your job is to do the planning and control for the legs of a robot,
+    then there is a <a href="https://underactuated.mit.edu">rich literature for
+    you to explore</a>. But if you are using a legged robot like <a
+    href="https://bostondynamics.com/products/spot/">Spot</a> to perform mobile
+    manipulation, and you're using the API provided by Boston Dynamics, then
+    (fortunately or unfortunately) you don't get to dive into the low-level
+    control of the legs. In fact, Spot provides an API that to first order
+    treats the legged platform as a holonomic base. (There are secondary
+    considerations, like the fact that the robots center of mass is limited by
+    dynamic constraints, and may deviate from your requested trajectory in
+    order to maintain balance).</p>
+
+    <example><h1>Mobile manipulation with Spot</h1>
+    
+    </example>
+
+    <p>Of course, things get much more interesting when you are performing
+    mobile manipulation on rough or intermitted terrain; this is where the
+    legged platform really shines!</p>
+
+  </subsection>
+
+</section>
+
+<section><h1>What's different about simulation?</h1>
+
+  <p>Mobile manipulation encourages us to expand the scope of our simulation,
+  in addition to our autonomy algorithms. Rather than simulating a few objects
+  on a table top, now we start asking about simulating the robot in a more
+  expansive environment.</p>
+
+  <p>When I've used the term "simulation" so far in these notes, I've been
+  focusing mostly on the enabling technologies, like the physics engine and the
+  the rendering engine. In robotics today, there are only a handful of
+  mainstream simulators which people are using, such as NVidia Isaac/Omniverse,
+  MuJoCo, and Drake. (PyBullet was very popular but is no longer
+  actively maintained.) But there is another crop of tools which call
+  themselves "simulators" that build upon these engines (and/or more
+  traditional engines from computer games like Unity or Unreal) and offer
+  higher-level abstractions. I think of these as content aggregators, and feel
+  that they serve a very important role.</p>
+
+  <example><h1>Sapien</h1></example>
+  <example><h1>Behavior 1K</h1></example>
+  <example><h1>Habitat 3.0</h1></example>
+  <!--<example><h1>ThreeDWorld</h1></example>-->
+
+  <p>For my part, I hope that the problems specifications and assets from these
+  tools can be imported easily enough into Drake that we can use not only our
+  simulation engine, but also our perception, planning, and control tools to
+  solve them. We are gradually building out or support for loading from other
+  formats, or translating from other formats in order to facilitate this.</p>
+
+</section>
+
+<section><h1>Navigation</h1>
+
+  <p>Most of the ideas we've covered in this chapter so far can be considered
+  relatively modest extensions to our existing manipulation toolbox. But there
+  are some important problem associated with navigating a mobile robot that
+  really don't come up in table-top manipulation.</p>
+
+  <subsection><h1>Mapping (in addition to localization)</h1>
+  
+  </subsection>
+
+  <subsection><h1>Identifying traversable terrain</h1>
+  
+  </subsection>
+
+</section>
+
+
+<section><h1>Exercises</h1>
+  <exercise><h1>Adding Object Models</h1>
+    <p> For this exercise, you will load custom objects into a simulation.
+    You will work exclusively in <script>document.write(notebook_link('mobile', d=deepnote, link_text='this notebook', notebook='adding_models'))</script>. You will be asked to complete the following steps: </p>
+    <ol type="a">
+      <li> Analyze the collision geometry of pre-defined SDF files. </li>
+      <li> Import your own object file into the simulation. </li>
+    </ol>
+  </exercise>    
+
+  <exercise><h1>Mobile Base Inverse Kinematics</h1>
+    <p> For this exercise, you will implement an inverse kinematics optimization for a manipulator with both a fixed and mobile base.
+    By removing position constraints on the base of our robot, we can solve the optimization much more easily.
+    You will work exclusively in <script>document.write(notebook_link('mobile', d=deepnote, link_text='this notebook', notebook='mobile_base_ik'))</script>.</p>
+  </exercise>
+</section>
 
 </chapter>
 <!-- EVERYTHING BELOW THIS LINE IS OVERWRITTEN BY THE INSTALL SCRIPT -->
 
-<div id="references"></div>
+<div id="references"><section><h1>References</h1>
+<ol>
+
+<li id=Hornung13>
+<span class="author">Armin Hornung and Kai M. Wurm and Maren Bennewitz and Cyrill  Stachniss and Wolfram Burgard</span>, 
+<span class="title">"{OctoMap}: An Efficient Probabilistic {3D} Mapping Framework Based   on Octrees"</span>, 
+<span class="publisher">Autonomous Robots</span>, <span class="year">2013</span>.
+
+</li><br>
+<li id=Thrun05>
+<span class="author">S. Thrun and W. Burgard and D. Fox</span>, 
+<span class="title">"Probabilistic Robotics"</span>, MIT Press
+, <span class="year">2005</span>.
+
+</li><br>
+<li id=Kaess08>
+<span class="author">M. Kaess and A. Ranganathan and F. Dellaert</span>, 
+<span class="title">"i{SAM}: Incremental Smoothing and Mapping"</span>, 
+<span class="publisher">IEEE Transactions on Robotics</span>, vol. 24, no. 6, pp. 1365-1378, <span class="year">2008</span>.
+
+</li><br>
+<li id=Scaramuzza11>
+<span class="author">Davide Scaramuzza and Friedrich Fraundorfer</span>, 
+<span class="title">"Visual odometry [tutorial]"</span>, 
+<span class="publisher">Robotics \& Automation Magazine, IEEE</span>, vol. 18, no. 4, pp. 80--92, <span class="year">2011</span>.
+
+</li><br>
+<li id=Ming21>
+<span class="author">Yue Ming and Xuyang Meng and Chunxiao Fan and Hui Yu</span>, 
+<span class="title">"Deep learning for monocular depth estimation: A review"</span>, 
+<span class="publisher">Neurocomputing</span>, vol. 438, pp. 14--33, <span class="year">2021</span>.
+
+</li><br>
+<li id=Mildenhall21>
+<span class="author">Ben Mildenhall and Pratul P Srinivasan and Matthew Tancik and Jonathan T Barron and Ravi Ramamoorthi and Ren Ng</span>, 
+<span class="title">"Nerf: Representing scenes as neural radiance fields for view synthesis"</span>, 
+<span class="publisher">Communications of the ACM</span>, vol. 65, no. 1, pp. 99--106, <span class="year">2021</span>.
+
+</li><br>
+<li id=Kerbl23>
+<span class="author">Bernhard Kerbl and Georgios Kopanas and Thomas Leimkuhler and George Drettakis</span>, 
+<span class="title">"3d gaussian splatting for real-time radiance field rendering"</span>, 
+<span class="publisher">ACM Transactions on Graphics (ToG)</span>, vol. 42, no. 4, pp. 1--14, <span class="year">2023</span>.
+
+</li><br>
+<li id=Cohn23>
+<span class="author">Thomas Cohn and Mark Petersen and Max Simchowitz and Russ Tedrake</span>, 
+<span class="title">"Non-Euclidean Motion Planning with Graphs of Geodesically-Convex Sets"</span>, 
+<span class="publisher">Robotics: Science and Systems</span> , <span class="year">2023</span>.
+[&nbsp;<a href="http://groups.csail.mit.edu/robotics-center/public_papers/Cohn23.pdf">link</a>&nbsp;]
+
+</li><br>
+<li id=Siciliano16>
+<span class="author">Bruno Siciliano and Oussama Khatib</span>, 
+<span class="title">"Springer handbook of robotics"</span>, Springer
+, <span class="year">2016</span>.
+
+</li><br>
+</ol>
+</section><p/>
+</div>
 
 <table style="width:100%;" pdf="no"><tr style="width:100%">
   <td style="width:33%;text-align:left;"><a class="previous_chapter" href=trajectories.html>Previous Chapter</a></td>

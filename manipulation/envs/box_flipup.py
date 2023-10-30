@@ -1,4 +1,4 @@
-import gym
+import gymnasium as gym
 import numpy as np
 from pydrake.all import (
     AddMultibodyPlantSceneGraph,
@@ -31,7 +31,7 @@ from pydrake.all import (
     Variable,
 )
 
-from manipulation.drake_gym import DrakeGymEnv
+from pydrake.gym import DrakeGymEnv
 from manipulation.scenarios import AddShape, SetColor, SetTransparency
 from manipulation.utils import ConfigureParser
 
@@ -271,7 +271,7 @@ def BoxFlipUpEnv(observations="state", meshcat=None, time_limit=10):
         RandomGenerator(), observations, meshcat=meshcat, time_limit=time_limit
     )
     action_space = gym.spaces.Box(
-        low=np.array([-0.5, -0.1]), high=np.array([0.5, 0.6]), dtype=np.float64
+        low=np.array([-0.5, -0.1]), high=np.array([0.5, 0.6]), dtype=np.float32
     )
 
     plant = simulator.get_system().GetSubsystemByName("plant")

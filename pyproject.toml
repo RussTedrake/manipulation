@@ -2,7 +2,7 @@
 name = "manipulation"
 # Use e.g. 2023.10.4.rc0 if I need to release a release candidate.
 # Use e.g. 2023.10.4.post1 if I need to rerelease on the same day.
-version = "2023.10.19"
+version = "2023.10.26"
 description = "MIT 6.421 - Robotic Manipulation"
 authors = ["Russ Tedrake <russt@mit.edu>"]
 license = "BSD License"
@@ -53,9 +53,10 @@ gradescope-utils = ">=0.4.0"
 mpld3  = ">=0.5.6"
 nevergrad = ">=0.4.3"  # TODO: avoid expensive bayesian optimization dep
 psutil = ">=5.9.*"
-stable-baselines3 = "^1.8.0"
+stable-baselines3 = ">=2.0.0"
 timeout-decorator = ">=0.4.1"
-#torch = ">=2.0.1"
+torch = ">=2.0.1"
+trimesh = {extras = ["recommend"], version = ">=4.0.0"}
 #pymcubes = ">=0.0.9"
 pyzmq = ">=25.0.0" # seems to be needed on python 3.11
 
