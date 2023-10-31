@@ -908,8 +908,13 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       Jacobian</a>. Since we are operating here with torques instead of
       velocity commands, the natural analogue is to write the a joint-centering
       PD controller that operates in the nullspace of the end-effector control:
-      $$u = J^Tf^{B_E}_u + [I - J^+J][K_{p,joint} (q_0 - q) -
-      K_{d,joint}\dot{q}].$$</p>
+      $$u = J^Tf^{B_E}_u + P[K_{p,joint} (q_0 - q) - K_{d,joint}\dot{q}].$$
+      Here $P$ is the so-called "dynamically-consistent null-space projection"
+      <elib>Khatib87</elib>. In differential IK operate in the nullspace of the
+      velocity controller, but here we have to operate in the nullspace for the
+      accelerations.</p>
+
+      <todo>Add a derivation, or at least the equations for, the dynamically consistent nullspace projection.</todo>
       
       <p>This approach of programming the task-space dynamics with
       secondary joint-space objectives operating in the nullspace was developed
