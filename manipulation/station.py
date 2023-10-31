@@ -1,4 +1,5 @@
 import dataclasses as dc
+from functools import partial
 import os
 import sys
 import typing
@@ -48,6 +49,7 @@ from pydrake.all import (
     SchunkWsgPositionController,
     SchunkWsgCommandSender,
     SchunkWsgStatusReceiver,
+    ScopedName,
     SimulatorConfig,
     StateInterpolatorWithDiscreteDerivative,
     VisualizationConfig,
@@ -67,6 +69,11 @@ from manipulation.scenarios import (
     AddWsg,
 )
 from manipulation.utils import ConfigureParser
+
+
+@dc.dataclass
+class InverseDynamicsDriver:
+    """A simulation-only driver that adds the InverseDynamicsController to the station and exports the output ports. Multiple model instances can be provided using `instance_name1+instance_name2` as the key; the output ports will be named similarly."""
 
 
 @dc.dataclass
@@ -111,6 +118,7 @@ class Scenario:
         str,
         typing.Union[
             IiwaDriver,
+            InverseDynamicsDriver,
             SchunkWsgDriver,
             ZeroForceDriver,
         ],
@@ -191,16 +199,75 @@ def add_directives(
     return scenario
 
 
+class MultiplexState(LeafSystem):
+    def __init__(self, plant, model_instance_names):
+        LeafSystem.__init__(self)
+        total_states = 0
+        for name in model_instance_names:
+            model_instance = plant.GetModelInstanceByName(name)
+            num_states = plant.num_multibody_states(model_instance)
+            # The logic below assumes num_positions == num_velocities (though
+            # it would be simple to generalize).
+            assert plant.num_positions(model_instance) == plant.num_velocities(
+                model_instance
+            )
+            self.DeclareVectorInputPort(name + ".state", num_states)
+            total_states += num_states
+        self.DeclareVectorOutputPort(
+            "combined_state",
+            total_states,
+            self.CalcOutput,
+        )
+
+    def CalcOutput(self, context, output):
+        # The order should should be [q, q, ..., v, v, ...].
+        positions = np.array([])
+        velocities = np.array([])
+        for i in range(self.num_input_ports()):
+            state = self.get_input_port(i).Eval(context)
+            num_q = len(state) // 2
+            positions = np.append(positions, state[:num_q])
+            velocities = np.append(velocities, state[num_q:])
+        output.SetFromVector(np.concatenate((positions, velocities)))
+
+
+class DemultiplexInput(LeafSystem):
+    def __init__(self, plant, model_instance_names):
+        LeafSystem.__init__(self)
+        total_inputs = 0
+        for name in model_instance_names:
+            num_actuators = plant.num_actuators(
+                plant.GetModelInstanceByName(name)
+            )
+            self.DeclareVectorOutputPort(
+                name + ".input",
+                num_actuators,
+                partial(
+                    self.CalcOutput,
+                    size=num_actuators,
+                    start_index=total_inputs,
+                ),
+            )
+            total_inputs += num_actuators
+        self.DeclareVectorInputPort("combined_input", total_inputs)
+
+    def CalcOutput(self, context, output, size, start_index):
+        input = self.get_input_port().Eval(context)
+        output.SetFromVector(input[start_index : start_index + size])
+
+
 # TODO(russt): Use the c++ version pending https://github.com/RobotLocomotion/drake/issues/20055
-def ApplyDriverConfigSim(
+def _ApplyDriverConfigSim(
     driver_config,
     model_instance_name,
     sim_plant,
+    directives,
     models_from_directives_map,
+    package_xmls,
     builder,
 ):
-    model_instance = sim_plant.GetModelInstanceByName(model_instance_name)
     if isinstance(driver_config, IiwaDriver):
+        model_instance = sim_plant.GetModelInstanceByName(model_instance_name)
         num_iiwa_positions = sim_plant.num_positions(model_instance)
 
         # I need a PassThrough system so that I can export the input port.
@@ -323,6 +390,7 @@ def ApplyDriverConfigSim(
         )
 
     if isinstance(driver_config, SchunkWsgDriver):
+        model_instance = sim_plant.GetModelInstanceByName(model_instance_name)
         # Wsg controller.
         wsg_controller = builder.AddSystem(SchunkWsgPositionController())
         wsg_controller.set_name(model_instance_name + ".controller")
@@ -358,26 +426,129 @@ def ApplyDriverConfigSim(
             model_instance_name + ".force_measured",
         )
 
+    if isinstance(driver_config, InverseDynamicsDriver):
+        model_instance_names = model_instance_name.split("+")
+        model_instances = [
+            sim_plant.GetModelInstanceByName(n) for n in model_instance_names
+        ]
 
-def ApplyDriverConfigsSim(
-    *, driver_configs, sim_plant, models_from_directives, builder
+        # Make the plant for the iiwa controller to use.
+        controller_plant = MultibodyPlant(time_step=sim_plant.time_step())
+        controller_directives = []
+        for d in directives:
+            if d.add_model and (d.add_model.name in model_instance_names):
+                controller_directives.append(d)
+            if (
+                d.add_weld
+                and (
+                    ScopedName.Parse(d.add_weld.child).get_namespace()
+                    in model_instance_names
+                )
+                and (
+                    d.add_weld.parent == "world"
+                    or ScopedName.Parse(d.add_weld.parent).get_namespace()
+                    in model_instance_names
+                )
+            ):
+                controller_directives.append(d)
+        parser = Parser(controller_plant)
+        for p in package_xmls:
+            parser.package_map().AddPackageXml(p)
+        ConfigureParser(parser)
+        ProcessModelDirectives(
+            directives=ModelDirectives(directives=controller_directives),
+            parser=parser,
+        )
+        controller_plant.Finalize()
+
+        # Add the controller
+        # TODO(russt): Take the gains as parameters.
+        controller = builder.AddSystem(
+            InverseDynamicsController(
+                controller_plant,
+                kp=[100] * controller_plant.num_positions(),
+                ki=[1] * controller_plant.num_positions(),
+                kd=[20] * controller_plant.num_positions(),
+                has_reference_acceleration=False,
+            )
+        )
+        controller.set_name(model_instance_name + ".controller")
+        if len(model_instances) == 1:
+            builder.Connect(
+                sim_plant.get_state_output_port(model_instances[0]),
+                controller.get_input_port_estimated_state(),
+            )
+            builder.Connect(
+                controller.get_output_port(),
+                sim_plant.get_actuation_input_port(model_instances[0]),
+            )
+            builder.ExportOutput(
+                sim_plant.get_state_output_port(model_instances[0]),
+                model_instance_name + ".state_estimated",
+            )
+        else:
+            combined_state = builder.AddSystem(
+                MultiplexState(sim_plant, model_instance_names)
+            )
+            combined_state.set_name(model_instance_name + ".combined_state")
+            combined_input = builder.AddSystem(
+                DemultiplexInput(sim_plant, model_instance_names)
+            )
+            combined_input.set_name(model_instance_name + ".combined_input")
+            for index, model_instance in enumerate(model_instances):
+                builder.Connect(
+                    sim_plant.get_state_output_port(model_instance),
+                    combined_state.get_input_port(index),
+                )
+                builder.Connect(
+                    combined_input.get_output_port(index),
+                    sim_plant.get_actuation_input_port(model_instance),
+                )
+            builder.Connect(
+                combined_state.get_output_port(),
+                controller.get_input_port_estimated_state(),
+            )
+            builder.Connect(
+                controller.get_output_port(), combined_input.get_input_port()
+            )
+            builder.ExportOutput(
+                combined_state.get_output_port(),
+                model_instance_name + ".state_estimated",
+            )
+
+        builder.ExportInput(
+            controller.get_input_port_desired_state(),
+            model_instance_name + ".desired_state",
+        )
+
+
+def _ApplyDriverConfigsSim(
+    *,
+    driver_configs,
+    sim_plant,
+    directives,
+    models_from_directives,
+    package_xmls,
+    builder,
 ):
     models_from_directives_map = dict(
         [(info.model_name, info) for info in models_from_directives]
     )
     for model_instance_name, driver_config in driver_configs.items():
-        ApplyDriverConfigSim(
+        _ApplyDriverConfigSim(
             driver_config,
             model_instance_name,
             sim_plant,
+            directives,
             models_from_directives_map,
+            package_xmls,
             builder,
         )
 
 
 # TODO(russt): Remove this in favor of the Drake version once LCM becomes
 # optional. https://github.com/RobotLocomotion/drake/issues/20055
-def ApplyCameraConfigSim(*, config, builder):
+def _ApplyCameraConfigSim(*, config, builder):
     if not (config.rgb or config.depth):
         return
 
@@ -492,16 +663,18 @@ def MakeHardwareStation(
     sim_plant.Finalize()
 
     # Add drivers.
-    ApplyDriverConfigsSim(
+    _ApplyDriverConfigsSim(
         driver_configs=scenario.model_drivers,
         sim_plant=sim_plant,
+        directives=scenario.directives,
         models_from_directives=added_models,
+        package_xmls=package_xmls,
         builder=builder,
     )
 
     # Add scene cameras.
     for _, camera in scenario.cameras.items():
-        ApplyCameraConfigSim(config=camera, builder=builder)
+        _ApplyCameraConfigSim(config=camera, builder=builder)
 
     # Add visualization.
     ApplyVisualizationConfig(scenario.visualization, builder, meshcat=meshcat)

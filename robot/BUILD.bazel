@@ -34,6 +34,7 @@ rt_ipynb_test(
     srcs = ["iiwa_with_allegro.ipynb"],
     deps = [
       "//manipulation",
+      "//manipulation:station",
     ],
 )
 
