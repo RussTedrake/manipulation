@@ -1229,7 +1229,7 @@ Velocity names: ['$world_base_link_wx', '$world_base_link_wy', '$world_base_link
       <p>In the rich history of Jacobian-based control for robotics, there is a
       very elegant idea of implementing a "secondary" control, guaranteed (in
       some cases) not to interfere with our primary end-effector spatial
-      velocity controller, by projecting it into the <i>nullspace</i> of $J^G$.
+      velocity controller, by projecting it into the <i>null space</i> of $J^G$.
       So in order to fully specify the problem, we will provide a secondary
       controller that attempts to control <i>all</i> of the joints.  We'll do
       that here with a simple joint-space controller $v = K(q_0 - q)$; this is
@@ -1520,7 +1520,7 @@ Velocity names: ['$world_base_link_wx', '$world_base_link_wy', '$world_base_link
     compete.</p>
 
     <p>This seems like an overly simple example.  But I think you'll find that
-    it is actually quite similar to what is happening in the nullspace objective
+    it is actually quite similar to what is happening in the null-space objective
     formulation above.</p>
 
   </exercise>
