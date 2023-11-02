@@ -118,12 +118,12 @@ jobs:
       - name: post-checkout setup
         run: ./htmlbook/workflows/ci/jammy/setup
         shell: bash
-      - name: Check disk space
-        run: |
-          dpkg-query -Wf '${Installed-Size}\t${Package}\n' | sort -nr | head
-          df . -h
-          du /usr/ -hx -d 4 --threshold=1G | sort -hr | head
-        shell: bash
+#      - name: Check disk space
+#        run: |
+#          dpkg-query -Wf '${Installed-Size}\t${Package}\n' | sort -nr | head
+#          df . -h
+#          du /usr/ -hx -d 4 --threshold=1G | sort -hr | head
+#        shell: bash
       - name: test
         run: ./htmlbook/workflows/ci/jammy/test
         shell: bash
