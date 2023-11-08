@@ -42,13 +42,12 @@ I've added a prismatic xyz base, and removed the joint position limits from the 
     <color rgba="1.0 1.0 1.0 1.0"/>
   </material>
   <!-- Defines a base link that will serve as the model's root. -->
-  <link name="base"/>
   <link name="base_x"/>
   <link name="base_y"/>
   <!--joint between {parent} and link_0-->
   <joint name="iiwa_base_x" type="prismatic">
     <origin rpy="0 0 0" xyz="0 0 0"/>
-    <parent link="base"/>
+    <parent link="world"/>
     <child link="base_x"/>
     <axis xyz="1 0 0"/>
   </joint>
@@ -65,6 +64,18 @@ I've added a prismatic xyz base, and removed the joint position limits from the 
     <axis xyz="0 0 1"/>
     <limit lower="0" upper="0.25"/>
   </joint>
+  <transmission type="SimpleTransmission" name="base_x_trans">
+    <actuator name="iiwa_base_x"/>
+    <joint name="iiwa_base_x"/>
+  </transmission>
+  <transmission type="SimpleTransmission" name="base_y_trans">
+    <actuator name="iiwa_base_y"/>
+    <joint name="iiwa_base_y"/>
+  </transmission>
+  <transmission type="SimpleTransmission" name="base_z_trans">
+    <actuator name="iiwa_base_z"/>
+    <joint name="iiwa_base_z"/>
+  </transmission>
   <link name="iiwa_link_0">
     <inertial>
       <origin rpy="0 0 0" xyz="-0.1 0 0.07"/>

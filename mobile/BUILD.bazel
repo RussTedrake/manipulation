@@ -6,6 +6,16 @@
 
 load("//htmlbook/tools/jupyter:defs.bzl", "rt_ipynb_test")
 
+rt_ipynb_test(
+    name = "mobile_iiwa",
+    srcs = ["mobile_iiwa.ipynb"],
+    deps = [
+      "//manipulation",
+      "//manipulation:station",
+    ],
+)
+
+
 # TODO(russt): Pre-download the model
 #rt_ipynb_test(
 #    name = "spot",
