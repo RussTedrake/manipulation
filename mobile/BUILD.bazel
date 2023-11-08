@@ -8,8 +8,8 @@ load("//htmlbook/tools/jupyter:defs.bzl", "rt_ipynb_test")
 
 # TODO(russt): Pre-download the model
 #rt_ipynb_test(
-#    name = "spot_inspector",
-#    srcs = ["spot_inspector.ipynb"],
+#    name = "spot",
+#    srcs = ["spot.ipynb"],
 #    deps = [
 #      "//manipulation",
 #    ],

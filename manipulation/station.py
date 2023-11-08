@@ -619,6 +619,8 @@ def MakeHardwareStation(
     *,
     package_xmls: typing.List[str] = [],
     hardware: bool = False,
+    parser_preload_callback: typing.Callable[[Parser], None] = None,
+    parser_prefinalize_callback: typing.Callable[[Parser], None] = None,
 ):
     """
     If `hardware=False`, (the default) returns a HardwareStation diagram containing:
@@ -652,12 +654,17 @@ def MakeHardwareStation(
     for p in package_xmls:
         parser.package_map().AddPackageXml(p)
     ConfigureParser(parser)
+    if parser_preload_callback:
+        parser_preload_callback(parser)
 
     # Add model directives.
     added_models = ProcessModelDirectives(
         directives=ModelDirectives(directives=scenario.directives),
         parser=parser,
     )
+
+    if parser_prefinalize_callback:
+        parser_prefinalize_callback(parser)
 
     # Now the plant is complete.
     sim_plant.Finalize()

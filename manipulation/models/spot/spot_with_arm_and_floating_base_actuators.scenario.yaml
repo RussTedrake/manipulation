@@ -1,0 +1,9 @@
+directives:
+- add_model:
+    name: spot
+    file: package://manipulation/spot/spot_with_arm_and_floating_base_actuators.urdf
+    default_joint_positions:
+        arm_sh1: [-3.1]
+        arm_el0: [3.1]
+model_drivers:
+    spot: !InverseDynamicsDriver {}
