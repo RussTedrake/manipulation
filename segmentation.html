@@ -109,7 +109,8 @@ Segmentation</h1>
       image-level annotations, object-level annotations, and segmentations at
       the class/semantic- or instance- level..</figcaption></figure>
 
-      <p>The COCO dataset similarly enabled pixel-wise <i>instance-level</i>
+      <p>In practice, ImageNet enabled object detection.  The COCO dataset
+      similarly enabled pixel-wise <i>instance-level</i>
       segmentation <elib>Lin14a</elib>, where distinct instances of a class are
       given a unique label (and also associated with the class label).  COCO has
       fewer object categories than ImageNet, but more instances per category.
@@ -289,6 +290,31 @@ Segmentation</h1>
         We'll download that directly in our training notebook.</p>
 
       </example>
+
+    </subsection>
+
+    <subsection><h1>Self-supervised learning</h1></subsection>
+
+    <subsection><h1>Even bigger datasets</h1>
+    
+      <p>With the rise of large language models (LLMs) came a very natural
+      question: how do we obtain a "foundation model" for computer vision? This
+      would be loosely defined as a model that had impressive zero-shot
+      prediction performance on basically any new image, without prompting and
+      a small number of interactions with a non-expert user replacing the need
+      for fine-tuning on a domain-specific dataset.</p>
+
+      <p>Segment Anything <elib>Kirillov23</elib> came out earlier in 2023; it
+      is a foundation model for segmentation tasks. The associated dataset,
+      SA-1B, is dramatically larger that pre-existing datasets like COCO in
+      terms of the number of images,the resolution of the images, and the
+      number of labeled segmentations. It's enormous scale was enabled by a
+      "data-engine" which used increasingly powerful versions of the Segment
+      Anything models to provide initial segmentation labels; this output was
+      then passed to expert paid image labelers who could adjust/correct the
+      labels and add labels for increasingly obscure parts of the image that
+      the model had missed. Perhaps fine-tuning on our robot-specific datasets
+      is, or will soon be, a thing of the past.</p>
 
     </subsection>
 
@@ -507,6 +533,12 @@ Segmentation</h1>
 <span class="author">Curtis G Northcutt and Anish Athalye and Jonas Mueller</span>, 
 <span class="title">"Pervasive label errors in test sets destabilize machine learning benchmarks"</span>, 
 <span class="publisher">arXiv preprint arXiv:2103.14749</span>, <span class="year">2021</span>.
+
+</li><br>
+<li id=Kirillov23>
+<span class="author">Alexander Kirillov and Eric Mintun and Nikhila Ravi and Hanzi Mao and Chloe Rolland and Laura Gustafson and Tete Xiao and Spencer Whitehead and Alexander C Berg and Wan-Yen Lo and others</span>, 
+<span class="title">"Segment anything"</span>, 
+<span class="publisher">arXiv preprint arXiv:2304.02643</span>, <span class="year">2023</span>.
 
 </li><br>
 <li id=Long15>
