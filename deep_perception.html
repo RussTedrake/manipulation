@@ -98,10 +98,98 @@ Manipulation</h1>
 
     <!-- some notes in 2021 lecture 11 ithoughts. -->
 
-    <!-- probably reconstruction loss (for instance, as used by the scoring
-    function in BOP) is better than e.g. quaternion loss.  -->
+    <p>We discussed pose estimation at some length in the <a
+    href="pose.html">geometric perception chapter</a>, and had a few take-away
+    messages. Most importantly, the geometric approaches have only a very
+    limited ability to make use of RGB values; but these are incredibly
+    valuable for resolving a pose. Geometry alone doesn't tell the full story.
+    Another subtle lesson was that the ICP loss, although conceptually very
+    clean, does not sufficiently capture the richer concepts like
+    non-penetration and free-space constraints. As the original core problems
+    in 2D computer vision started to feel "solved", we've seen a surge of
+    interest/activity from the computer vision community on 3D perception,
+    which is great for robotics!</p>
 
-    <!-- NOCS in here? -->
+    <p>The conceptually simplest version of this problem is that we would like
+    to estimate the pose of a known object from a single RGB image. How should
+    we train a mustard-bottle-specific (for example) deep network which takes
+    an RGB image in, and outputs a pose estimate?</p> 
+
+    <subsection><h1>Pose representation</h1>
+    
+      <p>Once again, we must confront the question of how best to represent a
+      pose. Many initial architectures discretized the pose space into bins and
+      formulated pose estimation as a classification problem, but the trend
+      eventually shifted towards pose
+      regression<elib>Mahendran17+Xiang17</elib>. Regressing three numbers to
+      represent x-y-z translation seems clear, but we have many choices for how
+      to represent 3D orientation (e.g. Euler angles, unit quaternions,
+      rotation matrices, ...), and our choice can impact learning and
+      generalization performance.</p>
+
+      <p>To output a single pose, works like <elib>Zhou19</elib> and
+      <elib>Levinson20</elib> argue that many rotation parameterizations have
+      issues with discontinuities. They recommend having the network output 6
+      numbers for the rotation (and then projecting to SO(3) via Gram-Schmidt
+      orthogonalization), or outputting the full 9 numbers of the rotation
+      matrix, and projecting back to SO(3) via <a
+      href="pose.html#registration">SVD orthogonalization</a>.</p>
+    
+      <p>Perhaps more substantially, many works have pointed out that
+      outputting a single "correct" pose is simply not sufficient
+      <elib>Hashimoto20+Deng22</elib>. When objects have rotational symmetries,
+      or if they are severely occluded, then outputting an entire pose
+      distribution is much more adequate. Representing a categorial
+      distribution is very natural for discretized representations, but how do
+      we represent distributions over continuous pose? One very elegant choice
+      is the Bingham distribution, which gives the natural generalization of
+      Gaussians applied to unit quaternions
+      <elib>Glover14+Peretroukhin20+Deng22</elib>. </p>
+
+    </subsection>
+
+    <subsection><h1>Loss functions</h1>
+
+      <p>No matter which pose representation is coming out of the network and
+      the ground truth labels, one must choose the appropriate loss function.
+      Quaternion-based loss functions can be used to compute the geodesic
+      distance between two orientations, and should certainly be more
+      appropriate than e.g. a least-squares metric on Euler angles. More
+      expensive, but potentially more suitable is to write the loss function in
+      terms of a reconstruction error so that the network is not artificially
+      penalized for e.g. symmetries which it could not possibly address
+      <elib>Hodan20</elib>.</p>
+
+      <p>Training a network to output an entire distribution over pose brings
+      up additional interesting questions about the choice for the loss
+      function. While it is possible to train the distribution based on only
+      the statistics of the data labeled with ground truth pose (again,
+      choosing maximum likelihood loss vs mean-squared error), it is also
+      possible to use our understanding of the symmetries to provide more
+      direct supervision. For example, <elib>Hashimoto20</elib> used image
+      differences to efficiently (but heuristically) estimate a ground-truth
+      covariance for each sample.</p>
+    
+    </subsection>
+
+    <subsection><h1>Pose estimation benchmarks</h1>
+
+      <p><a href="https://bop.felk.cvut.cz/home/">Benchmark for 6D Object Pose Estimation (BOP)</a><elib>Hodan20</elib>.  </p>
+
+      <!-- maybe: Common Objects in 3D:
+Large-Scale Learning and Evaluation of Real-life 3D Category Reconstruction -->
+
+    </subsection>
+
+    <!-- maybe: 
+      More discussion/refs from Kuni, Duy, and Ben: https://tri-internal.slack.com/archives/C02J6UV6874/p1634596625000100
+
+      Angjoo's course: https://sites.google.com/berkeley.edu/cs294-173/
+
+    https://openaccess.thecvf.com/content_ECCV_2018/papers/Martin_Sundermeyer_Implicit_3D_Orientation_ECCV_2018_paper.pdf 
+    DeepIM https://arxiv.org/abs/1804.00175
+    NOCS in here? 
+    -->
 
   </section>
 
@@ -124,6 +212,12 @@ Manipulation</h1>
 
     <!-- dense correspondence -->
     <!-- anthony's neural descriptor fields -->
+
+  </section>
+
+  <section><h1>Scene Flow</h1>
+  
+    <todo>https://proceedings.mlr.press/v205/seita23a/seita23a.pdf and other work by Held should get me started.</todo>
 
   </section>
 
@@ -169,7 +263,67 @@ Manipulation</h1>
 </chapter>
 <!-- EVERYTHING BELOW THIS LINE IS OVERWRITTEN BY THE INSTALL SCRIPT -->
 
-<div id="references"></div>
+<div id="references"><section><h1>References</h1>
+<ol>
+
+<li id=Mahendran17>
+<span class="author">Siddharth Mahendran and Haider Ali and Ren{\'e} Vidal</span>, 
+<span class="title">"3d pose regression using convolutional neural networks"</span>, 
+<span class="publisher">Proceedings of the IEEE International Conference on Computer Vision Workshops</span> , pp. 2174--2182, <span class="year">2017</span>.
+
+</li><br>
+<li id=Xiang17>
+<span class="author">Yu Xiang and Tanner Schmidt and Venkatraman Narayanan and Dieter Fox</span>, 
+<span class="title">"Posecnn: A convolutional neural network for 6d object pose estimation in cluttered scenes"</span>, 
+<span class="publisher">arXiv preprint arXiv:1711.00199</span>, <span class="year">2017</span>.
+
+</li><br>
+<li id=Zhou19>
+<span class="author">Yi Zhou and Connelly Barnes and Jingwan Lu and Jimei Yang and Hao Li</span>, 
+<span class="title">"On the continuity of rotation representations in neural networks"</span>, 
+<span class="publisher">Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition</span> , pp. 5745--5753, <span class="year">2019</span>.
+
+</li><br>
+<li id=Levinson20>
+<span class="author">Jake Levinson and Carlos Esteves and Kefan Chen and Noah Snavely and Angjoo Kanazawa and Afshin Rostamizadeh and Ameesh Makadia</span>, 
+<span class="title">"An analysis of svd for deep rotation estimation"</span>, 
+<span class="publisher">Advances in Neural Information Processing Systems</span>, vol. 33, pp. 22554--22565, <span class="year">2020</span>.
+
+</li><br>
+<li id=Hashimoto20>
+<span class="author">Kunimatsu Hashimoto* and Duy-Nguyen Ta* and Eric Cousineau and Russ Tedrake</span>, 
+<span class="title">"{KOSNet}: A Unified {K}eypoint, {O}rientation and {S}cale {Net}work for Probabilistic 6D Pose Estimation"</span>, 
+<span class="publisher">Under review</span> , <span class="year">2020</span>.
+[&nbsp;<a href="http://groups.csail.mit.edu/robotics-center/public_papers/Hashimoto20.pdf">link</a>&nbsp;]
+
+</li><br>
+<li id=Deng22>
+<span class="author">Haowen Deng and Mai Bui and Nassir Navab and Leonidas Guibas and Slobodan Ilic and Tolga Birdal</span>, 
+<span class="title">"Deep bingham networks: Dealing with uncertainty and ambiguity in pose estimation"</span>, 
+<span class="publisher">International Journal of Computer Vision</span>, vol. 130, no. 7, pp. 1627--1654, <span class="year">2022</span>.
+
+</li><br>
+<li id=Glover14>
+<span class="author">Jared Marshall Glover</span>, 
+<span class="title">"The Quaternion Bingham Distribution, 3D Object Detection, and Dynamic Manipulation"</span>, 
+PhD thesis, Massachusetts Institute of Technology, May, <span class="year">2014</span>.
+
+</li><br>
+<li id=Peretroukhin20>
+<span class="author">Valentin Peretroukhin and Matthew Giamou and David M Rosen and W Nicholas Greene and Nicholas Roy and Jonathan Kelly</span>, 
+<span class="title">"A smooth representation of belief over so (3) for deep rotation learning with uncertainty"</span>, 
+<span class="publisher">arXiv preprint arXiv:2006.01031</span>, <span class="year">2020</span>.
+
+</li><br>
+<li id=Hodan20>
+<span class="author">Tom{\'a}s Hodan and Martin Sundermeyer and Bertram Drost and Yann Labb{\'e} and Eric Brachmann and Frank Michel and Carsten Rother and Jir{\'i} Matas</span>, 
+<span class="title">"{BOP} Challenge 2020 on {6D} Object Localization"</span>, 
+<span class="publisher">European Conference on Computer Vision Workshops (ECCVW)</span>, <span class="year">2020</span>.
+
+</li><br>
+</ol>
+</section><p/>
+</div>
 
 <table style="width:100%;" pdf="no"><tr style="width:100%">
   <td style="width:33%;text-align:left;"><a class="previous_chapter" href=segmentation.html>Previous Chapter</a></td>
