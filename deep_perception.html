@@ -223,9 +223,19 @@ Large-Scale Learning and Evaluation of Real-life 3D Category Reconstruction -->
     affordances without explicitly estimating pose.</p>
 
     <p>Two of the earliest and most successful examples of this were
-    <elib>tenPas17</elib> and <elib>Mahler17</elib>, which attempted to learn
-    a mapping directly from pixels/point clouds to heat maps indicating good
-    places to grasp.</p>
+    <elib>tenPas17+tenPas18</elib> and <elib>Mahler17+Mahler17a</elib>, which
+    attempted to learn a grasping affordances directly from raw RGB-D input.
+    <elib>tenPas17</elib> used a grasp selection strategy that was very similar
+    to (and partly the inspiration for) the <a
+    href="clutter.html#grasp_sampler">grasp sampler</a> we introduced in our
+    antipodal grasping workflow. But in addition to the geometric heuristic,
+    <elib>tenPas17</elib> trained a small CNN to predict grasp success.  The
+    input to this CNN was a voxelized summary of the pixels and local geometry
+    estimates in the immediate vicinity of the grasp, and the output was a
+    binary prediction of grasp success or failure. Similarly,
+    <elib>Mahler17</elib> learned a "grasp quality" CNN takes as input the
+    depth image in the grasp frame (+ the grasp depth in the camera frame) and
+    outputs a probability of grasp success.</p>
 
     <p>Transporter nets <elib>Zeng21</elib></p>
 
@@ -386,10 +396,22 @@ PhD thesis, Massachusetts Institute of Technology, May, <span class="year">2014<
 <span class="publisher">The International Journal of Robotics Research</span>, vol. 36, no. 13-14, pp. 1455--1473, <span class="year">2017</span>.
 
 </li><br>
+<li id=tenPas18>
+<span class="author">Andreas Ten Pas and Robert Platt</span>, 
+<span class="title">"Using geometry to detect grasp poses in 3d point clouds"</span>, 
+<span class="publisher">Robotics Research: Volume 1</span>, pp. 307--324, <span class="year">2018</span>.
+
+</li><br>
 <li id=Mahler17>
 <span class="author">Jeffrey Mahler and Jacky Liang and Sherdil Niyaz and Michael Laskey and Richard Doan and Xinyu Liu and Juan Aparicio Ojea and Ken Goldberg</span>, 
 <span class="title">"Dex-net 2.0: Deep learning to plan robust grasps with synthetic point clouds and analytic grasp metrics"</span>, 
 <span class="publisher">arXiv preprint arXiv:1703.09312</span>, <span class="year">2017</span>.
+
+</li><br>
+<li id=Mahler17a>
+<span class="author">Jeffrey Mahler and Ken Goldberg</span>, 
+<span class="title">"Learning deep policies for robot bin picking by simulating robust grasping sequences"</span>, 
+<span class="publisher">Conference on robot learning</span> , pp. 515--524, <span class="year">2017</span>.
 
 </li><br>
 <li id=Zeng21>
