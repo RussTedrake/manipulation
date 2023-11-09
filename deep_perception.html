@@ -88,8 +88,8 @@ Manipulation</h1>
   control? So far we’ve had two version - grasp candidates and/or object pose…
   </todo>
 
-  <p>I'll start with deep-learning versions of two perception tasks we've
-  already considered: object pose estimation and grasp selection.</p>
+  <p>I'll start with the deep-learning version of a perception task we've
+  already considered: object pose estimation.</p>
 
   <!-- representations of uncertainty should be a theme i'll carry throughout.
   make analogy to object detection outputs (e.g. in mask-rcnn) -->
@@ -182,24 +182,61 @@ Large-Scale Learning and Evaluation of Real-life 3D Category Reconstruction -->
     </subsection>
 
     <!-- maybe: 
-      More discussion/refs from Kuni, Duy, and Ben: https://tri-internal.slack.com/archives/C02J6UV6874/p1634596625000100
+
+      Something about architecture?  (e.g. 3D convolutions, etc) Do I even want
+      to go there?
+
+      More discussion/refs from Kuni, Duy, and Ben:
+      https://tri-internal.slack.com/archives/C02J6UV6874/p1634596625000100
 
       Angjoo's course: https://sites.google.com/berkeley.edu/cs294-173/
 
-    https://openaccess.thecvf.com/content_ECCV_2018/papers/Martin_Sundermeyer_Implicit_3D_Orientation_ECCV_2018_paper.pdf 
-    DeepIM https://arxiv.org/abs/1804.00175
-    NOCS in here? 
+      https://openaccess.thecvf.com/content_ECCV_2018/papers/Martin_Sundermeyer_Implicit_3D_Orientation_ECCV_2018_paper.pdf
+
+      DeepIM https://arxiv.org/abs/1804.00175
+
     -->
+
+    <subsection><h1>Limitations</h1>
+    
+      <p>Although pose estimation is a natural task, and it is straightforward
+      to plug an estimated pose into many of our robotics pipelines, I feel
+      pretty strongly that this is often not the right choice for connecting
+      perception to planning and control. Although some attempts have been made
+      to generalize pose to categories of objects <elib>Wang19</elib>, pose
+      estimation is pretty strongly tied to known objects, which feels
+      limiting. Accurately estimating the pose of an object is difficult, and
+      is often not necessary for manipulation.</p>
+
+    </subsection>
 
   </section>
 
   <section><h1>Grasp selection</h1>
 
-  </section>
+    <p>In <elib>Gibson77+Gibson79</elib>, J.J. Gibson articulated his highly
+    influential <i>theory of affordances</i>, where he described the role of
+    perception as serving behavior (and behavior being controlled by
+    perception). In our case, affordances describe not what the
+    object/environment is nor its pose, but what opportunities for action it
+    provides to the robot. Importantly, one can potentially estimate
+    affordances without explicitly estimating pose.</p>
+
+    <p>Two of the earliest and most successful examples of this were
+    <elib>tenPas17</elib> and <elib>Mahler17</elib>, which attempted to learn
+    a mapping directly from pixels/point clouds to heat maps indicating good
+    places to grasp.</p>
+
+    <p>Transporter nets <elib>Zeng21</elib></p>
+
+  </section>  
 
   <section><h1>(Semantic) Keypoints</h1>
   
-    <!-- affordances -->
+    <!-- something in-between: can reuse the representation for multiple tasks... -->
+
+    <p>KeyPoint Affordances for Category-Level Robotic Manipulation (kPAM) <elib>Manuelli19+Gao20b</elib>.</p>
+
     <!-- category level -->
 
     <!-- wei's keypoint labeling tool -->
@@ -208,7 +245,9 @@ Large-Scale Learning and Evaluation of Real-life 3D Category Reconstruction -->
     from keypoints?)</todo>
   </section>
 
-  <section><h1>Dense Descriptors</h1>
+  <section><h1>Dense Correspondences</h1>
+
+    <p><elib>Florence18a</elib>, DynoV2, ...</p>
 
     <!-- dense correspondence -->
     <!-- anthony's neural descriptor fields -->
@@ -220,6 +259,8 @@ Large-Scale Learning and Evaluation of Real-life 3D Category Reconstruction -->
     <todo>https://proceedings.mlr.press/v205/seita23a/seita23a.pdf and other work by Held should get me started.</todo>
 
   </section>
+
+
 
   <section><h1>Task-level state</h1>
 
@@ -319,6 +360,63 @@ PhD thesis, Massachusetts Institute of Technology, May, <span class="year">2014<
 <span class="author">Tom{\'a}s Hodan and Martin Sundermeyer and Bertram Drost and Yann Labb{\'e} and Eric Brachmann and Frank Michel and Carsten Rother and Jir{\'i} Matas</span>, 
 <span class="title">"{BOP} Challenge 2020 on {6D} Object Localization"</span>, 
 <span class="publisher">European Conference on Computer Vision Workshops (ECCVW)</span>, <span class="year">2020</span>.
+
+</li><br>
+<li id=Wang19>
+<span class="author">He Wang and Srinath Sridhar and Jingwei Huang and Julien Valentin and Shuran Song and Leonidas J Guibas</span>, 
+<span class="title">"Normalized object coordinate space for category-level 6d object pose and size estimation"</span>, 
+<span class="publisher">Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition</span> , pp. 2642--2651, <span class="year">2019</span>.
+
+</li><br>
+<li id=Gibson77>
+<span class="author">James J Gibson</span>, 
+<span class="title">"The theory of affordances"</span>, 
+<span class="publisher">Hilldale, USA</span>, vol. 1, no. 2, pp. 67--82, <span class="year">1977</span>.
+
+</li><br>
+<li id=Gibson79>
+<span class="author">James J Gibson</span>, 
+<span class="title">"The ecological approach to visual perception"</span>, Psychology press
+, <span class="year">1979</span>.
+
+</li><br>
+<li id=tenPas17>
+<span class="author">Andreas ten Pas and Marcus Gualtieri and Kate Saenko and Robert Platt</span>, 
+<span class="title">"Grasp pose detection in point clouds"</span>, 
+<span class="publisher">The International Journal of Robotics Research</span>, vol. 36, no. 13-14, pp. 1455--1473, <span class="year">2017</span>.
+
+</li><br>
+<li id=Mahler17>
+<span class="author">Jeffrey Mahler and Jacky Liang and Sherdil Niyaz and Michael Laskey and Richard Doan and Xinyu Liu and Juan Aparicio Ojea and Ken Goldberg</span>, 
+<span class="title">"Dex-net 2.0: Deep learning to plan robust grasps with synthetic point clouds and analytic grasp metrics"</span>, 
+<span class="publisher">arXiv preprint arXiv:1703.09312</span>, <span class="year">2017</span>.
+
+</li><br>
+<li id=Zeng21>
+<span class="author">Andy Zeng and Pete Florence and Jonathan Tompson and Stefan Welker and Jonathan Chien and Maria Attarian and Travis Armstrong and Ivan Krasin and Dan Duong and Vikas Sindhwani and others</span>, 
+<span class="title">"Transporter networks: Rearranging the visual world for robotic manipulation"</span>, 
+<span class="publisher">Conference on Robot Learning</span> , pp. 726--747, <span class="year">2021</span>.
+
+</li><br>
+<li id=Manuelli19>
+<span class="author">Lucas Manuelli* and Wei Gao* and Peter Florence and Russ Tedrake</span>, 
+<span class="title">"{kPAM: KeyPoint Affordances for Category-Level Robotic Manipulation}"</span>, 
+<span class="publisher">arXiv e-prints</span>, pp. arXiv:1903.06684, Mar, <span class="year">2019</span>.
+[&nbsp;<a href="https://sites.google.com/view/kpam">link</a>&nbsp;]
+
+</li><br>
+<li id=Gao20b>
+<span class="author">Wei Gao and Russ Tedrake</span>, 
+<span class="title">"kPAM 2.0: Feedback control for generalizable manipulation"</span>, 
+<span class="publisher">IEEE Robotics and Automation Letters</span>, <span class="year">2020</span>.
+[&nbsp;<a href="http://groups.csail.mit.edu/robotics-center/public_papers/Gao20b.pdf">link</a>&nbsp;]
+
+</li><br>
+<li id=Florence18a>
+<span class="author">Peter R. Florence* and Lucas Manuelli* and Russ Tedrake</span>, 
+<span class="title">"Dense Object Nets: Learning Dense Visual Object Descriptors By and For Robotic Manipulation"</span>, 
+<span class="publisher">Conference on Robot Learning (CoRL)</span> , October, <span class="year">2018</span>.
+[&nbsp;<a href="http://groups.csail.mit.edu/robotics-center/public_papers/Florence18a.pdf">link</a>&nbsp;]
 
 </li><br>
 </ol>
