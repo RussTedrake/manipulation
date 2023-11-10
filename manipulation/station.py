@@ -592,6 +592,7 @@ def _ApplyCameraConfigSim(*, config, builder):
         RgbdSensor(
             parent_id=body_frame_id,
             X_PB=X_BC,
+            color_camera=color_camera,
             depth_camera=depth_camera,
             show_window=False,
         )

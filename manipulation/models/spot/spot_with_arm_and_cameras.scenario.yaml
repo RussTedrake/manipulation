@@ -1,0 +1,210 @@
+cameras:
+  back_depth:
+    X_PB:
+      base_frame: body
+      rotation: !Rpy
+        deg: [-105.48909691486149, -0.041772139944310914, 90.10138675127546]
+      translation: [-0.41657524417747616, -0.03675054272171917, 0.009783190546345522]
+    center_x: 208.95120239257812
+    center_y: 116.4424819946289
+    depth: true
+    focal_x: 215.2998504638672
+    focal_y: 215.2998504638672
+    height: 240
+    name: back_depth
+    rgb: false
+    width: 424
+  back_fisheye_image:
+    X_BC:
+      rotation: !Rpy
+        deg: [-0.46942074654099414, 0.3842180012895529, 0.023779786229513298]
+      translation: [0.07679596000000007, -0.0023862200000000083, 0.00245293000000002]
+    X_PB:
+      base_frame: body
+      rotation: !Rpy
+        deg: [-105.48909691486149, -0.041772139944310914, 90.10138675127546]
+      translation: [-0.41657524417747616, -0.03675054272171917, 0.009783190546345522]
+    center_x: 323.0675354003906
+    center_y: 235.14096069335938
+    depth: false
+    focal_x: 330.0875244140625
+    focal_y: 329.0193176269531
+    height: 480
+    name: back_fisheye_image
+    rgb: false
+    width: 640
+  frontleft_depth:
+    X_PB:
+      base_frame: body
+      rotation: !Rpy
+        deg: [-148.60493899923674, 65.8513357519968, -179.6177031811891]
+      translation: [0.41614198818571146, 0.03876606197968771, 0.024440234358514057]
+    center_x: 204.85960388183594
+    center_y: 119.14192962646484
+    depth: true
+    focal_x: 217.1869659423828
+    focal_y: 217.1869659423828
+    height: 240
+    name: frontleft_depth
+    rgb: false
+    width: 424
+  frontleft_fisheye_image:
+    X_BC:
+      rotation: !Rpy
+        deg: [-0.7861847779356491, 0.25125605421606945, -0.34157619181559185]
+      translation: [0.07761029, -0.002738170000000012, 0.002000709999999961]
+    X_PB:
+      base_frame: body
+      rotation: !Rpy
+        deg: [-148.60493899923674, 65.8513357519968, -179.6177031811891]
+      translation: [0.41614198818571146, 0.03876606197968771, 0.024440234358514057]
+    center_x: 317.08135986328125
+    center_y: 242.35467529296875
+    depth: false
+    focal_x: 329.4396667480469
+    focal_y: 328.4884338378906
+    height: 480
+    name: frontleft_fisheye_image
+    rgb: false
+    width: 640
+  frontright_depth:
+    X_PB:
+      base_frame: body
+      rotation: !Rpy
+        deg: [149.5113144414584, 65.03839884827077, -179.59352779553913]
+      translation: [0.4165694674076411, -0.03566698714609548, 0.024867324877234254]
+    center_x: 212.03453063964844
+    center_y: 117.82328033447266
+    depth: true
+    focal_x: 214.53036499023438
+    focal_y: 214.53036499023438
+    height: 240
+    name: frontright_depth
+    rgb: false
+    width: 424
+  frontright_fisheye_image:
+    X_BC:
+      rotation: !Rpy
+        deg: [-0.5219299478195599, -0.5635967781991412, 0.01135069193397525]
+      translation: [0.07674974, -0.0023223699999999903, 0.003094899999999956]
+    X_PB:
+      base_frame: body
+      rotation: !Rpy
+        deg: [149.5113144414584, 65.03839884827077, -179.59352779553913]
+      translation: [0.4165694674076411, -0.03566698714609548, 0.024867324877234254]
+    center_x: 316.28533935546875
+    center_y: 239.01754760742188
+    depth: false
+    focal_x: 327.79736328125
+    focal_y: 326.8816833496094
+    height: 480
+    name: frontright_fisheye_image
+    rgb: false
+    width: 640
+  hand_color_image:
+    X_PB:
+      base_frame: arm_link_wr1
+      rotation: !Rpy
+        deg: [-80.9999763610074, -9.54166404439055e-15, -90.0]
+      translation: [0.13806000000000002, 0.02020500000000003, 0.02451999999999996]
+    center_x: 320.0
+    center_y: 240.0
+    depth: false
+    focal_x: 552.0291012161067
+    focal_y: 552.0291012161067
+    height: 480
+    name: hand_color_image
+    rgb: true
+    width: 640
+  hand_depth:
+    X_PB:
+      base_frame: arm_link_wr1
+      rotation: !Rpy
+        deg: [-1.014374885994677e-14, 80.9999763610074, -1.4937634426153968e-14]
+      translation: [0.13494999999999996, 0.0, 0.007990000000000011]
+    center_x: 112.87166595458984
+    center_y: 87.74130249023438
+    depth: true
+    focal_x: 210.77549743652344
+    focal_y: 210.77549743652344
+    height: 171
+    name: hand_depth
+    rgb: false
+    width: 224
+  left_depth:
+    X_PB:
+      base_frame: body
+      rotation: !Rpy
+        deg: [-105.27007808928333, 0.31815755856273087, 0.10073630047848582]
+      translation: [-0.1608682612475711, 0.11248539460038062, 0.037239770408653367]
+    center_x: 211.72865295410156
+    center_y: 117.93174743652344
+    depth: true
+    focal_x: 214.22756958007812
+    focal_y: 214.22756958007812
+    height: 240
+    name: left_depth
+    rgb: false
+    width: 424
+  left_fisheye_image:
+    X_BC:
+      rotation: !Rpy
+        deg: [-0.6341492287935613, -0.566530796392417, 0.3353148362399816]
+      translation: [0.07670138, -0.001574749999999972, 0.003646110000000008]
+    X_PB:
+      base_frame: body
+      rotation: !Rpy
+        deg: [-105.27007808928333, 0.31815755856273087, 0.10073630047848582]
+      translation: [-0.1608682612475711, 0.11248539460038062, 0.037239770408653367]
+    center_x: 318.00762939453125
+    center_y: 242.71261596679688
+    depth: false
+    focal_x: 329.33489990234375
+    focal_y: 328.2731018066406
+    height: 480
+    name: left_fisheye_image
+    rgb: false
+    width: 640
+  right_depth:
+    X_PB:
+      base_frame: body
+      rotation: !Rpy
+        deg: [105.03796007129203, 0.043566840239963614, -0.07517861079590231]
+      translation: [-0.16969714576057038, -0.10852276381480623, 0.0362927923018819]
+    center_x: 214.32330322265625
+    center_y: 117.5512924194336
+    depth: true
+    focal_x: 212.34518432617188
+    focal_y: 212.34518432617188
+    height: 240
+    name: right_depth
+    rgb: false
+    width: 424
+  right_fisheye_image:
+    X_BC:
+      rotation: !Rpy
+        deg: [-0.5885472946040657, -0.5876089404264645, 0.4210072692915067]
+      translation: [0.07607076000000004, -0.002142449999999997, 0.00343172999999998]
+    X_PB:
+      base_frame: body
+      rotation: !Rpy
+        deg: [105.03796007129203, 0.043566840239963614, -0.07517861079590231]
+      translation: [-0.16969714576057038, -0.10852276381480623, 0.0362927923018819]
+    center_x: 321.9902038574219
+    center_y: 234.76083374023438
+    depth: false
+    focal_x: 330.74481201171875
+    focal_y: 329.877197265625
+    height: 480
+    name: right_fisheye_image
+    rgb: false
+    width: 640
+directives:
+- add_model:
+    default_joint_positions:
+      arm_el0: [3.1]
+      arm_sh1: [-3.1]
+    file: package://manipulation/spot/spot_with_arm_and_floating_base_actuators.urdf
+    name: spot
+model_drivers:
+  spot: !InverseDynamicsDriver {}
