@@ -29,16 +29,12 @@ ENV LANG en_US.UTF-8
 ENV LANGUAGE en_US.UTF-8
 ENV LC_ALL en_US.UTF-8
 COPY manipulation/ /opt/manipulation/manipulation/
-COPY requirements.txt /tmp/requirements.txt
+COPY requirements-docker.txt /tmp/requirements.txt
 COPY setup/docker/pip.conf /root/.config/pip/pip.conf
 COPY setup/ubuntu/22.04/install_prereqs.sh /tmp/
 RUN /tmp/install_prereqs.sh
 RUN apt -y install xvfb git
 RUN /opt/drake/share/drake/setup/deepnote/install_nginx
-# Remove drake from requirements.txt:
-RUN sed -i '/drake/d' /tmp/requirements.txt
-# Remove CPU decoration for torch:
-RUN sed -i 's/\(torch==[0-9.]*\)+cpu/\1/' /tmp/requirements.txt
 RUN pip3 install -r /tmp/requirements.txt pyvirtualdisplay
 RUN rm -rf /root/.cache /root/.config
 RUN rm -f /tmp/install_prereqs.sh

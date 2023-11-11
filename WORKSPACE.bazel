@@ -24,7 +24,7 @@ load("@rules_python//python:pip.bzl", "pip_install")
 
 pip_install(
     name = "pip",
-    requirements = "//:requirements.txt",
+    requirements = "//:requirements-bazel.txt",
 )
 
 load("//htmlbook/tools/buildifier:repositories.bzl", "buildifier_dependencies")
