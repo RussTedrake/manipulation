@@ -35,6 +35,13 @@ from pydrake.gym import DrakeGymEnv
 from manipulation.scenarios import AddShape, SetColor, SetTransparency
 from manipulation.utils import ConfigureParser
 
+""" Defines the BoxFlipUpEnv
+
+BoxFlipUpEnv is an extremely simple environment, inspired by the example used
+in the force control chapter, in which a point finger tries to rotate a box
+inside a bin onto its side.
+"""
+
 
 def AddPlanarBinAndSimpleBox(
     plant, mass=1.0, mu=1.0, width=0.2, depth=0.05, height=0.3

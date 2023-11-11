@@ -22,6 +22,7 @@ rt_ipynb_test(
     data = ["//manipulation/models"],
     deps = [
         "//manipulation",
+        "//manipulation/envs:planar_gripper_pushing_a_box",
         "//manipulation/exercises:grader",
         "//manipulation/exercises/rl:test_vpg",
     ],

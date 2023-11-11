@@ -19,3 +19,17 @@ rt_py_library(
       "//manipulation:scenarios",
     ]
 )
+
+rt_py_library(
+    name = "planar_gripper_pushing_a_box",
+    srcs = ["planar_gripper_pushing_a_box.py"],
+    data = [
+      "//manipulation/models",
+    ],
+    imports = [".."],
+    visibility = ["//visibility:public"],
+    deps = [
+      "//manipulation",
+      "//manipulation:scenarios",
+    ]
+)
