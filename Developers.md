@@ -58,6 +58,8 @@ the root directory, run:
 rm -rf dist/*
 poetry publish --build
 ```
+(Use `poetry config pypi-token.pypi <token>` once first)
+
 
 ## Tips for developers
 
