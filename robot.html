@@ -114,7 +114,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
     <p>There is one particular requirement which, if we want our robot to
     satisfy, quickly winnows the field to only a few viable platforms: that
     requirement is joint-torque sensing and control.  Out of the
-    torque-controlled robots on the market, I've use the Kuka LBR iiwa robot
+    torque-controlled robots on the market, I've used the Kuka LBR iiwa robot
     most often throughout these notes (I will try to use the lower case "iiwa"
     to be <a
     href="https://www.kuka.com/en-us/products/robotics-systems/industrial-robots/lbr-iiwa">consistent
@@ -178,15 +178,15 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
         <p>How can we overcome this challenge of not having a good model of the
         transmission dynamics?  Regulating the current or speed <i>of the
         motor</i> only requires sensors on the motor side of the transmission.
-        To accurately regulate the joint, we typically need add more sensors on
-        the output side of the transmission. Importantly, although the torques
-        due to the transmission are not known precisely, they are also not
-        arbitrary -- for instance they will never add energy into the system.
-        Most importantly, we can be confident that there is a <i>monotonically
-        increasing</i> relationship between the current that we put into the
-        motor and the torque at the joint, and ultimately the acceleration of
-        the joint.  Note that I chose the term monotonic carefully, meaning
-        "non-decreasing" but <i>not</i>
+        To accurately regulate the joint, we typically need to add more sensors
+        on the output side of the transmission. Importantly, although the
+        torques due to the transmission are not known precisely, they are also
+        not arbitrary -- for instance they will never add energy into the
+        system. Most importantly, we can be confident that there is a
+        <i>monotonically increasing</i> relationship between the current that
+        we put into the motor and the torque at the joint, and ultimately the
+        acceleration of the joint.  Note that I chose the term monotonic
+        carefully, meaning "non-decreasing" but <i>not</i>
         implying "strictly increasing", because, for instance, when a joint is
         starting from rest, static friction will resist small torques without
         having any acceleration at the output.</p>
@@ -288,7 +288,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
         target="underactuated">state-dependent function that captures the
         inertia of the actuated link and also the inertial coupling of the
         other joints in the manipulator</a>. $I_{motor}$, on the other hand, is
-        constant and only effects the local joint. For large gear ratios, the
+        constant and only affects the local joint. For large gear ratios, the
         $I_{motor}$ terms dominate the other terms, which has two important
         effects: 1) it effectively diagonalizes the manipulator equations (the
         inertial coupling terms are relatively small), and 2) the dynamics are
@@ -314,7 +314,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       robots"<elib>Asada87</elib> had enormous motors and limited payloads.
       More recently, robots like the <a
       href="https://robots.ieee.org/robots/wam/">Barrett WAM</a> arm used cable
-      drives to keep the arm light but having large motors in the base.  And
+      drives to keep the arm light by having large motors in the base.  And
       just in the last few years, we've seen progress in high-torque outrunner
       and frameless motors bringing in a new generation of low-cost,
       "quasi-direct-drive" robots: e.g. MIT Cheetah <elib>Wensing17</elib>, <a
@@ -651,7 +651,7 @@ output_ports:
       <p>Finally, the third and newest camp is promoting clever mechanical
       designs for hands, which are often called "underactuated hands". The
       basic idea is that, for many tasks, you might not need as many actuators
-      in your hand has you have joints. Many underactuated hands use a
+      in your hand as you have joints. Many underactuated hands use a
       cable-drive mechanism to close the fingers, where a single tendon can
       cause multiple joints in the finger to bend. When designed correctly,
       these mechanisms can allow the finger to <a
