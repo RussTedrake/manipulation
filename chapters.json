@@ -12,6 +12,7 @@
     "deep_perception",
     "rl",
     "drake",
+    "environments",
     "station",
     "misc"
   ],
