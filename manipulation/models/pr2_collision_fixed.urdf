@@ -1923,10 +1923,10 @@
     <actuator name="r_wrist_flex_motor"/>
     <joint name="r_wrist_flex_joint"/>
   </transmission>
-  <!-- <transmission name="r_wrist_roll_trans" type="SimpleTransmission">
+  <transmission name="r_wrist_roll_trans" type="SimpleTransmission">
     <actuator name="r_wrist_roll_motor"/>
     <joint name="r_wrist_roll_joint"/>
-  </transmission> -->
+  </transmission>
   <joint name="r_gripper_palm_joint" type="fixed">
     <origin rpy="0 0 0" xyz="0 0 0"/>
     <parent link="r_wrist_roll_link"/>
@@ -2822,10 +2822,10 @@
     <actuator name="l_wrist_flex_motor"/>
     <joint name="l_wrist_flex_joint"/>
   </transmission>
-  <!-- <transmission name="l_wrist_roll_trans" type="SimpleTransmission">
+  <transmission name="l_wrist_roll_trans" type="SimpleTransmission">
     <actuator name="l_wrist_roll_motor"/>
     <joint name="l_wrist_roll_joint"/>
-  </transmission> -->
+  </transmission>
   <joint name="l_gripper_palm_joint" type="fixed">
     <origin rpy="0 0 0" xyz="0 0 0"/>
     <parent link="l_wrist_roll_link"/>
