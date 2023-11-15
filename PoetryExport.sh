@@ -15,6 +15,3 @@ awk '
     next;
 }
 1' requirements.txt > requirements-bazel.txt
-# Remove Drake for bazel and for docker.
-sed '/drake/d' requirements-bazel.txt > requirements-bazel.txt.tmp && mv requirements-bazel.txt.tmp requirements-bazel.txt
-sed '/drake/d' requirements.txt > requirements-docker.txt

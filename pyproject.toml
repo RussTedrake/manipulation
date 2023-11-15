@@ -47,7 +47,7 @@ priority = "explicit"
 [tool.poetry.dependencies]
 python = ">=3.8"
 cloudpickle = "2.2.1"  # needs to be pinned for stored files to remain compatible.
-drake = { version = "==0.0.20231110", source = "drake-nightly" }
+drake = { version = "==0.0.20231114", source = "drake-nightly" }
 #drake = ">=1.22.0"
 gradescope-utils = ">=0.4.0"
 mpld3  = ">=0.5.6"
