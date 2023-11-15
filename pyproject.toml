@@ -45,7 +45,7 @@ url = "https://drake-packages.csail.mit.edu/whl/nightly/"
 priority = "explicit"
 
 [tool.poetry.dependencies]
-python = ">=3.8"
+python = "<3.12,>=3.10"  # <3.12 is for the newer versions of scipy
 cloudpickle = "2.2.1"  # needs to be pinned for stored files to remain compatible.
 drake = { version = "==0.0.20231114", source = "drake-nightly" }
 #drake = ">=1.22.0"
@@ -53,6 +53,7 @@ gradescope-utils = ">=0.4.0"
 mpld3  = ">=0.5.6"
 nevergrad = ">=0.4.3"  # TODO: avoid expensive bayesian optimization dep
 psutil = ">=5.9.*"
+scipy = ">=1.10.0"  # From github dependabot
 stable-baselines3 = ">=2.0.0"
 timeout-decorator = ">=0.4.1"
 torch = ">=2.0.1"
