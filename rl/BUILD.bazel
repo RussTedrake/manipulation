@@ -16,18 +16,16 @@ rt_ipynb_test(
     ],
 )
 
-# Having cuda issues on puget
-# Having EOFError issue on mac
-#rt_ipynb_test(
-#    name = "box_flipup",
-#    srcs = ["box_flipup.ipynb"],
-#    # data = ["//data:box_flipup_ppo_state.zip"],
-#    deps = [
-#      "//manipulation",
-#      "//manipulation:meshcat_utils",
-#      "//manipulation/envs:box_flipup",
-#    ],
-#)
+rt_ipynb_test(
+    name = "box_flipup",
+    srcs = ["box_flipup.ipynb"],
+    data = ["//data:box_flipup_ppo_state.zip"],
+    deps = [
+      "//manipulation",
+      "//manipulation:meshcat_utils",
+      "//manipulation/envs:box_flipup",
+    ],
+)
 
 #rt_py_test(
 #  name = "train_boxflipup",

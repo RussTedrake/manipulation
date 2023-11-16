@@ -12,9 +12,7 @@ from pydrake.all import (
     InverseDynamicsController,
     LeafSystem,
     MeshcatVisualizer,
-    MeshcatVisualizerParams,
     MultibodyPlant,
-    MultibodyPositionToGeometryPose,
     Multiplexer,
     Parser,
     PassThrough,
@@ -23,7 +21,6 @@ from pydrake.all import (
     RandomGenerator,
     RigidTransform,
     RotationMatrix,
-    SceneGraph,
     Simulator,
     SpatialInertia,
     Sphere,
@@ -32,7 +29,7 @@ from pydrake.all import (
 )
 
 from pydrake.gym import DrakeGymEnv
-from manipulation.scenarios import AddShape, SetColor, SetTransparency
+from manipulation.scenarios import AddShape, SetTransparency
 from manipulation.utils import ConfigureParser
 
 """ Defines the BoxFlipUpEnv
@@ -48,8 +45,7 @@ def AddPlanarBinAndSimpleBox(
 ):
     parser = Parser(plant)
     ConfigureParser(parser)
-    sdf_location = "package://manipulation/planar_bin.sdf"
-    bin = parser.AddModelsFromUrl(sdf_location)[0]
+    bin = parser.AddModelsFromUrl("package://manipulation/planar_bin.sdf")[0]
     plant.WeldFrames(
         plant.world_frame(),
         plant.GetFrameByName("bin_base", bin),
@@ -71,14 +67,12 @@ def AddPlanarBinAndSimpleBox(
     box_instance = AddShape(plant, Box(width, depth, height), "box", mass, mu)
     box_joint = plant.AddJoint(
         PlanarJoint(
-            "box",
+            "box_joint",
             planar_joint_frame,
             plant.GetFrameByName("box", box_instance),
         )
     )
-    box_joint.set_position_limits([-0.5, -0.1, -np.pi], [0.5, 0.3, np.pi])
-    box_joint.set_velocity_limits([-2, -2, -2], [2, 2, 2])
-    box_joint.set_default_translation([0, depth / 2.0])
+    box_joint.set_default_translation([0, height / 2.0])
     return box_instance
 
 
@@ -101,8 +95,6 @@ def AddPointFinger(plant):
             0.3,
         )
     )
-    finger_x.set_position_limits([-0.5], [0.5])
-    finger_x.set_velocity_limits([-2], [2])
     plant.AddJointActuator("finger_x", finger_x)
     finger_z = plant.AddJoint(
         PrismaticJoint(
@@ -115,11 +107,34 @@ def AddPointFinger(plant):
         )
     )
     finger_z.set_default_translation(0.25)
-    finger_z.set_position_limits([-0.1], [0.3])
-    finger_z.set_velocity_limits([-2], [2])
     plant.AddJointActuator("finger_z", finger_z)
 
     return finger
+
+
+class RewardSystem(LeafSystem):
+    def __init__(self):
+        LeafSystem.__init__(self)
+        self.DeclareVectorInputPort("box_state", 6)
+        self.DeclareVectorInputPort("finger_state", 4)
+        self.DeclareVectorInputPort("actions", 2)
+        self.DeclareVectorOutputPort("reward", 1, self.CalcReward)
+
+    def CalcReward(self, context, output):
+        box_state = self.get_input_port(0).Eval(context)
+        finger_state = self.get_input_port(1).Eval(context)
+        actions = self.get_input_port(2).Eval(context)
+
+        angle_from_vertical = (box_state[2] % np.pi) - np.pi / 2
+        cost = 2 * angle_from_vertical**2  # box angle
+        cost += 0.1 * box_state[5] ** 2  # box velocity
+        effort = actions - finger_state[:2]
+        cost += 0.1 * effort.dot(effort)  # effort
+        # finger velocity
+        cost += 0.1 * finger_state[2:].dot(finger_state[2:])
+        # Add 10 to make rewards positive (to avoid rewarding simulator
+        # crashes).
+        output[0] = 10 - cost
 
 
 def make_box_flipup(
@@ -127,13 +142,8 @@ def make_box_flipup(
 ):
     builder = DiagramBuilder()
     plant, scene_graph = AddMultibodyPlantSceneGraph(builder, time_step=0.001)
-
-    # TODO(russt): Re-enable Sap pending resolution of
-    # https://github.com/RobotLocomotion/drake/issues/18338
     # plant.set_discrete_contact_solver(DiscreteContactSolver.kSap)
-
     # TODO(russt): randomize parameters.
-
     box = AddPlanarBinAndSimpleBox(plant)
     finger = AddPointFinger(plant)
     plant.Finalize()
@@ -151,22 +161,6 @@ def make_box_flipup(
             meshcat,
             ContactVisualizerParams(radius=0.005, newtons_per_meter=40.0),
         )
-
-        # Use the controller plant to visualize the set point geometry.
-        controller_scene_graph = builder.AddSystem(SceneGraph())
-        controller_plant.RegisterAsSourceForSceneGraph(controller_scene_graph)
-        SetColor(
-            controller_scene_graph,
-            color=[1.0, 165.0 / 255, 0.0, 1.0],
-            source_id=controller_plant.get_source_id(),
-        )
-        controller_vis = MeshcatVisualizer.AddToBuilder(
-            builder,
-            controller_scene_graph,
-            meshcat,
-            MeshcatVisualizerParams(prefix="controller"),
-        )
-        controller_vis.set_name("controller meshcat")
 
     controller_plant.Finalize()
 
@@ -200,16 +194,6 @@ def make_box_flipup(
     builder.Connect(
         controller.get_output_port_control(), plant.get_actuation_input_port()
     )
-    if meshcat:
-        positions_to_poses = builder.AddSystem(
-            MultibodyPositionToGeometryPose(controller_plant)
-        )
-        builder.Connect(
-            positions_to_poses.get_output_port(),
-            controller_scene_graph.get_source_pose_port(
-                controller_plant.get_source_id()
-            ),
-        )
 
     builder.ExportInput(actions.get_input_port(), "actions")
     if observations == "state":
@@ -217,30 +201,6 @@ def make_box_flipup(
     # TODO(russt): Add 'time', and 'keypoints'
     else:
         raise ValueError("observations must be one of ['state']")
-
-    class RewardSystem(LeafSystem):
-        def __init__(self):
-            LeafSystem.__init__(self)
-            self.DeclareVectorInputPort("box_state", 6)
-            self.DeclareVectorInputPort("finger_state", 4)
-            self.DeclareVectorInputPort("actions", 2)
-            self.DeclareVectorOutputPort("reward", 1, self.CalcReward)
-
-        def CalcReward(self, context, output):
-            box_state = self.get_input_port(0).Eval(context)
-            finger_state = self.get_input_port(1).Eval(context)
-            actions = self.get_input_port(2).Eval(context)
-
-            angle_from_vertical = (box_state[2] % np.pi) - np.pi / 2
-            cost = 2 * angle_from_vertical**2  # box angle
-            cost += 0.1 * box_state[5] ** 2  # box velocity
-            effort = actions - finger_state[:2]
-            cost += 0.1 * effort.dot(effort)  # effort
-            # finger velocity
-            cost += 0.1 * finger_state[2:].dot(finger_state[2:])
-            # Add 10 to make rewards positive (to avoid rewarding simulator
-            # crashes).
-            output[0] = 10 - cost
 
     reward = builder.AddSystem(RewardSystem())
     builder.Connect(plant.get_state_output_port(box), reward.get_input_port(0))
@@ -254,7 +214,7 @@ def make_box_flipup(
     uniform_random = Variable(
         name="uniform_random", type=Variable.Type.RANDOM_UNIFORM
     )
-    box_joint = plant.GetJointByName("box")
+    box_joint = plant.GetJointByName("box_joint")
     x, y = box_joint.get_default_translation()
     box_joint.set_random_pose_distribution(
         [0.2 * uniform_random - 0.1 + x, y], 0
@@ -317,4 +277,7 @@ def BoxFlipUpEnv(observations="state", meshcat=None, time_limit=10):
         action_port_id="actions",
         observation_port_id="observations",
     )
+
+    #    from stable_baselines3.common.monitor import Monitor
+    #    env = Monitor(env)
     return env

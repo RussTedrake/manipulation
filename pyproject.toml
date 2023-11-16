@@ -53,14 +53,15 @@ gradescope-utils = ">=0.4.0"
 mpld3  = ">=0.5.6"
 nevergrad = ">=0.4.3"  # TODO: avoid expensive bayesian optimization dep
 psutil = ">=5.9.*"
+#pymcubes = ">=0.0.9"
+pyzmq = ">=25.0.0" # seems to be needed on python 3.11
 scipy = ">=1.10.0"  # From github dependabot
 stable-baselines3 = ">=2.0.0"
 timeout-decorator = ">=0.4.1"
 torch = ">=2.0.1"
 torchvision = ">=0.10.1"
 trimesh = {extras = ["recommend"], version = ">=4.0.0"}
-#pymcubes = ">=0.0.9"
-pyzmq = ">=25.0.0" # seems to be needed on python 3.11
+#wandb = ">=0.14.0"
 
 [tool.poetry.group.dev.dependencies]
 beautifulsoup4 = ">=4.6.3"
