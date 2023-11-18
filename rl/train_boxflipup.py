@@ -29,7 +29,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--test", action="store_true")
     parser.add_argument("--train_single_env", action="store_true")
-    parser.add_argument("--wandb", action="store_false")
+    parser.add_argument("--wandb", action="store_true", default=False)
     parser.add_argument("--debug", action="store_true")
     parser.add_argument(
         "--log_path",

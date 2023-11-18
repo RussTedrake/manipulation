@@ -7,6 +7,7 @@ from pydrake.all import (
     ContactVisualizer,
     ContactVisualizerParams,
     DiagramBuilder,
+    DiscreteContactSolver,
     EventStatus,
     FixedOffsetFrame,
     InverseDynamicsController,
@@ -147,7 +148,7 @@ def make_box_flipup(
 ):
     builder = DiagramBuilder()
     plant, scene_graph = AddMultibodyPlantSceneGraph(builder, time_step=0.001)
-    # plant.set_discrete_contact_solver(DiscreteContactSolver.kSap)
+    plant.set_discrete_contact_solver(DiscreteContactSolver.kSap)
     # TODO(russt): randomize parameters.
     box = AddPlanarBinAndSimpleBox(plant)
     finger = AddPointFinger(plant)
