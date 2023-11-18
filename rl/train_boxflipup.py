@@ -22,10 +22,7 @@ from psutil import cpu_count
 
 from pydrake.all import StartMeshcat
 
-gym.envs.register(
-    id="BoxFlipUp-v0",
-    entry_point=("manipulation.envs.box_flipup:BoxFlipUpEnv"),
-)
+import manipulation.envs.box_flipup  # no-member
 
 
 def main():

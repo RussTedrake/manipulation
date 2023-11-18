@@ -32,6 +32,11 @@ from pydrake.gym import DrakeGymEnv
 from manipulation.scenarios import AddShape, SetTransparency
 from manipulation.utils import ConfigureParser
 
+gym.envs.register(
+    id="BoxFlipUp-v0",
+    entry_point=("manipulation.envs.box_flipup:BoxFlipUpEnv"),
+)
+
 """ Defines the BoxFlipUpEnv
 
 BoxFlipUpEnv is an extremely simple environment, inspired by the example used

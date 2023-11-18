@@ -2,6 +2,7 @@ import unittest
 
 import gymnasium as gym
 import stable_baselines3.common.env_checker
+import manipulation.envs.box_flipup  # no-member
 
 
 class DrakeGymTest(unittest.TestCase):
@@ -17,10 +18,7 @@ class DrakeGymTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        gym.envs.register(
-            id="BoxFlipUp-v0",
-            entry_point="manipulation.envs.box_flipup:BoxFlipUpEnv",
-        )
+        pass
 
     def make_env(self):
         return gym.make("BoxFlipUp-v0")
