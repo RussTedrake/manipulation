@@ -9,7 +9,7 @@ pip3 install poetry-plugin-export
 ## To update poetry
 
 ```
-./PoetryExport.sh
+./htmlbook/PoetryExport.sh
 ```
 One may want to also run
 ```
@@ -17,7 +17,6 @@ poetry install
 ```
 - Hopefully [direct poetry
 support](https://github.com/bazelbuild/rules_python/issues/340) will land soon, or I can use [rules_python_poetry](https://github.com/AndrewGuenther/rules_python_poetry) directly; but it looks like it will still require poetry to fix [their issue](# https://github.com/python-poetry/poetry-plugin-export/issues/176).
-- The awk command forces [torch to be cpu-only for bazel](https://drakedevelopers.slack.com/archives/C2PMBJVAN/p1697855405335329).
 
 ## To install the pre-commit hooks
 
@@ -42,10 +41,6 @@ Then run
 ```bash
 bazel test //...
 ```
-
-If you would like to `bazel` to use a local installation of drake, you can set
-the `DRAKE_INSTALL_DIR` environment variable. Otherwise it will look in
-`/opt/drake`.
 
 ## To update the pip wheels
 
