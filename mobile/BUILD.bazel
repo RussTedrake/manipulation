@@ -24,3 +24,13 @@ rt_ipynb_test(
 #      "//manipulation",
 #    ],
 #)
+
+# Waiting on https://github.com/RobotLocomotion/drake/pull/20588
+#rt_ipynb_test(
+#    name = "pr2",
+#    srcs = ["pr2.ipynb"],
+#    deps = [
+#      "//manipulation",
+#      "//manipulation:station",
+#    ],
+#)

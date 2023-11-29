@@ -41,6 +41,7 @@ from pydrake.all import (
     OutputPort,
     Parser,
     PassThrough,
+    PdControllerGains,
     ProcessModelDirectives,
     RgbdSensor,
     RigidTransform,
@@ -73,7 +74,32 @@ from manipulation.utils import ConfigureParser
 
 @dc.dataclass
 class InverseDynamicsDriver:
-    """A simulation-only driver that adds the InverseDynamicsController to the station and exports the output ports. Multiple model instances can be provided using `instance_name1+instance_name2` as the key; the output ports will be named similarly."""
+    """A simulation-only driver that adds the InverseDynamicsController to the
+    station and exports the output ports. Multiple model instances can be
+    provided using `instance_name1+instance_name2` as the key; the output ports
+    will be named similarly."""
+
+    # TODO(russt): Support setting the gains.
+
+
+@dc.dataclass
+class MyPdControllerGains:
+    kp: float = 0  # Position gain
+    kd: float = 0  # Velocity gain
+
+
+@dc.dataclass
+class JointStiffnessDriver:
+    """A simulation-only driver that sets up MultibodyPlant to act as if it is
+    being controlled with a JointStiffnessController. The MultibodyPlant must
+    be using SAP as the (discrete-time) contact solver."""
+
+    # Must have one element for every (named) actuator in the model_instance.
+    gains: typing.Mapping[str, MyPdControllerGains] = dc.field(
+        default_factory=dict
+    )
+
+    hand_model_name: str = ""
 
 
 @dc.dataclass
@@ -119,6 +145,7 @@ class Scenario:
         typing.Union[
             IiwaDriver,
             InverseDynamicsDriver,
+            JointStiffnessDriver,
             SchunkWsgDriver,
             ZeroForceDriver,
         ],
@@ -432,10 +459,17 @@ def _ApplyDriverConfigSim(
             sim_plant.GetModelInstanceByName(n) for n in model_instance_names
         ]
 
-        # Make the plant for the iiwa controller to use.
         controller_plant = MultibodyPlant(time_step=sim_plant.time_step())
+        parser = Parser(controller_plant)
+        for p in package_xmls:
+            parser.package_map().AddPackageXml(p)
+        ConfigureParser(parser)
+
+        # Make the plant for the iiwa controller to use.
         controller_directives = []
         for d in directives:
+            # waiting for https://github.com/RobotLocomotion/drake/pull/20608.
+            # for d in FlattenModelDirectives(directives, parser.package_map()):
             if d.add_model and (d.add_model.name in model_instance_names):
                 controller_directives.append(d)
             if (
@@ -451,10 +485,6 @@ def _ApplyDriverConfigSim(
                 )
             ):
                 controller_directives.append(d)
-        parser = Parser(controller_plant)
-        for p in package_xmls:
-            parser.package_map().AddPackageXml(p)
-        ConfigureParser(parser)
         ProcessModelDirectives(
             directives=ModelDirectives(directives=controller_directives),
             parser=parser,
@@ -521,6 +551,24 @@ def _ApplyDriverConfigSim(
             model_instance_name + ".desired_state",
         )
 
+    if isinstance(driver_config, JointStiffnessDriver):
+        model_instance = sim_plant.GetModelInstanceByName(model_instance_name)
+
+        # PD gains and gravity comp are set in ApplyPrefinalizeDriverConfigsSim
+
+        builder.ExportInput(
+            sim_plant.get_desired_state_input_port(model_instance),
+            model_instance_name + ".desired_state",
+        )
+        builder.ExportInput(
+            sim_plant.get_actuation_input_port(model_instance),
+            model_instance_name + ".tau_feedforward",
+        )
+        builder.ExportOutput(
+            sim_plant.get_state_output_port(model_instance),
+            model_instance_name + ".state_estimated",
+        )
+
 
 def _ApplyDriverConfigsSim(
     *,
@@ -536,6 +584,60 @@ def _ApplyDriverConfigsSim(
     )
     for model_instance_name, driver_config in driver_configs.items():
         _ApplyDriverConfigSim(
+            driver_config,
+            model_instance_name,
+            sim_plant,
+            directives,
+            models_from_directives_map,
+            package_xmls,
+            builder,
+        )
+
+
+def _ApplyPrefinalizeDriverConfigSim(
+    driver_config,
+    model_instance_name,
+    sim_plant,
+    directives,
+    models_from_directives_map,
+    package_xmls,
+    builder,
+):
+    if isinstance(driver_config, JointStiffnessDriver):
+        model_instance = sim_plant.GetModelInstanceByName(model_instance_name)
+
+        # Set PD gains.
+        for name, gains in driver_config.gains.items():
+            actuator = sim_plant.GetJointActuatorByName(name, model_instance)
+            actuator.set_controller_gains(
+                PdControllerGains(p=gains.kp, d=gains.kd)
+            )
+
+        # Turn off gravity to model (perfect) gravity compensation.
+        sim_plant.set_gravity_enabled(model_instance, False)
+        if driver_config.hand_model_name:
+            sim_plant.set_gravity_enabled(
+                sim_plant.GetModelInstanceByName(
+                    driver_config.hand_model_name
+                ),
+                False,
+            )
+
+
+def _ApplyPrefinalizeDriverConfigsSim(
+    *,
+    driver_configs,
+    sim_plant,
+    directives,
+    models_from_directives,
+    package_xmls,
+    builder,
+):
+    models_from_directives_map = dict(
+        [(info.model_name, info) for info in models_from_directives]
+    )
+    for model_instance_name, driver_config in driver_configs.items():
+        _ApplyPrefinalizeDriverConfigSim(
             driver_config,
             model_instance_name,
             sim_plant,
@@ -666,7 +768,16 @@ def MakeHardwareStation(
     if parser_prefinalize_callback:
         parser_prefinalize_callback(parser)
 
-    # Now the plant is complete.
+    # To support JointStiffnessControl, we need a pre-finalize version, too.
+    _ApplyPrefinalizeDriverConfigsSim(
+        driver_configs=scenario.model_drivers,
+        sim_plant=sim_plant,
+        directives=scenario.directives,
+        models_from_directives=added_models,
+        package_xmls=package_xmls,
+        builder=builder,
+    )
+
     sim_plant.Finalize()
 
     # Add drivers.
