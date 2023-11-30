@@ -569,18 +569,36 @@
     </collision>
     <collision>
       <geometry>
-        <mesh filename="package://spot_description/meshes/arm/collision/front_jaw.obj"/>
+        <mesh filename="package://spot_description/meshes/arm/collision/front_jaw.obj">
+          <drake:declare_convex/>
+        </mesh>
       </geometry>
+      <drake:proximity_properties>
+        <drake:compliant_hydroelastic/>
+        <drake:hydroelastic_modulus value="1e6"/>
+      </drake:proximity_properties>
     </collision>
     <collision>
       <geometry>
-        <mesh filename="package://spot_description/meshes/arm/collision/middle_jaw.obj"/>
+        <mesh filename="package://spot_description/meshes/arm/collision/middle_jaw.obj">
+          <drake:declare_convex/>
+        </mesh>
       </geometry>
+      <drake:proximity_properties>
+        <drake:compliant_hydroelastic/>
+        <drake:hydroelastic_modulus value="1e6"/>
+      </drake:proximity_properties>
     </collision>
     <collision>
       <geometry>
-        <mesh filename="package://spot_description/meshes/arm/collision/jaw_tooth.obj"/>
+        <mesh filename="package://spot_description/meshes/arm/collision/jaw_tooth.obj">
+          <drake:declare_convex/>
+        </mesh>
       </geometry>
+      <drake:proximity_properties>
+        <drake:compliant_hydroelastic/>
+        <drake:hydroelastic_modulus value="1e6"/>
+      </drake:proximity_properties>
     </collision>
     <inertial>
       <origin rpy="0.006393076449033863 0.2928526604761865 -0.022814984050994802" xyz="0.12516802549362183 0.00010137435310753062 -0.013997982256114483"/>
@@ -612,13 +630,25 @@
     </collision>
     <collision>
       <geometry>
-        <mesh filename="package://spot_description/meshes/arm/collision/left_finger.obj"/>
+        <mesh filename="package://spot_description/meshes/arm/collision/left_finger.obj">
+          <drake:declare_convex/>
+        </mesh>
       </geometry>
+      <drake:proximity_properties>
+        <drake:compliant_hydroelastic/>
+        <drake:hydroelastic_modulus value="1e6"/>
+      </drake:proximity_properties>
     </collision>
     <collision>
       <geometry>
-        <mesh filename="package://spot_description/meshes/arm/collision/left_tooth.obj"/>
+        <mesh filename="package://spot_description/meshes/arm/collision/left_tooth.obj">
+          <drake:declare_convex/>
+        </mesh>
       </geometry>
+      <drake:proximity_properties>
+        <drake:compliant_hydroelastic/>
+        <drake:hydroelastic_modulus value="1e6"/>
+      </drake:proximity_properties>
     </collision>
     <collision>
       <geometry>
@@ -627,13 +657,25 @@
     </collision>
     <collision>
       <geometry>
-        <mesh filename="package://spot_description/meshes/arm/collision/right_finger.obj"/>
+        <mesh filename="package://spot_description/meshes/arm/collision/right_finger.obj">
+          <drake:declare_convex/>
+        </mesh>
       </geometry>
+      <drake:proximity_properties>
+        <drake:compliant_hydroelastic/>
+        <drake:hydroelastic_modulus value="1e6"/>
+      </drake:proximity_properties>
     </collision>
     <collision>
       <geometry>
-        <mesh filename="package://spot_description/meshes/arm/collision/right_tooth.obj"/>
+        <mesh filename="package://spot_description/meshes/arm/collision/right_tooth.obj">
+          <drake:declare_convex/>
+        </mesh>
       </geometry>
+      <drake:proximity_properties>
+        <drake:compliant_hydroelastic/>
+        <drake:hydroelastic_modulus value="1e6"/>
+      </drake:proximity_properties>
     </collision>
     <inertial>
       <origin rpy="0.0003416659657240473 0.3751670012784243 -0.004058661249495721" xyz="0.04787873849272728 -0.00020676758140325546 -0.01628788933157921"/>

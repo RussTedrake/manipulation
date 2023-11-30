@@ -4,6 +4,7 @@ The models in this directory were obtained from https://github.com/bdaiinstitute
 They were modified in the following ways:
 - use package paths to reference the assets
 - add collision filter groups
+- added hydroelastic tags to the fingers
 
 spot_with_arm_and_floating_base_actuators.urdf was forked from spot_with_arm, and modified in the following ways:
 - changed the leg joints from revolute to fixed (at reasonable angles)
