@@ -271,24 +271,6 @@ def AddShape(plant, shape, name, mass=1, mu=1, color=[0.5, 0.5, 0.9, 1.0]):
     return instance
 
 
-# Add the camera_box.sdf.
-def AddCameraBox(plant, X_WC, name="camera0", parent_frame=None):
-    # TODO(russt): could be smarter and increment the default camera name (by
-    # checking with the plant).
-    if not parent_frame:
-        parent_frame = plant.world_frame()
-    parser = Plant(parser)
-    ConfigureParser(parser)
-    directives = f"""
-directives:
-- add_model:
-    name: {name}
-    file: package://manipulation/camera_box.sdf
-"""
-    camera = parser.AddModelsFromString(directives, ".dmd.yaml")
-    plant.WeldFrames(parent_frame, plant.GetFrameByName("base", camera), X_WC)
-
-
 def AddCamera(builder, scene_graph, X_WC, depth_camera=None, renderer=None):
     warnings.warn(
         "Please use AddRgbdSensor instead.", warnings.DeprecationWarning
