@@ -21,6 +21,7 @@ from pydrake.all import (
     Diagram,
     DiagramBuilder,
     DrakeLcmParams,
+    FlattenModelDirectives,
     GetScopedFrameByName,
     IiwaCommandSender,
     IiwaDriver,
@@ -467,9 +468,9 @@ def _ApplyDriverConfigSim(
 
         # Make the plant for the iiwa controller to use.
         controller_directives = []
-        for d in directives:
-            # waiting for https://github.com/RobotLocomotion/drake/pull/20608.
-            # for d in FlattenModelDirectives(directives, parser.package_map()):
+        for d in FlattenModelDirectives(
+            ModelDirectives(directives=directives), parser.package_map()
+        ).directives:
             if d.add_model and (d.add_model.name in model_instance_names):
                 controller_directives.append(d)
             if (
