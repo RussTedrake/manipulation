@@ -55,7 +55,7 @@ class RRT:
                     (child_closest, child_distance) = recur(child, depth + 1)
                     if child_distance < distance:
                         closest = child_closest
-                        child_distance = child_distance
+                        distance = child_distance
             return closest, distance
 
         return recur(self.root)[0]
