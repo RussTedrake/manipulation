@@ -1,5 +1,5 @@
 import os
-import sys
+import pydot
 from datetime import date
 from pathlib import Path
 from urllib.request import urlretrieve
@@ -7,12 +7,16 @@ from warnings import warn
 
 import numpy as np
 from IPython import get_ipython
+from IPython.display import display, SVG
 from pydrake.all import GetDrakePath
 from pydrake.common import GetDrakePath
 from pydrake.geometry import RenderLabel
+from pydrake.multibody.parsing import Parser
+from pydrake.systems.framework import System
+from pydrake.systems.sensors import ImageLabel16I
 
-# Use a global variable here because some calls to IPython will actually case an
-# interpreter to be created.  This file needs to be imported BEFORE that
+# Use a global variable here because some calls to IPython will actually cause
+# an interpreter to be created.  This file needs to be imported BEFORE that
 # happens.
 running_as_notebook = (
     "COLAB_TESTING" not in os.environ
@@ -23,25 +27,27 @@ running_as_notebook = (
 running_as_test = False
 
 
-def set_running_as_test(value):
+def set_running_as_test(value: bool):
+    """[INTERNAL USE ONLY]: Set the global variable `running_as_test` to
+    `value`.
+
+    This method is used by the build system; it is not intended for general
+    use.
+    """
     global running_as_test
     running_as_test = value
 
 
-def pyplot_is_interactive():
-    # import needs to happen after the backend is set.
-    import matplotlib.pyplot as plt
-    from matplotlib.rcsetup import interactive_bk
-
-    return plt.get_backend() in interactive_bk
-
-
-def FindResource(filename):
+def FindResource(filename: str):
+    """Returns the absolute path to the given filename relative to the
+    manipulation module."""
     return os.path.join(os.path.dirname(__file__), filename)
 
 
-# A filename from the data directory.  Will download if necessary.
-def LoadDataResource(filename):
+def LoadDataResource(filename: str):
+    """
+    Returns the absolute path to the given filename relative to the data directory; fetching it from a remote host if necessary.
+    """
     data = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data")
     if not os.path.exists(data):
         os.makedirs(data)
@@ -54,48 +60,25 @@ def LoadDataResource(filename):
     return path
 
 
-def ConfigureParser(parser):
-    """Add the manipulation/package.xml index to the given Parser."""
+def ConfigureParser(parser: Parser):
+    """Add the manipulation module packages to the given Parser."""
     package_xml = os.path.join(os.path.dirname(__file__), "models/package.xml")
     parser.package_map().AddPackageXml(filename=package_xml)
-    AddPackagePaths(parser)
 
 
-def AddPackagePaths(parser):
-    # Remove once https://github.com/RobotLocomotion/drake/issues/10531 lands.
-    parser.package_map().PopulateFromFolder(FindResource(""))
-    parser.package_map().Add(
-        "manipulation_station",
-        os.path.join(
-            GetDrakePath(),
-            "examples/manipulation_station/models",
-        ),
-    )
-    parser.package_map().Add(
-        "ycb",
-        os.path.join(GetDrakePath(), "manipulation/models/ycb"),
-    )
-    parser.package_map().Add(
-        "wsg_50_description",
-        os.path.join(
-            GetDrakePath(),
-            "manipulation/models/wsg_50_description",
-        ),
-    )
+def colorize_labels(image: ImageLabel16I):
+    """Given a label image, replace the integer labels with color values that display nicely in matplotlib."""
 
-
-reserved_labels = [
-    RenderLabel.kDoNotRender,
-    RenderLabel.kDontCare,
-    RenderLabel.kEmpty,
-    RenderLabel.kUnspecified,
-]
-
-
-def colorize_labels(image):
     # import needs to happen after backend is set up.
     import matplotlib as mpl
     import matplotlib.pyplot as plt
+
+    reserved_labels = [
+        RenderLabel.kDoNotRender,
+        RenderLabel.kDontCare,
+        RenderLabel.kEmpty,
+        RenderLabel.kUnspecified,
+    ]
 
     """Colorizes labels."""
     # TODO(eric.cousineau): Revive and use Kuni's palette.
@@ -111,38 +94,6 @@ def colorize_labels(image):
     color_image = colors[image % len(colors)]
     color_image[background] = bg_color
     return color_image
-
-
-def SetupMatplotlibBackend(wishlist=["notebook"]):
-    """
-    Helper to support multiple workflows:
-        1) nominal -- running locally w/ jupyter notebook
-        2) unit tests (no ipython, backend is template)
-        3) binder -- does have notebook backend
-        4) colab -- claims to have notebook, but it doesn't work
-    Puts the matplotlib backend into notebook mode, if possible,
-    otherwise falls back to inline mode.
-    Returns True iff the final backend is interactive.
-    """
-    # To find available backends, one can access the lists:
-    # matplotlib.rcsetup.interactive_bk
-    # matplotlib.rcsetup.non_interactive_bk
-    # matplotlib.rcsetup.all_backends
-    if running_as_notebook:
-        ipython = get_ipython()
-        # Short-circuit for google colab.
-        if "google.colab" in sys.modules:
-            ipython.run_line_magic("matplotlib", "inline")
-            return False
-        # TODO: Find a way to detect vscode, and use inline instead of notebook
-        for backend in wishlist:
-            try:
-                ipython.run_line_magic("matplotlib", backend)
-                return pyplot_is_interactive()
-            except KeyError:
-                continue
-        ipython.run_line_magic("matplotlib", "inline")
-    return False
 
 
 def DrakeVersionGreaterThan(minimum_date: date):
@@ -176,9 +127,29 @@ def DrakeVersionGreaterThan(minimum_date: date):
             )
 
 
+def RenderDiagram(system: System, max_depth: int = None):
+    """Use pydot to render the GraphViz diagram of the given system.
+
+    Args:
+        system (System): The Drake system (or diagram) to render.
+        max_depth (int, optional): Sets a
+        limit to the depth of nested diagrams to visualize. Use zero to render
+        a diagram as a single system block. Defaults to 1.
+    """
+    display(
+        SVG(
+            pydot.graph_from_dot_data(
+                system.GetGraphvizString(max_depth=max_depth)
+            )[0].create_svg()
+        )
+    )
+
+
 # Adapted from Drake's system_doxygen.py.  Just make an html rendering of the
 # system block with its name and input/output ports (even if it is a Diagram).
-def SystemHtml(system):
+def SystemHtml(system: System):
+    """Generates an HTML string for `system` of the style seen in the Drake
+    doxygen documentation."""
     input_port_html = ""
     for p in range(system.num_input_ports()):
         input_port_html += (
