@@ -9,7 +9,6 @@ import numpy as np
 from pydrake.all import (
     AbstractValue,
     Adder,
-    AddMultibodyPlant,
     ApplyLcmBusConfig,
     ApplyMultibodyPlantConfig,
     ApplyVisualizationConfig,
@@ -33,6 +32,7 @@ from pydrake.all import (
     MakeMultibodyStateToWsgStateSystem,
     MakeRenderEngineVtk,
     RenderEngineVtkParams,
+    RobotDiagramBuilder,
     Meshcat,
     MeshcatPointCloudVisualizer,
     ModelDirective,
@@ -746,12 +746,13 @@ def MakeHardwareStation(
             scenario=scenario, meshcat=meshcat, package_xmls=package_xmls
         )
 
-    builder = DiagramBuilder()
-
-    # Create the multibody plant and scene graph.
-    sim_plant, scene_graph = AddMultibodyPlant(
-        config=scenario.plant_config, builder=builder
+    robot_builder = RobotDiagramBuilder(
+        time_step=scenario.plant_config.time_step
     )
+    builder = robot_builder.builder()
+    sim_plant = robot_builder.plant()
+    scene_graph = robot_builder.scene_graph()
+    ApplyMultibodyPlantConfig(scenario.plant_config, sim_plant)
 
     parser = Parser(sim_plant)
     for p in package_xmls:
