@@ -1,0 +1,130 @@
+<?xml version="1.0" ?>
+<sdf version="1.5">
+  <model name="box">
+    <link name="base">
+      <inertial>
+        <mass>0.1</mass>
+      </inertial>
+      <visual name="visual">
+        <pose>0 0 -0.5 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>3.6576 3.6576 1</size>
+          </box>
+        </geometry>
+      </visual>
+      <collision name="collision">
+        <pose>0 0 -0.5 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>3.6576 3.6576 1</size>
+          </box>
+        </geometry>
+      </collision>
+    </link>
+    <link name="wall">
+      <inertial>
+        <mass>0.1</mass>
+      </inertial>
+      <visual name="visual">
+        <pose>1.79 0 0.25 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.1 3.7 0.5</size>
+          </box>
+        </geometry>
+      </visual>
+      <collision name="collision">
+        <pose>1.79 0 0.25 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.1 3.7 0.5</size>
+          </box>
+        </geometry>
+      </collision>
+    </link>
+    <joint name="wall_ground" type="fixed">
+        <parent>base</parent>
+        <child>wall</child>
+        <pose>0 0 0 0 0 0</pose>
+    </joint>
+    <link name="wall2">
+      <inertial>
+        <mass>0.1</mass>
+      </inertial>
+      <visual name="visual">
+        <pose>-1.79 0 0.25 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.1 3.7 0.5</size>
+          </box>
+        </geometry>
+      </visual>
+      <collision name="collision">
+        <pose>-1.79 0 0.25 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.1 3.7 0.5</size>
+          </box>
+        </geometry>
+      </collision>
+    </link>
+    <joint name="wall2_ground" type="fixed">
+        <parent>base</parent>
+        <child>wall2</child>
+        <pose>0 0 0 0 0 0</pose>
+    </joint>
+    <link name="wall3">
+      <inertial>
+        <mass>0.1</mass>
+      </inertial>
+      <visual name="visual">
+        <pose>0 1.79 0.25 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>3.7 0.1 0.5</size>
+          </box>
+        </geometry>
+      </visual>
+      <collision name="collision">
+        <pose>0 1.79 0.25 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>3.7 0.1 0.5</size>
+          </box>
+        </geometry>
+      </collision>
+    </link>
+    <joint name="wall3_ground" type="fixed">
+        <parent>base</parent>
+        <child>wall3</child>
+        <pose>0 0 0 0 0 0</pose>
+    </joint>
+    <link name="wall4">
+      <inertial>
+        <mass>0.1</mass>
+      </inertial>
+      <visual name="visual">
+        <pose>0 -1.79 0.25 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>3.7 0.1 0.5</size>
+          </box>
+        </geometry>
+      </visual>
+      <collision name="collision">
+        <pose>0 -1.79 0.25 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>3.7 0.1 0.5</size>
+          </box>
+        </geometry>
+      </collision>
+    </link>
+    <joint name="wall4_ground" type="fixed">
+        <parent>base</parent>
+        <child>wall4</child>
+        <pose>0 0 0 0 0 0</pose>
+    </joint>
+  </model>
+</sdf>
