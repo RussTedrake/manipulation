@@ -72,15 +72,21 @@ def main():
         check_env(env)
         input("Open meshcat (optional). Press Enter to continue...")
     else:
+        # Use a callback so that the forked process imports the environment.
+        def make_boxflipup():
+            pass
+
+            return gym.make(
+                "BoxFlipUp-v0",
+                observations=config["observations"],
+                time_limit=config["env_time_limit"],
+            )
+
         env = make_vec_env(
-            "BoxFlipUp-v0",
+            make_boxflipup,
             n_envs=num_cpu,
             seed=0,
             vec_env_cls=SubprocVecEnv,
-            env_kwargs={
-                "observations": config["observations"],
-                "time_limit": config["env_time_limit"],
-            },
         )
 
     if args.test:
