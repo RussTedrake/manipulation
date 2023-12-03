@@ -1,0 +1,1637 @@
+<?xml version="1.0" encoding="utf-8"?>
+<robot name="mecanum_base">
+
+    <link name="chassis">
+      <visual name="chassis_visual">
+        <origin xyz="0 0 0" rpy="0 1.57079632679 0"/>
+        <geometry>
+          <cylinder radius="0.02" length="0.2"/>
+        </geometry>
+        <material name="chassis_tube">
+          <color rgba="0.45 0.45 0.45 1.0"/>
+        </material>
+      </visual>
+      <collision name="chassis_collision">
+        <origin xyz="0 0 0" rpy="0 1.57079632679 0"/>
+        <geometry>
+          <cylinder radius="0.02" length="0.2"/>
+        </geometry>
+      </collision>
+      <inertial>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <mass value="0.5"/>
+        <inertia ixx="0.0001" ixy="0" ixz="0" iyy="0.001716666666666667" iyz="0" izz="0.001716666666666667"/>
+      </inertial>
+    </link>
+
+    <link name="front_axle">
+      <visual name="front_axle_visual">
+        <origin xyz="0 0 0" rpy="-1.57079632679 0 0"/>
+        <geometry>
+          <cylinder radius="0.02" length="0.205"/>
+        </geometry>
+        <material name="axle">
+          <color rgba="0.35 0.35 0.35 1.0"/>
+        </material>
+      </visual>
+      <collision name="front_axle_collision">
+        <origin xyz="0 0 0" rpy="-1.57079632679 0 0"/>
+        <geometry>
+          <cylinder radius="0.02" length="0.205"/>
+        </geometry>
+      </collision>
+      <inertial>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <mass value="0.5"/>
+        <inertia ixx="0.0018010416666666663" ixy="0" ixz="0" iyy="0.0001" iyz="0" izz="0.0018010416666666663"/>
+      </inertial>
+    </link>
+    <joint name="front_axle_joint" type="revolute">
+      <parent link="chassis"/>
+      <child link="front_axle"/>
+      <origin xyz="0.1 0 0" rpy="0 0 0"/>
+      <axis xyz="1 0 0"/>
+      <limit lower="-0.25" upper="0.25"/>
+    </joint>
+
+    <link name="front_left_wheel">
+      <visual name="front_left_wheel_visual">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <cylinder radius="0.045" length="0.04"/>
+        </geometry>
+        <material name="hub">
+          <color rgba="0.25 0.25 0.25 1.0"/>
+        </material>
+      </visual>
+      <collision name="front_left_wheel_collision">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <cylinder radius="0.045" length="0.04"/>
+        </geometry>
+      </collision>
+      <inertial>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <mass value="0.125"/>
+        <inertia ixx="7.994791666666666e-05" ixy="0" ixz="0" iyy="7.994791666666666e-05" iyz="0" izz="0.0001265625"/>
+      </inertial>
+    </link>
+    <joint name="front_left_wheel_joint" type="continuous">
+      <parent link="front_axle"/>
+      <child link="front_left_wheel"/>
+      <origin xyz="0.0 0.1025 0.0" rpy="-1.57079632679 0 0"/>
+      <axis xyz="0 0 1"/>
+      <limit effort="1.0"/>
+    </joint>
+    <transmission name="front_left_wheel_transmission">
+      <type>transmission_interface/SimpleTransmission</type>
+      <joint name="front_left_wheel_joint">
+        <hardwareInterface>VelocityJointInterface</hardwareInterface>
+      </joint>
+      <actuator name="front_left_wheel_motor">
+        <hardwareInterface>VelocityJointInterface</hardwareInterface>
+        <mechanicalReduction>1</mechanicalReduction>
+      </actuator>
+    </transmission>
+
+    <link name="front_left_wheel_roller_1">
+      <visual name="front_left_wheel_roller_1_visual">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <drake:ellipsoid a="0.0075" b="0.0075" c="0.03"/>
+        </geometry>
+        <material name="roller">
+          <color rgba="0.15 0.15 0.15 1.0"/>
+        </material>
+      </visual>
+      <collision name="front_left_wheel_roller_1_collision">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <drake:ellipsoid a="0.0075" b="0.0075" c="0.03"/>
+        </geometry>
+      </collision>
+      <inertial>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <mass value="0.01"/>
+        <inertia ixx="1.9125e-06" ixy="0" ixz="0" iyy="1.9125e-06" iyz="0" izz="2.25e-07"/>
+      </inertial>
+    </link>
+    <joint name="front_left_wheel_roller_1_joint" type="continuous">
+      <parent link="front_left_wheel"/>
+      <child link="front_left_wheel_roller_1"/>
+      <origin xyz="0.045 0.0 0.0" rpy="-0.7853981633974484 -0.0 0.0"/>
+      <axis xyz="0 0 1"/>
+    </joint>
+
+    <link name="front_left_wheel_roller_2">
+      <visual name="front_left_wheel_roller_2_visual">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <drake:ellipsoid a="0.0075" b="0.0075" c="0.03"/>
+        </geometry>
+        <material name="roller">
+          <color rgba="0.15 0.15 0.15 1.0"/>
+        </material>
+      </visual>
+      <collision name="front_left_wheel_roller_2_collision">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <drake:ellipsoid a="0.0075" b="0.0075" c="0.03"/>
+        </geometry>
+      </collision>
+      <inertial>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <mass value="0.01"/>
+        <inertia ixx="1.9125e-06" ixy="0" ixz="0" iyy="1.9125e-06" iyz="0" izz="2.25e-07"/>
+      </inertial>
+    </link>
+    <joint name="front_left_wheel_roller_2_joint" type="continuous">
+      <parent link="front_left_wheel"/>
+      <child link="front_left_wheel_roller_2"/>
+      <origin xyz="0.03897114317029974 0.022499999999999996 0.0" rpy="-0.7853981633974482 -0.0 0.5235987755982988"/>
+      <axis xyz="0 0 1"/>
+    </joint>
+
+    <link name="front_left_wheel_roller_3">
+      <visual name="front_left_wheel_roller_3_visual">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <drake:ellipsoid a="0.0075" b="0.0075" c="0.03"/>
+        </geometry>
+        <material name="roller">
+          <color rgba="0.15 0.15 0.15 1.0"/>
+        </material>
+      </visual>
+      <collision name="front_left_wheel_roller_3_collision">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <drake:ellipsoid a="0.0075" b="0.0075" c="0.03"/>
+        </geometry>
+      </collision>
+      <inertial>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <mass value="0.01"/>
+        <inertia ixx="1.9125e-06" ixy="0" ixz="0" iyy="1.9125e-06" iyz="0" izz="2.25e-07"/>
+      </inertial>
+    </link>
+    <joint name="front_left_wheel_roller_3_joint" type="continuous">
+      <parent link="front_left_wheel"/>
+      <child link="front_left_wheel_roller_3"/>
+      <origin xyz="0.022500000000000003 0.03897114317029973 0.0" rpy="-0.7853981633974483 -0.0 1.0471975511965976"/>
+      <axis xyz="0 0 1"/>
+    </joint>
+
+    <link name="front_left_wheel_roller_4">
+      <visual name="front_left_wheel_roller_4_visual">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <drake:ellipsoid a="0.0075" b="0.0075" c="0.03"/>
+        </geometry>
+        <material name="roller">
+          <color rgba="0.15 0.15 0.15 1.0"/>
+        </material>
+      </visual>
+      <collision name="front_left_wheel_roller_4_collision">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <drake:ellipsoid a="0.0075" b="0.0075" c="0.03"/>
+        </geometry>
+      </collision>
+      <inertial>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <mass value="0.01"/>
+        <inertia ixx="1.9125e-06" ixy="0" ixz="0" iyy="1.9125e-06" iyz="0" izz="2.25e-07"/>
+      </inertial>
+    </link>
+    <joint name="front_left_wheel_roller_4_joint" type="continuous">
+      <parent link="front_left_wheel"/>
+      <child link="front_left_wheel_roller_4"/>
+      <origin xyz="2.7554552980815448e-18 0.045 0.0" rpy="-0.7853981633974483 -0.0 1.5707963267948966"/>
+      <axis xyz="0 0 1"/>
+    </joint>
+
+    <link name="front_left_wheel_roller_5">
+      <visual name="front_left_wheel_roller_5_visual">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <drake:ellipsoid a="0.0075" b="0.0075" c="0.03"/>
+        </geometry>
+        <material name="roller">
+          <color rgba="0.15 0.15 0.15 1.0"/>
+        </material>
+      </visual>
+      <collision name="front_left_wheel_roller_5_collision">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <drake:ellipsoid a="0.0075" b="0.0075" c="0.03"/>
+        </geometry>
+      </collision>
+      <inertial>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <mass value="0.01"/>
+        <inertia ixx="1.9125e-06" ixy="0" ixz="0" iyy="1.9125e-06" iyz="0" izz="2.25e-07"/>
+      </inertial>
+    </link>
+    <joint name="front_left_wheel_roller_5_joint" type="continuous">
+      <parent link="front_left_wheel"/>
+      <child link="front_left_wheel_roller_5"/>
+      <origin xyz="-0.02249999999999999 0.03897114317029974 0.0" rpy="-0.7853981633974482 -0.0 2.0943951023931953"/>
+      <axis xyz="0 0 1"/>
+    </joint>
+
+    <link name="front_left_wheel_roller_6">
+      <visual name="front_left_wheel_roller_6_visual">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <drake:ellipsoid a="0.0075" b="0.0075" c="0.03"/>
+        </geometry>
+        <material name="roller">
+          <color rgba="0.15 0.15 0.15 1.0"/>
+        </material>
+      </visual>
+      <collision name="front_left_wheel_roller_6_collision">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <drake:ellipsoid a="0.0075" b="0.0075" c="0.03"/>
+        </geometry>
+      </collision>
+      <inertial>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <mass value="0.01"/>
+        <inertia ixx="1.9125e-06" ixy="0" ixz="0" iyy="1.9125e-06" iyz="0" izz="2.25e-07"/>
+      </inertial>
+    </link>
+    <joint name="front_left_wheel_roller_6_joint" type="continuous">
+      <parent link="front_left_wheel"/>
+      <child link="front_left_wheel_roller_6"/>
+      <origin xyz="-0.03897114317029974 0.022499999999999996 0.0" rpy="-0.7853981633974482 -0.0 2.6179938779914944"/>
+      <axis xyz="0 0 1"/>
+    </joint>
+
+    <link name="front_left_wheel_roller_7">
+      <visual name="front_left_wheel_roller_7_visual">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <drake:ellipsoid a="0.0075" b="0.0075" c="0.03"/>
+        </geometry>
+        <material name="roller">
+          <color rgba="0.15 0.15 0.15 1.0"/>
+        </material>
+      </visual>
+      <collision name="front_left_wheel_roller_7_collision">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <drake:ellipsoid a="0.0075" b="0.0075" c="0.03"/>
+        </geometry>
+      </collision>
+      <inertial>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <mass value="0.01"/>
+        <inertia ixx="1.9125e-06" ixy="0" ixz="0" iyy="1.9125e-06" iyz="0" izz="2.25e-07"/>
+      </inertial>
+    </link>
+    <joint name="front_left_wheel_roller_7_joint" type="continuous">
+      <parent link="front_left_wheel"/>
+      <child link="front_left_wheel_roller_7"/>
+      <origin xyz="-0.045 5.5109105961630896e-18 0.0" rpy="-0.7853981633974483 -0.0 3.141592653589793"/>
+      <axis xyz="0 0 1"/>
+    </joint>
+
+    <link name="front_left_wheel_roller_8">
+      <visual name="front_left_wheel_roller_8_visual">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <drake:ellipsoid a="0.0075" b="0.0075" c="0.03"/>
+        </geometry>
+        <material name="roller">
+          <color rgba="0.15 0.15 0.15 1.0"/>
+        </material>
+      </visual>
+      <collision name="front_left_wheel_roller_8_collision">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <drake:ellipsoid a="0.0075" b="0.0075" c="0.03"/>
+        </geometry>
+      </collision>
+      <inertial>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <mass value="0.01"/>
+        <inertia ixx="1.9125e-06" ixy="0" ixz="0" iyy="1.9125e-06" iyz="0" izz="2.25e-07"/>
+      </inertial>
+    </link>
+    <joint name="front_left_wheel_roller_8_joint" type="continuous">
+      <parent link="front_left_wheel"/>
+      <child link="front_left_wheel_roller_8"/>
+      <origin xyz="-0.03897114317029973 -0.022500000000000003 0.0" rpy="-0.7853981633974483 -0.0 -2.6179938779914944"/>
+      <axis xyz="0 0 1"/>
+    </joint>
+
+    <link name="front_left_wheel_roller_9">
+      <visual name="front_left_wheel_roller_9_visual">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <drake:ellipsoid a="0.0075" b="0.0075" c="0.03"/>
+        </geometry>
+        <material name="roller">
+          <color rgba="0.15 0.15 0.15 1.0"/>
+        </material>
+      </visual>
+      <collision name="front_left_wheel_roller_9_collision">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <drake:ellipsoid a="0.0075" b="0.0075" c="0.03"/>
+        </geometry>
+      </collision>
+      <inertial>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <mass value="0.01"/>
+        <inertia ixx="1.9125e-06" ixy="0" ixz="0" iyy="1.9125e-06" iyz="0" izz="2.25e-07"/>
+      </inertial>
+    </link>
+    <joint name="front_left_wheel_roller_9_joint" type="continuous">
+      <parent link="front_left_wheel"/>
+      <child link="front_left_wheel_roller_9"/>
+      <origin xyz="-0.02250000000000002 -0.038971143170299725 0.0" rpy="-0.7853981633974481 -0.0 -2.0943951023931957"/>
+      <axis xyz="0 0 1"/>
+    </joint>
+
+    <link name="front_left_wheel_roller_10">
+      <visual name="front_left_wheel_roller_10_visual">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <drake:ellipsoid a="0.0075" b="0.0075" c="0.03"/>
+        </geometry>
+        <material name="roller">
+          <color rgba="0.15 0.15 0.15 1.0"/>
+        </material>
+      </visual>
+      <collision name="front_left_wheel_roller_10_collision">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <drake:ellipsoid a="0.0075" b="0.0075" c="0.03"/>
+        </geometry>
+      </collision>
+      <inertial>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <mass value="0.01"/>
+        <inertia ixx="1.9125e-06" ixy="0" ixz="0" iyy="1.9125e-06" iyz="0" izz="2.25e-07"/>
+      </inertial>
+    </link>
+    <joint name="front_left_wheel_roller_10_joint" type="continuous">
+      <parent link="front_left_wheel"/>
+      <child link="front_left_wheel_roller_10"/>
+      <origin xyz="-8.266365894244633e-18 -0.045 0.0" rpy="-0.7853981633974481 -0.0 -1.5707963267948968"/>
+      <axis xyz="0 0 1"/>
+    </joint>
+
+    <link name="front_left_wheel_roller_11">
+      <visual name="front_left_wheel_roller_11_visual">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <drake:ellipsoid a="0.0075" b="0.0075" c="0.03"/>
+        </geometry>
+        <material name="roller">
+          <color rgba="0.15 0.15 0.15 1.0"/>
+        </material>
+      </visual>
+      <collision name="front_left_wheel_roller_11_collision">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <drake:ellipsoid a="0.0075" b="0.0075" c="0.03"/>
+        </geometry>
+      </collision>
+      <inertial>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <mass value="0.01"/>
+        <inertia ixx="1.9125e-06" ixy="0" ixz="0" iyy="1.9125e-06" iyz="0" izz="2.25e-07"/>
+      </inertial>
+    </link>
+    <joint name="front_left_wheel_roller_11_joint" type="continuous">
+      <parent link="front_left_wheel"/>
+      <child link="front_left_wheel_roller_11"/>
+      <origin xyz="0.022500000000000003 -0.03897114317029973 0.0" rpy="-0.7853981633974483 -0.0 -1.0471975511965976"/>
+      <axis xyz="0 0 1"/>
+    </joint>
+
+    <link name="front_left_wheel_roller_12">
+      <visual name="front_left_wheel_roller_12_visual">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <drake:ellipsoid a="0.0075" b="0.0075" c="0.03"/>
+        </geometry>
+        <material name="roller">
+          <color rgba="0.15 0.15 0.15 1.0"/>
+        </material>
+      </visual>
+      <collision name="front_left_wheel_roller_12_collision">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <drake:ellipsoid a="0.0075" b="0.0075" c="0.03"/>
+        </geometry>
+      </collision>
+      <inertial>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <mass value="0.01"/>
+        <inertia ixx="1.9125e-06" ixy="0" ixz="0" iyy="1.9125e-06" iyz="0" izz="2.25e-07"/>
+      </inertial>
+    </link>
+    <joint name="front_left_wheel_roller_12_joint" type="continuous">
+      <parent link="front_left_wheel"/>
+      <child link="front_left_wheel_roller_12"/>
+      <origin xyz="0.038971143170299725 -0.02250000000000002 0.0" rpy="-0.7853981633974483 -0.0 -0.5235987755982994"/>
+      <axis xyz="0 0 1"/>
+    </joint>
+
+    <link name="front_right_wheel">
+      <visual name="front_right_wheel_visual">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <cylinder radius="0.045" length="0.04"/>
+        </geometry>
+        <material name="hub">
+          <color rgba="0.25 0.25 0.25 1.0"/>
+        </material>
+      </visual>
+      <collision name="front_right_wheel_collision">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <cylinder radius="0.045" length="0.04"/>
+        </geometry>
+      </collision>
+      <inertial>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <mass value="0.125"/>
+        <inertia ixx="7.994791666666666e-05" ixy="0" ixz="0" iyy="7.994791666666666e-05" iyz="0" izz="0.0001265625"/>
+      </inertial>
+    </link>
+    <joint name="front_right_wheel_joint" type="continuous">
+      <parent link="front_axle"/>
+      <child link="front_right_wheel"/>
+      <origin xyz="0.0 -0.1025 0.0" rpy="-1.57079632679 0 0"/>
+      <axis xyz="0 0 1"/>
+      <limit effort="1.0"/>
+    </joint>
+    <transmission name="front_right_wheel_transmission">
+      <type>transmission_interface/SimpleTransmission</type>
+      <joint name="front_right_wheel_joint">
+        <hardwareInterface>VelocityJointInterface</hardwareInterface>
+      </joint>
+      <actuator name="front_right_wheel_motor">
+        <hardwareInterface>VelocityJointInterface</hardwareInterface>
+        <mechanicalReduction>1</mechanicalReduction>
+      </actuator>
+    </transmission>
+
+    <link name="front_right_wheel_roller_1">
+      <visual name="front_right_wheel_roller_1_visual">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <drake:ellipsoid a="0.0075" b="0.0075" c="0.03"/>
+        </geometry>
+        <material name="roller">
+          <color rgba="0.15 0.15 0.15 1.0"/>
+        </material>
+      </visual>
+      <collision name="front_right_wheel_roller_1_collision">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <drake:ellipsoid a="0.0075" b="0.0075" c="0.03"/>
+        </geometry>
+      </collision>
+      <inertial>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <mass value="0.01"/>
+        <inertia ixx="1.9125e-06" ixy="0" ixz="0" iyy="1.9125e-06" iyz="0" izz="2.25e-07"/>
+      </inertial>
+    </link>
+    <joint name="front_right_wheel_roller_1_joint" type="continuous">
+      <parent link="front_right_wheel"/>
+      <child link="front_right_wheel_roller_1"/>
+      <origin xyz="0.045 0.0 0.0" rpy="0.7853981633974484 -0.0 0.0"/>
+      <axis xyz="0 0 1"/>
+    </joint>
+
+    <link name="front_right_wheel_roller_2">
+      <visual name="front_right_wheel_roller_2_visual">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <drake:ellipsoid a="0.0075" b="0.0075" c="0.03"/>
+        </geometry>
+        <material name="roller">
+          <color rgba="0.15 0.15 0.15 1.0"/>
+        </material>
+      </visual>
+      <collision name="front_right_wheel_roller_2_collision">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <drake:ellipsoid a="0.0075" b="0.0075" c="0.03"/>
+        </geometry>
+      </collision>
+      <inertial>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <mass value="0.01"/>
+        <inertia ixx="1.9125e-06" ixy="0" ixz="0" iyy="1.9125e-06" iyz="0" izz="2.25e-07"/>
+      </inertial>
+    </link>
+    <joint name="front_right_wheel_roller_2_joint" type="continuous">
+      <parent link="front_right_wheel"/>
+      <child link="front_right_wheel_roller_2"/>
+      <origin xyz="0.03897114317029974 0.022499999999999996 0.0" rpy="0.7853981633974482 -0.0 0.5235987755982988"/>
+      <axis xyz="0 0 1"/>
+    </joint>
+
+    <link name="front_right_wheel_roller_3">
+      <visual name="front_right_wheel_roller_3_visual">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <drake:ellipsoid a="0.0075" b="0.0075" c="0.03"/>
+        </geometry>
+        <material name="roller">
+          <color rgba="0.15 0.15 0.15 1.0"/>
+        </material>
+      </visual>
+      <collision name="front_right_wheel_roller_3_collision">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <drake:ellipsoid a="0.0075" b="0.0075" c="0.03"/>
+        </geometry>
+      </collision>
+      <inertial>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <mass value="0.01"/>
+        <inertia ixx="1.9125e-06" ixy="0" ixz="0" iyy="1.9125e-06" iyz="0" izz="2.25e-07"/>
+      </inertial>
+    </link>
+    <joint name="front_right_wheel_roller_3_joint" type="continuous">
+      <parent link="front_right_wheel"/>
+      <child link="front_right_wheel_roller_3"/>
+      <origin xyz="0.022500000000000003 0.03897114317029973 0.0" rpy="0.7853981633974483 -0.0 1.0471975511965976"/>
+      <axis xyz="0 0 1"/>
+    </joint>
+
+    <link name="front_right_wheel_roller_4">
+      <visual name="front_right_wheel_roller_4_visual">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <drake:ellipsoid a="0.0075" b="0.0075" c="0.03"/>
+        </geometry>
+        <material name="roller">
+          <color rgba="0.15 0.15 0.15 1.0"/>
+        </material>
+      </visual>
+      <collision name="front_right_wheel_roller_4_collision">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <drake:ellipsoid a="0.0075" b="0.0075" c="0.03"/>
+        </geometry>
+      </collision>
+      <inertial>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <mass value="0.01"/>
+        <inertia ixx="1.9125e-06" ixy="0" ixz="0" iyy="1.9125e-06" iyz="0" izz="2.25e-07"/>
+      </inertial>
+    </link>
+    <joint name="front_right_wheel_roller_4_joint" type="continuous">
+      <parent link="front_right_wheel"/>
+      <child link="front_right_wheel_roller_4"/>
+      <origin xyz="2.7554552980815448e-18 0.045 0.0" rpy="0.7853981633974483 -0.0 1.5707963267948966"/>
+      <axis xyz="0 0 1"/>
+    </joint>
+
+    <link name="front_right_wheel_roller_5">
+      <visual name="front_right_wheel_roller_5_visual">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <drake:ellipsoid a="0.0075" b="0.0075" c="0.03"/>
+        </geometry>
+        <material name="roller">
+          <color rgba="0.15 0.15 0.15 1.0"/>
+        </material>
+      </visual>
+      <collision name="front_right_wheel_roller_5_collision">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <drake:ellipsoid a="0.0075" b="0.0075" c="0.03"/>
+        </geometry>
+      </collision>
+      <inertial>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <mass value="0.01"/>
+        <inertia ixx="1.9125e-06" ixy="0" ixz="0" iyy="1.9125e-06" iyz="0" izz="2.25e-07"/>
+      </inertial>
+    </link>
+    <joint name="front_right_wheel_roller_5_joint" type="continuous">
+      <parent link="front_right_wheel"/>
+      <child link="front_right_wheel_roller_5"/>
+      <origin xyz="-0.02249999999999999 0.03897114317029974 0.0" rpy="0.7853981633974482 -0.0 2.0943951023931953"/>
+      <axis xyz="0 0 1"/>
+    </joint>
+
+    <link name="front_right_wheel_roller_6">
+      <visual name="front_right_wheel_roller_6_visual">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <drake:ellipsoid a="0.0075" b="0.0075" c="0.03"/>
+        </geometry>
+        <material name="roller">
+          <color rgba="0.15 0.15 0.15 1.0"/>
+        </material>
+      </visual>
+      <collision name="front_right_wheel_roller_6_collision">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <drake:ellipsoid a="0.0075" b="0.0075" c="0.03"/>
+        </geometry>
+      </collision>
+      <inertial>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <mass value="0.01"/>
+        <inertia ixx="1.9125e-06" ixy="0" ixz="0" iyy="1.9125e-06" iyz="0" izz="2.25e-07"/>
+      </inertial>
+    </link>
+    <joint name="front_right_wheel_roller_6_joint" type="continuous">
+      <parent link="front_right_wheel"/>
+      <child link="front_right_wheel_roller_6"/>
+      <origin xyz="-0.03897114317029974 0.022499999999999996 0.0" rpy="0.7853981633974482 -0.0 2.6179938779914944"/>
+      <axis xyz="0 0 1"/>
+    </joint>
+
+    <link name="front_right_wheel_roller_7">
+      <visual name="front_right_wheel_roller_7_visual">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <drake:ellipsoid a="0.0075" b="0.0075" c="0.03"/>
+        </geometry>
+        <material name="roller">
+          <color rgba="0.15 0.15 0.15 1.0"/>
+        </material>
+      </visual>
+      <collision name="front_right_wheel_roller_7_collision">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <drake:ellipsoid a="0.0075" b="0.0075" c="0.03"/>
+        </geometry>
+      </collision>
+      <inertial>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <mass value="0.01"/>
+        <inertia ixx="1.9125e-06" ixy="0" ixz="0" iyy="1.9125e-06" iyz="0" izz="2.25e-07"/>
+      </inertial>
+    </link>
+    <joint name="front_right_wheel_roller_7_joint" type="continuous">
+      <parent link="front_right_wheel"/>
+      <child link="front_right_wheel_roller_7"/>
+      <origin xyz="-0.045 5.5109105961630896e-18 0.0" rpy="0.7853981633974483 -0.0 3.141592653589793"/>
+      <axis xyz="0 0 1"/>
+    </joint>
+
+    <link name="front_right_wheel_roller_8">
+      <visual name="front_right_wheel_roller_8_visual">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <drake:ellipsoid a="0.0075" b="0.0075" c="0.03"/>
+        </geometry>
+        <material name="roller">
+          <color rgba="0.15 0.15 0.15 1.0"/>
+        </material>
+      </visual>
+      <collision name="front_right_wheel_roller_8_collision">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <drake:ellipsoid a="0.0075" b="0.0075" c="0.03"/>
+        </geometry>
+      </collision>
+      <inertial>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <mass value="0.01"/>
+        <inertia ixx="1.9125e-06" ixy="0" ixz="0" iyy="1.9125e-06" iyz="0" izz="2.25e-07"/>
+      </inertial>
+    </link>
+    <joint name="front_right_wheel_roller_8_joint" type="continuous">
+      <parent link="front_right_wheel"/>
+      <child link="front_right_wheel_roller_8"/>
+      <origin xyz="-0.03897114317029973 -0.022500000000000003 0.0" rpy="0.7853981633974483 -0.0 -2.6179938779914944"/>
+      <axis xyz="0 0 1"/>
+    </joint>
+
+    <link name="front_right_wheel_roller_9">
+      <visual name="front_right_wheel_roller_9_visual">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <drake:ellipsoid a="0.0075" b="0.0075" c="0.03"/>
+        </geometry>
+        <material name="roller">
+          <color rgba="0.15 0.15 0.15 1.0"/>
+        </material>
+      </visual>
+      <collision name="front_right_wheel_roller_9_collision">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <drake:ellipsoid a="0.0075" b="0.0075" c="0.03"/>
+        </geometry>
+      </collision>
+      <inertial>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <mass value="0.01"/>
+        <inertia ixx="1.9125e-06" ixy="0" ixz="0" iyy="1.9125e-06" iyz="0" izz="2.25e-07"/>
+      </inertial>
+    </link>
+    <joint name="front_right_wheel_roller_9_joint" type="continuous">
+      <parent link="front_right_wheel"/>
+      <child link="front_right_wheel_roller_9"/>
+      <origin xyz="-0.02250000000000002 -0.038971143170299725 0.0" rpy="0.7853981633974481 -0.0 -2.0943951023931957"/>
+      <axis xyz="0 0 1"/>
+    </joint>
+
+    <link name="front_right_wheel_roller_10">
+      <visual name="front_right_wheel_roller_10_visual">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <drake:ellipsoid a="0.0075" b="0.0075" c="0.03"/>
+        </geometry>
+        <material name="roller">
+          <color rgba="0.15 0.15 0.15 1.0"/>
+        </material>
+      </visual>
+      <collision name="front_right_wheel_roller_10_collision">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <drake:ellipsoid a="0.0075" b="0.0075" c="0.03"/>
+        </geometry>
+      </collision>
+      <inertial>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <mass value="0.01"/>
+        <inertia ixx="1.9125e-06" ixy="0" ixz="0" iyy="1.9125e-06" iyz="0" izz="2.25e-07"/>
+      </inertial>
+    </link>
+    <joint name="front_right_wheel_roller_10_joint" type="continuous">
+      <parent link="front_right_wheel"/>
+      <child link="front_right_wheel_roller_10"/>
+      <origin xyz="-8.266365894244633e-18 -0.045 0.0" rpy="0.7853981633974481 -0.0 -1.5707963267948968"/>
+      <axis xyz="0 0 1"/>
+    </joint>
+
+    <link name="front_right_wheel_roller_11">
+      <visual name="front_right_wheel_roller_11_visual">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <drake:ellipsoid a="0.0075" b="0.0075" c="0.03"/>
+        </geometry>
+        <material name="roller">
+          <color rgba="0.15 0.15 0.15 1.0"/>
+        </material>
+      </visual>
+      <collision name="front_right_wheel_roller_11_collision">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <drake:ellipsoid a="0.0075" b="0.0075" c="0.03"/>
+        </geometry>
+      </collision>
+      <inertial>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <mass value="0.01"/>
+        <inertia ixx="1.9125e-06" ixy="0" ixz="0" iyy="1.9125e-06" iyz="0" izz="2.25e-07"/>
+      </inertial>
+    </link>
+    <joint name="front_right_wheel_roller_11_joint" type="continuous">
+      <parent link="front_right_wheel"/>
+      <child link="front_right_wheel_roller_11"/>
+      <origin xyz="0.022500000000000003 -0.03897114317029973 0.0" rpy="0.7853981633974483 -0.0 -1.0471975511965976"/>
+      <axis xyz="0 0 1"/>
+    </joint>
+
+    <link name="front_right_wheel_roller_12">
+      <visual name="front_right_wheel_roller_12_visual">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <drake:ellipsoid a="0.0075" b="0.0075" c="0.03"/>
+        </geometry>
+        <material name="roller">
+          <color rgba="0.15 0.15 0.15 1.0"/>
+        </material>
+      </visual>
+      <collision name="front_right_wheel_roller_12_collision">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <drake:ellipsoid a="0.0075" b="0.0075" c="0.03"/>
+        </geometry>
+      </collision>
+      <inertial>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <mass value="0.01"/>
+        <inertia ixx="1.9125e-06" ixy="0" ixz="0" iyy="1.9125e-06" iyz="0" izz="2.25e-07"/>
+      </inertial>
+    </link>
+    <joint name="front_right_wheel_roller_12_joint" type="continuous">
+      <parent link="front_right_wheel"/>
+      <child link="front_right_wheel_roller_12"/>
+      <origin xyz="0.038971143170299725 -0.02250000000000002 0.0" rpy="0.7853981633974483 -0.0 -0.5235987755982994"/>
+      <axis xyz="0 0 1"/>
+    </joint>
+
+    <link name="rear_axle">
+      <visual name="rear_axle_visual">
+        <origin xyz="0 0 0" rpy="-1.57079632679 0 0"/>
+        <geometry>
+          <cylinder radius="0.02" length="0.205"/>
+        </geometry>
+        <material name="axle">
+          <color rgba="0.35 0.35 0.35 1.0"/>
+        </material>
+      </visual>
+      <collision name="rear_axle_collision">
+        <origin xyz="0 0 0" rpy="-1.57079632679 0 0"/>
+        <geometry>
+          <cylinder radius="0.02" length="0.205"/>
+        </geometry>
+      </collision>
+      <inertial>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <mass value="0.5"/>
+        <inertia ixx="0.0018010416666666663" ixy="0" ixz="0" iyy="0.0001" iyz="0" izz="0.0018010416666666663"/>
+      </inertial>
+    </link>
+    <joint name="rear_axle_joint" type="fixed">
+      <parent link="chassis"/>
+      <child link="rear_axle"/>
+      <origin xyz="-0.1 0 0" rpy="0 0 0"/>
+    </joint>
+
+    <link name="rear_left_wheel">
+      <visual name="rear_left_wheel_visual">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <cylinder radius="0.045" length="0.04"/>
+        </geometry>
+        <material name="hub">
+          <color rgba="0.25 0.25 0.25 1.0"/>
+        </material>
+      </visual>
+      <collision name="rear_left_wheel_collision">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <cylinder radius="0.045" length="0.04"/>
+        </geometry>
+      </collision>
+      <inertial>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <mass value="0.125"/>
+        <inertia ixx="7.994791666666666e-05" ixy="0" ixz="0" iyy="7.994791666666666e-05" iyz="0" izz="0.0001265625"/>
+      </inertial>
+    </link>
+    <joint name="rear_left_wheel_joint" type="continuous">
+      <parent link="rear_axle"/>
+      <child link="rear_left_wheel"/>
+      <origin xyz="0.0 0.1025 0.0" rpy="-1.57079632679 0 0"/>
+      <axis xyz="0 0 1"/>
+      <limit effort="1.0"/>
+    </joint>
+    <transmission name="rear_left_wheel_transmission">
+      <type>transmission_interface/SimpleTransmission</type>
+      <joint name="rear_left_wheel_joint">
+        <hardwareInterface>VelocityJointInterface</hardwareInterface>
+      </joint>
+      <actuator name="rear_left_wheel_motor">
+        <hardwareInterface>VelocityJointInterface</hardwareInterface>
+        <mechanicalReduction>1</mechanicalReduction>
+      </actuator>
+    </transmission>
+
+    <link name="rear_left_wheel_roller_1">
+      <visual name="rear_left_wheel_roller_1_visual">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <drake:ellipsoid a="0.0075" b="0.0075" c="0.03"/>
+        </geometry>
+        <material name="roller">
+          <color rgba="0.15 0.15 0.15 1.0"/>
+        </material>
+      </visual>
+      <collision name="rear_left_wheel_roller_1_collision">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <drake:ellipsoid a="0.0075" b="0.0075" c="0.03"/>
+        </geometry>
+      </collision>
+      <inertial>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <mass value="0.01"/>
+        <inertia ixx="1.9125e-06" ixy="0" ixz="0" iyy="1.9125e-06" iyz="0" izz="2.25e-07"/>
+      </inertial>
+    </link>
+    <joint name="rear_left_wheel_roller_1_joint" type="continuous">
+      <parent link="rear_left_wheel"/>
+      <child link="rear_left_wheel_roller_1"/>
+      <origin xyz="0.045 0.0 0.0" rpy="0.7853981633974484 -0.0 0.0"/>
+      <axis xyz="0 0 1"/>
+    </joint>
+
+    <link name="rear_left_wheel_roller_2">
+      <visual name="rear_left_wheel_roller_2_visual">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <drake:ellipsoid a="0.0075" b="0.0075" c="0.03"/>
+        </geometry>
+        <material name="roller">
+          <color rgba="0.15 0.15 0.15 1.0"/>
+        </material>
+      </visual>
+      <collision name="rear_left_wheel_roller_2_collision">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <drake:ellipsoid a="0.0075" b="0.0075" c="0.03"/>
+        </geometry>
+      </collision>
+      <inertial>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <mass value="0.01"/>
+        <inertia ixx="1.9125e-06" ixy="0" ixz="0" iyy="1.9125e-06" iyz="0" izz="2.25e-07"/>
+      </inertial>
+    </link>
+    <joint name="rear_left_wheel_roller_2_joint" type="continuous">
+      <parent link="rear_left_wheel"/>
+      <child link="rear_left_wheel_roller_2"/>
+      <origin xyz="0.03897114317029974 0.022499999999999996 0.0" rpy="0.7853981633974482 -0.0 0.5235987755982988"/>
+      <axis xyz="0 0 1"/>
+    </joint>
+
+    <link name="rear_left_wheel_roller_3">
+      <visual name="rear_left_wheel_roller_3_visual">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <drake:ellipsoid a="0.0075" b="0.0075" c="0.03"/>
+        </geometry>
+        <material name="roller">
+          <color rgba="0.15 0.15 0.15 1.0"/>
+        </material>
+      </visual>
+      <collision name="rear_left_wheel_roller_3_collision">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <drake:ellipsoid a="0.0075" b="0.0075" c="0.03"/>
+        </geometry>
+      </collision>
+      <inertial>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <mass value="0.01"/>
+        <inertia ixx="1.9125e-06" ixy="0" ixz="0" iyy="1.9125e-06" iyz="0" izz="2.25e-07"/>
+      </inertial>
+    </link>
+    <joint name="rear_left_wheel_roller_3_joint" type="continuous">
+      <parent link="rear_left_wheel"/>
+      <child link="rear_left_wheel_roller_3"/>
+      <origin xyz="0.022500000000000003 0.03897114317029973 0.0" rpy="0.7853981633974483 -0.0 1.0471975511965976"/>
+      <axis xyz="0 0 1"/>
+    </joint>
+
+    <link name="rear_left_wheel_roller_4">
+      <visual name="rear_left_wheel_roller_4_visual">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <drake:ellipsoid a="0.0075" b="0.0075" c="0.03"/>
+        </geometry>
+        <material name="roller">
+          <color rgba="0.15 0.15 0.15 1.0"/>
+        </material>
+      </visual>
+      <collision name="rear_left_wheel_roller_4_collision">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <drake:ellipsoid a="0.0075" b="0.0075" c="0.03"/>
+        </geometry>
+      </collision>
+      <inertial>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <mass value="0.01"/>
+        <inertia ixx="1.9125e-06" ixy="0" ixz="0" iyy="1.9125e-06" iyz="0" izz="2.25e-07"/>
+      </inertial>
+    </link>
+    <joint name="rear_left_wheel_roller_4_joint" type="continuous">
+      <parent link="rear_left_wheel"/>
+      <child link="rear_left_wheel_roller_4"/>
+      <origin xyz="2.7554552980815448e-18 0.045 0.0" rpy="0.7853981633974483 -0.0 1.5707963267948966"/>
+      <axis xyz="0 0 1"/>
+    </joint>
+
+    <link name="rear_left_wheel_roller_5">
+      <visual name="rear_left_wheel_roller_5_visual">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <drake:ellipsoid a="0.0075" b="0.0075" c="0.03"/>
+        </geometry>
+        <material name="roller">
+          <color rgba="0.15 0.15 0.15 1.0"/>
+        </material>
+      </visual>
+      <collision name="rear_left_wheel_roller_5_collision">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <drake:ellipsoid a="0.0075" b="0.0075" c="0.03"/>
+        </geometry>
+      </collision>
+      <inertial>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <mass value="0.01"/>
+        <inertia ixx="1.9125e-06" ixy="0" ixz="0" iyy="1.9125e-06" iyz="0" izz="2.25e-07"/>
+      </inertial>
+    </link>
+    <joint name="rear_left_wheel_roller_5_joint" type="continuous">
+      <parent link="rear_left_wheel"/>
+      <child link="rear_left_wheel_roller_5"/>
+      <origin xyz="-0.02249999999999999 0.03897114317029974 0.0" rpy="0.7853981633974482 -0.0 2.0943951023931953"/>
+      <axis xyz="0 0 1"/>
+    </joint>
+
+    <link name="rear_left_wheel_roller_6">
+      <visual name="rear_left_wheel_roller_6_visual">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <drake:ellipsoid a="0.0075" b="0.0075" c="0.03"/>
+        </geometry>
+        <material name="roller">
+          <color rgba="0.15 0.15 0.15 1.0"/>
+        </material>
+      </visual>
+      <collision name="rear_left_wheel_roller_6_collision">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <drake:ellipsoid a="0.0075" b="0.0075" c="0.03"/>
+        </geometry>
+      </collision>
+      <inertial>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <mass value="0.01"/>
+        <inertia ixx="1.9125e-06" ixy="0" ixz="0" iyy="1.9125e-06" iyz="0" izz="2.25e-07"/>
+      </inertial>
+    </link>
+    <joint name="rear_left_wheel_roller_6_joint" type="continuous">
+      <parent link="rear_left_wheel"/>
+      <child link="rear_left_wheel_roller_6"/>
+      <origin xyz="-0.03897114317029974 0.022499999999999996 0.0" rpy="0.7853981633974482 -0.0 2.6179938779914944"/>
+      <axis xyz="0 0 1"/>
+    </joint>
+
+    <link name="rear_left_wheel_roller_7">
+      <visual name="rear_left_wheel_roller_7_visual">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <drake:ellipsoid a="0.0075" b="0.0075" c="0.03"/>
+        </geometry>
+        <material name="roller">
+          <color rgba="0.15 0.15 0.15 1.0"/>
+        </material>
+      </visual>
+      <collision name="rear_left_wheel_roller_7_collision">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <drake:ellipsoid a="0.0075" b="0.0075" c="0.03"/>
+        </geometry>
+      </collision>
+      <inertial>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <mass value="0.01"/>
+        <inertia ixx="1.9125e-06" ixy="0" ixz="0" iyy="1.9125e-06" iyz="0" izz="2.25e-07"/>
+      </inertial>
+    </link>
+    <joint name="rear_left_wheel_roller_7_joint" type="continuous">
+      <parent link="rear_left_wheel"/>
+      <child link="rear_left_wheel_roller_7"/>
+      <origin xyz="-0.045 5.5109105961630896e-18 0.0" rpy="0.7853981633974483 -0.0 3.141592653589793"/>
+      <axis xyz="0 0 1"/>
+    </joint>
+
+    <link name="rear_left_wheel_roller_8">
+      <visual name="rear_left_wheel_roller_8_visual">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <drake:ellipsoid a="0.0075" b="0.0075" c="0.03"/>
+        </geometry>
+        <material name="roller">
+          <color rgba="0.15 0.15 0.15 1.0"/>
+        </material>
+      </visual>
+      <collision name="rear_left_wheel_roller_8_collision">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <drake:ellipsoid a="0.0075" b="0.0075" c="0.03"/>
+        </geometry>
+      </collision>
+      <inertial>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <mass value="0.01"/>
+        <inertia ixx="1.9125e-06" ixy="0" ixz="0" iyy="1.9125e-06" iyz="0" izz="2.25e-07"/>
+      </inertial>
+    </link>
+    <joint name="rear_left_wheel_roller_8_joint" type="continuous">
+      <parent link="rear_left_wheel"/>
+      <child link="rear_left_wheel_roller_8"/>
+      <origin xyz="-0.03897114317029973 -0.022500000000000003 0.0" rpy="0.7853981633974483 -0.0 -2.6179938779914944"/>
+      <axis xyz="0 0 1"/>
+    </joint>
+
+    <link name="rear_left_wheel_roller_9">
+      <visual name="rear_left_wheel_roller_9_visual">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <drake:ellipsoid a="0.0075" b="0.0075" c="0.03"/>
+        </geometry>
+        <material name="roller">
+          <color rgba="0.15 0.15 0.15 1.0"/>
+        </material>
+      </visual>
+      <collision name="rear_left_wheel_roller_9_collision">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <drake:ellipsoid a="0.0075" b="0.0075" c="0.03"/>
+        </geometry>
+      </collision>
+      <inertial>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <mass value="0.01"/>
+        <inertia ixx="1.9125e-06" ixy="0" ixz="0" iyy="1.9125e-06" iyz="0" izz="2.25e-07"/>
+      </inertial>
+    </link>
+    <joint name="rear_left_wheel_roller_9_joint" type="continuous">
+      <parent link="rear_left_wheel"/>
+      <child link="rear_left_wheel_roller_9"/>
+      <origin xyz="-0.02250000000000002 -0.038971143170299725 0.0" rpy="0.7853981633974481 -0.0 -2.0943951023931957"/>
+      <axis xyz="0 0 1"/>
+    </joint>
+
+    <link name="rear_left_wheel_roller_10">
+      <visual name="rear_left_wheel_roller_10_visual">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <drake:ellipsoid a="0.0075" b="0.0075" c="0.03"/>
+        </geometry>
+        <material name="roller">
+          <color rgba="0.15 0.15 0.15 1.0"/>
+        </material>
+      </visual>
+      <collision name="rear_left_wheel_roller_10_collision">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <drake:ellipsoid a="0.0075" b="0.0075" c="0.03"/>
+        </geometry>
+      </collision>
+      <inertial>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <mass value="0.01"/>
+        <inertia ixx="1.9125e-06" ixy="0" ixz="0" iyy="1.9125e-06" iyz="0" izz="2.25e-07"/>
+      </inertial>
+    </link>
+    <joint name="rear_left_wheel_roller_10_joint" type="continuous">
+      <parent link="rear_left_wheel"/>
+      <child link="rear_left_wheel_roller_10"/>
+      <origin xyz="-8.266365894244633e-18 -0.045 0.0" rpy="0.7853981633974481 -0.0 -1.5707963267948968"/>
+      <axis xyz="0 0 1"/>
+    </joint>
+
+    <link name="rear_left_wheel_roller_11">
+      <visual name="rear_left_wheel_roller_11_visual">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <drake:ellipsoid a="0.0075" b="0.0075" c="0.03"/>
+        </geometry>
+        <material name="roller">
+          <color rgba="0.15 0.15 0.15 1.0"/>
+        </material>
+      </visual>
+      <collision name="rear_left_wheel_roller_11_collision">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <drake:ellipsoid a="0.0075" b="0.0075" c="0.03"/>
+        </geometry>
+      </collision>
+      <inertial>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <mass value="0.01"/>
+        <inertia ixx="1.9125e-06" ixy="0" ixz="0" iyy="1.9125e-06" iyz="0" izz="2.25e-07"/>
+      </inertial>
+    </link>
+    <joint name="rear_left_wheel_roller_11_joint" type="continuous">
+      <parent link="rear_left_wheel"/>
+      <child link="rear_left_wheel_roller_11"/>
+      <origin xyz="0.022500000000000003 -0.03897114317029973 0.0" rpy="0.7853981633974483 -0.0 -1.0471975511965976"/>
+      <axis xyz="0 0 1"/>
+    </joint>
+
+    <link name="rear_left_wheel_roller_12">
+      <visual name="rear_left_wheel_roller_12_visual">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <drake:ellipsoid a="0.0075" b="0.0075" c="0.03"/>
+        </geometry>
+        <material name="roller">
+          <color rgba="0.15 0.15 0.15 1.0"/>
+        </material>
+      </visual>
+      <collision name="rear_left_wheel_roller_12_collision">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <drake:ellipsoid a="0.0075" b="0.0075" c="0.03"/>
+        </geometry>
+      </collision>
+      <inertial>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <mass value="0.01"/>
+        <inertia ixx="1.9125e-06" ixy="0" ixz="0" iyy="1.9125e-06" iyz="0" izz="2.25e-07"/>
+      </inertial>
+    </link>
+    <joint name="rear_left_wheel_roller_12_joint" type="continuous">
+      <parent link="rear_left_wheel"/>
+      <child link="rear_left_wheel_roller_12"/>
+      <origin xyz="0.038971143170299725 -0.02250000000000002 0.0" rpy="0.7853981633974483 -0.0 -0.5235987755982994"/>
+      <axis xyz="0 0 1"/>
+    </joint>
+
+    <link name="rear_right_wheel">
+      <visual name="rear_right_wheel_visual">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <cylinder radius="0.045" length="0.04"/>
+        </geometry>
+        <material name="hub">
+          <color rgba="0.25 0.25 0.25 1.0"/>
+        </material>
+      </visual>
+      <collision name="rear_right_wheel_collision">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <cylinder radius="0.045" length="0.04"/>
+        </geometry>
+      </collision>
+      <inertial>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <mass value="0.125"/>
+        <inertia ixx="7.994791666666666e-05" ixy="0" ixz="0" iyy="7.994791666666666e-05" iyz="0" izz="0.0001265625"/>
+      </inertial>
+    </link>
+    <joint name="rear_right_wheel_joint" type="continuous">
+      <parent link="rear_axle"/>
+      <child link="rear_right_wheel"/>
+      <origin xyz="0.0 -0.1025 0.0" rpy="-1.57079632679 0 0"/>
+      <axis xyz="0 0 1"/>
+      <limit effort="1.0"/>
+    </joint>
+    <transmission name="rear_right_wheel_transmission">
+      <type>transmission_interface/SimpleTransmission</type>
+      <joint name="rear_right_wheel_joint">
+        <hardwareInterface>VelocityJointInterface</hardwareInterface>
+      </joint>
+      <actuator name="rear_right_wheel_motor">
+        <hardwareInterface>VelocityJointInterface</hardwareInterface>
+        <mechanicalReduction>1</mechanicalReduction>
+      </actuator>
+    </transmission>
+
+    <link name="rear_right_wheel_roller_1">
+      <visual name="rear_right_wheel_roller_1_visual">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <drake:ellipsoid a="0.0075" b="0.0075" c="0.03"/>
+        </geometry>
+        <material name="roller">
+          <color rgba="0.15 0.15 0.15 1.0"/>
+        </material>
+      </visual>
+      <collision name="rear_right_wheel_roller_1_collision">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <drake:ellipsoid a="0.0075" b="0.0075" c="0.03"/>
+        </geometry>
+      </collision>
+      <inertial>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <mass value="0.01"/>
+        <inertia ixx="1.9125e-06" ixy="0" ixz="0" iyy="1.9125e-06" iyz="0" izz="2.25e-07"/>
+      </inertial>
+    </link>
+    <joint name="rear_right_wheel_roller_1_joint" type="continuous">
+      <parent link="rear_right_wheel"/>
+      <child link="rear_right_wheel_roller_1"/>
+      <origin xyz="0.045 0.0 0.0" rpy="-0.7853981633974484 -0.0 0.0"/>
+      <axis xyz="0 0 1"/>
+    </joint>
+
+    <link name="rear_right_wheel_roller_2">
+      <visual name="rear_right_wheel_roller_2_visual">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <drake:ellipsoid a="0.0075" b="0.0075" c="0.03"/>
+        </geometry>
+        <material name="roller">
+          <color rgba="0.15 0.15 0.15 1.0"/>
+        </material>
+      </visual>
+      <collision name="rear_right_wheel_roller_2_collision">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <drake:ellipsoid a="0.0075" b="0.0075" c="0.03"/>
+        </geometry>
+      </collision>
+      <inertial>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <mass value="0.01"/>
+        <inertia ixx="1.9125e-06" ixy="0" ixz="0" iyy="1.9125e-06" iyz="0" izz="2.25e-07"/>
+      </inertial>
+    </link>
+    <joint name="rear_right_wheel_roller_2_joint" type="continuous">
+      <parent link="rear_right_wheel"/>
+      <child link="rear_right_wheel_roller_2"/>
+      <origin xyz="0.03897114317029974 0.022499999999999996 0.0" rpy="-0.7853981633974482 -0.0 0.5235987755982988"/>
+      <axis xyz="0 0 1"/>
+    </joint>
+
+    <link name="rear_right_wheel_roller_3">
+      <visual name="rear_right_wheel_roller_3_visual">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <drake:ellipsoid a="0.0075" b="0.0075" c="0.03"/>
+        </geometry>
+        <material name="roller">
+          <color rgba="0.15 0.15 0.15 1.0"/>
+        </material>
+      </visual>
+      <collision name="rear_right_wheel_roller_3_collision">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <drake:ellipsoid a="0.0075" b="0.0075" c="0.03"/>
+        </geometry>
+      </collision>
+      <inertial>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <mass value="0.01"/>
+        <inertia ixx="1.9125e-06" ixy="0" ixz="0" iyy="1.9125e-06" iyz="0" izz="2.25e-07"/>
+      </inertial>
+    </link>
+    <joint name="rear_right_wheel_roller_3_joint" type="continuous">
+      <parent link="rear_right_wheel"/>
+      <child link="rear_right_wheel_roller_3"/>
+      <origin xyz="0.022500000000000003 0.03897114317029973 0.0" rpy="-0.7853981633974483 -0.0 1.0471975511965976"/>
+      <axis xyz="0 0 1"/>
+    </joint>
+
+    <link name="rear_right_wheel_roller_4">
+      <visual name="rear_right_wheel_roller_4_visual">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <drake:ellipsoid a="0.0075" b="0.0075" c="0.03"/>
+        </geometry>
+        <material name="roller">
+          <color rgba="0.15 0.15 0.15 1.0"/>
+        </material>
+      </visual>
+      <collision name="rear_right_wheel_roller_4_collision">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <drake:ellipsoid a="0.0075" b="0.0075" c="0.03"/>
+        </geometry>
+      </collision>
+      <inertial>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <mass value="0.01"/>
+        <inertia ixx="1.9125e-06" ixy="0" ixz="0" iyy="1.9125e-06" iyz="0" izz="2.25e-07"/>
+      </inertial>
+    </link>
+    <joint name="rear_right_wheel_roller_4_joint" type="continuous">
+      <parent link="rear_right_wheel"/>
+      <child link="rear_right_wheel_roller_4"/>
+      <origin xyz="2.7554552980815448e-18 0.045 0.0" rpy="-0.7853981633974483 -0.0 1.5707963267948966"/>
+      <axis xyz="0 0 1"/>
+    </joint>
+
+    <link name="rear_right_wheel_roller_5">
+      <visual name="rear_right_wheel_roller_5_visual">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <drake:ellipsoid a="0.0075" b="0.0075" c="0.03"/>
+        </geometry>
+        <material name="roller">
+          <color rgba="0.15 0.15 0.15 1.0"/>
+        </material>
+      </visual>
+      <collision name="rear_right_wheel_roller_5_collision">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <drake:ellipsoid a="0.0075" b="0.0075" c="0.03"/>
+        </geometry>
+      </collision>
+      <inertial>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <mass value="0.01"/>
+        <inertia ixx="1.9125e-06" ixy="0" ixz="0" iyy="1.9125e-06" iyz="0" izz="2.25e-07"/>
+      </inertial>
+    </link>
+    <joint name="rear_right_wheel_roller_5_joint" type="continuous">
+      <parent link="rear_right_wheel"/>
+      <child link="rear_right_wheel_roller_5"/>
+      <origin xyz="-0.02249999999999999 0.03897114317029974 0.0" rpy="-0.7853981633974482 -0.0 2.0943951023931953"/>
+      <axis xyz="0 0 1"/>
+    </joint>
+
+    <link name="rear_right_wheel_roller_6">
+      <visual name="rear_right_wheel_roller_6_visual">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <drake:ellipsoid a="0.0075" b="0.0075" c="0.03"/>
+        </geometry>
+        <material name="roller">
+          <color rgba="0.15 0.15 0.15 1.0"/>
+        </material>
+      </visual>
+      <collision name="rear_right_wheel_roller_6_collision">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <drake:ellipsoid a="0.0075" b="0.0075" c="0.03"/>
+        </geometry>
+      </collision>
+      <inertial>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <mass value="0.01"/>
+        <inertia ixx="1.9125e-06" ixy="0" ixz="0" iyy="1.9125e-06" iyz="0" izz="2.25e-07"/>
+      </inertial>
+    </link>
+    <joint name="rear_right_wheel_roller_6_joint" type="continuous">
+      <parent link="rear_right_wheel"/>
+      <child link="rear_right_wheel_roller_6"/>
+      <origin xyz="-0.03897114317029974 0.022499999999999996 0.0" rpy="-0.7853981633974482 -0.0 2.6179938779914944"/>
+      <axis xyz="0 0 1"/>
+    </joint>
+
+    <link name="rear_right_wheel_roller_7">
+      <visual name="rear_right_wheel_roller_7_visual">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <drake:ellipsoid a="0.0075" b="0.0075" c="0.03"/>
+        </geometry>
+        <material name="roller">
+          <color rgba="0.15 0.15 0.15 1.0"/>
+        </material>
+      </visual>
+      <collision name="rear_right_wheel_roller_7_collision">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <drake:ellipsoid a="0.0075" b="0.0075" c="0.03"/>
+        </geometry>
+      </collision>
+      <inertial>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <mass value="0.01"/>
+        <inertia ixx="1.9125e-06" ixy="0" ixz="0" iyy="1.9125e-06" iyz="0" izz="2.25e-07"/>
+      </inertial>
+    </link>
+    <joint name="rear_right_wheel_roller_7_joint" type="continuous">
+      <parent link="rear_right_wheel"/>
+      <child link="rear_right_wheel_roller_7"/>
+      <origin xyz="-0.045 5.5109105961630896e-18 0.0" rpy="-0.7853981633974483 -0.0 3.141592653589793"/>
+      <axis xyz="0 0 1"/>
+    </joint>
+
+    <link name="rear_right_wheel_roller_8">
+      <visual name="rear_right_wheel_roller_8_visual">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <drake:ellipsoid a="0.0075" b="0.0075" c="0.03"/>
+        </geometry>
+        <material name="roller">
+          <color rgba="0.15 0.15 0.15 1.0"/>
+        </material>
+      </visual>
+      <collision name="rear_right_wheel_roller_8_collision">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <drake:ellipsoid a="0.0075" b="0.0075" c="0.03"/>
+        </geometry>
+      </collision>
+      <inertial>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <mass value="0.01"/>
+        <inertia ixx="1.9125e-06" ixy="0" ixz="0" iyy="1.9125e-06" iyz="0" izz="2.25e-07"/>
+      </inertial>
+    </link>
+    <joint name="rear_right_wheel_roller_8_joint" type="continuous">
+      <parent link="rear_right_wheel"/>
+      <child link="rear_right_wheel_roller_8"/>
+      <origin xyz="-0.03897114317029973 -0.022500000000000003 0.0" rpy="-0.7853981633974483 -0.0 -2.6179938779914944"/>
+      <axis xyz="0 0 1"/>
+    </joint>
+
+    <link name="rear_right_wheel_roller_9">
+      <visual name="rear_right_wheel_roller_9_visual">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <drake:ellipsoid a="0.0075" b="0.0075" c="0.03"/>
+        </geometry>
+        <material name="roller">
+          <color rgba="0.15 0.15 0.15 1.0"/>
+        </material>
+      </visual>
+      <collision name="rear_right_wheel_roller_9_collision">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <drake:ellipsoid a="0.0075" b="0.0075" c="0.03"/>
+        </geometry>
+      </collision>
+      <inertial>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <mass value="0.01"/>
+        <inertia ixx="1.9125e-06" ixy="0" ixz="0" iyy="1.9125e-06" iyz="0" izz="2.25e-07"/>
+      </inertial>
+    </link>
+    <joint name="rear_right_wheel_roller_9_joint" type="continuous">
+      <parent link="rear_right_wheel"/>
+      <child link="rear_right_wheel_roller_9"/>
+      <origin xyz="-0.02250000000000002 -0.038971143170299725 0.0" rpy="-0.7853981633974481 -0.0 -2.0943951023931957"/>
+      <axis xyz="0 0 1"/>
+    </joint>
+
+    <link name="rear_right_wheel_roller_10">
+      <visual name="rear_right_wheel_roller_10_visual">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <drake:ellipsoid a="0.0075" b="0.0075" c="0.03"/>
+        </geometry>
+        <material name="roller">
+          <color rgba="0.15 0.15 0.15 1.0"/>
+        </material>
+      </visual>
+      <collision name="rear_right_wheel_roller_10_collision">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <drake:ellipsoid a="0.0075" b="0.0075" c="0.03"/>
+        </geometry>
+      </collision>
+      <inertial>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <mass value="0.01"/>
+        <inertia ixx="1.9125e-06" ixy="0" ixz="0" iyy="1.9125e-06" iyz="0" izz="2.25e-07"/>
+      </inertial>
+    </link>
+    <joint name="rear_right_wheel_roller_10_joint" type="continuous">
+      <parent link="rear_right_wheel"/>
+      <child link="rear_right_wheel_roller_10"/>
+      <origin xyz="-8.266365894244633e-18 -0.045 0.0" rpy="-0.7853981633974481 -0.0 -1.5707963267948968"/>
+      <axis xyz="0 0 1"/>
+    </joint>
+
+    <link name="rear_right_wheel_roller_11">
+      <visual name="rear_right_wheel_roller_11_visual">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <drake:ellipsoid a="0.0075" b="0.0075" c="0.03"/>
+        </geometry>
+        <material name="roller">
+          <color rgba="0.15 0.15 0.15 1.0"/>
+        </material>
+      </visual>
+      <collision name="rear_right_wheel_roller_11_collision">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <drake:ellipsoid a="0.0075" b="0.0075" c="0.03"/>
+        </geometry>
+      </collision>
+      <inertial>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <mass value="0.01"/>
+        <inertia ixx="1.9125e-06" ixy="0" ixz="0" iyy="1.9125e-06" iyz="0" izz="2.25e-07"/>
+      </inertial>
+    </link>
+    <joint name="rear_right_wheel_roller_11_joint" type="continuous">
+      <parent link="rear_right_wheel"/>
+      <child link="rear_right_wheel_roller_11"/>
+      <origin xyz="0.022500000000000003 -0.03897114317029973 0.0" rpy="-0.7853981633974483 -0.0 -1.0471975511965976"/>
+      <axis xyz="0 0 1"/>
+    </joint>
+
+    <link name="rear_right_wheel_roller_12">
+      <visual name="rear_right_wheel_roller_12_visual">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <drake:ellipsoid a="0.0075" b="0.0075" c="0.03"/>
+        </geometry>
+        <material name="roller">
+          <color rgba="0.15 0.15 0.15 1.0"/>
+        </material>
+      </visual>
+      <collision name="rear_right_wheel_roller_12_collision">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <drake:ellipsoid a="0.0075" b="0.0075" c="0.03"/>
+        </geometry>
+      </collision>
+      <inertial>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <mass value="0.01"/>
+        <inertia ixx="1.9125e-06" ixy="0" ixz="0" iyy="1.9125e-06" iyz="0" izz="2.25e-07"/>
+      </inertial>
+    </link>
+    <joint name="rear_right_wheel_roller_12_joint" type="continuous">
+      <parent link="rear_right_wheel"/>
+      <child link="rear_right_wheel_roller_12"/>
+      <origin xyz="0.038971143170299725 -0.02250000000000002 0.0" rpy="-0.7853981633974483 -0.0 -0.5235987755982994"/>
+      <axis xyz="0 0 1"/>
+    </joint>
+
+</robot>
