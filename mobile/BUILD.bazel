@@ -7,6 +7,17 @@
 load("//htmlbook/tools/jupyter:defs.bzl", "rt_ipynb_test")
 
 rt_ipynb_test(
+    name = "mecanum",
+    srcs = ["mecanum.ipynb"],
+    data = ["//manipulation/models"],
+    deps = [
+      "//manipulation",
+      "//manipulation:meshcat_utils",
+    ],
+)
+
+
+rt_ipynb_test(
     name = "mobile_iiwa",
     srcs = ["mobile_iiwa.ipynb"],
     deps = [
