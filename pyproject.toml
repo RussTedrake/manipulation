@@ -2,7 +2,7 @@
 name = "manipulation"
 # Use e.g. 2023.10.4.rc0 if I need to release a release candidate.
 # Use e.g. 2023.10.4.post1 if I need to rerelease on the same day.
-version = "2023.12.02"
+version = "2023.12.05"
 description = "MIT 6.421 - Robotic Manipulation"
 authors = ["Russ Tedrake <russt@mit.edu>"]
 license = "BSD License"
@@ -47,7 +47,7 @@ priority = "explicit"
 [tool.poetry.dependencies]
 python = "<3.12,>=3.10"  # <3.12 is for the newer versions of scipy
 cloudpickle = "2.2.1"  # needs to be pinned for stored files to remain compatible.
-drake = { version = "==0.0.20231130", source = "drake-nightly" }
+drake = { version = "==0.0.20231204", source = "drake-nightly" }
 #drake = ">=1.23.0"
 gradescope-utils = ">=0.4.0"
 mpld3  = ">=0.5.6"
