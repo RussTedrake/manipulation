@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+
+<html>
+
+  <head>
+    <title>Ch. 12 - Soft Robots and Tactile Sensing</title>
+    <meta name="Ch. 12 - Soft Robots and Tactile Sensing" content="text/html; charset=utf-8;" />
+    <link rel="canonical" href="http://manipulation.csail.mit.edu/tactile.html" />
+
+    <script src="https://hypothes.is/embed.js" async></script>
+    <script type="text/javascript" src="chapters.js"></script>
+    <script type="text/javascript" src="htmlbook/book.js"></script>
+
+    <script src="htmlbook/mathjax-config.js" defer></script> 
+    <script type="text/javascript" id="MathJax-script" defer
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js">
+    </script>
+    <script>window.MathJax || document.write('<script type="text/javascript" src="htmlbook/MathJax/es5/tex-chtml.js" defer><\/script>')</script>
+
+    <link rel="stylesheet" href="htmlbook/highlight/styles/default.css">
+    <script src="htmlbook/highlight/highlight.pack.js"></script> <!-- http://highlightjs.readthedocs.io/en/latest/css-classes-reference.html#language-names-and-aliases -->
+    <script>hljs.initHighlightingOnLoad();</script>
+
+    <link rel="stylesheet" type="text/css" href="htmlbook/book.css" />
+  </head>
+
+<body onload="loadChapter('manipulation');">
+
+<div data-type="titlepage" pdf="no">
+  <header>
+    <h1><a href="index.html" style="text-decoration:none;">Robotic Manipulation</a></h1>
+    <p data-type="subtitle">Perception, Planning, and Control</p> 
+    <p style="font-size: 18px;"><a href="http://people.csail.mit.edu/russt/">Russ Tedrake</a></p>
+    <p style="font-size: 14px; text-align: right;"> 
+      &copy; Russ Tedrake, 2020-2023<br/>
+      Last modified <span id="last_modified"></span>.</br>
+      <script>
+      var d = new Date(document.lastModified);
+      document.getElementById("last_modified").innerHTML = d.getFullYear() + "-" + (d.getMonth()+1) + "-" + d.getDate();</script>
+      <a href="misc.html">How to cite these notes, use annotations, and give feedback.</a><br/>
+    </p>
+  </header>
+</div>
+
+<p pdf="no"><b>Note:</b> These are working notes used for <a
+href="http://manipulation.csail.mit.edu/Fall2023/">a course being taught
+at MIT</a>. They will be updated throughout the Fall 2023 semester.  <!-- <a 
+href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos are available on YouTube</a>.--></p> 
+
+<table style="width:100%;" pdf="no"><tr style="width:100%">
+  <td style="width:33%;text-align:left;"><a class="previous_chapter" href=rl.html>Previous Chapter</a></td>
+  <td style="width:33%;text-align:center;"><a href=index.html>Table of contents</a></td>
+  <td style="width:33%;text-align:right;"><a class="next_chapter" href=drake.html>Next Chapter</a></td>
+</tr></table>
+
+<script type="text/javascript">document.write(notebook_header('tactile'))
+</script>
+<!-- EVERYTHING ABOVE THIS LINE IS OVERWRITTEN BY THE INSTALL SCRIPT -->
+<chapter style="counter-reset: chapter 11"><h1>Soft Robots and Tactile Sensing</h1>
+
+<p>So far in these notes, we've assumed that cameras and proprioceptive (e.g.
+joint) sensing were our primary sources of information about the world. There
+is another obvious sensor modality that we must discuss -- the sense of touch.
+My first goal for this chapter is to explore recent advances in sensing
+hardware, but also the computational frameworks that can leverage this
+information. (Hearing, the sense that enables the perception of sound, is
+likely the next most important sensing modality for humans in manipulation, but
+so far this field is relatively unexplored.)</p>
+
+<p>Another important trend in manipulation research is the design and
+fabrication of robots that are fundamentally soft. Manipulation requires rich
+contact interactions with the environment. Most of the robots we've discussed
+so far are relatively very rigid; but they do always have something like rubber
+pads in the finger tips (the only place we traditionally expected to make
+contact with the environment). My second goal for this chapter is to explore
+advances in soft robot hardware, but also in the computational frameworks that
+can deal with soft robots.</p>
+
+<p>These seem to be two separable ideas; so why am I putting them together into
+a single chapter? It turns out that being soft can enable tactile sensing. One
+might even argue that it's required for the richest forms of tactile sensing.
+Conversely, one could even argue that tactile sensing becomes the natural
+sensing modality for soft-skinned robots -- the natural extension of
+proprioception. So these two topics are intimately connected!</p>
+
+<section><h1>Why soft?</h1>
+
+
+</section>
+
+<section><h1>Soft robot hardware</h1>
+
+</section>
+
+<section><h1>Soft-body simulation</h1>
+
+  <p>FEM, MPM, ...</p>
+
+  <p>Here is the <a href="https://www.youtube.com/watch?v=yugIJDkWR6M">video
+  from a recent paper</a> describing some of the recent advances enabling
+  high-performance, reliable FEM soft-body simulation in Drake (including
+  interactions with rigid bodies) <elib>Han23</elib>. There is a subtle comment
+  in the narration mentioning that the contact problem is solved to convergence
+  on every time step -- this is in fairly stark contrast to game-engine-quality
+  physics which cut many computational corners for the sake of performance.
+  Amazingly we can now do this at real-time rates on a single CPU core.
+  </p>
+
+</section>
+
+<section><h1>Tactile sensing</h1>
+
+
+  <subsection><h1>Simulating tactile sensors</h1></subsection>
+
+</section>
+
+<section><h1>Perception with tactile sensors</h1>
+
+</section>
+
+<section><h1>Control with tactile sensors</h1>
+
+</section>
+
+
+</chapter>
+<!-- EVERYTHING BELOW THIS LINE IS OVERWRITTEN BY THE INSTALL SCRIPT -->
+
+<div id="references"><section><h1>References</h1>
+<ol>
+
+<li id=Han23>
+<span class="author">Xuchen Han and Joseph Masterjohn and Alejandro Castro</span>, 
+<span class="title">"A Convex Formulation of Frictional Contact between Rigid and Deformable Bodies"</span>, 
+<span class="publisher">arXiv preprint arXiv:2303.08912</span>, <span class="year">2023</span>.
+
+</li><br>
+</ol>
+</section><p/>
+</div>
+
+<table style="width:100%;" pdf="no"><tr style="width:100%">
+  <td style="width:33%;text-align:left;"><a class="previous_chapter" href=rl.html>Previous Chapter</a></td>
+  <td style="width:33%;text-align:center;"><a href=index.html>Table of contents</a></td>
+  <td style="width:33%;text-align:right;"><a class="next_chapter" href=drake.html>Next Chapter</a></td>
+</tr></table>
+
+<div id="footer" pdf="no">
+  <hr>
+  <table style="width:100%;">
+    <tr><td><a href="https://accessibility.mit.edu/">Accessibility</a></td><td style="text-align:right">&copy; Russ
+      Tedrake, 2023</td></tr>
+  </table>
+</div>
+
+
+</body>
+</html>
