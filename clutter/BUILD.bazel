@@ -74,6 +74,20 @@ rt_ipynb_test(
 )
 
 rt_ipynb_test(
+    name = "suction",
+    srcs = ["suction.ipynb"],
+    flaky = True,  # occasionally mbp will crash.
+    data = ["//manipulation/models"],
+    tags = ["no-sandbox"],  # from vtk-test-tags() in drake
+    deps = [
+        "//manipulation",
+        "//manipulation:scenarios",
+        "//manipulation:station",
+    ],
+)
+
+
+rt_ipynb_test(
     name = "clutter_clearing",
     srcs = ["clutter_clearing.ipynb"],
     data = ["//manipulation/models"],

@@ -1,0 +1,10 @@
+<?xml version="0.0" ?>
+<robot name="suction-head">
+  <link name="parent"/>
+  <link name="child"/>
+
+  <joint name="floating" type="floating">
+    <parent link="parent"/>
+    <child link="child"/>
+  </joint>
+</robot>
