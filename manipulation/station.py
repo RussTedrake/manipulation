@@ -800,14 +800,12 @@ def MakeHardwareStation(
     ApplyVisualizationConfig(scenario.visualization, builder, meshcat=meshcat)
 
     # Export "cheat" ports.
+    for i in range(sim_plant.num_output_ports()):
+        builder.ExportOutput(
+            sim_plant.get_output_port(i),
+            sim_plant.get_output_port(i).get_name(),
+        )
     builder.ExportOutput(scene_graph.get_query_output_port(), "query_object")
-    builder.ExportOutput(
-        sim_plant.get_contact_results_output_port(), "contact_results"
-    )
-    builder.ExportOutput(
-        sim_plant.get_state_output_port(), "plant_continuous_state"
-    )
-    builder.ExportOutput(sim_plant.get_body_poses_output_port(), "body_poses")
 
     diagram = builder.Build()
     diagram.set_name("station")
