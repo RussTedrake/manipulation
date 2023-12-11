@@ -37,6 +37,7 @@ from pydrake.all import (
     MeshcatPointCloudVisualizer,
     ModelDirective,
     ModelDirectives,
+    ModelInstanceIndex,
     MultibodyPlant,
     MultibodyPlantConfig,
     OutputPort,
@@ -821,11 +822,19 @@ def MakeHardwareStation(
         sim_plant.get_applied_spatial_force_input_port(),
         "applied_spatial_force",
     )
+    # Export any actuation (non-empty) input ports that are not already
+    # connected (e.g. by a driver).
+    for i in range(sim_plant.num_model_instances()):
+        port = sim_plant.get_actuation_input_port(ModelInstanceIndex(i))
+        if port.size() > 0 and not builder.IsConnectedOrExported(port):
+            builder.ExportInput(port, port.get_name())
+    # Export all MultibodyPlant output ports.
     for i in range(sim_plant.num_output_ports()):
         builder.ExportOutput(
             sim_plant.get_output_port(i),
             sim_plant.get_output_port(i).get_name(),
         )
+    # Export the only SceneGraph output port.
     builder.ExportOutput(scene_graph.get_query_output_port(), "query_object")
 
     diagram = builder.Build()
