@@ -104,6 +104,11 @@ class JointStiffnessDriver:
 
 
 @dc.dataclass
+class ForceDriver:
+    """A simulation-only driver which directly outputs the actuation input port of a particular model_instance."""
+
+
+@dc.dataclass
 class Scenario:
     """Defines the YAML format for a (possibly stochastic) scenario to be
     simulated.
@@ -149,6 +154,7 @@ class Scenario:
             JointStiffnessDriver,
             SchunkWsgDriver,
             ZeroForceDriver,
+            ForceDriver,
         ],
     ] = dc.field(default_factory=dict)
 
@@ -417,7 +423,7 @@ def _ApplyDriverConfigSim(
             model_instance_name + ".torque_external",
         )
 
-    if isinstance(driver_config, SchunkWsgDriver):
+    elif isinstance(driver_config, SchunkWsgDriver):
         model_instance = sim_plant.GetModelInstanceByName(model_instance_name)
         # Wsg controller.
         wsg_controller = builder.AddSystem(SchunkWsgPositionController())
@@ -454,7 +460,7 @@ def _ApplyDriverConfigSim(
             model_instance_name + ".force_measured",
         )
 
-    if isinstance(driver_config, InverseDynamicsDriver):
+    elif isinstance(driver_config, InverseDynamicsDriver):
         model_instance_names = model_instance_name.split("+")
         model_instances = [
             sim_plant.GetModelInstanceByName(n) for n in model_instance_names
@@ -552,7 +558,7 @@ def _ApplyDriverConfigSim(
             model_instance_name + ".desired_state",
         )
 
-    if isinstance(driver_config, JointStiffnessDriver):
+    elif isinstance(driver_config, JointStiffnessDriver):
         model_instance = sim_plant.GetModelInstanceByName(model_instance_name)
 
         # PD gains and gravity comp are set in ApplyPrefinalizeDriverConfigsSim
@@ -568,6 +574,13 @@ def _ApplyDriverConfigSim(
         builder.ExportOutput(
             sim_plant.get_state_output_port(model_instance),
             model_instance_name + ".state_estimated",
+        )
+
+    elif isinstance(driver_config, ForceDriver):
+        model_instance = sim_plant.GetModelInstanceByName(model_instance_name)
+        builder.ExportInput(
+            sim_plant.get_actuation_input_port(model_instance),
+            model_instance_name + ".actuation",
         )
 
 
@@ -800,6 +813,14 @@ def MakeHardwareStation(
     ApplyVisualizationConfig(scenario.visualization, builder, meshcat=meshcat)
 
     # Export "cheat" ports.
+    builder.ExportInput(
+        sim_plant.get_applied_generalized_force_input_port(),
+        "applied_generalized_force",
+    )
+    builder.ExportInput(
+        sim_plant.get_applied_spatial_force_input_port(),
+        "applied_spatial_force",
+    )
     for i in range(sim_plant.num_output_ports()):
         builder.ExportOutput(
             sim_plant.get_output_port(i),
