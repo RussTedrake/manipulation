@@ -27,3 +27,5 @@ clutter_maskrcnn_data/
 clutter_maskrcnn_model.pt
 
 clutter_maskrcnn_test.zip
+
+MODULE.bazel
