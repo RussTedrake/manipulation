@@ -105,11 +105,6 @@ class JointStiffnessDriver:
 
 
 @dc.dataclass
-class ForceDriver:
-    """A simulation-only driver which directly outputs the actuation input port of a particular model_instance."""
-
-
-@dc.dataclass
 class Scenario:
     """Defines the YAML format for a (possibly stochastic) scenario to be
     simulated.
@@ -155,7 +150,6 @@ class Scenario:
             JointStiffnessDriver,
             SchunkWsgDriver,
             ZeroForceDriver,
-            ForceDriver,
         ],
     ] = dc.field(default_factory=dict)
 
@@ -575,13 +569,6 @@ def _ApplyDriverConfigSim(
         builder.ExportOutput(
             sim_plant.get_state_output_port(model_instance),
             model_instance_name + ".state_estimated",
-        )
-
-    elif isinstance(driver_config, ForceDriver):
-        model_instance = sim_plant.GetModelInstanceByName(model_instance_name)
-        builder.ExportInput(
-            sim_plant.get_actuation_input_port(model_instance),
-            model_instance_name + ".actuation",
         )
 
 
