@@ -275,7 +275,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
         interactive rates.  I've assembled a few examples of this in the
         chapter notebook:</p>
 
-        <script>document.write(notebook_link('trajectories', d=deepnote, link_text="", notebook="interactive_ik"))</script>
+        <script>document.write(notebook_link('trajectories', notebook="interactive_ik"))</script>
 
         <p>In the first version, I've added sliders to let you control the
         desired pose of the end-effector.  This is the simple version of the IK
@@ -364,7 +364,7 @@ ik.AddPositionConstraint(
         axis as unconstrained, and capture the cylinder position constraints
         all quite nicely.</p>
 
-        <script>document.write(notebook_link('trajectories', d=deepnote, link_text="", notebook="interactive_ik"))</script>
+        <script>document.write(notebook_link('trajectories', notebook="interactive_ik"))</script>
 
       </example>
 
@@ -404,7 +404,7 @@ ik.AddPositionConstraint(
         <a href="data/iiwa_shelves_configuration_space.html">3D
         visualization</a> so you can navigate around it yourself.  Scary!</p>
 
-        <script>document.write(notebook_link('trajectories', d=deepnote, link_text="", notebook="cspace"))</script>
+        <script>document.write(notebook_link('trajectories', notebook="cspace"))</script>
 
       </example>
 
@@ -439,7 +439,7 @@ ik.AddPositionConstraint(
         visualization is available in the notebook, and you can find the exact
         formulation of the costs and constraints there:</p>  
 
-        <script>document.write(notebook_link('trajectories', d=deepnote, link_text="", notebook="optimization_landscape"))</script>
+        <script>document.write(notebook_link('trajectories', notebook="optimization_landscape"))</script>
         
         <p>You should also take a quick look at the <a
         href="data/shelf_ik_prog.html">full optimization landscape</a>.  This
@@ -683,7 +683,7 @@ ik.AddPositionConstraint(
         <p>As a warm-up, I've provided a simple example of the planar iiwa
         reaching from the top shelf into the middle shelf.</p>
 
-        <script>document.write(notebook_link('trajectories', d=deepnote, link_text="", notebook="kinematic_trajectory_optimization"))</script>
+        <script>document.write(notebook_link('trajectories', notebook="kinematic_trajectory_optimization"))</script>
       
         <p>If you look carefully at the code, I actually had to solve this
         trajectory optimization twice to get SNOPT to return a good solution
@@ -716,7 +716,7 @@ ik.AddPositionConstraint(
         rotate 270 degrees around its base instead of taking the shorter
         path.</p>
 
-        <script>document.write(notebook_link('trajectories', d=deepnote, link_text="", notebook="kinematic_trajectory_optimization"))</script>
+        <script>document.write(notebook_link('trajectories', notebook="kinematic_trajectory_optimization"))</script>
       
       </example>
 
@@ -820,14 +820,14 @@ ik.AddPositionConstraint(
     
       <example><h1>The basic RRT</h1>
     
-        <script>document.write(notebook_link('trajectories', d=deepnote, link_text="", notebook="rrt"))</script>
+        <script>document.write(notebook_link('trajectories', notebook="rrt"))</script>
       </example>
     
     </subsection>
 
     <example><h1>The RRT "Bug Trap"</h1>
     
-      <script>document.write(notebook_link('trajectories', d=deepnote, link_text="", notebook="rrt"))</script>
+      <script>document.write(notebook_link('trajectories', notebook="rrt"))</script>
     </example>
     
     </subsection>
@@ -1303,7 +1303,7 @@ ik.AddPositionConstraint(
 
   <section><h1>Exercises</h1>
     <exercise><h1>Door Opening</h1>
-      <p> For this exercise, you will implement a optimization-based inverse kinematics solver to open a cupboard door. You will work exclusively in <script>document.write(notebook_link('trajectories', d=deepnote, link_text='this notebook', notebook='door_opening'))</script>. You will be asked to complete the following steps: </p>
+      <p> For this exercise, you will implement a optimization-based inverse kinematics solver to open a cupboard door. You will work exclusively in <script>document.write(notebook_link('trajectories', notebook='door_opening', link_text='this notebook'))</script>. You will be asked to complete the following steps: </p>
       <ol type="a">
         <li> Write down the constraints on the IK problem of grabbing a cupboard handle.
         </li>
@@ -1313,7 +1313,7 @@ ik.AddPositionConstraint(
     </exercise>    
 
     <exercise id="rrtExercise"><h1>RRT Motion Planning</h1>
-      <p> For this exercise, you will implement and analyze the RRT algorithm introduced in class. You will work exclusively in <script>document.write(notebook_link('trajectories', d=deepnote, link_text='this notebook', notebook='rrt_planning'))</script>. You will be asked to complete the following steps: </p>
+      <p> For this exercise, you will implement and analyze the RRT algorithm introduced in class. You will work exclusively in <script>document.write(notebook_link('trajectories', notebook='rrt_planning', link_text='this notebook'))</script>. You will be asked to complete the following steps: </p>
       <ol type="a">
         <li> Implement the RRT algorithm for the Kuka arm.
         </li>
@@ -1339,7 +1339,7 @@ Name one pair of nodes for which the shortcutting algorithm would result in a sh
     </exercise> 
 
     <exercise><h1>Decomposing Obstacle-Free Space with Convex Optimization</h1>
-      <p> For this exercise, you will implement part of the IRIS algorithm <elib>Deits14</elib>, which is used to compute large regions of obstacle-free space through a series of convex optimizations. These regions can be used by various planning methods that search for trajectories from start to goal while remaining collision-free. You will work exclusively in <script>document.write(notebook_link('trajectories', d=deepnote, link_text='this notebook', notebook='taskspace_iris'))</script>. You will be asked to complete the following steps: </p>
+      <p> For this exercise, you will implement part of the IRIS algorithm <elib>Deits14</elib>, which is used to compute large regions of obstacle-free space through a series of convex optimizations. These regions can be used by various planning methods that search for trajectories from start to goal while remaining collision-free. You will work exclusively in <script>document.write(notebook_link('trajectories', notebook='taskspace_iris', link_text='this notebook'))</script>. You will be asked to complete the following steps: </p>
       <ol type="a">
         <li> Implement a QP that finds the closest point on an obstacle to an ellipse in free-space. </li>
         <li> Implement the part of the algorithm that searches for a set of hyperplanes that separate a free-space ellipse from all the obstacles. </li>

@@ -128,7 +128,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
         second for the bricks to come to rest and give us our intended "initial
         conditions".</p>
 
-        <script>document.write(notebook_link('clutter', deepnote, "", "falling_things"))</script>
+        <script>document.write(notebook_link('clutter', "falling_things"))</script>
   
         <figure>
           <iframe style="border:0;height:300px;width:540px;" src="data/falling_bricks_2d.html?height=240px" pdf="no"></iframe>
@@ -156,7 +156,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
         the method <code>UniformlyRandomRotationMatrix</code> (and also one for
         quaternions and roll-pitch-yaw) to do that work for us.</p>
 
-        <script>document.write(notebook_link('clutter'))</script>
+        <script>document.write(notebook_link('clutter', 'falling_things'))</script>
   
         <figure>
           <img style="width:70%" src="data/ycb_clutter.png"/>
@@ -306,12 +306,9 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
     
       <p>Drake's has a very useful <code>ModelVisualizer</code> tool that
       publishes by the illustration and collision geometry roles to Meshcat
-      (see, for example, the Drake <script>document.write(notebook_link(
-        'tutorials',
-        d=drake_deepnote,
-        link_text='tutorial on authoring multibody simulations',
-        notebook='authoring_multibody_simulation',
-        workspace_id=drake_workspace_id))
+      (see, for example, the Drake <script>document.write(drake_tutorials_link(
+        'authoring_multibody_simulation',
+        link_text='tutorial on authoring multibody simulations'))
       </script>). This is very useful for designing new models, but also for 
       understanding the contact geometry of existing models.</p>
 
@@ -320,7 +317,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       <code>Scene > drake > proximity</code> and check the box to enable
       visualizing the geometries with the proximity role.</p>
 
-      <script>document.write(notebook_link('robot', d=deepnote, link_text="", notebook='inspector'))</script>
+      <script>document.write(notebook_link('robot', notebook='inspector'))</script>
       
       <figure>
         <img width="50%"" src="figures/ur3e_collision_geo.png"/>
@@ -373,12 +370,9 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
     on the current configurations of the geometry which selects contact points
     consistently from one time step to the next.</p>
 
-    <p>One of the innovations in Drake which makes it particularly good at simulating complex contact situations is that we have moved away from point contact models. When we enable <a href="https://drake.mit.edu/doxygen_cxx/group__hydroelastic__user__guide.html">hydroelastic contact in Drake</a>, the spatial forces between two penetrating bodies are computed by taking an integral over a "hydroelastic surface" which generalizes the notion of a contact patch <elib>Elandt19</elib>. As of this writing, you still have to "opt-in" to using hydroelastic in Drake (see <script>document.write(notebook_link(
-      'tutorials',
-      d=drake_deepnote,
-      link_text='this tutorial on hydroelastic',
-      notebook='hydroelastic_contact_basics',
-      workspace_id=drake_workspace_id))
+    <p>One of the innovations in Drake which makes it particularly good at simulating complex contact situations is that we have moved away from point contact models. When we enable <a href="https://drake.mit.edu/doxygen_cxx/group__hydroelastic__user__guide.html">hydroelastic contact in Drake</a>, the spatial forces between two penetrating bodies are computed by taking an integral over a "hydroelastic surface" which generalizes the notion of a contact patch <elib>Elandt19</elib>. As of this writing, you still have to "opt-in" to using hydroelastic in Drake (see <script>document.write(drake_tutorials_link(
+      'hydroelastic_contact_basics',
+                ext='this tutorial on hydroelastic'))
     </script>); I'm working to use it in all of my examples in these notes.</p>
 
     <todo>More about hydroelastic here.  Show some of the nice videos.
@@ -391,7 +385,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
       computed when those object are put into penetration.
       </p>
 
-      <script>document.write(notebook_link('clutter', deepnote, '', 'contact_inspector'))</script>
+      <script>document.write(notebook_link('clutter', 'contact_inspector'))</script>
 
     </example>
 
@@ -715,7 +709,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
         misleading because one cannot actually select independently from both
         sets.</p>
 
-        <script>document.write(notebook_link('clutter', deepnote, '', 'contact_wrench'))</script>
+        <script>document.write(notebook_link('clutter', 'contact_wrench'))</script>
 
         <p>Here is the contact wrench cone for a single contact point, visualized for two different contact locations:</p>
         <figure>
@@ -852,7 +846,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
         <figure><img style="width:60%"
           src="data/mustard_normals.png"></figure>
 
-          <script>document.write(notebook_link('clutter', deepnote, '', 'point_cloud_processing'))</script>
+          <script>document.write(notebook_link('clutter',  'point_cloud_processing'))</script>
       
         <p>I've produced a scene with three cameras looking at our favorite YCB
         mustard bottle.  I've taken the individual point clouds (already
@@ -930,7 +924,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
         <figure><img style="width:60%"
         src="data/mustard_surface_estimation.png"></figure>
 
-        <script>document.write(notebook_link('clutter', deepnote, '', 'normal_estimation'))</script>
+        <script>document.write(notebook_link('clutter', 'normal_estimation'))</script>
   
         <p>I've coded up the basic least-squares surface estimation algorithm,
         with the query point in green, the nearest neighbors in blue, and the
@@ -1011,7 +1005,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
         terms in the notebook, and given you a sliders to move the hand around
         and see how the cost changes.</p>
 
-        <script>document.write(notebook_link('clutter', deepnote, '', 'grasp_selection'))</script>
+        <script>document.write(notebook_link('clutter', 'grasp_selection'))</script>
     
       </example>
 
@@ -1083,7 +1077,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
         <figure><img style="width:80%"
             src="data/grasp_candidates.png"></figure>
   
-            <script>document.write(notebook_link('clutter', deepnote, '', 'grasp_selection'))</script>
+            <script>document.write(notebook_link('clutter', 'grasp_selection'))</script>
         
       </example>
 
@@ -1333,7 +1327,7 @@ output_ports:
 
     <example id="clutter_clearing">
       <h1>Clutter clearing (complete demo)</h1>
-      <script>document.write(notebook_link('clutter', deepnote, '', 'clutter_clearing'))</script>
+      <script>document.write(notebook_link('clutter', 'clutter_clearing'))</script>
     </example>
 
   </section>
@@ -1372,7 +1366,7 @@ output_ports:
         balanced for all bodies to be in equilibrium.</p>
 
         <p>To help you solve these problems, we have
-        <script>document.write(notebook_link('clutter', d=deepnote, link_text = 'a notebook', notebook='static_equilibrium'))</script>
+        <script>document.write(notebook_link('clutter', notebook='static_equilibrium', link_text = 'a notebook'))</script>
         to help you build intuition and test your answers. It lets you specify
         the configuration of the spheres and then uses the <a
         href="https://drake.mit.edu/doxygen_cxx/classdrake_1_1multibody_1_1_static_equilibrium_problem.html">StaticEquilbriumProblem</a>
@@ -1423,7 +1417,7 @@ output_ports:
 
     <exercise><h1>Normal Estimation from Depth</h1>
 
-      <p>For this exercise, you will investigate a slightly different approach to normal vector estimation. In particular, we can exploit the spatial structure that is already in a depth image to avoid computing nearest neighbors. You will work exclusively in <script>document.write(notebook_link('clutter', d=deepnote, link_text='this notebook', notebook='normal_estimation_depth'))</script>. You will be asked to complete the following steps:</p>
+      <p>For this exercise, you will investigate a slightly different approach to normal vector estimation. In particular, we can exploit the spatial structure that is already in a depth image to avoid computing nearest neighbors. You will work exclusively in <script>document.write(notebook_link('clutter', notebook='normal_estimation_depth', link_text='this notebook'))</script>. You will be asked to complete the following steps:</p>
       <ol type="a">
         <li> Implement a method to estimate normal vectors from a depth image,
         without computing nearest neighbors. </li>
@@ -1433,7 +1427,7 @@ output_ports:
     </exercise>
 
     <exercise><h1>Analytic Antipodal Grasping</h1>
-      <p>So far, we have used sampling-based methods to find antipodal grasps - but can we have find one analytically if we knew the equation of the object shape? For this exercise, you will analyze and implement a correct-by-construction method to find antipodal points using symbolic differentiation and MathematicalProgram. You will work exclusively in <script>document.write(notebook_link('clutter', deepnote, link_text='this notebook', notebook='analytic_antipodal_grasps'))</script>. You will be asked to complete the following steps:</p>
+      <p>So far, we have used sampling-based methods to find antipodal grasps - but can we have find one analytically if we knew the equation of the object shape? For this exercise, you will analyze and implement a correct-by-construction method to find antipodal points using symbolic differentiation and MathematicalProgram. You will work exclusively in <script>document.write(notebook_link('clutter', notebook='analytic_antipodal_grasps', link_text='this notebook'))</script>. You will be asked to complete the following steps:</p>
       <ol type="a">
         <li> Prove that antipodal points are critical points of an energy
         function defined on the shape. </li>
@@ -1452,7 +1446,7 @@ output_ports:
       alternative method for generating grasp candidates based on local
       curvature, similar to the one proposed in <elib>tenPas17</elib>. This
       exercise is
-      implementation-heavy, and you will work exclusively in <script>document.write(notebook_link('clutter', d=deepnote, link_text='this notebook', notebook='grasp_candidate'))</script>.</p>
+      implementation-heavy, and you will work exclusively in <script>document.write(notebook_link('clutter', notebook='grasp_candidate', link_text='this notebook'))</script>.</p>
       
     </exercise>    
 
@@ -1604,7 +1598,7 @@ output_ports:
       into a customized simulation and tune physical parameters to reach a desired final state. 
       This exercise is intended to demonstrate the delicate interplay of physical parameters and geometry within a dynamic simulation.
       You will work in
-      <script>document.write(notebook_link('clutter', d = deepnote, link_text = 'this notebook', notebook = 'simulation_tuning'))</script>. 
+      <script>document.write(notebook_link('clutter', notebook = 'simulation_tuning', link_text = 'this notebook'))</script>. 
       There are 5 subproblems in this notebook, some involve coding and others involve answering written questions -- remember to do them all! </p>
     </exercise>  
   </section>

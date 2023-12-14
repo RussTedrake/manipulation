@@ -177,7 +177,7 @@ output_ports:
 
       <example class="drake"><h1>Simulating an RGB-D camera</h1>
 
-        <script>document.write(notebook_link('pose', d=deepnote, link_text="", notebook="camera_sim"))</script>
+        <script>document.write(notebook_link('pose', notebook="camera_sim"))</script>
 
         <p>As a simple example of depth cameras in drake, I've constructed a
         scene with a single object (the mustard bottle from the <a
@@ -658,7 +658,7 @@ output_ports:
       will recover the exact solution.  So every one of those steps before
       convergence has at least a few bad correspondences.  Look closely!</p>
   
-      <script>document.write(notebook_link('pose', d=deepnote, link_text="", notebook="icp"))</script>
+      <script>document.write(notebook_link('pose', notebook="icp"))</script>
   
     </example>      
       
@@ -700,7 +700,7 @@ output_ports:
       point), to add noise, and/or to restrict the points to a partial view.
       Please try them by themselves and in combination.</p>
 
-      <script>document.write(notebook_link('pose', d=deepnote, link_text="", notebook="icp"))</script>
+      <script>document.write(notebook_link('pose', notebook="icp"))</script>
   
       <figure style="margin-top:-40px;">
         <iframe style="border:0;height:300px;width:400px;" src="data/icp_outliers.html?height=240px" pdf="no"></iframe>
@@ -1163,7 +1163,7 @@ output_ports:
       <code>AddConstraint</code> methods. I've provided an implementation in
       this notebook: </p>
   
-      <script>document.write(notebook_link('pose', d=deepnote, link_text="", notebook="icp"))</script>
+      <script>document.write(notebook_link('pose', notebook="icp"))</script>
         
       <figure style="margin-top:-20px"><img style="width:70%"
       src="data/constrained_nonlinear_pose.svg"/><figcaption>The solution to
@@ -1201,7 +1201,7 @@ output_ports:
       (SOCP), though we need to use a slack variable to put it into the standard
       form with a linear objective.</p>
 
-      <script>document.write(notebook_link('pose', d=deepnote, link_text="", notebook="icp"))</script>
+      <script>document.write(notebook_link('pose', notebook="icp"))</script>
       
       <p>Please be careful.  Now that we have a constraint that depends on $p$,
       our original approach to solving for $R$ independently is no longer valid
@@ -1278,7 +1278,7 @@ output_ports:
     last chapter to pick it up and place it in the second bin.  Finally, I use
     differential inverse kinematics to execute it.  Very satisfying!</p>
 
-    <script>document.write(notebook_link('pose', d=deepnote, link_text="", notebook="pose"))</script>
+    <script>document.write(notebook_link('pose', notebook="pose"))</script>
 
   </section>
   
@@ -1480,7 +1480,7 @@ output_ports:
 
     <exercise><h1>Bunny ICP</h1>
       <p>For this exercise, you will implement the ICP algorithm to match
-      pointclouds of two Stanford bunnies. You will work exclusively in <script>document.write(notebook_link('pose', d=deepnote, link_text='this notebook', notebook='bunny_icp'))</script>. You will be asked to complete the
+      pointclouds of two Stanford bunnies. You will work exclusively in <script>document.write(notebook_link('pose', notebook='bunny_icp',  link_text='this notebook'))</script>. You will be asked to complete the
       following steps:</p>
       <ol type="a">
         <li> Implement a method to compute the least-squares transform given
@@ -1493,7 +1493,7 @@ output_ports:
     <exercise><h1>RANSAC</h1>
       <p>For this exercise, you will remove the environmental background from
       the Stanford bunny pointcloud using the RANSAC algorithm. You will work
-      exclusively in <script>document.write(notebook_link('pose', d=deepnote, link_text='this notebook', notebook='ransac'))</script>. You will be asked to complete the
+      exclusively in <script>document.write(notebook_link('pose', notebook='ransac', link_text='this notebook'))</script>. You will be asked to complete the
       following steps:</p>
       <ol type="a">
         <li> Implement the RANSAC algorithm. </li>
@@ -1570,7 +1570,7 @@ output_ports:
       simulated raw pointcloud from our previous setup from a depth camera.
       Your task is to perform segmentation on this raw pointcloud data, and
       perform ICP to estimate the pose of the brick. You will work exclusively
-      in <script>document.write(notebook_link('pose', d=deepnote, link_text = 'this notebook', notebook='pose_estimation_icp'))</script>
+      in <script>document.write(notebook_link('pose', notebook='pose_estimation_icp', link_text = 'this notebook'))</script>
       . You will be asked to complete the
       following steps:</p>
       <ol type="a">

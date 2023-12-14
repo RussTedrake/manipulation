@@ -394,7 +394,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
         example, too, so that you can see that a "free" body is just another
         branch off the world root node.</p>
 
-        <script>document.write(notebook_link('pick', d=deepnote, link_text="", notebook="kinematic_tree"))</script>
+        <script>document.write(notebook_link('pick', notebook="kinematic_tree"))</script>
     
         <todo>Insert topology visualization here (once it is better)</todo>
       </example>
@@ -452,7 +452,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture  videos 
         (and so is stored in the <code>Context</code>).  The following example
         shows you how it works.</p>
 
-        <script>document.write(notebook_link('pick', d=deepnote, link_text="", notebook="forward_kinematics"))</script>
+        <script>document.write(notebook_link('pick', notebook="forward_kinematics"))</script>
 
         <p>The key lines are 
           <code class="language-python"><pre>
@@ -623,7 +623,7 @@ pose = plant.EvalBodyPoseInWorld(context, gripper)</pre></code>
       <code>MultibodyPlant</code>, and then prints its
       <code>Context</code>.</p>
 
-      <script>document.write(notebook_link('pick', d=deepnote, link_text="", notebook="qdot_vs_v"))</script>
+      <script>document.write(notebook_link('pick', notebook="qdot_vs_v"))</script>
 
       <p>The output looks like this:
       <code><pre>Context
@@ -676,7 +676,7 @@ Velocity names: ['$world_base_link_wx', '$world_base_link_wy', '$world_base_link
       the gripper frame, measured from the world frame, expressed in the world
       frame.</p>
 
-      <script>document.write(notebook_link('pick', d=deepnote, link_text="", notebook="jacobian"))</script>
+      <script>document.write(notebook_link('pick', notebook="jacobian"))</script>
 
     </example>
 
@@ -750,7 +750,7 @@ Velocity names: ['$world_base_link_wx', '$world_base_link_wy', '$world_base_link
         worth finding the important lines and making sure you can change them
         and see what happens!</p>
 
-        <script>document.write(notebook_link('pick', d=deepnote, link_text="", notebook="pseudoinverse"))</script>
+        <script>document.write(notebook_link('pick', notebook="pseudoinverse"))</script>
   
         <p>Congratulations!  Things are really moving now.</p>
 
@@ -780,7 +780,7 @@ Velocity names: ['$world_base_link_wx', '$world_base_link_wy', '$world_base_link
         See if you can find configurations where the smallest singular value
         gets close to zero.</p>
 
-        <script>document.write(notebook_link('pick', d=deepnote, link_text="", notebook="jacobian"))</script>
+        <script>document.write(notebook_link('pick', notebook="jacobian"))</script>
 
         <p>Here's a hint: try some configurations where the arm is very
         straight, (e.g. driving joint 2 and 4 close to zero).</p>
@@ -934,7 +934,7 @@ Velocity names: ['$world_base_link_wx', '$world_base_link_wy', '$world_base_link
       transformation clearly), and rendering the hand relative to the
       object.</p>
 
-      <script>document.write(notebook_link('pick', d=deepnote, link_text="", notebook="grasp"))</script>
+      <script>document.write(notebook_link('pick', notebook="grasp"))</script>
 
       <p>I hope you can see the value of having good notation at work here.  My
       right hand was in the air when I was deciding what a suitable relative
@@ -1140,12 +1140,9 @@ Velocity names: ['$world_base_link_wx', '$world_base_link_wy', '$world_base_link
       recommend <elib>Boyd04a</elib>; it is free online and even reading the
       first chapter can be incredibly valuable.  For a very short introduction
       to using optimization in Drake, please take a look at the
-      <script>document.write(notebook_link(
-        'tutorials',
-        d=drake_deepnote,
-        link_text='tutorials on MathematicalProgram',
-        notebook='mathematical_program',
-        workspace_id=drake_workspace_id))</script>.
+      <script>document.write(drake_tutorials_link(
+        'mathematical_program',
+        link_text='tutorials on MathematicalProgram'))</script>.
       I use the term "mathematical program" almost synonymously with
       "optimization problem".  Mathematical program is perhaps slightly more
       appropriate if we don't actually have an objective; only constraints.</p>
@@ -1183,7 +1180,7 @@ Velocity names: ['$world_base_link_wx', '$world_base_link_wy', '$world_base_link
         see the constraints visualized as in red, and the objective function
         visualized as a function in green.</p>
 
-        <script>document.write(notebook_link('pick', d=deepnote, link_text="", notebook="qp_diff_ik"))</script>
+        <script>document.write(notebook_link('pick', notebook="qp_diff_ik"))</script>
 
       </example>
     
@@ -1410,7 +1407,7 @@ Velocity names: ['$world_base_link_wx', '$world_base_link_wy', '$world_base_link
   </exercise>
 
   <exercise id="planar_manipulator"><h1>Planar Manipulator</h1>
-      <p> For this exercise you will derive the translational forward kinematics ${^A}p{^C}=f(q)$ and the translational Jacobian $J(q)$ of a planar two-link manipulator. You will work exclusively in <script>document.write(notebook_link('pick', d=deepnote, link_text='this notebook', notebook='05_planar_manipulator'))</script>. You will be asked to complete the following steps: </p>
+      <p> For this exercise you will derive the translational forward kinematics ${^A}p{^C}=f(q)$ and the translational Jacobian $J(q)$ of a planar two-link manipulator. You will work exclusively in <script>document.write(notebook_link('pick', notebook='05_planar_manipulator', link_text='this notebook'))</script>. You will be asked to complete the following steps: </p>
 
       <ol type="a">
         <li> Derive the forward kinematics of the manipulator. </li>
@@ -1461,7 +1458,7 @@ Velocity names: ['$world_base_link_wx', '$world_base_link_wy', '$world_base_link
   </exercise>
 
   <exercise id="spatial_transforms"><h1>Spatial Transforms and Grasp Pose</h1>
-      <p> For this exercise you will apply your knowledge on spatial algebra to write poses of frames in different reference frames, and design a grasp pose yourself. You will work exclusively in <script>document.write(notebook_link('pick', d=deepnote, link_text='this notebook', notebook='07_rigid_transforms'))</script>. You will be asked to complete the following steps: </p>
+      <p> For this exercise you will apply your knowledge on spatial algebra to write poses of frames in different reference frames, and design a grasp pose yourself. You will work exclusively in <script>document.write(notebook_link('pick', notebook='07_rigid_transforms', link_text='this notebook'))</script>. You will be asked to complete the following steps: </p>
 
       <ol type="a">
         <li> Express poses of frames in different reference frames using spatial algebra. </li>
@@ -1470,7 +1467,7 @@ Velocity names: ['$world_base_link_wx', '$world_base_link_wy', '$world_base_link
   </exercise>
 
   <exercise id="robot_painter"><h1>The Robot Painter</h1>
-      <p> For this exercise you will design interesting trajectories for the robot to follow, and observe the robot virtually painting in the air! You will work exclusively in <script>document.write(notebook_link('pick', d=deepnote, link_text='this notebook', notebook='08_robot_painter'))</script>. You will be asked to complete the following steps: </p>
+      <p> For this exercise you will design interesting trajectories for the robot to follow, and observe the robot virtually painting in the air! You will work exclusively in <script>document.write(notebook_link('pick', notebook='08_robot_painter', link_text='this notebook'))</script>. You will be asked to complete the following steps: </p>
 
       <ol type="a">
         <li> Design and compute the poses of key frames of a designated trajectory. </li>
@@ -1479,11 +1476,11 @@ Velocity names: ['$world_base_link_wx', '$world_base_link_wy', '$world_base_link
   </exercise>  
 
   <exercise id="intro_to_qp"><h1>Introduction to QPs</h1>
-      <p> For this exercise you will practice the syntax of solving Quadratic Programs (QPs) via Drake's MathematicalProgram interface. You will work exclusively in <script>document.write(notebook_link('pick', d=deepnote, link_text='this notebook', notebook='09_intro_to_qp'))</script>.</p> 
+      <p> For this exercise you will practice the syntax of solving Quadratic Programs (QPs) via Drake's MathematicalProgram interface. You will work exclusively in <script>document.write(notebook_link('pick', notebook='09_intro_to_qp', link_text='this notebook'))</script>.</p> 
   </exercise>  
 
   <exercise id="virtual_wall"><h1>Virtual Wall</h1>
-      <p> For this exercise you will implement a virtual wall for a robot manipulator, using an optimization-based approach to differential inverse kinematics. You will work exclusively in <script>document.write(notebook_link('pick', d=deepnote, link_text='this notebook', notebook='10_differential_ik_optimization'))</script>. You will be asked to complete the following steps: </p>
+      <p> For this exercise you will implement a virtual wall for a robot manipulator, using an optimization-based approach to differential inverse kinematics. You will work exclusively in <script>document.write(notebook_link('pick', notebook='10_differential_ik_optimization', link_text='this notebook'))</script>. You will be asked to complete the following steps: </p>
 
       <ol type="a">
         <li> Implement a optimization-based differential IK controller with joint velocity limits. </li>
