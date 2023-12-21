@@ -725,6 +725,7 @@ def MakeHardwareStation(
     hardware: bool = False,
     parser_preload_callback: typing.Callable[[Parser], None] = None,
     parser_prefinalize_callback: typing.Callable[[Parser], None] = None,
+    prebuild_callback: typing.Callable[[DiagramBuilder], None] = None,
 ):
     """
     If `hardware=False`, (the default) returns a HardwareStation diagram containing:
@@ -823,6 +824,9 @@ def MakeHardwareStation(
         )
     # Export the only SceneGraph output port.
     builder.ExportOutput(scene_graph.get_query_output_port(), "query_object")
+
+    if prebuild_callback:
+        prebuild_callback(builder)
 
     diagram = builder.Build()
     diagram.set_name("station")

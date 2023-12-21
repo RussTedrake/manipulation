@@ -552,6 +552,7 @@ def AddMultibodyTriad(
         radius,
         opacity,
         frame.GetFixedPoseInBodyFrame(),
+        name=frame.name(),
     )
 
 
