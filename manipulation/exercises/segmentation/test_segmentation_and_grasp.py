@@ -4,7 +4,7 @@ import numpy as np
 import timeout_decorator
 from gradescope_utils.autograder_utils.decorators import weight
 
-from manipulation.utils import LoadDataResource
+from manipulation.utils import FindDataResource
 
 
 def chamfer_dist(pc_a, pc_b):
@@ -44,7 +44,7 @@ class TestSegmentationAndGrasp(unittest.TestCase):
         num_points_eval = pcd_pts_eval.shape[0]
 
         data_target = np.load(
-            LoadDataResource("segmentation_and_grasp_soln.npz")
+            FindDataResource("segmentation_and_grasp_soln.npz")
         )
         pcd_pts_target = data_target["points"]
         data_target["colors"]

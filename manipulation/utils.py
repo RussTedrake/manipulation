@@ -46,6 +46,13 @@ def FindResource(filename: str):
 
 def LoadDataResource(filename: str):
     """
+    Deprecated. Use `FindDataResource` instead.
+    """
+    warn("`LoadDataResource` is deprecated. Use `FindDataResource` instead.")
+
+
+def FindDataResource(filename: str):
+    """
     Returns the absolute path to the given filename relative to the data directory; fetching it from a remote host if necessary.
     """
     data = os.path.join(
