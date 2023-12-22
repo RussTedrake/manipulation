@@ -30,3 +30,9 @@ rt_py_test(
     data = ["//manipulation/models"],
     deps = ["//manipulation"],
 )
+
+# Export some files so that I can link to them from the text.
+exports_files(
+    ["scaling_spatial_velocity.py"],
+    visibility = ["//visibility:public"],
+)

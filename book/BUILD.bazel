@@ -32,14 +32,34 @@ rt_html_test(
 
 rt_html_test(
     srcs = ["pick.html"],
+    data = [
+      "//book/data:gripper_position_trajectory.html",
+      "//book/data:gripper_trajectory.html",
+      "//book/data:pick.html",
+      "//book/data:two_link_singularities.html",
+      "//book/figures:scaling_spatial_velocity.py",
+    ],
 )
 
 rt_html_test(
     srcs = ["pose.html"],
+    data = [
+      "//book/data:depth_camera_diagram.svg",
+      "//book/data:icp_noise.html",
+      "//book/data:icp_outliers.html",
+      "//book/data:icp_partial_view.html",
+      "//book/data:iterative_closest_point.html",
+      "//book/data:mustard.html",
+    ],
 )
 
 rt_html_test(
     srcs = ["clutter.html"],
+    data = [
+      "//book/data:falling_bricks_2d.html",
+      "//book/data:foam_brick_contact_geometry.html",
+      "//book/data:mustard_bottle_point_clouds.html",
+    ],
 )
 
 rt_html_test(
@@ -52,10 +72,18 @@ rt_html_test(
 
 rt_html_test(
     srcs = ["force.html"],
+    data = [
+      "//book/data:force_flip_up.html",
+    ],
 )
 
 rt_html_test(
     srcs = ["trajectories.html"],
+    data = [
+      "//book/data:iiwa_shelves_configuration_space.html",
+      "//book/data:shelf_ik_prog.html",
+      "//book/data:shelf_ik_prog_zoom.html",
+    ],
 )
 
 rt_html_test(
