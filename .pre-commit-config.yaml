@@ -1,6 +1,6 @@
 repos:
 - repo: https://github.com/psf/black
-  rev: 23.1.0
+  rev: 23.12.0
   hooks:
     - id: black-jupyter
       types_or: ["python","jupyter"] 
@@ -12,3 +12,10 @@ repos:
   rev: v2.0.2
   hooks:
     - id: autoflake
+- repo: https://github.com/floatingpurr/sync_with_poetry
+  rev: 1.1.0
+  hooks:
+    - id: sync_with_poetry
+      args: [
+          '--all',  # Scan all dependencies in poetry.lock (main and dev)
+      ]
