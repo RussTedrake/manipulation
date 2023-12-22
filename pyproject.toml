@@ -73,14 +73,11 @@ lxml = ">=4.9.2" # seems to be needed on python 3.11
 #  {platform="linux", version="3.5.1"}, # https://github.com/RobotLocomotion/drake/issues/14250 
 #]
 mysql-connector-python = ">=8.0.23"
-myst-parser = ">=2.0.0"
 nbconvert = [ 
   {platform="darwin", version="7.0.0"},
   {platform="linux", version="6.4.0"},
 ]
 requests = ">=2.25.1"
-sphinx = ">=7.2.6"
-sphinx_rtd_theme = ">=2.0.0"
 
 [tool.black]
 line-length = 79
