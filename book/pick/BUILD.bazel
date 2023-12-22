@@ -1,0 +1,78 @@
+# -*- mode: python -*-
+# vi: set ft=python :
+
+# Copyright 2020-2023 Massachusetts Institute of Technology.
+# Licensed under the BSD 3-Clause License. See LICENSE.TXT for details.
+
+load("//book/htmlbook/tools/jupyter:defs.bzl", "rt_ipynb_test")
+
+rt_ipynb_test(
+    name = "pick",
+    srcs = ["pick.ipynb"],
+    deps = [
+      "//manipulation",
+      "//manipulation:station",
+    ],
+)
+
+rt_ipynb_test(
+    name = "kinematic_tree",
+    srcs = ["kinematic_tree.ipynb"],
+    data = ["//manipulation/models"],
+    deps = [
+      "//manipulation",
+    ],
+)
+
+rt_ipynb_test(
+    name = "forward_kinematics",
+    srcs = ["forward_kinematics.ipynb"],
+    deps = [
+      "//manipulation",
+      "//manipulation:scenarios",
+    ],
+)
+
+rt_ipynb_test(
+    name = "qdot_vs_v",
+    srcs = ["qdot_vs_v.ipynb"],
+)
+
+rt_ipynb_test(
+    name = "jacobian",
+    srcs = ["jacobian.ipynb"],
+    data = ["//manipulation/models"],
+    deps = [
+      "//manipulation",
+    ],
+)
+
+rt_ipynb_test(
+    name = "grasp",
+    srcs = ["grasp.ipynb"],
+    deps = [
+      "//manipulation",
+      "//manipulation:scenarios",
+    ],
+)
+
+rt_ipynb_test(
+    name = "pseudoinverse",
+    srcs = ["pseudoinverse.ipynb"],
+    deps = [
+      "//manipulation",
+      "//manipulation:station",
+    ],
+)
+
+rt_ipynb_test(
+    name = "qp_diff_ik",
+    srcs = ["qp_diff_ik.ipynb"],
+    tags = ["requires-network"], # For gurobi
+    data = ["//manipulation/models:two_link_iiwa14.urdf"],
+    deps = [
+      "//manipulation",
+      "//manipulation:meshcat_utils",
+      "//manipulation:scenarios",
+    ],
+)

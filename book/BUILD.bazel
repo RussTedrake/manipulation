@@ -1,0 +1,81 @@
+# -*- mode: python -*-
+# vi: set ft=python :
+
+# Copyright 2020-2023 Massachusetts Institute of Technology.
+# Licensed under the BSD 3-Clause License. See LICENSE.TXT for details.
+
+load("//book/htmlbook/tools/html:defs.bzl", "rt_html_test")
+load("//book/htmlbook/tools/tidy:def.bzl", "html_tidy_test")
+
+filegroup(
+    name = "html",
+    srcs = glob([
+        "*.html",
+        "*.html.in",
+    ]),
+    visibility = ["//:__subpackages__"],
+)
+
+html_tidy_test(
+    name = "html_tidy",
+    srcs = [":html"],
+    config = ".tidy.config",
+)
+
+rt_html_test(
+    srcs = ["intro.html"],
+)
+
+rt_html_test(
+    srcs = ["robot.html"],
+)
+
+rt_html_test(
+    srcs = ["pick.html"],
+)
+
+rt_html_test(
+    srcs = ["pose.html"],
+)
+
+rt_html_test(
+    srcs = ["clutter.html"],
+)
+
+rt_html_test(
+    srcs = ["segmentation.html"],
+)
+
+rt_html_test(
+    srcs = ["deep_perception.html"],
+)
+
+rt_html_test(
+    srcs = ["force.html"],
+)
+
+rt_html_test(
+    srcs = ["trajectories.html"],
+)
+
+rt_html_test(
+    srcs = ["rl.html"],
+)
+
+rt_html_test(
+    srcs = ["drake.html"],
+)
+
+rt_html_test(
+    srcs = ["misc.html"],
+)
+
+rt_html_test(
+    srcs = ["station.html"],
+)
+
+filegroup(
+    name = "chapters",
+    srcs = ["chapters.json"],
+    visibility = ["//visibility:public"],
+)

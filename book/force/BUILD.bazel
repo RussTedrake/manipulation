@@ -1,0 +1,41 @@
+# -*- mode: python -*-
+# vi: set ft=python :
+
+# Copyright 2020-2023 Massachusetts Institute of Technology.
+# Licensed under the BSD 3-Clause License. See LICENSE.TXT for details.
+
+load("//book/htmlbook/tools/jupyter:defs.bzl", "rt_ipynb_test")
+
+rt_ipynb_test(
+    name = "point_finger",
+    srcs = ["point_finger.ipynb"],
+    tags = ["requires-network"], # For gurobi
+    data = ["//manipulation/models"],
+    deps = [
+      "//manipulation",
+      "//manipulation:meshcat_utils",
+      "//manipulation:scenarios",
+    ],
+)
+
+rt_ipynb_test(
+    name = "tracking",
+    srcs = ["tracking.ipynb"],
+)
+
+rt_ipynb_test(
+    name = "writing",
+    srcs = ["writing.ipynb"],
+    deps = [
+      "//manipulation",
+      "//manipulation:scenarios",
+    ],
+)
+
+rt_ipynb_test(
+    name = "bounce",
+    srcs = ["bounce.ipynb"],
+    deps = [
+      "//manipulation",
+    ],
+)

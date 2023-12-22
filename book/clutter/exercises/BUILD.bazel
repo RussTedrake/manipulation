@@ -1,0 +1,66 @@
+# -*- mode: python -*-
+# vi: set ft=python :
+
+# Copyright 2020-2021 Massachusetts Institute of Technology.
+# Licensed under the BSD 3-Clause License. See LICENSE.TXT for details.
+
+load("//book/htmlbook/tools/jupyter:defs.bzl", "rt_ipynb_test")
+
+rt_ipynb_test(
+    name = "static_equilibrium",
+    srcs = ["static_equilibrium.ipynb"],
+    deps = [
+        "//manipulation",
+        "//manipulation:scenarios",
+    ],
+)
+
+rt_ipynb_test(
+    name = "normal_estimation_depth",
+    srcs = ["normal_estimation_depth.ipynb"],
+    deps = [
+        "//manipulation",
+        "//manipulation:meshcat_utils",
+        "//manipulation:scenarios",
+        "//manipulation:mustard_depth_camera_example",
+        "//manipulation/exercises:grader",
+        "//manipulation/exercises/clutter:test_normal",
+    ],
+)
+
+rt_ipynb_test(
+    name = "analytic_antipodal_grasps",
+    srcs = ["analytic_antipodal_grasps.ipynb"],
+    deps = [
+        "//manipulation",
+        "//manipulation/exercises:grader",
+        "//manipulation/exercises/clutter:test_analytic_grasp",
+    ],
+)
+
+rt_ipynb_test(
+    name = "grasp_candidate",
+    srcs = ["grasp_candidate.ipynb"],
+    data = [
+      "//manipulation/models",
+    ],
+    deps = [
+        "//manipulation",
+        "//manipulation:meshcat_utils",
+        "//manipulation:mustard_depth_camera_example",
+        "//manipulation:scenarios",
+        "//manipulation/exercises:grader",
+        "//manipulation/exercises/clutter:test_grasp_candidate",
+    ],
+)
+
+rt_ipynb_test(
+    name = "simulation_tuning",
+    srcs = ["simulation_tuning.ipynb"],
+    timeout = "moderate",
+    deps = [
+        "//manipulation",
+        "//manipulation/exercises:grader",
+        "//manipulation/exercises/clutter:test_simulation_tuning",
+    ],
+)

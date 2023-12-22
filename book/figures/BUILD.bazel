@@ -1,0 +1,32 @@
+# -*- mode: python -*-
+# vi: set ft=python :
+
+# Copyright 2020-2023 Massachusetts Institute of Technology.
+# Licensed under the BSD 3-Clause License. See LICENSE.TXT for details.
+
+load("//book/htmlbook/tools/jupyter:defs.bzl", "rt_ipynb_test")
+load("//book/htmlbook/tools/python:defs.bzl", "rt_py_test")
+
+rt_ipynb_test(
+    name = "grasp_frames",
+    srcs = ["grasp_frames.ipynb"],
+    deps = ["//manipulation:scenarios"],
+)
+
+rt_ipynb_test(
+    name = "nonlinear_pose_estimation",
+    srcs = ["nonlinear_pose_estimation.ipynb"],
+    deps = ["//manipulation"],
+)
+
+rt_py_test(
+    name = "scaling_spatial_velocity",
+    srcs = ["scaling_spatial_velocity.py"],
+)
+
+rt_py_test(
+    name = "two_link_singularities",
+    srcs = ["two_link_singularities.py"],
+    data = ["//manipulation/models"],
+    deps = ["//manipulation"],
+)

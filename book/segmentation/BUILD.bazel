@@ -1,0 +1,28 @@
+# -*- mode: python -*-
+# vi: set ft=python :
+
+# Copyright 2020-2023 Massachusetts Institute of Technology.
+# Licensed under the BSD 3-Clause License. See LICENSE.TXT for details.
+
+load("//book/htmlbook/tools/jupyter:defs.bzl", "rt_ipynb_test")
+load("//book/htmlbook/tools/python:defs.bzl", "rt_py_test")
+
+# torchvision is trying to write to a temp directory.
+#rt_ipynb_test(
+#    name = "segmentation_inference",
+#    srcs = ["segmentation_inference.ipynb"],
+#    deps = ["//manipulation"],
+#    data = ["//data:clutter_maskrcnn_data"],
+#)
+
+rt_py_test(
+  name = "segmentation_data",
+    srcs = ["segmentation_data.py"],
+    data = ["//manipulation/models"],
+    args = ["--test"],
+    imports = [".."],
+    deps = [
+      "//manipulation",
+      "//manipulation:scenarios",
+    ],
+)

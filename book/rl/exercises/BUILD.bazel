@@ -1,0 +1,29 @@
+# -*- mode: python -*-
+# vi: set ft=python :
+
+# Copyright 2020-2021 Massachusetts Institute of Technology.
+# Licensed under the BSD 3-Clause License. See LICENSE.TXT for details.
+
+load("//book/htmlbook/tools/jupyter:defs.bzl", "rt_ipynb_test")
+
+rt_ipynb_test(
+    name = "stochastic_optimization",
+    srcs = ["stochastic_optimization.ipynb"],
+    deps = [
+        "//manipulation",
+        "//manipulation/exercises:grader",
+        "//manipulation/exercises/rl:test_stochastic_optimization",
+    ],
+)
+
+rt_ipynb_test(
+    name = "policy_gradient",
+    srcs = ["policy_gradient.ipynb"],
+    data = ["//manipulation/models"],
+    deps = [
+        "//manipulation",
+        "//manipulation/envs:planar_gripper_pushing_a_box",
+        "//manipulation/exercises:grader",
+        "//manipulation/exercises/rl:test_vpg",
+    ],
+)
