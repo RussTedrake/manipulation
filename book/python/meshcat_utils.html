@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>manipulation.meshcat_utils &#8212; manipulation  documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=4f649999" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=039e1c02" />
+    <script src="_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="module-manipulation.meshcat_utils">
+<span id="manipulation-meshcat-utils"></span><h1><code class="docutils literal notranslate"><span class="pre">manipulation.meshcat_utils</span></code><a class="headerlink" href="#module-manipulation.meshcat_utils" title="Link to this heading">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="manipulation.meshcat_utils.MeshcatPoseSliders">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">manipulation.meshcat_utils.</span></span><span class="sig-name descname"><span class="pre">MeshcatPoseSliders</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">meshcat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">visible</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(True,</span> <span class="pre">True,</span> <span class="pre">True,</span> <span class="pre">True,</span> <span class="pre">True,</span> <span class="pre">True)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_range</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(-3.141592653589793,</span> <span class="pre">-3.141592653589793,</span> <span class="pre">-3.141592653589793,</span> <span class="pre">-1.0,</span> <span class="pre">-1.0,</span> <span class="pre">-1.0)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_range</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(3.141592653589793,</span> <span class="pre">3.141592653589793,</span> <span class="pre">3.141592653589793,</span> <span class="pre">1.0,</span> <span class="pre">1.0,</span> <span class="pre">1.0)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(0.0,</span> <span class="pre">0.0,</span> <span class="pre">0.0,</span> <span class="pre">0.0,</span> <span class="pre">0.0,</span> <span class="pre">0.0)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">decrement_keycode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">('KeyQ',</span> <span class="pre">'KeyW',</span> <span class="pre">'KeyA',</span> <span class="pre">'KeyJ',</span> <span class="pre">'KeyI',</span> <span class="pre">'KeyO')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">increment_keycode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">('KeyE',</span> <span class="pre">'KeyS',</span> <span class="pre">'KeyD',</span> <span class="pre">'KeyL',</span> <span class="pre">'KeyK',</span> <span class="pre">'KeyU')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">body_index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#manipulation.meshcat_utils.MeshcatPoseSliders" title="Link to this definition">¶</a></dt>
+<dd><p>Provides a set of ipywidget sliders (to be used in a Jupyter notebook) with
+one slider for each of roll, pitch, yaw, x, y, and z.  This can be used,
+for instance, as an interface to teleoperate the end-effector of a robot.</p>
+<p>The optional <cite>pose</cite> input port is used ONLY at initialization; it can be
+used to set the initial pose e.g. from the current pose of a MultibodyPlant
+frame.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="manipulation.meshcat_utils.MeshcatPoseSliders.DecrementKey">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">DecrementKey</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">roll</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pitch</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yaw</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#manipulation.meshcat_utils.MeshcatPoseSliders.DecrementKey" title="Link to this definition">¶</a></dt>
+<dd><dl class="py attribute">
+<dt class="sig sig-object py" id="manipulation.meshcat_utils.MeshcatPoseSliders.DecrementKey.pitch">
+<span class="sig-name descname"><span class="pre">pitch</span></span><a class="headerlink" href="#manipulation.meshcat_utils.MeshcatPoseSliders.DecrementKey.pitch" title="Link to this definition">¶</a></dt>
+<dd><p>Alias for field number 1</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="manipulation.meshcat_utils.MeshcatPoseSliders.DecrementKey.roll">
+<span class="sig-name descname"><span class="pre">roll</span></span><a class="headerlink" href="#manipulation.meshcat_utils.MeshcatPoseSliders.DecrementKey.roll" title="Link to this definition">¶</a></dt>
+<dd><p>Alias for field number 0</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="manipulation.meshcat_utils.MeshcatPoseSliders.DecrementKey.x">
+<span class="sig-name descname"><span class="pre">x</span></span><a class="headerlink" href="#manipulation.meshcat_utils.MeshcatPoseSliders.DecrementKey.x" title="Link to this definition">¶</a></dt>
+<dd><p>Alias for field number 3</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="manipulation.meshcat_utils.MeshcatPoseSliders.DecrementKey.y">
+<span class="sig-name descname"><span class="pre">y</span></span><a class="headerlink" href="#manipulation.meshcat_utils.MeshcatPoseSliders.DecrementKey.y" title="Link to this definition">¶</a></dt>
+<dd><p>Alias for field number 4</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="manipulation.meshcat_utils.MeshcatPoseSliders.DecrementKey.yaw">
+<span class="sig-name descname"><span class="pre">yaw</span></span><a class="headerlink" href="#manipulation.meshcat_utils.MeshcatPoseSliders.DecrementKey.yaw" title="Link to this definition">¶</a></dt>
+<dd><p>Alias for field number 2</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="manipulation.meshcat_utils.MeshcatPoseSliders.DecrementKey.z">
+<span class="sig-name descname"><span class="pre">z</span></span><a class="headerlink" href="#manipulation.meshcat_utils.MeshcatPoseSliders.DecrementKey.z" title="Link to this definition">¶</a></dt>
+<dd><p>Alias for field number 5</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="manipulation.meshcat_utils.MeshcatPoseSliders.DoCalcOutput">
+<span class="sig-name descname"><span class="pre">DoCalcOutput</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#manipulation.meshcat_utils.MeshcatPoseSliders.DoCalcOutput" title="Link to this definition">¶</a></dt>
+<dd><p>Constructs the output values from the sliders.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="manipulation.meshcat_utils.MeshcatPoseSliders.IncrementKey">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">IncrementKey</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">roll</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pitch</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yaw</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#manipulation.meshcat_utils.MeshcatPoseSliders.IncrementKey" title="Link to this definition">¶</a></dt>
+<dd><dl class="py attribute">
+<dt class="sig sig-object py" id="manipulation.meshcat_utils.MeshcatPoseSliders.IncrementKey.pitch">
+<span class="sig-name descname"><span class="pre">pitch</span></span><a class="headerlink" href="#manipulation.meshcat_utils.MeshcatPoseSliders.IncrementKey.pitch" title="Link to this definition">¶</a></dt>
+<dd><p>Alias for field number 1</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="manipulation.meshcat_utils.MeshcatPoseSliders.IncrementKey.roll">
+<span class="sig-name descname"><span class="pre">roll</span></span><a class="headerlink" href="#manipulation.meshcat_utils.MeshcatPoseSliders.IncrementKey.roll" title="Link to this definition">¶</a></dt>
+<dd><p>Alias for field number 0</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="manipulation.meshcat_utils.MeshcatPoseSliders.IncrementKey.x">
+<span class="sig-name descname"><span class="pre">x</span></span><a class="headerlink" href="#manipulation.meshcat_utils.MeshcatPoseSliders.IncrementKey.x" title="Link to this definition">¶</a></dt>
+<dd><p>Alias for field number 3</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="manipulation.meshcat_utils.MeshcatPoseSliders.IncrementKey.y">
+<span class="sig-name descname"><span class="pre">y</span></span><a class="headerlink" href="#manipulation.meshcat_utils.MeshcatPoseSliders.IncrementKey.y" title="Link to this definition">¶</a></dt>
+<dd><p>Alias for field number 4</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="manipulation.meshcat_utils.MeshcatPoseSliders.IncrementKey.yaw">
+<span class="sig-name descname"><span class="pre">yaw</span></span><a class="headerlink" href="#manipulation.meshcat_utils.MeshcatPoseSliders.IncrementKey.yaw" title="Link to this definition">¶</a></dt>
+<dd><p>Alias for field number 2</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="manipulation.meshcat_utils.MeshcatPoseSliders.IncrementKey.z">
+<span class="sig-name descname"><span class="pre">z</span></span><a class="headerlink" href="#manipulation.meshcat_utils.MeshcatPoseSliders.IncrementKey.z" title="Link to this definition">¶</a></dt>
+<dd><p>Alias for field number 5</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="manipulation.meshcat_utils.MeshcatPoseSliders.MaxRange">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">MaxRange</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">roll</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pitch</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yaw</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#manipulation.meshcat_utils.MeshcatPoseSliders.MaxRange" title="Link to this definition">¶</a></dt>
+<dd><dl class="py attribute">
+<dt class="sig sig-object py" id="manipulation.meshcat_utils.MeshcatPoseSliders.MaxRange.pitch">
+<span class="sig-name descname"><span class="pre">pitch</span></span><a class="headerlink" href="#manipulation.meshcat_utils.MeshcatPoseSliders.MaxRange.pitch" title="Link to this definition">¶</a></dt>
+<dd><p>Alias for field number 1</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="manipulation.meshcat_utils.MeshcatPoseSliders.MaxRange.roll">
+<span class="sig-name descname"><span class="pre">roll</span></span><a class="headerlink" href="#manipulation.meshcat_utils.MeshcatPoseSliders.MaxRange.roll" title="Link to this definition">¶</a></dt>
+<dd><p>Alias for field number 0</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="manipulation.meshcat_utils.MeshcatPoseSliders.MaxRange.x">
+<span class="sig-name descname"><span class="pre">x</span></span><a class="headerlink" href="#manipulation.meshcat_utils.MeshcatPoseSliders.MaxRange.x" title="Link to this definition">¶</a></dt>
+<dd><p>Alias for field number 3</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="manipulation.meshcat_utils.MeshcatPoseSliders.MaxRange.y">
+<span class="sig-name descname"><span class="pre">y</span></span><a class="headerlink" href="#manipulation.meshcat_utils.MeshcatPoseSliders.MaxRange.y" title="Link to this definition">¶</a></dt>
+<dd><p>Alias for field number 4</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="manipulation.meshcat_utils.MeshcatPoseSliders.MaxRange.yaw">
+<span class="sig-name descname"><span class="pre">yaw</span></span><a class="headerlink" href="#manipulation.meshcat_utils.MeshcatPoseSliders.MaxRange.yaw" title="Link to this definition">¶</a></dt>
+<dd><p>Alias for field number 2</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="manipulation.meshcat_utils.MeshcatPoseSliders.MaxRange.z">
+<span class="sig-name descname"><span class="pre">z</span></span><a class="headerlink" href="#manipulation.meshcat_utils.MeshcatPoseSliders.MaxRange.z" title="Link to this definition">¶</a></dt>
+<dd><p>Alias for field number 5</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="manipulation.meshcat_utils.MeshcatPoseSliders.MinRange">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">MinRange</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">roll</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pitch</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yaw</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#manipulation.meshcat_utils.MeshcatPoseSliders.MinRange" title="Link to this definition">¶</a></dt>
+<dd><dl class="py attribute">
+<dt class="sig sig-object py" id="manipulation.meshcat_utils.MeshcatPoseSliders.MinRange.pitch">
+<span class="sig-name descname"><span class="pre">pitch</span></span><a class="headerlink" href="#manipulation.meshcat_utils.MeshcatPoseSliders.MinRange.pitch" title="Link to this definition">¶</a></dt>
+<dd><p>Alias for field number 1</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="manipulation.meshcat_utils.MeshcatPoseSliders.MinRange.roll">
+<span class="sig-name descname"><span class="pre">roll</span></span><a class="headerlink" href="#manipulation.meshcat_utils.MeshcatPoseSliders.MinRange.roll" title="Link to this definition">¶</a></dt>
+<dd><p>Alias for field number 0</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="manipulation.meshcat_utils.MeshcatPoseSliders.MinRange.x">
+<span class="sig-name descname"><span class="pre">x</span></span><a class="headerlink" href="#manipulation.meshcat_utils.MeshcatPoseSliders.MinRange.x" title="Link to this definition">¶</a></dt>
+<dd><p>Alias for field number 3</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="manipulation.meshcat_utils.MeshcatPoseSliders.MinRange.y">
+<span class="sig-name descname"><span class="pre">y</span></span><a class="headerlink" href="#manipulation.meshcat_utils.MeshcatPoseSliders.MinRange.y" title="Link to this definition">¶</a></dt>
+<dd><p>Alias for field number 4</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="manipulation.meshcat_utils.MeshcatPoseSliders.MinRange.yaw">
+<span class="sig-name descname"><span class="pre">yaw</span></span><a class="headerlink" href="#manipulation.meshcat_utils.MeshcatPoseSliders.MinRange.yaw" title="Link to this definition">¶</a></dt>
+<dd><p>Alias for field number 2</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="manipulation.meshcat_utils.MeshcatPoseSliders.MinRange.z">
+<span class="sig-name descname"><span class="pre">z</span></span><a class="headerlink" href="#manipulation.meshcat_utils.MeshcatPoseSliders.MinRange.z" title="Link to this definition">¶</a></dt>
+<dd><p>Alias for field number 5</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="manipulation.meshcat_utils.MeshcatPoseSliders.SetPose">
+<span class="sig-name descname"><span class="pre">SetPose</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pose</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#manipulation.meshcat_utils.MeshcatPoseSliders.SetPose" title="Link to this definition">¶</a></dt>
+<dd><p>Sets the current value of the sliders.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>pose</strong> – Any viable argument for the RigidTransform
+constructor.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="manipulation.meshcat_utils.MeshcatPoseSliders.SetRpy">
+<span class="sig-name descname"><span class="pre">SetRpy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rpy</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#manipulation.meshcat_utils.MeshcatPoseSliders.SetRpy" title="Link to this definition">¶</a></dt>
+<dd><p>Sets the current value of the sliders for roll, pitch, and yaw.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>rpy</strong> – An instance of drake.math.RollPitchYaw</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="manipulation.meshcat_utils.MeshcatPoseSliders.SetXyz">
+<span class="sig-name descname"><span class="pre">SetXyz</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xyz</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#manipulation.meshcat_utils.MeshcatPoseSliders.SetXyz" title="Link to this definition">¶</a></dt>
+<dd><p>Sets the current value of the sliders for x, y, and z.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>xyz</strong> – A 3 element iterable object with x, y, z.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="manipulation.meshcat_utils.MeshcatPoseSliders.Value">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">roll</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pitch</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yaw</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#manipulation.meshcat_utils.MeshcatPoseSliders.Value" title="Link to this definition">¶</a></dt>
+<dd><dl class="py attribute">
+<dt class="sig sig-object py" id="manipulation.meshcat_utils.MeshcatPoseSliders.Value.pitch">
+<span class="sig-name descname"><span class="pre">pitch</span></span><a class="headerlink" href="#manipulation.meshcat_utils.MeshcatPoseSliders.Value.pitch" title="Link to this definition">¶</a></dt>
+<dd><p>Alias for field number 1</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="manipulation.meshcat_utils.MeshcatPoseSliders.Value.roll">
+<span class="sig-name descname"><span class="pre">roll</span></span><a class="headerlink" href="#manipulation.meshcat_utils.MeshcatPoseSliders.Value.roll" title="Link to this definition">¶</a></dt>
+<dd><p>Alias for field number 0</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="manipulation.meshcat_utils.MeshcatPoseSliders.Value.x">
+<span class="sig-name descname"><span class="pre">x</span></span><a class="headerlink" href="#manipulation.meshcat_utils.MeshcatPoseSliders.Value.x" title="Link to this definition">¶</a></dt>
+<dd><p>Alias for field number 3</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="manipulation.meshcat_utils.MeshcatPoseSliders.Value.y">
+<span class="sig-name descname"><span class="pre">y</span></span><a class="headerlink" href="#manipulation.meshcat_utils.MeshcatPoseSliders.Value.y" title="Link to this definition">¶</a></dt>
+<dd><p>Alias for field number 4</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="manipulation.meshcat_utils.MeshcatPoseSliders.Value.yaw">
+<span class="sig-name descname"><span class="pre">yaw</span></span><a class="headerlink" href="#manipulation.meshcat_utils.MeshcatPoseSliders.Value.yaw" title="Link to this definition">¶</a></dt>
+<dd><p>Alias for field number 2</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="manipulation.meshcat_utils.MeshcatPoseSliders.Value.z">
+<span class="sig-name descname"><span class="pre">z</span></span><a class="headerlink" href="#manipulation.meshcat_utils.MeshcatPoseSliders.Value.z" title="Link to this definition">¶</a></dt>
+<dd><p>Alias for field number 5</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="manipulation.meshcat_utils.MeshcatPoseSliders.Visible">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Visible</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">roll</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pitch</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yaw</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#manipulation.meshcat_utils.MeshcatPoseSliders.Visible" title="Link to this definition">¶</a></dt>
+<dd><dl class="py attribute">
+<dt class="sig sig-object py" id="manipulation.meshcat_utils.MeshcatPoseSliders.Visible.pitch">
+<span class="sig-name descname"><span class="pre">pitch</span></span><a class="headerlink" href="#manipulation.meshcat_utils.MeshcatPoseSliders.Visible.pitch" title="Link to this definition">¶</a></dt>
+<dd><p>Alias for field number 1</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="manipulation.meshcat_utils.MeshcatPoseSliders.Visible.roll">
+<span class="sig-name descname"><span class="pre">roll</span></span><a class="headerlink" href="#manipulation.meshcat_utils.MeshcatPoseSliders.Visible.roll" title="Link to this definition">¶</a></dt>
+<dd><p>Alias for field number 0</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="manipulation.meshcat_utils.MeshcatPoseSliders.Visible.x">
+<span class="sig-name descname"><span class="pre">x</span></span><a class="headerlink" href="#manipulation.meshcat_utils.MeshcatPoseSliders.Visible.x" title="Link to this definition">¶</a></dt>
+<dd><p>Alias for field number 3</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="manipulation.meshcat_utils.MeshcatPoseSliders.Visible.y">
+<span class="sig-name descname"><span class="pre">y</span></span><a class="headerlink" href="#manipulation.meshcat_utils.MeshcatPoseSliders.Visible.y" title="Link to this definition">¶</a></dt>
+<dd><p>Alias for field number 4</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="manipulation.meshcat_utils.MeshcatPoseSliders.Visible.yaw">
+<span class="sig-name descname"><span class="pre">yaw</span></span><a class="headerlink" href="#manipulation.meshcat_utils.MeshcatPoseSliders.Visible.yaw" title="Link to this definition">¶</a></dt>
+<dd><p>Alias for field number 2</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="manipulation.meshcat_utils.MeshcatPoseSliders.Visible.z">
+<span class="sig-name descname"><span class="pre">z</span></span><a class="headerlink" href="#manipulation.meshcat_utils.MeshcatPoseSliders.Visible.z" title="Link to this definition">¶</a></dt>
+<dd><p>Alias for field number 5</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="manipulation.meshcat_utils.MeshcatPoseSliders.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">meshcat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">visible</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(True,</span> <span class="pre">True,</span> <span class="pre">True,</span> <span class="pre">True,</span> <span class="pre">True,</span> <span class="pre">True)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_range</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(-3.141592653589793,</span> <span class="pre">-3.141592653589793,</span> <span class="pre">-3.141592653589793,</span> <span class="pre">-1.0,</span> <span class="pre">-1.0,</span> <span class="pre">-1.0)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_range</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(3.141592653589793,</span> <span class="pre">3.141592653589793,</span> <span class="pre">3.141592653589793,</span> <span class="pre">1.0,</span> <span class="pre">1.0,</span> <span class="pre">1.0)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(0.0,</span> <span class="pre">0.0,</span> <span class="pre">0.0,</span> <span class="pre">0.0,</span> <span class="pre">0.0,</span> <span class="pre">0.0)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">decrement_keycode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">('KeyQ',</span> <span class="pre">'KeyW',</span> <span class="pre">'KeyA',</span> <span class="pre">'KeyJ',</span> <span class="pre">'KeyI',</span> <span class="pre">'KeyO')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">increment_keycode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">('KeyE',</span> <span class="pre">'KeyS',</span> <span class="pre">'KeyD',</span> <span class="pre">'KeyL',</span> <span class="pre">'KeyK',</span> <span class="pre">'KeyU')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">body_index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#manipulation.meshcat_utils.MeshcatPoseSliders.__init__" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>meshcat</strong> – A Meshcat instance.</p></li>
+<li><p><strong>visible</strong> – An object with boolean elements for ‘roll’, ‘pitch’,
+‘yaw’, ‘x’, ‘y’, ‘z’; the intention is for this to be the
+PoseSliders.Visible() namedtuple.  Defaults to all true.</p></li>
+<li><p><strong>min_range</strong> – Objects with float values for ‘roll’,
+‘pitch’, ‘yaw’, ‘x’, ‘y’, ‘z’; the intention is for the
+caller to use the PoseSliders.MinRange, MaxRange, and
+Value namedtuples.  See those tuples for default values.</p></li>
+<li><p><strong>max_range</strong> – Objects with float values for ‘roll’,
+‘pitch’, ‘yaw’, ‘x’, ‘y’, ‘z’; the intention is for the
+caller to use the PoseSliders.MinRange, MaxRange, and
+Value namedtuples.  See those tuples for default values.</p></li>
+<li><p><strong>value</strong> – Objects with float values for ‘roll’,
+‘pitch’, ‘yaw’, ‘x’, ‘y’, ‘z’; the intention is for the
+caller to use the PoseSliders.MinRange, MaxRange, and
+Value namedtuples.  See those tuples for default values.</p></li>
+<li><p><strong>body_index</strong> – if the body_poses input port is connected, then this
+index determine which pose is used to set the initial
+slider positions during the Initialization event.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="manipulation.meshcat_utils.MeshcatSliders">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">manipulation.meshcat_utils.</span></span><span class="sig-name descname"><span class="pre">MeshcatSliders</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">meshcat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slider_names</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#manipulation.meshcat_utils.MeshcatSliders" title="Link to this definition">¶</a></dt>
+<dd><p>A system that outputs the <a href="#id1"><span class="problematic" id="id2">``</span></a>value``s from meshcat sliders.</p>
+<blockquote>
+<div><p>name: MeshcatSliderSystem
+output_ports:
+- slider_group_0
+- …
+- slider_group_{N-1}</p>
+</div></blockquote>
+<dl class="py method">
+<dt class="sig sig-object py" id="manipulation.meshcat_utils.MeshcatSliders.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">meshcat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slider_names</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#manipulation.meshcat_utils.MeshcatSliders.__init__" title="Link to this definition">¶</a></dt>
+<dd><p>An output port is created for each element in the list <cite>slider_names</cite>.
+Each element of <cite>slider_names</cite> must itself be an iterable collection
+(list, tuple, set, …) of strings, with the names of sliders that have
+<em>already</em> been added to Meshcat via Meshcat.AddSlider().</p>
+<p>The same slider may be used in multiple ports.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="manipulation.meshcat_utils.PublishPositionTrajectory">
+<span class="sig-prename descclassname"><span class="pre">manipulation.meshcat_utils.</span></span><span class="sig-name descname"><span class="pre">PublishPositionTrajectory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trajectory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">root_context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plant</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">visualizer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_step</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.030303030303030304</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#manipulation.meshcat_utils.PublishPositionTrajectory" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>trajectory</strong> – A Trajectory instance.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="manipulation.meshcat_utils.WsgButton">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">manipulation.meshcat_utils.</span></span><span class="sig-name descname"><span class="pre">WsgButton</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">meshcat</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#manipulation.meshcat_utils.WsgButton" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">manipulation</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2023, Russ Tedrake.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 7.2.6</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.13</a>
+      
+      |
+      <a href="_sources/meshcat_utils.md.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

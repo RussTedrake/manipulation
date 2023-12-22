@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>manipulation.station &#8212; manipulation  documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=4f649999" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=039e1c02" />
+    <script src="_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="module-manipulation.station">
+<span id="manipulation-station"></span><h1><code class="docutils literal notranslate"><span class="pre">manipulation.station</span></code><a class="headerlink" href="#module-manipulation.station" title="Link to this heading">¶</a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="manipulation.station.AddPointClouds">
+<span class="sig-prename descclassname"><span class="pre">manipulation.station.</span></span><span class="sig-name descname"><span class="pre">AddPointClouds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scenario</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#manipulation.station.Scenario" title="manipulation.station.Scenario"><span class="pre">Scenario</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">station</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Diagram</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">builder</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DiagramBuilder</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">poses_output_port</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">OutputPort</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">meshcat</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Meshcat</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#manipulation.station.AddPointClouds" title="Link to this definition">¶</a></dt>
+<dd><p>Adds one DepthImageToPointCloud system to the <cite>builder</cite> for each camera in <cite>scenario</cite>, and connects it to the respective camera station output ports.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>scenario</strong> – A Scenario structure, populated using the <cite>load_scenario</cite> method.</p></li>
+<li><p><strong>station</strong> – A HardwareStation system (e.g. from MakeHardwareStation) that has already been added to <cite>builder</cite>.</p></li>
+<li><p><strong>builder</strong> – The DiagramBuilder containing <cite>station</cite> into which the new systems will be added.</p></li>
+<li><p><strong>poses_output_port</strong> – (optional) HardwareStation will have a body_poses output port iff it was created with <cite>hardware=False</cite>. Alternatively, one could create a MultibodyPositionsToGeometryPoses system to consume the position measurements; this optional input can be used to support that workflow.</p></li>
+<li><p><strong>meshcat</strong> – If not None, then a MeshcatPointCloudVisualizer will be added to the builder using this meshcat instance.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="manipulation.station.DemultiplexInput">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">manipulation.station.</span></span><span class="sig-name descname"><span class="pre">DemultiplexInput</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plant</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_instance_names</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#manipulation.station.DemultiplexInput" title="Link to this definition">¶</a></dt>
+<dd><dl class="py method">
+<dt class="sig sig-object py" id="manipulation.station.DemultiplexInput.CalcOutput">
+<span class="sig-name descname"><span class="pre">CalcOutput</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pydrake.systems.framework.System</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pydrake.systems.framework.Context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outputs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pydrake.systems.framework.SystemOutput</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#manipulation.station.DemultiplexInput.CalcOutput" title="Link to this definition">¶</a></dt>
+<dd><p>Utility method that computes for <em>every</em> output port i the value y(i)
+that should result from the current contents of the given Context.
+Note that individual output port values can be calculated using
+<code class="docutils literal notranslate"><span class="pre">get_output_port(i).Calc()</span></code>; this method invokes that for each
+output port in index order. The result may depend on time and the
+current values of input ports, parameters, and state variables. The
+result is written to <code class="docutils literal notranslate"><span class="pre">outputs</span></code> which must already have been
+allocated to have the right number of entries of the right types.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="manipulation.station.Directives">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">manipulation.station.</span></span><span class="sig-name descname"><span class="pre">Directives</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">directives:</span> <span class="pre">List[pydrake.multibody.parsing.ModelDirective]</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#manipulation.station.Directives" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="manipulation.station.ExtractPose">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">manipulation.station.</span></span><span class="sig-name descname"><span class="pre">ExtractPose</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">body_poses_output_port</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">body_index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">X_BA</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">RigidTransform(R=RotationMatrix([[1.0,</span> <span class="pre">0.0,</span> <span class="pre">0.0],</span> <span class="pre">[0.0,</span> <span class="pre">1.0,</span> <span class="pre">0.0],</span> <span class="pre">[0.0,</span> <span class="pre">0.0,</span> <span class="pre">1.0]]),</span> <span class="pre">p=[0.0,</span> <span class="pre">0.0,</span> <span class="pre">0.0])</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#manipulation.station.ExtractPose" title="Link to this definition">¶</a></dt>
+<dd><dl class="py method">
+<dt class="sig sig-object py" id="manipulation.station.ExtractPose.CalcOutput">
+<span class="sig-name descname"><span class="pre">CalcOutput</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pydrake.systems.framework.System</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pydrake.systems.framework.Context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outputs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pydrake.systems.framework.SystemOutput</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#manipulation.station.ExtractPose.CalcOutput" title="Link to this definition">¶</a></dt>
+<dd><p>Utility method that computes for <em>every</em> output port i the value y(i)
+that should result from the current contents of the given Context.
+Note that individual output port values can be calculated using
+<code class="docutils literal notranslate"><span class="pre">get_output_port(i).Calc()</span></code>; this method invokes that for each
+output port in index order. The result may depend on time and the
+current values of input ports, parameters, and state variables. The
+result is written to <code class="docutils literal notranslate"><span class="pre">outputs</span></code> which must already have been
+allocated to have the right number of entries of the right types.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="manipulation.station.InverseDynamicsDriver">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">manipulation.station.</span></span><span class="sig-name descname"><span class="pre">InverseDynamicsDriver</span></span><a class="headerlink" href="#manipulation.station.InverseDynamicsDriver" title="Link to this definition">¶</a></dt>
+<dd><p>A simulation-only driver that adds the InverseDynamicsController to the
+station and exports the output ports. Multiple model instances can be
+provided using <cite>instance_name1+instance_name2</cite> as the key; the output ports
+will be named similarly.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="manipulation.station.JointStiffnessDriver">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">manipulation.station.</span></span><span class="sig-name descname"><span class="pre">JointStiffnessDriver</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gains:</span> <span class="pre">~typing.Mapping[str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">~manipulation.station.MyPdControllerGains]</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hand_model_name:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#manipulation.station.JointStiffnessDriver" title="Link to this definition">¶</a></dt>
+<dd><p>A simulation-only driver that sets up MultibodyPlant to act as if it is
+being controlled with a JointStiffnessController. The MultibodyPlant must
+be using SAP as the (discrete-time) contact solver.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="manipulation.station.MakeHardwareStation">
+<span class="sig-prename descclassname"><span class="pre">manipulation.station.</span></span><span class="sig-name descname"><span class="pre">MakeHardwareStation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scenario</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#manipulation.station.Scenario" title="manipulation.station.Scenario"><span class="pre">Scenario</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">meshcat</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Meshcat</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">package_xmls</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hardware</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parser_preload_callback</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">Parser</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parser_prefinalize_callback</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">Parser</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prebuild_callback</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">DiagramBuilder</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#manipulation.station.MakeHardwareStation" title="Link to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>If <cite>hardware=False</cite>, (the default) returns a HardwareStation diagram containing:</dt><dd><ul class="simple">
+<li><p>A MultibodyPlant with populated via the directives in <cite>scenario</cite>.</p></li>
+<li><p>A SceneGraph</p></li>
+<li><p>The default Drake visualizers</p></li>
+<li><p>Any robot / sensors drivers specified in the YAML description.</p></li>
+</ul>
+</dd>
+</dl>
+<p>If <cite>hardware=True</cite>, returns a HardwareStationInterface diagram containing the network interfaces to communicate directly with the hardware drivers.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>scenario</strong> – A Scenario structure, populated using the <cite>load_scenario</cite> method.</p></li>
+<li><p><strong>meshcat</strong> – If not None, then AddDefaultVisualization will be added to the subdiagram using this meshcat instance.</p></li>
+<li><p><strong>package_xmls</strong> – A list of package.xml file paths that will be passed to the parser, using Parser.AddPackageXml().</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="manipulation.station.MultiplexState">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">manipulation.station.</span></span><span class="sig-name descname"><span class="pre">MultiplexState</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plant</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_instance_names</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#manipulation.station.MultiplexState" title="Link to this definition">¶</a></dt>
+<dd><dl class="py method">
+<dt class="sig sig-object py" id="manipulation.station.MultiplexState.CalcOutput">
+<span class="sig-name descname"><span class="pre">CalcOutput</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pydrake.systems.framework.System</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pydrake.systems.framework.Context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outputs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pydrake.systems.framework.SystemOutput</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#manipulation.station.MultiplexState.CalcOutput" title="Link to this definition">¶</a></dt>
+<dd><p>Utility method that computes for <em>every</em> output port i the value y(i)
+that should result from the current contents of the given Context.
+Note that individual output port values can be calculated using
+<code class="docutils literal notranslate"><span class="pre">get_output_port(i).Calc()</span></code>; this method invokes that for each
+output port in index order. The result may depend on time and the
+current values of input ports, parameters, and state variables. The
+result is written to <code class="docutils literal notranslate"><span class="pre">outputs</span></code> which must already have been
+allocated to have the right number of entries of the right types.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="manipulation.station.MyPdControllerGains">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">manipulation.station.</span></span><span class="sig-name descname"><span class="pre">MyPdControllerGains</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kd</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#manipulation.station.MyPdControllerGains" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="manipulation.station.Scenario">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">manipulation.station.</span></span><span class="sig-name descname"><span class="pre">Scenario</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">random_seed:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simulation_duration:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">inf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simulator_config:</span> <span class="pre">~pydrake.systems.analysis.SimulatorConfig</span> <span class="pre">=</span> <span class="pre">SimulatorConfig(integration_scheme='runge_kutta3'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_step_size=0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">accuracy=0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_error_control=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_realtime_rate=0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">publish_every_time_step=False)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plant_config:</span> <span class="pre">~pydrake.multibody.plant.MultibodyPlantConfig</span> <span class="pre">=</span> <span class="pre">MultibodyPlantConfig(time_step=0.001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">penetration_allowance=0.001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stiction_tolerance=0.001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">contact_model='hydroelastic_with_fallback'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">discrete_contact_solver='sap'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sap_near_rigid_threshold=1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">contact_surface_representation='polygon'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adjacent_bodies_collision_filters=True)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">directives:</span> <span class="pre">~typing.List[~pydrake.multibody.parsing.ModelDirective]</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lcm_buses:</span> <span class="pre">~typing.Mapping[str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">~pydrake.lcm.DrakeLcmParams]</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_drivers:</span> <span class="pre">~typing.Mapping[str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">~pydrake.manipulation.IiwaDriver</span> <span class="pre">|</span> <span class="pre">~manipulation.station.InverseDynamicsDriver</span> <span class="pre">|</span> <span class="pre">~manipulation.station.JointStiffnessDriver</span> <span class="pre">|</span> <span class="pre">~pydrake.manipulation.SchunkWsgDriver</span> <span class="pre">|</span> <span class="pre">~pydrake.manipulation.ZeroForceDriver]</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cameras:</span> <span class="pre">~typing.Mapping[str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">~pydrake.systems.sensors.CameraConfig]</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">visualization:</span> <span class="pre">~pydrake.visualization.VisualizationConfig</span> <span class="pre">=</span> <span class="pre">VisualizationConfig(lcm_bus='default'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">publish_period=0.015625</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">publish_illustration=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default_illustration_color=Rgba(r=0.9</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g=0.9</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b=0.9</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a=1.0)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">publish_proximity=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default_proximity_color=Rgba(r=1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g=0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b=0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a=0.5)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">publish_contacts=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">publish_inertia=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">enable_meshcat_creation=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delete_on_initialization_event=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">enable_alpha_sliders=False)</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#manipulation.station.Scenario" title="Link to this definition">¶</a></dt>
+<dd><p>Defines the YAML format for a (possibly stochastic) scenario to be
+simulated.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="manipulation.station.load_scenario">
+<span class="sig-prename descclassname"><span class="pre">manipulation.station.</span></span><span class="sig-name descname"><span class="pre">load_scenario</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scenario_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">defaults</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Scenario(random_seed=0,</span> <span class="pre">simulation_duration=inf,</span> <span class="pre">simulator_config=SimulatorConfig(integration_scheme='runge_kutta3',</span> <span class="pre">max_step_size=0.01,</span> <span class="pre">accuracy=0.01,</span> <span class="pre">use_error_control=False,</span> <span class="pre">target_realtime_rate=0.0,</span> <span class="pre">publish_every_time_step=False),</span> <span class="pre">plant_config=MultibodyPlantConfig(time_step=0.001,</span> <span class="pre">penetration_allowance=0.001,</span> <span class="pre">stiction_tolerance=0.001,</span> <span class="pre">contact_model='hydroelastic_with_fallback',</span> <span class="pre">discrete_contact_solver='sap',</span> <span class="pre">sap_near_rigid_threshold=1.0,</span> <span class="pre">contact_surface_representation='polygon',</span> <span class="pre">adjacent_bodies_collision_filters=True),</span> <span class="pre">directives=[],</span> <span class="pre">lcm_buses={'default':</span> <span class="pre">DrakeLcmParams(lcm_url='',</span> <span class="pre">channel_suffix='',</span> <span class="pre">defer_initialization=False)},</span> <span class="pre">model_drivers={},</span> <span class="pre">cameras={},</span> <span class="pre">visualization=VisualizationConfig(lcm_bus='default',</span> <span class="pre">publish_period=0.015625,</span> <span class="pre">publish_illustration=True,</span> <span class="pre">default_illustration_color=Rgba(r=0.9,</span> <span class="pre">g=0.9,</span> <span class="pre">b=0.9,</span> <span class="pre">a=1.0),</span> <span class="pre">publish_proximity=True,</span> <span class="pre">default_proximity_color=Rgba(r=1.0,</span> <span class="pre">g=0.0,</span> <span class="pre">b=0.0,</span> <span class="pre">a=0.5),</span> <span class="pre">publish_contacts=True,</span> <span class="pre">publish_inertia=True,</span> <span class="pre">enable_meshcat_creation=True,</span> <span class="pre">delete_on_initialization_event=True,</span> <span class="pre">enable_alpha_sliders=False))</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#manipulation.station.load_scenario" title="Link to this definition">¶</a></dt>
+<dd><p>Implements the command-line handling logic for scenario data.
+Returns a <cite>Scenario</cite> object loaded from the given input arguments.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filename</strong> (<em>optional</em>) – A yaml filename to load the scenario from.</p></li>
+<li><p><strong>data</strong> (<em>optional</em>) – A yaml string to load the scenario from. If both
+filename and string are specified, then the filename is parsed
+first, and then the string is _also_ parsed, potentially overwriting defaults from the filename..</p></li>
+<li><p><strong>scenario_name</strong> (<em>optional</em>) – The name of the scenario/child to load from
+the yaml file. If None, then the entire file is loaded.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">manipulation</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2023, Russ Tedrake.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 7.2.6</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.13</a>
+      
+      |
+      <a href="_sources/station.md.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

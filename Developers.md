@@ -1,24 +1,27 @@
-## To install poetry
+## Requirements management with Poetry
 
 Install poetry using the [official installer](https://python-poetry.org/docs/#installing-with-the-official-installer); not brew nor apt.
 Install the poetry export plugin:
 ```
 pip3 install poetry-plugin-export
 ```
-
-## To update poetry
-
-```
-./book/htmlbook/PoetryExport.sh
-```
-One may want to also run
+Then one can run
 ```
 poetry install
 ```
-- Hopefully [direct poetry
-support](https://github.com/bazelbuild/rules_python/issues/340) will land soon, or I can use [rules_python_poetry](https://github.com/AndrewGuenther/rules_python_poetry) directly; but it looks like it will still require poetry to fix [their issue](# https://github.com/python-poetry/poetry-plugin-export/issues/176).
+(potentially in a virtual environment) to install the requirements.
 
-## To install the pre-commit hooks
+## Bazel currently uses requirements-bazel.txt, which we generate from poetry
+
+To generate it, run
+```
+./book/htmlbook/PoetryExport.sh
+```
+
+Hopefully [direct poetry
+support](https://github.com/bazelbuild/rules_python/issues/340) in bazel will land soon, or I can use [rules_python_poetry](https://github.com/AndrewGuenther/rules_python_poetry) directly; but it looks like it will still require poetry to fix [their issue](# https://github.com/python-poetry/poetry-plugin-export/issues/176).
+
+## Please install the pre-commit hooks
 
 ```
 pip3 install pre-commit
@@ -54,6 +57,13 @@ rm -rf dist/*
 poetry publish --build
 ```
 (Use `poetry config pypi-token.pypi <token>` once first)
+
+## Building the documentation
+
+From the root directory, run
+```
+rm -rf book/python && sphinx-build -M html manipulation /tmp/manip_doc && cp -r /tmp/manip_doc/html book/python
+```
 
 
 ## Tips for developers
