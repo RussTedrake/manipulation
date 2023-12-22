@@ -1,11 +1,16 @@
 import dataclasses as dc
-from functools import partial
 import os
 import sys
 import typing
+from functools import partial
 
 import numpy as np
-
+from drake import (
+    lcmt_iiwa_command,
+    lcmt_iiwa_status,
+    lcmt_schunk_wsg_command,
+    lcmt_schunk_wsg_status,
+)
 from pydrake.all import (
     AbstractValue,
     Adder,
@@ -26,13 +31,11 @@ from pydrake.all import (
     IiwaDriver,
     IiwaStatusReceiver,
     InverseDynamicsController,
-    LeafSystem,
     LcmPublisherSystem,
     LcmSubscriberSystem,
+    LeafSystem,
     MakeMultibodyStateToWsgStateSystem,
     MakeRenderEngineVtk,
-    RenderEngineVtkParams,
-    RobotDiagramBuilder,
     Meshcat,
     MeshcatPointCloudVisualizer,
     ModelDirective,
@@ -45,12 +48,14 @@ from pydrake.all import (
     PassThrough,
     PdControllerGains,
     ProcessModelDirectives,
+    RenderEngineVtkParams,
     RgbdSensor,
     RigidTransform,
+    RobotDiagramBuilder,
     SceneGraph,
+    SchunkWsgCommandSender,
     SchunkWsgDriver,
     SchunkWsgPositionController,
-    SchunkWsgCommandSender,
     SchunkWsgStatusReceiver,
     ScopedName,
     SimulatorConfig,
@@ -59,18 +64,8 @@ from pydrake.all import (
     ZeroForceDriver,
 )
 from pydrake.common.yaml import yaml_load_typed
-from drake import (
-    lcmt_iiwa_command,
-    lcmt_iiwa_status,
-    lcmt_schunk_wsg_command,
-    lcmt_schunk_wsg_status,
-)
 
-from manipulation.scenarios import (
-    AddIiwa,
-    AddPlanarIiwa,
-    AddWsg,
-)
+from manipulation.scenarios import AddIiwa, AddPlanarIiwa, AddWsg
 from manipulation.utils import ConfigureParser
 
 

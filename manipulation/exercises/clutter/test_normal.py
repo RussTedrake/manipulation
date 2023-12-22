@@ -1,7 +1,9 @@
 import unittest
+
+import numpy as np
 import timeout_decorator
 from gradescope_utils.autograder_utils.decorators import weight
-import numpy as np
+
 from manipulation.utils import FindResource
 
 

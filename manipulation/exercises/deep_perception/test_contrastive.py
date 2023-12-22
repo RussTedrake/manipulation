@@ -1,7 +1,8 @@
 import unittest
+
+import numpy as np
 import timeout_decorator
 from gradescope_utils.autograder_utils.decorators import weight
-import numpy as np
 
 
 def gt_don_loss(f, img_a, img_b, u_a, u_b, match, margin=2.0):

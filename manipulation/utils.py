@@ -1,13 +1,13 @@
 import os
-import pydot
 from datetime import date
 from pathlib import Path
 from urllib.request import urlretrieve
 from warnings import warn
 
 import numpy as np
+import pydot
 from IPython import get_ipython
-from IPython.display import display, SVG
+from IPython.display import SVG, display
 from pydrake.all import GetDrakePath
 from pydrake.common import GetDrakePath
 from pydrake.geometry import RenderLabel

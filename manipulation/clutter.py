@@ -1,6 +1,5 @@
 import numpy as np
-
-from pydrake.all import RotationMatrix, RigidTransform
+from pydrake.all import RigidTransform, RotationMatrix
 
 
 def GraspCandidateCost(

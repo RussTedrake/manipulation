@@ -10,9 +10,9 @@ from enum import Enum
 import numpy as np
 from pydrake.all import (
     AbstractValue,
-    Adder,
-    AddContactMaterial,
     AddCompliantHydroelasticProperties,
+    AddContactMaterial,
+    Adder,
     AddMultibodyPlantSceneGraph,
     BallRpyJoint,
     BaseField,

@@ -1,8 +1,9 @@
 import unittest
+
+import numpy as np
+import pydrake.symbolic as ps
 import timeout_decorator
 from gradescope_utils.autograder_utils.decorators import weight
-import pydrake.symbolic as ps
-import numpy as np
 
 
 class TestSimplePendulumWithGearbox(unittest.TestCase):

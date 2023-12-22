@@ -1,12 +1,13 @@
 import argparse
 import sys
-import numpy as np
+
 import bosdyn.client
-from bosdyn.client.frame_helpers import get_a_tform_b, BODY_FRAME_NAME
 import bosdyn.client.util
+import numpy as np
+from bosdyn.client.frame_helpers import BODY_FRAME_NAME, get_a_tform_b
 from bosdyn.client.image import ImageClient
-from pydrake.math import RigidTransform, RollPitchYaw
 from pydrake.common.yaml import yaml_dump
+from pydrake.math import RigidTransform, RollPitchYaw
 
 CAMERA_NAMES = [
     "frontleft",
@@ -52,7 +53,9 @@ def main(argv):
         camera_configs[camera_name]["name"] = camera_name
 
         camera_configs[camera_name]["width"] = color_image_response.source.cols
-        camera_configs[camera_name]["height"] = color_image_response.source.rows
+        camera_configs[camera_name][
+            "height"
+        ] = color_image_response.source.rows
 
         camera_configs[camera_name]["focal"] = {
             "x": color_image_response.source.pinhole.intrinsics.focal_length.x,
@@ -84,7 +87,9 @@ def main(argv):
                 "translation"
             ] = X_PB.translation().tolist()
             camera_configs[camera_name]["X_PB"]["rotation"] = {
-                "deg": (RollPitchYaw(X_PB.rotation()).vector() * 180 / np.pi).tolist(),
+                "deg": (
+                    RollPitchYaw(X_PB.rotation()).vector() * 180 / np.pi
+                ).tolist(),
                 "_tag": "!Rpy",
             }
         else:
@@ -103,7 +108,9 @@ def main(argv):
                 "translation"
             ] = X_PB.translation().tolist()
             camera_configs[camera_name]["X_PB"]["rotation"] = {
-                "deg": (RollPitchYaw(X_PB.rotation()).vector() * 180 / np.pi).tolist(),
+                "deg": (
+                    RollPitchYaw(X_PB.rotation()).vector() * 180 / np.pi
+                ).tolist(),
                 "_tag": "!Rpy",
             }
 
@@ -122,7 +129,9 @@ def main(argv):
                 "translation"
             ] = X_BC.translation().tolist()
             camera_configs[camera_name]["X_BC"]["rotation"] = {
-                "deg": (RollPitchYaw(X_BC.rotation()).vector() * 180 / np.pi).tolist(),
+                "deg": (
+                    RollPitchYaw(X_BC.rotation()).vector() * 180 / np.pi
+                ).tolist(),
                 "_tag": "!Rpy",
             }
 

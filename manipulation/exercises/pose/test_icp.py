@@ -3,11 +3,7 @@ import unittest
 import numpy as np
 import timeout_decorator
 from gradescope_utils.autograder_utils.decorators import weight
-from pydrake.all import (
-    RigidTransform,
-    RollPitchYaw,
-    RotationMatrix,
-)
+from pydrake.all import RigidTransform, RollPitchYaw, RotationMatrix
 
 
 def least_squares_transform(scene, model):

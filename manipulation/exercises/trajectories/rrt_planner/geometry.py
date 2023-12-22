@@ -1,6 +1,6 @@
 # Written by Caelan Garrett, modified a bit by Tomas Lozano-Perez
 # yapf: disable
-from math import sqrt, cos, sin, atan2
+from math import atan2, cos, sin, sqrt
 
 # Some utilities used in the class definitions, notably Polygon,
 

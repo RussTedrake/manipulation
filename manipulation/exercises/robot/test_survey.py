@@ -1,7 +1,8 @@
+import hashlib
 import unittest
+
 import timeout_decorator
 from gradescope_utils.autograder_utils.decorators import weight
-import hashlib
 
 
 class TestSurvey(unittest.TestCase):

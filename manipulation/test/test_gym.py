@@ -2,6 +2,7 @@ import unittest
 
 import gymnasium as gym
 import stable_baselines3.common.env_checker
+
 import manipulation.envs.box_flipup  # no-member
 
 

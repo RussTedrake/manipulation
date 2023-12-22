@@ -4,8 +4,8 @@ from pydrake.all import (
     AddMultibodyPlantSceneGraph,
     ConnectPlanarSceneGraphVisualizer,
     ConstantVectorSource,
-    DiagramBuilder,
     Demultiplexer,
+    DiagramBuilder,
     FixedOffsetFrame,
     InverseDynamicsController,
     LeafSystem,
@@ -21,9 +21,8 @@ from pydrake.all import (
     SpatialInertia,
     UnitInertia,
 )
-
-
 from pydrake.gym import DrakeGymEnv
+
 from manipulation.utils import ConfigureParser
 
 """ Defines the PlanarPusherPushingABoxEnv

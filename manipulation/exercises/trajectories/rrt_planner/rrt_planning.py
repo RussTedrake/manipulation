@@ -1,10 +1,11 @@
 # Written by Caelan Garrett, modified a bit by Tomas Lozano-Perez
 # yapf: disable
-from .geometry import Point, Line, Polygon, Object, AABB, convex_hull
-from .robot import ConfigurationSpace
-from random import random, randint, uniform
+from math import cos, pi, sin
+from random import randint, random, uniform
 from time import time
-from math import pi, cos, sin
+
+from .geometry import AABB, Line, Object, Point, Polygon, convex_hull
+from .robot import ConfigurationSpace
 
 
 class TreeNode:

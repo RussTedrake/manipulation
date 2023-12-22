@@ -1,7 +1,7 @@
-import manipulation.meshcat_utils as dut
-
 import numpy as np
-from pydrake.all import MathematicalProgram, Solve, Meshcat
+from pydrake.all import MathematicalProgram, Meshcat, Solve
+
+import manipulation.meshcat_utils as dut
 
 prog = MathematicalProgram()
 x = prog.NewContinuousVariables(2)

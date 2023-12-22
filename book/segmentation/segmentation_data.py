@@ -29,7 +29,7 @@ from pydrake.all import (
 )
 
 from manipulation.scenarios import AddRgbdSensor, ycb
-from manipulation.utils import colorize_labels, ConfigureParser
+from manipulation.utils import ConfigureParser, colorize_labels
 
 parser = argparse.ArgumentParser(
     description="Install ToC and Navigation into book html files."

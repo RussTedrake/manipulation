@@ -1,7 +1,8 @@
 # yapf: disable
-from .geometry import Point, Pose, Object
 import random
 from math import ceil, sqrt
+
+from .geometry import Object, Point, Pose
 
 
 class Robot:

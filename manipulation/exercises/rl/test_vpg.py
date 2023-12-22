@@ -1,7 +1,8 @@
 import unittest
+
 import timeout_decorator
-from gradescope_utils.autograder_utils.decorators import weight
 import torch
+from gradescope_utils.autograder_utils.decorators import weight
 from torch.nn.functional import l1_loss
 
 

@@ -28,8 +28,8 @@ from pydrake.all import (
     UnitInertia,
     Variable,
 )
-
 from pydrake.gym import DrakeGymEnv
+
 from manipulation.scenarios import AddShape, SetTransparency
 from manipulation.utils import ConfigureParser
 

@@ -4,17 +4,10 @@ from functools import partial
 
 import numpy as np
 from pydrake.common.value import AbstractValue
-from pydrake.geometry import (
-    Cylinder,
-    Rgba,
-    Sphere,
-)
+from pydrake.geometry import Cylinder, Rgba, Sphere
 from pydrake.math import RigidTransform, RollPitchYaw, RotationMatrix
 from pydrake.solvers import BoundingBoxConstraint
-from pydrake.systems.framework import (
-    EventStatus,
-    LeafSystem,
-)
+from pydrake.systems.framework import EventStatus, LeafSystem
 
 from manipulation import running_as_notebook
 

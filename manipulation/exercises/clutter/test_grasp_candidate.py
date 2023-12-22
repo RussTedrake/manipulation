@@ -1,10 +1,10 @@
 import unittest
+
+import numpy as np
 import timeout_decorator
 from gradescope_utils.autograder_utils.decorators import weight
-import numpy as np
-from scipy.spatial import KDTree
-
 from pydrake.all import RigidTransform
+from scipy.spatial import KDTree
 
 # Store X_lst_target as global for testing all the functions
 # yapf: disable

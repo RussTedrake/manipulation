@@ -3,7 +3,7 @@ import numpy as np
 from rrt_planner.manipulation_station_collision_checker import (
     ManipulationStationCollisionChecker,
 )
-from rrt_planner.robot import Range, ConfigurationSpace
+from rrt_planner.robot import ConfigurationSpace, Range
 from rrt_planner.rrt_planning import Problem
 
 
