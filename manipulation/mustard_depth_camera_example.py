@@ -14,9 +14,7 @@ def MustardExampleSystem():
     plant, scene_graph = AddMultibodyPlantSceneGraph(builder, time_step=0.0)
     parser = Parser(plant)
     ConfigureParser(parser)
-    parser.AddModelsFromUrl(
-        "package://manipulation/mustard_w_cameras.dmd.yaml"
-    )
+    parser.AddModelsFromUrl("package://manipulation/mustard_w_cameras.dmd.yaml")
     plant.Finalize()
 
     # Add a visualizer just to help us see the object.
@@ -46,9 +44,7 @@ def MustardPointCloud(normals=False, down_sample=True):
         cloud = system.GetOutputPort(f"camera{i}_point_cloud").Eval(context)
 
         # Crop to region of interest.
-        pcd.append(
-            cloud.Crop(lower_xyz=[-0.3, -0.3, -0.3], upper_xyz=[0.3, 0.3, 0.3])
-        )
+        pcd.append(cloud.Crop(lower_xyz=[-0.3, -0.3, -0.3], upper_xyz=[0.3, 0.3, 0.3]))
 
         if normals:
             pcd[i].EstimateNormals(radius=0.1, num_closest=30)

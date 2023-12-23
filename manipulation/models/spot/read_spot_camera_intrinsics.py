@@ -53,9 +53,7 @@ def main(argv):
         camera_configs[camera_name]["name"] = camera_name
 
         camera_configs[camera_name]["width"] = color_image_response.source.cols
-        camera_configs[camera_name][
-            "height"
-        ] = color_image_response.source.rows
+        camera_configs[camera_name]["height"] = color_image_response.source.rows
 
         camera_configs[camera_name]["focal"] = {
             "x": color_image_response.source.pinhole.intrinsics.focal_length.x,
@@ -87,9 +85,7 @@ def main(argv):
                 "translation"
             ] = X_PB.translation().tolist()
             camera_configs[camera_name]["X_PB"]["rotation"] = {
-                "deg": (
-                    RollPitchYaw(X_PB.rotation()).vector() * 180 / np.pi
-                ).tolist(),
+                "deg": (RollPitchYaw(X_PB.rotation()).vector() * 180 / np.pi).tolist(),
                 "_tag": "!Rpy",
             }
         else:
@@ -108,9 +104,7 @@ def main(argv):
                 "translation"
             ] = X_PB.translation().tolist()
             camera_configs[camera_name]["X_PB"]["rotation"] = {
-                "deg": (
-                    RollPitchYaw(X_PB.rotation()).vector() * 180 / np.pi
-                ).tolist(),
+                "deg": (RollPitchYaw(X_PB.rotation()).vector() * 180 / np.pi).tolist(),
                 "_tag": "!Rpy",
             }
 
@@ -129,9 +123,7 @@ def main(argv):
                 "translation"
             ] = X_BC.translation().tolist()
             camera_configs[camera_name]["X_BC"]["rotation"] = {
-                "deg": (
-                    RollPitchYaw(X_BC.rotation()).vector() * 180 / np.pi
-                ).tolist(),
+                "deg": (RollPitchYaw(X_BC.rotation()).vector() * 180 / np.pi).tolist(),
                 "_tag": "!Rpy",
             }
 

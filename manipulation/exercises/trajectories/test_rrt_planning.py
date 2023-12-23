@@ -59,8 +59,7 @@ class TestRRT(unittest.TestCase):
         )
         self.assertTrue(
             student_path[-1] == iiwa_problem_test.goal,
-            msg="the last configuration of the path "
-            "does not equal to goal.",
+            msg="the last configuration of the path " "does not equal to goal.",
         )
         self.assertTrue(
             student_path[0] == iiwa_problem_test.start,

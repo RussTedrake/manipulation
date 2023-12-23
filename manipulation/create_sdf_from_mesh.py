@@ -47,14 +47,10 @@ def calc_mesh_com_and_inertia(
     volume = mesh.volume
     mesh.density = mass / volume
     moment_of_inertia = (
-        mesh.moment_inertia
-        if frame is None
-        else mesh.moment_inertia_frame(frame)
+        mesh.moment_inertia if frame is None else mesh.moment_inertia_frame(frame)
     )
     if frame is None:
-        logging.info(
-            f"Calculating the moment of inertia about {mesh.center_mass}"
-        )
+        logging.info(f"Calculating the moment of inertia about {mesh.center_mass}")
     return mesh.center_mass, moment_of_inertia
 
 
@@ -183,13 +179,9 @@ def create_sdf_from_mesh(
     mesh.apply_scale(scale)
 
     # Generate the SDFormat headers
-    root_item = ET.Element(
-        "sdf", version="1.7", nsmap={"drake": "drake.mit.edu"}
-    )
+    root_item = ET.Element("sdf", version="1.7", nsmap={"drake": "drake.mit.edu"})
     model_item = ET.SubElement(root_item, "model", name=mesh_name)
-    link_item = ET.SubElement(
-        model_item, "link", name=f"{mesh_name}_body_link"
-    )
+    link_item = ET.SubElement(model_item, "link", name=f"{mesh_name}_body_link")
     pose_item = ET.SubElement(link_item, "pose")
     pose_item.text = "0 0 0 0 0 0"
 
@@ -240,9 +232,7 @@ def create_sdf_from_mesh(
             collision_item, "{drake.mit.edu}proximity_properties"
         )
         if is_compliant:
-            ET.SubElement(
-                proximity_item, "{drake.mit.edu}compliant_hydroelastic"
-            )
+            ET.SubElement(proximity_item, "{drake.mit.edu}compliant_hydroelastic")
             hydroelastic_moulus_item = ET.SubElement(
                 proximity_item, "{drake.mit.edu}hydroelastic_modulus"
             )
@@ -253,18 +243,12 @@ def create_sdf_from_mesh(
             hunt_crossley_dissipation_item = ET.SubElement(
                 proximity_item, "{drake.mit.edu}hunt_crossley_dissipation"
             )
-            hunt_crossley_dissipation_item.text = (
-                f"{hunt_crossley_dissipation:.3f}"
-            )
+            hunt_crossley_dissipation_item.text = f"{hunt_crossley_dissipation:.3f}"
         if mu_dynamic is not None:
-            mu_dynamic_item = ET.SubElement(
-                proximity_item, "{drake.mit.edu}mu_dynamic"
-            )
+            mu_dynamic_item = ET.SubElement(proximity_item, "{drake.mit.edu}mu_dynamic")
             mu_dynamic_item.text = f"{mu_dynamic:.3f}"
         if mu_static is not None:
-            mu_static_item = ET.SubElement(
-                proximity_item, "{drake.mit.edu}mu_static"
-            )
+            mu_static_item = ET.SubElement(proximity_item, "{drake.mit.edu}mu_static")
             mu_static_item.text = f"{mu_static:.3f}"
 
     logging.info(f"Writing SDF to {sdf_path}")
@@ -413,11 +397,7 @@ if __name__ == "__main__":
 
     is_compliant = args.compliant
     hydroelastic_modulus = args.hydroelastic_modulus
-    if (
-        is_compliant
-        and hydroelastic_modulus is not None
-        and hydroelastic_modulus < 0
-    ):
+    if is_compliant and hydroelastic_modulus is not None and hydroelastic_modulus < 0:
         logging.error(
             f"Got a Hydroelastic modulus of {hydroelastic_modulus:.3e} Pa. A "
             + "non-negative value is required!"

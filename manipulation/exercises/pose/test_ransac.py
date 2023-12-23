@@ -86,9 +86,7 @@ class TestRANSAC(unittest.TestCase):
         bunny_w_plane_copy = deepcopy(bunny_w_plane)
 
         rng = np.random.default_rng(135)
-        student_answer = remove_plane(
-            bunny_w_plane, self.ransac_student, rng, tol=1e-4
-        )
+        student_answer = remove_plane(bunny_w_plane, self.ransac_student, rng, tol=1e-4)
 
         outliers = []
         plane_equation = np.array([0.0, 0.0, 1.0, 0.0])

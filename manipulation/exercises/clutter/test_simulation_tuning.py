@@ -29,12 +29,8 @@ class TestSimulationTuning(unittest.TestCase):
         in_range_list1 = []
         in_range_list2 = []
         for i in range(3):
-            in_range_1 = (
-                block_pos_range[i, 0] < block1_pos[i] < block_pos_range[i, 1]
-            )
-            in_range_2 = (
-                block_pos_range[i, 0] < block2_pos[i] < block_pos_range[i, 1]
-            )
+            in_range_1 = block_pos_range[i, 0] < block1_pos[i] < block_pos_range[i, 1]
+            in_range_2 = block_pos_range[i, 0] < block2_pos[i] < block_pos_range[i, 1]
             in_range_list1.append(in_range_1)
             in_range_list2.append(in_range_2)
 
@@ -58,22 +54,14 @@ class TestSimulationTuning(unittest.TestCase):
         block1_pos = block_poses[:7][4:]
         block2_pos = block_poses[7:][4:]
 
-        block1_pos_range = np.array(
-            [[0.01, 0.035], [-0.025, 0.025], [0.0475, 0.0675]]
-        )
-        block2_pos_range = np.array(
-            [[0.20, 0.23], [-0.025, 0.025], [0.0275, 0.05]]
-        )
+        block1_pos_range = np.array([[0.01, 0.035], [-0.025, 0.025], [0.0475, 0.0675]])
+        block2_pos_range = np.array([[0.20, 0.23], [-0.025, 0.025], [0.0275, 0.05]])
 
         in_range_list1 = []
         in_range_list2 = []
         for i in range(3):
-            in_range_1 = (
-                block1_pos_range[i, 0] < block1_pos[i] < block1_pos_range[i, 1]
-            )
-            in_range_2 = (
-                block2_pos_range[i, 0] < block2_pos[i] < block2_pos_range[i, 1]
-            )
+            in_range_1 = block1_pos_range[i, 0] < block1_pos[i] < block1_pos_range[i, 1]
+            in_range_2 = block2_pos_range[i, 0] < block2_pos[i] < block2_pos_range[i, 1]
             in_range_list1.append(in_range_1)
             in_range_list2.append(in_range_2)
 
@@ -97,22 +85,14 @@ class TestSimulationTuning(unittest.TestCase):
         block1_pos = block_poses[:7][4:]
         block2_pos = block_poses[7:][4:]
 
-        block1_pos_range = np.array(
-            [[0.2, 0.3], [-0.025, 0.025], [0.025, 0.0375]]
-        )
-        block2_pos_range = np.array(
-            [[0.2, 0.3], [-0.025, 0.025], [0.0475, 0.06]]
-        )
+        block1_pos_range = np.array([[0.2, 0.3], [-0.025, 0.025], [0.025, 0.0375]])
+        block2_pos_range = np.array([[0.2, 0.3], [-0.025, 0.025], [0.0475, 0.06]])
 
         in_range_list1 = []
         in_range_list2 = []
         for i in range(3):
-            in_range_1 = (
-                block1_pos_range[i, 0] < block1_pos[i] < block1_pos_range[i, 1]
-            )
-            in_range_2 = (
-                block2_pos_range[i, 0] < block2_pos[i] < block2_pos_range[i, 1]
-            )
+            in_range_1 = block1_pos_range[i, 0] < block1_pos[i] < block1_pos_range[i, 1]
+            in_range_2 = block2_pos_range[i, 0] < block2_pos[i] < block2_pos_range[i, 1]
             in_range_list1.append(in_range_1)
             in_range_list2.append(in_range_2)
 

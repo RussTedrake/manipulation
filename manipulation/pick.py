@@ -1,10 +1,5 @@
 import numpy as np
-from pydrake.all import (
-    AngleAxis,
-    PiecewisePolynomial,
-    PiecewisePose,
-    RigidTransform,
-)
+from pydrake.all import AngleAxis, PiecewisePolynomial, PiecewisePose, RigidTransform
 
 
 def MakeGripperFrames(X_G, t0=0):
@@ -63,9 +58,7 @@ def MakeGripperFrames(X_G, t0=0):
     X_G["pick_end"] = X_G["pick"]
     times["postpick"] = times["pick_end"] + 2.0
     X_G["postpick"] = X_G["prepick"]
-    time_to_from_clearance = 10.0 * np.linalg.norm(
-        X_GprepickGclearance.translation()
-    )
+    time_to_from_clearance = 10.0 * np.linalg.norm(X_GprepickGclearance.translation())
     times["clearance"] = times["postpick"] + time_to_from_clearance
     times["preplace"] = times["clearance"] + time_to_from_clearance
     times["place_start"] = times["preplace"] + 2.0

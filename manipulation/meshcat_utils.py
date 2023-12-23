@@ -79,9 +79,7 @@ class MeshcatPoseSliders(LeafSystem):
     MaxRange.__new__.__defaults__ = (np.pi, np.pi, np.pi, 1.0, 1.0, 1.0)
     Value = namedtuple("Value", ("roll", "pitch", "yaw", "x", "y", "z"))
     Value.__new__.__defaults__ = (0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
-    DecrementKey = namedtuple(
-        "DecrementKey", ("roll", "pitch", "yaw", "x", "y", "z")
-    )
+    DecrementKey = namedtuple("DecrementKey", ("roll", "pitch", "yaw", "x", "y", "z"))
     DecrementKey.__new__.__defaults__ = (
         "KeyQ",
         "KeyW",
@@ -90,9 +88,7 @@ class MeshcatPoseSliders(LeafSystem):
         "KeyI",
         "KeyO",
     )
-    IncrementKey = namedtuple(
-        "IncrementKey", ("roll", "pitch", "yaw", "x", "y", "z")
-    )
+    IncrementKey = namedtuple("IncrementKey", ("roll", "pitch", "yaw", "x", "y", "z"))
     IncrementKey.__new__.__defaults__ = (
         "KeyE",
         "KeyS",
@@ -195,9 +191,7 @@ class MeshcatPoseSliders(LeafSystem):
         self._value[2] = rpy.yaw_angle()
         for i in range(3):
             if self._visible[i]:
-                self._meshcat.SetSliderValue(
-                    self._visible._fields[i], self._value[i]
-                )
+                self._meshcat.SetSliderValue(self._visible._fields[i], self._value[i])
 
     def SetXyz(self, xyz):
         """
@@ -209,18 +203,14 @@ class MeshcatPoseSliders(LeafSystem):
         self._value[3:] = xyz
         for i in range(3, 6):
             if self._visible[i]:
-                self._meshcat.SetSliderValue(
-                    self._visible._fields[i], self._value[i]
-                )
+                self._meshcat.SetSliderValue(self._visible._fields[i], self._value[i])
 
     def _update_values(self):
         changed = False
         for i in range(6):
             if self._visible[i]:
                 old_value = self._value[i]
-                self._value[i] = self._meshcat.GetSliderValue(
-                    self._visible._fields[i]
-                )
+                self._value[i] = self._meshcat.GetSliderValue(self._visible._fields[i])
                 changed = changed or self._value[i] != old_value
         return changed
 
@@ -252,9 +242,7 @@ class MeshcatPoseSliders(LeafSystem):
         if not running_as_notebook:
             return
 
-        publishing_context = publishing_system.GetMyContextFromRoot(
-            root_context
-        )
+        publishing_context = publishing_system.GetMyContextFromRoot(root_context)
 
         print("Press the 'Stop PoseSliders' button in Meshcat to continue.")
         self._meshcat.AddButton("Stop PoseSliders", "Escape")
@@ -270,9 +258,7 @@ class MeshcatPoseSliders(LeafSystem):
 class WsgButton(LeafSystem):
     def __init__(self, meshcat):
         LeafSystem.__init__(self)
-        port = self.DeclareVectorOutputPort(
-            "wsg_position", 1, self.DoCalcOutput
-        )
+        port = self.DeclareVectorOutputPort("wsg_position", 1, self.DoCalcOutput)
         port.disable_caching_by_default()
         self._meshcat = meshcat
         self._button = "Open/Close Gripper"
@@ -294,18 +280,14 @@ def AddMeshcatTriad(
 ):
     meshcat.SetTransform(path, X_PT)
     # x-axis
-    X_TG = RigidTransform(
-        RotationMatrix.MakeYRotation(np.pi / 2), [length / 2.0, 0, 0]
-    )
+    X_TG = RigidTransform(RotationMatrix.MakeYRotation(np.pi / 2), [length / 2.0, 0, 0])
     meshcat.SetTransform(path + "/x-axis", X_TG)
     meshcat.SetObject(
         path + "/x-axis", Cylinder(radius, length), Rgba(1, 0, 0, opacity)
     )
 
     # y-axis
-    X_TG = RigidTransform(
-        RotationMatrix.MakeXRotation(np.pi / 2), [0, length / 2.0, 0]
-    )
+    X_TG = RigidTransform(RotationMatrix.MakeXRotation(np.pi / 2), [0, length / 2.0, 0])
     meshcat.SetTransform(path + "/y-axis", X_TG)
     meshcat.SetObject(
         path + "/y-axis", Cylinder(radius, length), Rgba(0, 1, 0, opacity)
@@ -354,9 +336,7 @@ def plot_surface(
     )
 
 
-def plot_mathematical_program(
-    meshcat, path, prog, X, Y, result=None, point_size=0.05
-):
+def plot_mathematical_program(meshcat, path, prog, X, Y, result=None, point_size=0.05):
     assert prog.num_vars() == 2
     assert X.size == Y.size
 
@@ -436,9 +416,7 @@ def plot_mathematical_program(
         x_solution = result.get_x_val()
         meshcat.SetTransform(
             v,
-            RigidTransform(
-                [x_solution[0], x_solution[1], result.get_optimal_cost()]
-            ),
+            RigidTransform([x_solution[0], x_solution[1], result.get_optimal_cost()]),
         )
 
 

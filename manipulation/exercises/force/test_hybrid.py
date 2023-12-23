@@ -19,9 +19,7 @@ class TestHybrid(unittest.TestCase):
         plant_context = self.notebook_locals["plant_context"]
 
         # Get final pose of the book.
-        X_WB = plant.GetFreeBodyPose(
-            plant_context, plant.GetBodyByName("book_body")
-        )
+        X_WB = plant.GetFreeBodyPose(plant_context, plant.GetBodyByName("book_body"))
 
         p_WB = X_WB.translation()
 
@@ -51,6 +49,5 @@ class TestHybrid(unittest.TestCase):
             self.assertLessEqual(
                 -p_y[t],
                 -0.045,
-                "The gripper tip cannot be lower than the "
-                "surface of the book.",
+                "The gripper tip cannot be lower than the " "surface of the book.",
             )

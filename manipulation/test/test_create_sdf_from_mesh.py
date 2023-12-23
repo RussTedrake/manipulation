@@ -42,9 +42,7 @@ class CreateSDFFromMeshTest(unittest.TestCase):
         self.assertTrue(
             os.path.exists(mesh_pieces_dir), "Mesh pieces dir does not exist"
         )
-        num_mesh_pieces = len(
-            fnmatch.filter(os.listdir(mesh_pieces_dir), "*.*")
-        )
+        num_mesh_pieces = len(fnmatch.filter(os.listdir(mesh_pieces_dir), "*.*"))
         self.assertTrue(
             num_mesh_pieces == 1,
             f"An incorrect number of mesh pieces were created ({num_mesh_pieces} pieces)",

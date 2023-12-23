@@ -92,9 +92,7 @@ class JointStiffnessDriver:
     be using SAP as the (discrete-time) contact solver."""
 
     # Must have one element for every (named) actuator in the model_instance.
-    gains: typing.Mapping[str, MyPdControllerGains] = dc.field(
-        default_factory=dict
-    )
+    gains: typing.Mapping[str, MyPdControllerGains] = dc.field(default_factory=dict)
 
     hand_model_name: str = ""
 
@@ -163,9 +161,7 @@ class Directives:
 
 
 # TODO(russt): load from url (using packagemap).
-def load_scenario(
-    *, filename=None, data=None, scenario_name=None, defaults=Scenario()
-):
+def load_scenario(*, filename=None, data=None, scenario_name=None, defaults=Scenario()):
     """Implements the command-line handling logic for scenario data.
     Returns a `Scenario` object loaded from the given input arguments.
 
@@ -260,9 +256,7 @@ class DemultiplexInput(LeafSystem):
         LeafSystem.__init__(self)
         total_inputs = 0
         for name in model_instance_names:
-            num_actuators = plant.num_actuators(
-                plant.GetModelInstanceByName(name)
-            )
+            num_actuators = plant.num_actuators(plant.GetModelInstanceByName(name))
             self.DeclareVectorOutputPort(
                 name + ".input",
                 num_actuators,
@@ -361,12 +355,8 @@ def _ApplyDriverConfigSim(
         )
         # Use a PassThrough to make the port optional (it will provide zero
         # values if not connected).
-        torque_passthrough = builder.AddSystem(
-            PassThrough([0] * num_iiwa_positions)
-        )
-        builder.Connect(
-            torque_passthrough.get_output_port(), adder.get_input_port(1)
-        )
+        torque_passthrough = builder.AddSystem(PassThrough([0] * num_iiwa_positions))
+        builder.Connect(torque_passthrough.get_output_port(), adder.get_input_port(1))
         builder.ExportInput(
             torque_passthrough.get_input_port(),
             model_instance_name + ".feedforward_torque",
@@ -407,9 +397,7 @@ def _ApplyDriverConfigSim(
         )
 
         builder.ExportOutput(
-            sim_plant.get_generalized_contact_forces_output_port(
-                model_instance
-            ),
+            sim_plant.get_generalized_contact_forces_output_port(model_instance),
             model_instance_name + ".torque_external",
         )
 
@@ -606,17 +594,13 @@ def _ApplyPrefinalizeDriverConfigSim(
         # Set PD gains.
         for name, gains in driver_config.gains.items():
             actuator = sim_plant.GetJointActuatorByName(name, model_instance)
-            actuator.set_controller_gains(
-                PdControllerGains(p=gains.kp, d=gains.kd)
-            )
+            actuator.set_controller_gains(PdControllerGains(p=gains.kp, d=gains.kd))
 
         # Turn off gravity to model (perfect) gravity compensation.
         sim_plant.set_gravity_enabled(model_instance, False)
         if driver_config.hand_model_name:
             sim_plant.set_gravity_enabled(
-                sim_plant.GetModelInstanceByName(
-                    driver_config.hand_model_name
-                ),
+                sim_plant.GetModelInstanceByName(driver_config.hand_model_name),
                 False,
             )
 
@@ -696,9 +680,7 @@ def _ApplyCameraConfigSim(*, config, builder):
         )
     )
     camera_sys.set_name(f"rgbd_sensor_{config.name}")
-    builder.Connect(
-        scene_graph.get_query_output_port(), camera_sys.get_input_port()
-    )
+    builder.Connect(scene_graph.get_query_output_port(), camera_sys.get_input_port())
 
     # TODO(russt): export output ports
     builder.ExportOutput(
@@ -743,9 +725,7 @@ def MakeHardwareStation(
             scenario=scenario, meshcat=meshcat, package_xmls=package_xmls
         )
 
-    robot_builder = RobotDiagramBuilder(
-        time_step=scenario.plant_config.time_step
-    )
+    robot_builder = RobotDiagramBuilder(time_step=scenario.plant_config.time_step)
     builder = robot_builder.builder()
     sim_plant = robot_builder.plant()
     scene_graph = robot_builder.scene_graph()
@@ -838,9 +818,7 @@ def ApplyDriverConfigInterface(
     builder,
 ):
     if isinstance(driver_config, IiwaDriver):
-        lcm = lcm_buses.Find(
-            "Driver for " + model_instance_name, driver_config.lcm_bus
-        )
+        lcm = lcm_buses.Find("Driver for " + model_instance_name, driver_config.lcm_bus)
 
         # Publish IIWA command.
         iiwa_command_sender = builder.AddSystem(IiwaCommandSender())
@@ -854,9 +832,7 @@ def ApplyDriverConfigInterface(
                 use_cpp_serializer=True,
             )
         )
-        iiwa_command_publisher.set_name(
-            model_instance_name + ".command_publisher"
-        )
+        iiwa_command_publisher.set_name(model_instance_name + ".command_publisher")
         builder.ExportInput(
             iiwa_command_sender.get_position_input_port(),
             model_instance_name + ".position",
@@ -880,9 +856,7 @@ def ApplyDriverConfigInterface(
                 wait_for_message_on_initialization_timeout=10,
             )
         )
-        iiwa_status_subscriber.set_name(
-            model_instance_name + ".status_subscriber"
-        )
+        iiwa_status_subscriber.set_name(model_instance_name + ".status_subscriber")
 
         # builder.Connect(
         #    iiwa_status_receiver.get_position_measured_output_port(),
@@ -918,9 +892,7 @@ def ApplyDriverConfigInterface(
             iiwa_status_receiver.get_input_port(),
         )
     if isinstance(driver_config, SchunkWsgDriver):
-        lcm = lcm_buses.Find(
-            "Driver for " + model_instance_name, driver_config.lcm_bus
-        )
+        lcm = lcm_buses.Find("Driver for " + model_instance_name, driver_config.lcm_bus)
 
         # Publish WSG command.
         wsg_command_sender = builder.AddSystem(SchunkWsgCommandSender())
@@ -933,9 +905,7 @@ def ApplyDriverConfigInterface(
                 use_cpp_serializer=True,
             )
         )
-        wsg_command_publisher.set_name(
-            model_instance_name + ".command_publisher"
-        )
+        wsg_command_publisher.set_name(model_instance_name + ".command_publisher")
         builder.ExportInput(
             wsg_command_sender.get_position_input_port(),
             model_instance_name + ".position",
@@ -960,9 +930,7 @@ def ApplyDriverConfigInterface(
                 wait_for_message_on_initialization_timeout=10,
             )
         )
-        wsg_status_subscriber.set_name(
-            model_instance_name + ".status_subscriber"
-        )
+        wsg_status_subscriber.set_name(model_instance_name + ".status_subscriber")
         builder.ExportOutput(
             wsg_status_receiver.get_state_output_port(),
             model_instance_name + ".state_measured",
@@ -1036,9 +1004,7 @@ def MakeHardwareStationInterface(
 
     # Add LCM buses. (The simulator will handle polling the network for new
     # messages and dispatching them to the receivers, i.e., "pump" the bus.)
-    lcm_buses = ApplyLcmBusConfig(
-        lcm_buses=scenario.lcm_buses, builder=builder
-    )
+    lcm_buses = ApplyLcmBusConfig(lcm_buses=scenario.lcm_buses, builder=builder)
 
     # Add drivers.
     ApplyDriverConfigsInterface(
@@ -1057,9 +1023,7 @@ def MakeHardwareStationInterface(
 
 
 class ExtractPose(LeafSystem):
-    def __init__(
-        self, body_poses_output_port, body_index, X_BA=RigidTransform()
-    ):
+    def __init__(self, body_poses_output_port, body_index, X_BA=RigidTransform()):
         LeafSystem.__init__(self)
         self.body_index = body_index
         self.DeclareAbstractInputPort(

@@ -57,9 +57,7 @@ class TestICP(unittest.TestCase):
             distances, indices = nearest_neighbors(self.scene, self.model)
 
             X_BA_test = f(self.scene, self.model[:, indices])
-            X_BA_true = least_squares_transform(
-                self.scene, self.model[:, indices]
-            )
+            X_BA_true = least_squares_transform(self.scene, self.model[:, indices])
 
             # check answer
             result = X_BA_true.inverse().multiply(X_BA_test)
@@ -101,10 +99,7 @@ class TestICP(unittest.TestCase):
             )
             X_BA = least_squares_transform(self.scene, self.model[:, indices])
             mean_error = np.mean(distances)
-            if (
-                abs(mean_error - prev_error) < tolerance
-                or num_iters >= max_iterations
-            ):
+            if abs(mean_error - prev_error) < tolerance or num_iters >= max_iterations:
                 break
             prev_error = mean_error
 

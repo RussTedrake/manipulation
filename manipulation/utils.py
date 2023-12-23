@@ -55,17 +55,13 @@ def FindDataResource(filename: str):
     """
     Returns the absolute path to the given filename relative to the data directory; fetching it from a remote host if necessary.
     """
-    data = os.path.join(
-        os.path.dirname(os.path.dirname(__file__)), "book/data"
-    )
+    data = os.path.join(os.path.dirname(os.path.dirname(__file__)), "book/data")
     if not os.path.exists(data):
         os.makedirs(data)
     path = os.path.join(data, filename)
     if not os.path.exists(path):
         print(f"{path} was not found locally; downloading it now...")
-        urlretrieve(
-            f"https://manipulation.csail.mit.edu/data/{filename}", path
-        )
+        urlretrieve(f"https://manipulation.csail.mit.edu/data/{filename}", path)
     return path
 
 
@@ -106,9 +102,7 @@ def colorize_labels(image: ImageLabel16I):
 
 
 def DrakeVersionGreaterThan(minimum_date: date):
-    drake_version_txt = (
-        Path(GetDrakePath()).parent / "doc" / "drake" / "VERSION.TXT"
-    )
+    drake_version_txt = Path(GetDrakePath()).parent / "doc" / "drake" / "VERSION.TXT"
     # If the file doesn't exist, then we should pass. A source install won't
     # have VERSION.TXT
     if drake_version_txt.is_file():
@@ -147,9 +141,9 @@ def RenderDiagram(system: System, max_depth: int = None):
     """
     display(
         SVG(
-            pydot.graph_from_dot_data(
-                system.GetGraphvizString(max_depth=max_depth)
-            )[0].create_svg()
+            pydot.graph_from_dot_data(system.GetGraphvizString(max_depth=max_depth))[
+                0
+            ].create_svg()
         )
     )
 

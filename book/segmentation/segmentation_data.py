@@ -82,9 +82,7 @@ directives:
         ConfigureParser(parser)
         instance = parser.AddModelsFromString(directives, ".dmd.yaml")[0]
 
-        frame_id = plant.GetBodyFrameIdOrThrow(
-            plant.GetBodyIndices(instance)[0]
-        )
+        frame_id = plant.GetBodyFrameIdOrThrow(plant.GetBodyIndices(instance)[0])
         geometry_ids = inspector.GetGeometries(frame_id, Role.kPerception)
         for geom_id in geometry_ids:
             instance_id_to_class_name[
@@ -123,9 +121,7 @@ directives:
                 UniformlyRandomRotationMatrix(generator),
                 [rng.uniform(-0.15, 0.15), rng.uniform(-0.2, 0.2), z],
             )
-            plant.SetFreeBodyPose(
-                plant_context, plant.get_body(body_index), tf
-            )
+            plant.SetFreeBodyPose(plant_context, plant.get_body(body_index), tf)
             z += 0.1
 
         try:

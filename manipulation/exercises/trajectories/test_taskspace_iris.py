@@ -75,9 +75,7 @@ class TestTaskspaceIRIS(unittest.TestCase):
         """Test closest point"""
         f = self.notebook_locals["ClosestPointOnObstacle"]
 
-        test_C = np.array(
-            [[0.22810313, -0.10359835], [-0.0444466, 0.27173404]]
-        )
+        test_C = np.array([[0.22810313, -0.10359835], [-0.0444466, 0.27173404]])
         test_C_inv = np.linalg.inv(test_C)
         test_d = np.array([0.36327963, 0.4762024])
 
@@ -115,9 +113,7 @@ class TestTaskspaceIRIS(unittest.TestCase):
         dist_diff = np.asarray(dist_diff)
 
         self.assertTrue((x_diff < 1e-3).all(), "Closest points are wrong!")
-        self.assertTrue(
-            (dist_diff < 1e-2).all(), "Closest distances are wrong!"
-        )
+        self.assertTrue((dist_diff < 1e-2).all(), "Closest distances are wrong!")
 
     @weight(4)
     @timeout_decorator.timeout(5.0)
@@ -126,9 +122,7 @@ class TestTaskspaceIRIS(unittest.TestCase):
         f = self.notebook_locals["SeparatingHyperplanes"]
 
         tris = [val for val in tri_obs]
-        test_C = np.array(
-            [[0.22810313, -0.10359835], [-0.0444466, 0.27173404]]
-        )
+        test_C = np.array([[0.22810313, -0.10359835], [-0.0444466, 0.27173404]])
         test_d = np.array([0.36327963, 0.4762024])
         A_pred, b_pred, hyp_sol = f(test_C, test_d, tris)
 
@@ -182,7 +176,5 @@ class TestTaskspaceIRIS(unittest.TestCase):
 
         b_diff = np.linalg.norm(b_sol - b_pred, axis=-1)
 
-        self.assertTrue(
-            (A_thetas < np.deg2rad(5)).all(), "Hyperplane angles are off!"
-        )
+        self.assertTrue((A_thetas < np.deg2rad(5)).all(), "Hyperplane angles are off!")
         self.assertTrue((b_diff < 0.01).all(), "Hyperplane offsets are off!")

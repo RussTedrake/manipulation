@@ -129,9 +129,7 @@ def AddPlanarIiwa(plant):
 def AddTwoLinkIiwa(plant, q0=[0.1, -1.2]):
     parser = Parser(plant)
     ConfigureParser(parser)
-    iiwa = parser.AddModelsFromUrl(
-        "package://manipulation/two_link_iiwa14.urdf"
-    )[0]
+    iiwa = parser.AddModelsFromUrl("package://manipulation/two_link_iiwa14.urdf")[0]
     plant.WeldFrames(plant.world_frame(), plant.GetFrameByName("iiwa_link_0"))
 
     # Set default positions:
@@ -151,9 +149,7 @@ class WsgPositions(Enum):
 
 
 # TODO: take argument for whether we want the welded fingers version or not
-def AddWsg(
-    plant, iiwa_model_instance, roll=np.pi / 2.0, welded=False, sphere=False
-):
+def AddWsg(plant, iiwa_model_instance, roll=np.pi / 2.0, welded=False, sphere=False):
     parser = Parser(plant)
     ConfigureParser(parser)
     if welded:
@@ -189,9 +185,7 @@ def AddFloatingXyzJoint(plant, frame, instance, actuators=False):
         SpatialInertia(mass=0, p_PScm_E=[0.0, 0.0, 0.0], G_SP_E=inertia),
     )
     x_joint = plant.AddJoint(
-        PrismaticJoint(
-            "x", plant.world_frame(), x_body.body_frame(), [1, 0, 0]
-        )
+        PrismaticJoint("x", plant.world_frame(), x_body.body_frame(), [1, 0, 0])
     )
     if actuators:
         plant.AddJointActuator("x", x_joint)
@@ -201,15 +195,11 @@ def AddFloatingXyzJoint(plant, frame, instance, actuators=False):
         SpatialInertia(mass=0, p_PScm_E=[0.0, 0.0, 0.0], G_SP_E=inertia),
     )
     y_joint = plant.AddJoint(
-        PrismaticJoint(
-            "y", x_body.body_frame(), y_body.body_frame(), [0, 1, 0]
-        )
+        PrismaticJoint("y", x_body.body_frame(), y_body.body_frame(), [0, 1, 0])
     )
     if actuators:
         plant.AddJointActuator("y", y_joint)
-    z_joint = plant.AddJoint(
-        PrismaticJoint("z", y_body.body_frame(), frame, [0, 0, 1])
-    )
+    z_joint = plant.AddJoint(PrismaticJoint("z", y_body.body_frame(), frame, [0, 0, 1]))
     if actuators:
         plant.AddJointActuator("z", z_joint)
 
@@ -230,51 +220,35 @@ def AddShape(plant, shape, name, mass=1, mu=1, color=[0.5, 0.5, 0.9, 1.0]):
     # TODO: Add a method to UnitInertia that accepts a geometry shape (unless
     # that dependency is somehow gross) and does this.
     if isinstance(shape, Box):
-        inertia = UnitInertia.SolidBox(
-            shape.width(), shape.depth(), shape.height()
-        )
+        inertia = UnitInertia.SolidBox(shape.width(), shape.depth(), shape.height())
     elif isinstance(shape, Cylinder):
-        inertia = UnitInertia.SolidCylinder(
-            shape.radius(), shape.length(), [0, 0, 1]
-        )
+        inertia = UnitInertia.SolidCylinder(shape.radius(), shape.length(), [0, 0, 1])
     elif isinstance(shape, Sphere):
         inertia = UnitInertia.SolidSphere(shape.radius())
     elif isinstance(shape, Capsule):
-        inertia = UnitInertia.SolidCapsule(
-            shape.radius(), shape.length(), [0, 0, 1]
-        )
+        inertia = UnitInertia.SolidCapsule(shape.radius(), shape.length(), [0, 0, 1])
     else:
-        raise RuntimeError(
-            f"need to write the unit inertia for shapes of type {shape}"
-        )
+        raise RuntimeError(f"need to write the unit inertia for shapes of type {shape}")
     body = plant.AddRigidBody(
         name,
         instance,
-        SpatialInertia(
-            mass=mass, p_PScm_E=np.array([0.0, 0.0, 0.0]), G_SP_E=inertia
-        ),
+        SpatialInertia(mass=mass, p_PScm_E=np.array([0.0, 0.0, 0.0]), G_SP_E=inertia),
     )
     if plant.geometry_source_is_registered():
         proximity_properties = ProximityProperties()
-        AddContactMaterial(
-            1e4, 1e7, CoulombFriction(mu, mu), proximity_properties
-        )
+        AddContactMaterial(1e4, 1e7, CoulombFriction(mu, mu), proximity_properties)
         AddCompliantHydroelasticProperties(0.01, 1e8, proximity_properties)
         plant.RegisterCollisionGeometry(
             body, RigidTransform(), shape, name, proximity_properties
         )
 
-        plant.RegisterVisualGeometry(
-            body, RigidTransform(), shape, name, color
-        )
+        plant.RegisterVisualGeometry(body, RigidTransform(), shape, name, color)
 
     return instance
 
 
 def AddCamera(builder, scene_graph, X_WC, depth_camera=None, renderer=None):
-    warnings.warn(
-        "Please use AddRgbdSensor instead.", warnings.DeprecationWarning
-    )
+    warnings.warn("Please use AddRgbdSensor instead.", warnings.DeprecationWarning)
     return AddRgbdSensor(builder, scene_graph, X_WC, depth_camera, renderer)
 
 
@@ -306,9 +280,7 @@ def AddRgbdSensor(
         parent_frame_id = scene_graph.world_frame_id()
 
     if not scene_graph.HasRenderer(renderer):
-        scene_graph.AddRenderer(
-            renderer, MakeRenderEngineVtk(RenderEngineVtkParams())
-        )
+        scene_graph.AddRenderer(renderer, MakeRenderEngineVtk(RenderEngineVtkParams()))
 
     if not depth_camera:
         depth_camera = DepthRenderCamera(
@@ -330,9 +302,7 @@ def AddRgbdSensor(
         )
     )
 
-    builder.Connect(
-        scene_graph.get_query_output_port(), rgbd.query_object_input_port()
-    )
+    builder.Connect(scene_graph.get_query_output_port(), rgbd.query_object_input_port())
 
     return rgbd
 
@@ -363,9 +333,7 @@ def AddRgbdSensors(
         renderer = "my_renderer"
 
     if not scene_graph.HasRenderer(renderer):
-        scene_graph.AddRenderer(
-            renderer, MakeRenderEngineVtk(RenderEngineVtkParams())
-        )
+        scene_graph.AddRenderer(renderer, MakeRenderEngineVtk(RenderEngineVtkParams()))
 
     if not depth_camera:
         depth_camera = DepthRenderCamera(
@@ -428,9 +396,7 @@ def AddRgbdSensors(
                 )
 
                 camera_pose = builder.AddSystem(
-                    ExtractBodyPose(
-                        plant.get_body_poses_output_port(), body_index
-                    )
+                    ExtractBodyPose(plant.get_body_poses_output_port(), body_index)
                 )
                 builder.Connect(
                     plant.get_body_poses_output_port(),
@@ -506,9 +472,7 @@ def AddTriad(
       name: the added geometry will have names name + " x-axis", etc.
     """
     # x-axis
-    X_TG = RigidTransform(
-        RotationMatrix.MakeYRotation(np.pi / 2), [length / 2.0, 0, 0]
-    )
+    X_TG = RigidTransform(RotationMatrix.MakeYRotation(np.pi / 2), [length / 2.0, 0, 0])
     geom = GeometryInstance(
         X_FT.multiply(X_TG), Cylinder(radius, length), name + " x-axis"
     )
@@ -518,9 +482,7 @@ def AddTriad(
     scene_graph.RegisterGeometry(source_id, frame_id, geom)
 
     # y-axis
-    X_TG = RigidTransform(
-        RotationMatrix.MakeXRotation(np.pi / 2), [0, length / 2.0, 0]
-    )
+    X_TG = RigidTransform(RotationMatrix.MakeXRotation(np.pi / 2), [0, length / 2.0, 0])
     geom = GeometryInstance(
         X_FT.multiply(X_TG), Cylinder(radius, length), name + " y-axis"
     )
@@ -540,9 +502,7 @@ def AddTriad(
     scene_graph.RegisterGeometry(source_id, frame_id, geom)
 
 
-def AddMultibodyTriad(
-    frame, scene_graph, length=0.25, radius=0.01, opacity=1.0
-):
+def AddMultibodyTriad(frame, scene_graph, length=0.25, radius=0.01, opacity=1.0):
     plant = frame.GetParentPlant()
     AddTriad(
         plant.get_source_id(),
@@ -564,9 +524,7 @@ def AddIiwaDifferentialIK(builder, plant, frame=None):
     q0 = plant.GetPositions(plant.CreateDefaultContext())
     params.set_nominal_joint_position(q0)
     params.set_end_effector_angular_speed_limit(2)
-    params.set_end_effector_translational_velocity_limits(
-        [-2, -2, -2], [2, 2, 2]
-    )
+    params.set_end_effector_translational_velocity_limits([-2, -2, -2], [2, 2, 2])
     if plant.num_positions() == 3:  # planar iiwa
         iiwa14_velocity_limits = np.array([1.4, 1.3, 2.3])
         params.set_joint_velocity_limits(
@@ -576,9 +534,7 @@ def AddIiwaDifferentialIK(builder, plant, frame=None):
         assert (
             frame.name() == "iiwa_link_7"
         ), "Still need to generalize the remaining planar diff IK params for different frames"  # noqa
-        params.set_end_effector_velocity_flag(
-            [True, False, False, True, False, True]
-        )
+        params.set_end_effector_velocity_flag([True, False, False, True, False, True])
     else:
         iiwa14_velocity_limits = np.array([1.4, 1.4, 1.7, 1.3, 2.2, 2.3, 2.3])
         params.set_joint_velocity_limits(
@@ -651,9 +607,7 @@ def MakeManipulationStation(
     builder = DiagramBuilder()
 
     # Add (only) the iiwa, WSG, and cameras to the scene.
-    plant, scene_graph = AddMultibodyPlantSceneGraph(
-        builder, time_step=time_step
-    )
+    plant, scene_graph = AddMultibodyPlantSceneGraph(builder, time_step=time_step)
     parser = Parser(plant)
     for p in package_xmls:
         parser.package_map().AddPackageXml(p)
@@ -785,9 +739,7 @@ def MakeManipulationStation(
             )
 
             builder.ExportOutput(
-                plant.get_generalized_contact_forces_output_port(
-                    model_instance
-                ),
+                plant.get_generalized_contact_forces_output_port(model_instance),
                 model_instance_name + "_torque_external",
             )
 
@@ -828,18 +780,12 @@ def MakeManipulationStation(
             )
 
     # Cameras.
-    AddRgbdSensors(
-        builder, plant, scene_graph, model_instance_prefix=camera_prefix
-    )
+    AddRgbdSensors(builder, plant, scene_graph, model_instance_prefix=camera_prefix)
 
     # Export "cheat" ports.
     builder.ExportOutput(scene_graph.get_query_output_port(), "query_object")
-    builder.ExportOutput(
-        plant.get_contact_results_output_port(), "contact_results"
-    )
-    builder.ExportOutput(
-        plant.get_state_output_port(), "plant_continuous_state"
-    )
+    builder.ExportOutput(plant.get_contact_results_output_port(), "contact_results")
+    builder.ExportOutput(plant.get_state_output_port(), "plant_continuous_state")
     builder.ExportOutput(plant.get_body_poses_output_port(), "body_poses")
 
     diagram = builder.Build()

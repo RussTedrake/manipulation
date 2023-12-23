@@ -20,9 +20,7 @@ class TestDirectJointControl(unittest.TestCase):
         station, context = f(interactive=False, q_cmd=q_cmd)
         station.ValidateContext(context)
 
-        commanded_pos = station.GetOutputPort("iiwa.position_commanded").Eval(
-            context
-        )
+        commanded_pos = station.GetOutputPort("iiwa.position_commanded").Eval(context)
 
         self.assertLessEqual(
             np.linalg.norm(commanded_pos - q_cmd),

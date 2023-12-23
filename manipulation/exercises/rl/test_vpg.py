@@ -20,9 +20,7 @@ class TestVPG(unittest.TestCase):
         obs = torch.ones(3, 2) * 2.0
         actions = torch.ones(3, 1) * 3.0
         returns = torch.arange(3, 6).float()
-        policy_f = PolicyEstimator(
-            num_hidden=1, hidden_dim=2, obs_dim=2, action_dim=1
-        )
+        policy_f = PolicyEstimator(num_hidden=1, hidden_dim=2, obs_dim=2, action_dim=1)
         # initialize to constant values
         for p in policy_f.parameters():
             torch.nn.init.ones_(p)
@@ -37,9 +35,7 @@ class TestVPG(unittest.TestCase):
     def test_value_loss(self):
         """Testing the value loss"""
         ValueEstimator = self.notebook_locals["ValueEstimator"]
-        value_f = ValueEstimator(
-            num_hidden=1, hidden_dim=2, obs_dim=2, action_dim=1
-        )
+        value_f = ValueEstimator(num_hidden=1, hidden_dim=2, obs_dim=2, action_dim=1)
         student_value_loss = self.notebook_locals["util_compute_value_loss"]
         # initialize to constant values
         for p in value_f.parameters():
@@ -72,9 +68,7 @@ class TestVPG(unittest.TestCase):
             [[20.8205, 10.9500, 0.0000], [15.8206, 10.9400, 0.0000]]
         )
 
-        l1_error = l1_loss(
-            input=student_sol[:, :-1], target=reference_sol[:, :-1]
-        )
+        l1_error = l1_loss(input=student_sol[:, :-1], target=reference_sol[:, :-1])
         print(l1_error)
         self.assertLess(
             l1_error,

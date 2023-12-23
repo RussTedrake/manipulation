@@ -26,12 +26,8 @@ class TestRobotPainter(unittest.TestCase):
         for i, frame_i in enumerate(output_frames):
             if i == 0:
                 # check if the first frame is the gripper's current frame
-                dist = np.linalg.norm(
-                    frame_i.translation() - X_WG.translation()
-                )
-                self.assertLessEqual(
-                    dist, 1e-6, "first key frame position incorrect!"
-                )
+                dist = np.linalg.norm(frame_i.translation() - X_WG.translation())
+                self.assertLessEqual(dist, 1e-6, "first key frame position incorrect!")
             else:
                 # check if the radius is correct
                 pos_cur = frame_i.translation()

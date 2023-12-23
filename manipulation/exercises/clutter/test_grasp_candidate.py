@@ -73,8 +73,7 @@ class TestGraspCandidate(unittest.TestCase):
         self.assertTrue(
             RT.IsNearlyEqualTo(RT_desired, 0.01)
             or RT.IsNearlyEqualTo(RT_desired_alt, 0.01),
-            "Did you forget to sort the eigenvalues, "
-            "or handle improper rotations?",
+            "Did you forget to sort the eigenvalues, " "or handle improper rotations?",
         )
 
     @weight(4)
@@ -150,16 +149,12 @@ class TestGraspCandidate(unittest.TestCase):
     def test_candidate_grasps(self):
         """Test compute_candidate_grasps"""
         pcd = self.notebook_locals["pcd_downsampled"]
-        compute_candidate_grasps = self.notebook_locals[
-            "compute_candidate_grasps"
-        ]
+        compute_candidate_grasps = self.notebook_locals["compute_candidate_grasps"]
         find_minimum_distance = self.notebook_locals["find_minimum_distance"]
         check_collision = self.notebook_locals["check_collision"]
         check_nonempty = self.notebook_locals["check_nonempty"]
 
-        grasp_candidates = compute_candidate_grasps(
-            pcd, candidate_num=3, random_seed=5
-        )
+        grasp_candidates = compute_candidate_grasps(pcd, candidate_num=3, random_seed=5)
 
         self.assertTrue(
             len(grasp_candidates) == 3,

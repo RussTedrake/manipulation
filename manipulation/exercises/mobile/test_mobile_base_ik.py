@@ -48,24 +48,18 @@ class TestMobileBaseIk(unittest.TestCase):
         for goal_pose in [goal_pose1, goal_pose2, goal_pose3]:
             q = self.notebook_locals["solve_ik"](goal_pose)
 
-            self.assertTrue(
-                q is not None, "IK failed, no configuration returned!"
-            )
+            self.assertTrue(q is not None, "IK failed, no configuration returned!")
 
             diagram, plant, scene_graph = self.notebook_locals["build_env"]()
 
             context = diagram.CreateDefaultContext()
             plant_context = plant.GetMyContextFromRoot(context)
             sg_context = scene_graph.GetMyContextFromRoot(context)
-            self.notebook_locals["filterCollsionGeometry"](
-                scene_graph, sg_context
-            )
+            self.notebook_locals["filterCollsionGeometry"](scene_graph, sg_context)
 
             plant.SetPositions(plant_context, q)
 
-            query_object = plant.get_geometry_query_input_port().Eval(
-                plant_context
-            )
+            query_object = plant.get_geometry_query_input_port().Eval(plant_context)
             inspector = query_object.inspector()
 
             pairs = (

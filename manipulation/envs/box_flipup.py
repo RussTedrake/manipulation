@@ -55,9 +55,7 @@ def AddPlanarBinAndSimpleBox(
     plant.WeldFrames(
         plant.world_frame(),
         plant.GetFrameByName("bin_base", bin),
-        RigidTransform(
-            RotationMatrix.MakeZRotation(np.pi / 2.0), [0, 0, -0.015]
-        ),
+        RigidTransform(RotationMatrix.MakeZRotation(np.pi / 2.0), [0, 0, -0.015]),
     )
 
     planar_joint_frame = plant.AddFrame(
@@ -83,9 +81,7 @@ def AddPlanarBinAndSimpleBox(
 
 
 def AddPointFinger(plant):
-    finger = AddShape(
-        plant, Sphere(0.01), "finger", color=[0.9, 0.5, 0.5, 1.0]
-    )
+    finger = AddShape(plant, Sphere(0.01), "finger", color=[0.9, 0.5, 0.5, 1.0])
     false_body1 = plant.AddRigidBody(
         "false_body1",
         finger,
@@ -143,9 +139,7 @@ class RewardSystem(LeafSystem):
         output[0] = 10 - cost
 
 
-def make_box_flipup(
-    generator, observations="state", meshcat=None, time_limit=10
-):
+def make_box_flipup(generator, observations="state", meshcat=None, time_limit=10):
     builder = DiagramBuilder()
     plant, scene_graph = AddMultibodyPlantSceneGraph(builder, time_step=0.001)
     plant.set_discrete_contact_approximation(DiscreteContactApproximation.kSap)
@@ -186,13 +180,9 @@ def make_box_flipup(
 
     actions = builder.AddSystem(PassThrough(N))
     positions_to_state = builder.AddSystem(Multiplexer([N, N]))
-    builder.Connect(
-        actions.get_output_port(), positions_to_state.get_input_port(0)
-    )
+    builder.Connect(actions.get_output_port(), positions_to_state.get_input_port(0))
     zeros = builder.AddSystem(ConstantVectorSource([0] * N))
-    builder.Connect(
-        zeros.get_output_port(), positions_to_state.get_input_port(1)
-    )
+    builder.Connect(zeros.get_output_port(), positions_to_state.get_input_port(1))
     builder.Connect(
         positions_to_state.get_output_port(),
         controller.get_input_port_desired_state(),
@@ -210,21 +200,15 @@ def make_box_flipup(
 
     reward = builder.AddSystem(RewardSystem())
     builder.Connect(plant.get_state_output_port(box), reward.get_input_port(0))
-    builder.Connect(
-        plant.get_state_output_port(finger), reward.get_input_port(1)
-    )
+    builder.Connect(plant.get_state_output_port(finger), reward.get_input_port(1))
     builder.Connect(actions.get_output_port(), reward.get_input_port(2))
     builder.ExportOutput(reward.get_output_port(), "reward")
 
     # Set random state distributions.
-    uniform_random = Variable(
-        name="uniform_random", type=Variable.Type.RANDOM_UNIFORM
-    )
+    uniform_random = Variable(name="uniform_random", type=Variable.Type.RANDOM_UNIFORM)
     box_joint = plant.GetJointByName("box_joint")
     x, y = box_joint.get_default_translation()
-    box_joint.set_random_pose_distribution(
-        [0.2 * uniform_random - 0.1 + x, y], 0
-    )
+    box_joint.set_random_pose_distribution([0.2 * uniform_random - 0.1 + x, y], 0)
 
     diagram = builder.Build()
     simulator = Simulator(diagram)

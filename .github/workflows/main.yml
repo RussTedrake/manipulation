@@ -185,9 +185,7 @@ jobs:
         uses: actions/setup-python@v4
       - name: black
         uses: psf/black@stable
-        with:
-            options: "--line-length 79"
       - name: isort
         uses: isort/isort-action@master
         with:
-            configuration: "--profile black --line-length 79"
+            configuration: "--profile black"

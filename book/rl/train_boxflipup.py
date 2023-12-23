@@ -91,9 +91,7 @@ def main():
     elif os.path.exists(zip):
         model = PPO.load(zip, env, verbose=1, tensorboard_log=f"runs/{run.id}")
     else:
-        model = PPO(
-            "MlpPolicy", env, verbose=1, tensorboard_log=f"runs/{run.id}"
-        )
+        model = PPO("MlpPolicy", env, verbose=1, tensorboard_log=f"runs/{run.id}")
 
     new_log = True
     while True:

@@ -38,9 +38,7 @@ def AddPlanarBinAndManipuland(plant):
     plant.WeldFrames(
         plant.world_frame(),
         plant.GetFrameByName("bin_base", bin),
-        RigidTransform(
-            RotationMatrix.MakeZRotation(np.pi / 2.0), [0, 0, -0.015]
-        ),
+        RigidTransform(RotationMatrix.MakeZRotation(np.pi / 2.0), [0, 0, -0.015]),
     )
     planar_joint_frame = plant.AddFrame(
         FixedOffsetFrame(
@@ -59,9 +57,7 @@ def AddPlanarBinAndManipuland(plant):
             RigidTransform(RotationMatrix.MakeXRotation(np.pi / 2)),
         )
     )
-    box_joint = plant.AddJoint(
-        PlanarJoint("box_joint", planar_joint_frame, box_frame)
-    )
+    box_joint = plant.AddJoint(PlanarJoint("box_joint", planar_joint_frame, box_frame))
     box_joint.set_default_translation([0, 0.033400])
 
 
@@ -226,9 +222,7 @@ def PlanarGripperPushingABoxEnv(
         controller.get_input_port_desired_state(),
     )
     truncate = builder.AddSystem(TruncateAction())
-    builder.Connect(
-        truncate.get_output_port(), step_interface.get_input_port(0)
-    )
+    builder.Connect(truncate.get_output_port(), step_interface.get_input_port(0))
     builder.Connect(plant.get_state_output_port(), truncate.get_input_port(1))
     builder.ExportInput(truncate.get_input_port(0), "action")
 
@@ -243,9 +237,7 @@ def PlanarGripperPushingABoxEnv(
         vis.set_name("visualizer")
 
     state_demux = builder.AddSystem(Demultiplexer([6, 6]))
-    builder.Connect(
-        plant.get_state_output_port(), state_demux.get_input_port()
-    )
+    builder.Connect(plant.get_state_output_port(), state_demux.get_input_port())
     builder.ExportOutput(state_demux.get_output_port(0), "position")
 
     diagram = builder.Build()

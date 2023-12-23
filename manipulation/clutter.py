@@ -68,9 +68,7 @@ def GraspCandidateCost(
         plant.SetFreeBodyPose(plant_context, wsg, X_G)
         X_GW = X_G.inverse()
 
-    query_object = scene_graph.get_query_output_port().Eval(
-        scene_graph_context
-    )
+    query_object = scene_graph.get_query_output_port().Eval(scene_graph_context)
 
     # Check collisions between the gripper and the sink
     if query_object.HasCollisions():

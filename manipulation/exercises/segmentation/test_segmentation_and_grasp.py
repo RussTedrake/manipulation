@@ -43,9 +43,7 @@ class TestSegmentationAndGrasp(unittest.TestCase):
         pcd_pts_eval = pcd_pts_eval.T
         num_points_eval = pcd_pts_eval.shape[0]
 
-        data_target = np.load(
-            FindDataResource("segmentation_and_grasp_soln.npz")
-        )
+        data_target = np.load(FindDataResource("segmentation_and_grasp_soln.npz"))
         pcd_pts_target = data_target["points"]
         data_target["colors"]
         num_points_target = pcd_pts_target.shape[0]

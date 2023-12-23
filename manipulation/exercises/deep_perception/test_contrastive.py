@@ -14,9 +14,7 @@ def gt_don_loss(f, img_a, img_b, u_a, u_b, match, margin=2.0):
     phi_b = phi_b.reshape(-1, d)[u_b[:, 0] * w + u_b[:, 1]]
     norm = np.linalg.norm(phi_a - phi_b, axis=1)
     loss_matches = np.mean(norm[match] ** 2)
-    loss_nonmatches = np.mean(
-        np.clip(margin - norm[~match], a_min=0, a_max=None) ** 2
-    )
+    loss_nonmatches = np.mean(np.clip(margin - norm[~match], a_min=0, a_max=None) ** 2)
     return loss_matches, loss_nonmatches
 
 
@@ -105,9 +103,7 @@ class TestContrastive(unittest.TestCase):
     @timeout_decorator.timeout(10.0)
     def test_don_predict(self):
         """Testing don_predict"""
-        expected_sol = gt_don_predict(
-            self._f, self._img_a, self._img_b, self._u_a[0]
-        )
+        expected_sol = gt_don_predict(self._f, self._img_a, self._img_b, self._u_a[0])
         sol = self.notebook_locals["don_predict"](
             self._f, self._img_a, self._img_b, self._u_a[0]
         )

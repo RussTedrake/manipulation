@@ -83,9 +83,7 @@ class IiwaProblem(Problem):
             return None
         else:
             print(
-                "Path found with "
-                + str(len(path) - 1)
-                + " movements of distance ",
+                "Path found with " + str(len(path) - 1) + " movements of distance ",
                 self.path_distance(path),
             )
             smooth_path = self.smooth_path(path)
@@ -98,9 +96,7 @@ class IiwaProblem(Problem):
             # interpolated smooth path
             spath = []
             for i in range(1, len(smooth_path)):
-                spath.extend(
-                    self.cspace.path(smooth_path[i - 1], smooth_path[i])
-                )
+                spath.extend(self.cspace.path(smooth_path[i - 1], smooth_path[i]))
 
             # make sure path is collision free
             if any([self.collide(c) for c in spath]):

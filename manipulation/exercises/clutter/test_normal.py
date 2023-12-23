@@ -21,9 +21,7 @@ class TestNormal(unittest.TestCase):
         pC = self.notebook_locals["pC"]
 
         student_sol = f(env.X_WC, pC, uv_step=10)
-        reference_sol = np.load(
-            FindResource("exercises/clutter/normal_solution.npy")
-        )
+        reference_sol = np.load(FindResource("exercises/clutter/normal_solution.npy"))
 
         self.assertTrue(
             len(student_sol) == len(reference_sol),
