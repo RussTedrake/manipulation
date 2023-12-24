@@ -27,7 +27,7 @@ running_as_notebook = (
 running_as_test = False
 
 
-def set_running_as_test(value: bool):
+def _set_running_as_test(value: bool):
     """[INTERNAL USE ONLY]: Set the global variable `running_as_test` to
     `value`.
 
@@ -53,7 +53,8 @@ def LoadDataResource(filename: str):
 
 def FindDataResource(filename: str):
     """
-    Returns the absolute path to the given filename relative to the data directory; fetching it from a remote host if necessary.
+    Returns the absolute path to the given filename relative to the book data
+    directory; fetching it from a remote host if necessary.
     """
     data = os.path.join(os.path.dirname(os.path.dirname(__file__)), "book/data")
     if not os.path.exists(data):
@@ -66,7 +67,7 @@ def FindDataResource(filename: str):
 
 
 def ConfigureParser(parser: Parser):
-    """Add the manipulation module packages to the given Parser."""
+    """Add the `manipulation` module packages to the given Parser."""
     package_xml = os.path.join(os.path.dirname(__file__), "models/package.xml")
     parser.package_map().AddPackageXml(filename=package_xml)
 
@@ -102,7 +103,22 @@ def colorize_labels(image: ImageLabel16I):
 
 
 def DrakeVersionGreaterThan(minimum_date: date):
+    """Check that the Drake version is at least `minimum_data`."""
     drake_version_txt = Path(GetDrakePath()).parent / "doc" / "drake" / "VERSION.TXT"
+    version_dates = {
+        "1.13.0": date(year=2023, month=2, day=14),
+        "1.14.0": date(year=2023, month=3, day=15),
+        "1.15.0": date(year=2023, month=4, day=18),
+        "1.16.0": date(year=2023, month=5, day=18),
+        "1.17.0": date(year=2023, month=5, day=23),
+        "1.18.0": date(year=2023, month=6, day=20),
+        "1.19.0": date(year=2023, month=7, day=13),
+        "1.20.0": date(year=2023, month=8, day=16),
+        "1.21.0": date(year=2023, month=9, day=14),
+        "1.22.0": date(year=2023, month=10, day=16),
+        "1.23.0": date(year=2023, month=11, day=17),
+        "1.24.0": date(year=2023, month=12, day=18),
+    }
     # If the file doesn't exist, then we should pass. A source install won't
     # have VERSION.TXT
     if drake_version_txt.is_file():
@@ -115,10 +131,8 @@ def DrakeVersionGreaterThan(minimum_date: date):
                 month=int(drake_version[4:6]),
                 day=int(drake_version[6:8]),
             )
-        elif drake_version == "1.13.0":
-            drake_date = date(year=2023, month=2, day=14)
-        elif drake_version == "1.14.0":
-            drake_date = date(year=2023, month=3, day=15)
+        elif drake_version in version_dates:
+            drake_date = version_dates[drake_version]
         else:
             warn(f"Unrecognized drake version {drake_version}")
             return
@@ -135,9 +149,9 @@ def RenderDiagram(system: System, max_depth: int = None):
 
     Args:
         system (System): The Drake system (or diagram) to render.
-        max_depth (int, optional): Sets a
-        limit to the depth of nested diagrams to visualize. Use zero to render
-        a diagram as a single system block. Defaults to 1.
+        max_depth (int, optional): Sets a limit to the depth of nested diagrams
+            to visualize. Use zero to render a diagram as a single system
+            block. Defaults to 1.
     """
     display(
         SVG(

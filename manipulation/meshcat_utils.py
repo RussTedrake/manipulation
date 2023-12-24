@@ -1,39 +1,37 @@
 import time
+import typing
 from collections import namedtuple
 from functools import partial
 
 import numpy as np
 from pydrake.common.value import AbstractValue
-from pydrake.geometry import Cylinder, Rgba, Sphere
+from pydrake.geometry import Cylinder, Meshcat, MeshcatVisualizer, Rgba, Sphere
 from pydrake.math import RigidTransform, RollPitchYaw, RotationMatrix
-from pydrake.solvers import BoundingBoxConstraint
-from pydrake.systems.framework import EventStatus, LeafSystem
+from pydrake.multibody.plant import MultibodyPlant
+from pydrake.solvers import (
+    BoundingBoxConstraint,
+    MathematicalProgram,
+    MathematicalProgramResult,
+)
+from pydrake.systems.framework import Context, EventStatus, LeafSystem
+from pydrake.trajectories import Trajectory
 
 from manipulation import running_as_notebook
-
-# Some GUI code that will be moved into Drake.
 
 
 class MeshcatSliders(LeafSystem):
     """
-    A system that outputs the ``value``s from meshcat sliders.
+    A system that outputs the values from meshcat sliders.
 
-      name: MeshcatSliderSystem
-      output_ports:
-      - slider_group_0
-      - ...
-      - slider_group_{N-1}
+    An output port is created for each element in the list `slider_names`.
+    Each element of `slider_names` must itself be an iterable collection
+    (list, tuple, set, ...) of strings, with the names of sliders that have
+    *already* been added to Meshcat via Meshcat.AddSlider().
+
+    The same slider may be used in multiple ports.
     """
 
-    def __init__(self, meshcat, slider_names):
-        """
-        An output port is created for each element in the list `slider_names`.
-        Each element of `slider_names` must itself be an iterable collection
-        (list, tuple, set, ...) of strings, with the names of sliders that have
-        *already* been added to Meshcat via Meshcat.AddSlider().
-
-        The same slider may be used in multiple ports.
-        """
+    def __init__(self, meshcat: Meshcat, slider_names: typing.List[str]):
         LeafSystem.__init__(self)
 
         self._meshcat = meshcat
@@ -42,28 +40,22 @@ class MeshcatSliders(LeafSystem):
             port = self.DeclareVectorOutputPort(
                 f"slider_group_{i}",
                 len(slider_iterable),
-                partial(self.DoCalcOutput, port_index=i),
+                partial(self._DoCalcOutput, port_index=i),
             )
             port.disable_caching_by_default()
 
-    def DoCalcOutput(self, context, output, port_index):
+    def _DoCalcOutput(self, context, output, port_index):
         for i, slider in enumerate(self._sliders[port_index]):
             output[i] = self._meshcat.GetSliderValue(slider)
 
 
-class MeshcatPoseSliders(LeafSystem):
+# This class is scheduled for removal.  Use the pydrake version of
+# MeshcatPoseSliders instead.
+class _MeshcatPoseSliders(LeafSystem):
     """
     Provides a set of ipywidget sliders (to be used in a Jupyter notebook) with
     one slider for each of roll, pitch, yaw, x, y, and z.  This can be used,
     for instance, as an interface to teleoperate the end-effector of a robot.
-
-    .. pydrake_system::
-
-        name: PoseSliders
-        input_ports:
-        - pose (optional)
-        output_ports:
-        - pose
 
     The optional `pose` input port is used ONLY at initialization; it can be
     used to set the initial pose e.g. from the current pose of a MultibodyPlant
@@ -127,13 +119,13 @@ class MeshcatPoseSliders(LeafSystem):
         port = self.DeclareAbstractOutputPort(
             "pose",
             lambda: AbstractValue.Make(RigidTransform()),
-            self.DoCalcOutput,
+            self._DoCalcOutput,
         )
 
         self.DeclareAbstractInputPort(
             "body_poses", AbstractValue.Make([RigidTransform()])
         )
-        self.DeclareInitializationDiscreteUpdateEvent(self.Initialize)
+        self.DeclareInitializationDiscreteUpdateEvent(self._Initialize)
 
         # The widgets themselves have undeclared state.  For now, we accept it,
         # and simply disable caching on the output port.
@@ -220,12 +212,12 @@ class MeshcatPoseSliders(LeafSystem):
             self._value[3:],
         )
 
-    def DoCalcOutput(self, context, output):
+    def _DoCalcOutput(self, context, output):
         """Constructs the output values from the sliders."""
         self._update_values()
         output.set_value(self._get_transform())
 
-    def Initialize(self, context, discrete_state):
+    def _Initialize(self, context, discrete_state):
         if self.get_input_port().HasValue(context):
             if self._body_index is None:
                 raise RuntimeError(
@@ -256,7 +248,9 @@ class MeshcatPoseSliders(LeafSystem):
 
 
 class WsgButton(LeafSystem):
-    def __init__(self, meshcat):
+    """Adds a button named `Open/Close Gripper` to the meshcat GUI, and registers the Space key to press it. Presing this button will toggle the value of the output port from a wsg position command correspoding to an open position or a closed position."""
+
+    def __init__(self, meshcat: Meshcat):
         LeafSystem.__init__(self)
         port = self.DeclareVectorOutputPort("wsg_position", 1, self.DoCalcOutput)
         port.disable_caching_by_default()
@@ -276,8 +270,23 @@ class WsgButton(LeafSystem):
 
 
 def AddMeshcatTriad(
-    meshcat, path, length=0.25, radius=0.01, opacity=1.0, X_PT=RigidTransform()
+    meshcat: Meshcat,
+    path: str,
+    length: float = 0.25,
+    radius: float = 0.01,
+    opacity: float = 1.0,
+    X_PT: RigidTransform = RigidTransform(),
 ):
+    """Adds an X-Y-Z triad to the meshcat scene.
+
+    Args:
+        meshcat: A Meshcat instance.
+        path: The Meshcat path on which to attach the triad. Using relative paths will attach the triad to the path's coordinate system.
+        length: The length of the axes in meters.
+        radius: The radius of the axes in meters.
+        opacity: The opacity of the axes in [0, 1].
+        X_PT: The pose of the triad relative to the path.
+    """
     meshcat.SetTransform(path, X_PT)
     # x-axis
     X_TG = RigidTransform(RotationMatrix.MakeYRotation(np.pi / 2), [length / 2.0, 0, 0])
@@ -302,15 +311,27 @@ def AddMeshcatTriad(
 
 
 def plot_surface(
-    meshcat,
-    path,
-    X,
-    Y,
-    Z,
-    rgba=Rgba(0.87, 0.6, 0.6, 1.0),
-    wireframe=False,
-    wireframe_line_width=1.0,
+    meshcat: Meshcat,
+    path: str,
+    X: np.ndarray,
+    Y: np.ndarray,
+    Z: np.ndarray,
+    rgba: Rgba = Rgba(0.87, 0.6, 0.6, 1.0),
+    wireframe: bool = False,
+    wireframe_line_width: float = 1.0,
 ):
+    """Plot a surface in meshcat.
+
+    Args:
+        meshcat: A Meshcat instance.
+        path: The Meshcat path to the surface.
+        X: A 2D array of x values.
+        Y: A 2D array of y values.
+        Z: A 2D array of z values.
+        rgba: The color of the surface.
+        wireframe: If true, plot the surface as a wireframe.
+        wireframe_line_width: The width of the wireframe lines.
+    """
     (rows, cols) = Z.shape
     assert np.array_equal(X.shape, Y.shape)
     assert np.array_equal(X.shape, Z.shape)
@@ -336,7 +357,27 @@ def plot_surface(
     )
 
 
-def plot_mathematical_program(meshcat, path, prog, X, Y, result=None, point_size=0.05):
+def plot_mathematical_program(
+    meshcat: Meshcat,
+    path: str,
+    prog: MathematicalProgram,
+    X: np.ndarray,
+    Y: np.ndarray,
+    result: MathematicalProgramResult = None,
+    point_size: float = 0.05,
+):
+    """Visualize a MathematicalProgram in Meshcat.
+
+    Args:
+        meshcat: A Meshcat instance.
+        path: The Meshcat path to the visualization.
+        prog: A MathematicalProgram instance.
+        X: A 2D array of x values.
+        Y: A 2D array of y values.
+        result: A MathematicalProgramResult instance; if provided then the
+            solution is visualized as a point.
+        point_size: The size of the solution point.
+    """
     assert prog.num_vars() == 2
     assert X.size == Y.size
 
@@ -421,11 +462,21 @@ def plot_mathematical_program(meshcat, path, prog, X, Y, result=None, point_size
 
 
 def PublishPositionTrajectory(
-    trajectory, root_context, plant, visualizer, time_step=1.0 / 33.0
+    trajectory: Trajectory,
+    root_context: Context,
+    plant: MultibodyPlant,
+    visualizer: MeshcatVisualizer,
+    time_step: float = 1.0 / 33.0,
 ):
     """
+    Publishes an animation to Meshcat of a MultibodyPlant using a trajectory of the plant positions.
+
     Args:
         trajectory: A Trajectory instance.
+        root_context: The root context of the diagram containing plant.
+        plant: A MultibodyPlant instance.
+        visualizer: A MeshcatVisualizer instance.
+        time_step: The time step between published frames.
     """
     plant_context = plant.GetMyContextFromRoot(root_context)
     visualizer_context = visualizer.GetMyContextFromRoot(root_context)

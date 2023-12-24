@@ -1,5 +1,11 @@
-from manipulation.scenarios import MakeManipulationStation
-from manipulation.utils import SystemHtml
+from datetime import date
 
-station = MakeManipulationStation()
-SystemHtml(station)
+from manipulation.mustard_depth_camera_example import MustardExampleSystem
+from manipulation.utils import DrakeVersionGreaterThan, SystemHtml
+
+# Test DrakeVersionGreaterThan
+DrakeVersionGreaterThan(date(2023, 12, 1))
+
+# Test SystemHtml
+system = MustardExampleSystem()
+SystemHtml(system)
