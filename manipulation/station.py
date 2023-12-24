@@ -80,7 +80,14 @@ class InverseDynamicsDriver:
 
 
 @dc.dataclass
-class MyPdControllerGains:
+class JointPdControllerGains:
+    """Defines the Proportional-Derivative gains for a single joint.
+
+    Args:
+        kp: The proportional gain.
+        kd: The derivative gain.
+    """
+
     kp: float = 0  # Position gain
     kd: float = 0  # Velocity gain
 
@@ -89,10 +96,17 @@ class MyPdControllerGains:
 class JointStiffnessDriver:
     """A simulation-only driver that sets up MultibodyPlant to act as if it is
     being controlled with a JointStiffnessController. The MultibodyPlant must
-    be using SAP as the (discrete-time) contact solver."""
+    be using SAP as the (discrete-time) contact solver.
+
+    Args:
+        gains: A mapping of {actuator_name: JointPdControllerGains} for each
+            actuator that should be controlled.
+        hand_model_name: If set, then the gravity compensation will be turned
+            off for this model instance (e.g. for a hand).
+    """
 
     # Must have one element for every (named) actuator in the model_instance.
-    gains: typing.Mapping[str, MyPdControllerGains] = dc.field(default_factory=dict)
+    gains: typing.Mapping[str, JointPdControllerGains] = dc.field(default_factory=dict)
 
     hand_model_name: str = ""
 
@@ -101,40 +115,48 @@ class JointStiffnessDriver:
 class Scenario:
     """Defines the YAML format for a (possibly stochastic) scenario to be
     simulated.
+
+    Args:
+        random_seed: Random seed for any random elements in the scenario. The
+            seed is always deterministic in the `Scenario`; a caller who wants
+            randomness must populate this value from their own randomness.
+        simulation_duration: The maximum simulation time (in seconds).  The
+            simulator will attempt to run until this time and then terminate.
+        simulator_config: Simulator configuration (integrator and publisher
+            parameters).
+        plant_config: Plant configuration (time step and contact parameters).
+        directives: All of the fully deterministic elements of the simulation.
+        lcm_buses: A map of {bus_name: lcm_params} for LCM transceivers to be
+            used by drivers, sensors, etc.
+        model_drivers: For actuated models, specifies where each model's
+            actuation inputs come from, keyed on the ModelInstance name.
+        cameras: Cameras to add to the scene (and broadcast over LCM). The key
+            for each camera is a helpful mnemonic, but does not serve a
+            technical role. The CameraConfig::name field is still the name that
+            will appear in the Diagram artifacts.
+        visualization: Visualization configuration.
     """
 
-    # Random seed for any random elements in the scenario. The seed is always
-    # deterministic in the `Scenario`; a caller who wants randomness must
-    # populate this value from their own randomness.
     random_seed: int = 0
 
-    # The maximum simulation time (in seconds).  The simulator will attempt to
-    # run until this time and then terminate.
     simulation_duration: float = np.inf
 
-    # Simulator configuration (integrator and publisher parameters).
     simulator_config: SimulatorConfig = SimulatorConfig(
         max_step_size=0.01,
         use_error_control=False,
         accuracy=1.0e-2,
     )
 
-    # Plant configuration (time step and contact parameters).
     plant_config: MultibodyPlantConfig = MultibodyPlantConfig(
         discrete_contact_solver="sap"
     )
 
-    # All of the fully deterministic elements of the simulation.
     directives: typing.List[ModelDirective] = dc.field(default_factory=list)
 
-    # A map of {bus_name: lcm_params} for LCM transceivers to be used by
-    # drivers, sensors, etc.
     lcm_buses: typing.Mapping[str, DrakeLcmParams] = dc.field(
         default_factory=lambda: dict(default=DrakeLcmParams())
     )
 
-    # For actuated models, specifies where each model's actuation inputs come
-    # from, keyed on the ModelInstance name.
     model_drivers: typing.Mapping[
         str,
         typing.Union[
@@ -146,10 +168,6 @@ class Scenario:
         ],
     ] = dc.field(default_factory=dict)
 
-    # Cameras to add to the scene (and broadcast over LCM). The key for each
-    # camera is a helpful mnemonic, but does not serve a technical role. The
-    # CameraConfig::name field is still the name that will appear in the
-    # Diagram artifacts.
     cameras: typing.Mapping[str, CameraConfig] = dc.field(default_factory=dict)
 
     visualization: VisualizationConfig = VisualizationConfig()
@@ -157,23 +175,37 @@ class Scenario:
 
 @dc.dataclass
 class Directives:
+    """Defines the YAML format for directives to be applied to a `Scenario`.
+
+    Args:
+        directives: A list of `ModelDirective` objects.
+    """
+
     directives: typing.List[ModelDirective] = dc.field(default_factory=list)
 
 
 # TODO(russt): load from url (using packagemap).
-def load_scenario(*, filename=None, data=None, scenario_name=None, defaults=Scenario()):
+def load_scenario(
+    *,
+    filename: str = None,
+    data: str = None,
+    scenario_name: str = None,
+    defaults: Scenario = Scenario(),
+):
     """Implements the command-line handling logic for scenario data.
     Returns a `Scenario` object loaded from the given input arguments.
 
     Args:
         filename (optional): A yaml filename to load the scenario from.
 
-        data (optional): A yaml string to load the scenario from. If both
+        data (optional): A yaml _string_ to load the scenario from. If both
             filename and string are specified, then the filename is parsed
             first, and then the string is _also_ parsed, potentially overwriting defaults from the filename..
 
         scenario_name (optional): The name of the scenario/child to load from
             the yaml file. If None, then the entire file is loaded.
+
+        defaults (optional): A `Scenario` object to use as the default values.
     """
     result = defaults
     if filename:
@@ -196,12 +228,26 @@ def load_scenario(*, filename=None, data=None, scenario_name=None, defaults=Scen
 
 
 def add_directives(
-    scenario,
+    scenario: Scenario,
     *,
-    filename=None,
-    data=None,
-    scenario_name=None,
+    filename: str = None,
+    data: str = None,
+    scenario_name: str = None,
 ):
+    """Append additional directives to an existing scenario.
+
+    Args:
+        scenario: The scenario to append to.
+
+        filename (optional): A yaml filename to load the directives from.
+
+        data (optional): A yaml string to load the directives from. If both
+            filename and string are specified, then the filename is parsed
+            first, and then the string is _also_ parsed, potentially overwriting defaults from the filename..
+
+        scenario_name (optional): The name of the scenario/child to load from
+            the yaml file. If None, then the entire file is loaded.
+    """
     d = Directives()
     if filename:
         d = yaml_load_typed(
@@ -219,7 +265,7 @@ def add_directives(
     return scenario
 
 
-class MultiplexState(LeafSystem):
+class _MultiplexState(LeafSystem):
     def __init__(self, plant, model_instance_names):
         LeafSystem.__init__(self)
         total_states = 0
@@ -251,7 +297,7 @@ class MultiplexState(LeafSystem):
         output.SetFromVector(np.concatenate((positions, velocities)))
 
 
-class DemultiplexInput(LeafSystem):
+class _DemultiplexInput(LeafSystem):
     def __init__(self, plant, model_instance_names):
         LeafSystem.__init__(self)
         total_inputs = 0
@@ -503,11 +549,11 @@ def _ApplyDriverConfigSim(
             )
         else:
             combined_state = builder.AddSystem(
-                MultiplexState(sim_plant, model_instance_names)
+                _MultiplexState(sim_plant, model_instance_names)
             )
             combined_state.set_name(model_instance_name + ".combined_state")
             combined_input = builder.AddSystem(
-                DemultiplexInput(sim_plant, model_instance_names)
+                _DemultiplexInput(sim_plant, model_instance_names)
             )
             combined_input.set_name(model_instance_name + ".combined_input")
             for index, model_instance in enumerate(model_instances):
@@ -704,24 +750,48 @@ def MakeHardwareStation(
     parser_prefinalize_callback: typing.Callable[[Parser], None] = None,
     prebuild_callback: typing.Callable[[DiagramBuilder], None] = None,
 ):
-    """
-    If `hardware=False`, (the default) returns a HardwareStation diagram containing:
-      - A MultibodyPlant with populated via the directives in `scenario`.
-      - A SceneGraph
-      - The default Drake visualizers
-      - Any robot / sensors drivers specified in the YAML description.
+    """Make a diagram encapsulating a simulation of (or the communications
+    interface to/from) a physical robot, including sensors and controllers.
 
-    If `hardware=True`, returns a HardwareStationInterface diagram containing the network interfaces to communicate directly with the hardware drivers.
+    If `hardware=False`, (the default) returns a HardwareStation diagram
+    containing:
+    - A MultibodyPlant with populated via the directives in `scenario`.
+    - A SceneGraph
+    - The default Drake visualizers
+    - Any robot / sensors drivers specified in the YAML description.
+
+    If `hardware=True`, returns a HardwareStationInterface diagram containing
+    the network interfaces to communicate directly with the hardware drivers.
 
     Args:
-        scenario: A Scenario structure, populated using the `load_scenario` method.
+        scenario: A Scenario structure, populated using the `load_scenario`
+            method.
 
-        meshcat: If not None, then AddDefaultVisualization will be added to the subdiagram using this meshcat instance.
+        meshcat: If not None, then AddDefaultVisualization will be added to the
+            subdiagram using this meshcat instance.
 
-        package_xmls: A list of package.xml file paths that will be passed to the parser, using Parser.AddPackageXml().
+        package_xmls: A list of package.xml file paths that will be passed to
+            the parser, using Parser.AddPackageXml().
+
+        hardware: If True, then the HardwareStationInterface diagram will be
+            returned. Otherwise, the HardwareStation diagram will be returned.
+
+        parser_preload_callback: A callback function that will be called after
+            the Parser is created, but before any directives are processed. This
+            can be used to add additional packages to the parser, or to add
+            additional model directives.
+
+        parser_prefinalize_callback: A callback function that will be called
+            after the directives are processed, but before the plant is
+            finalized. This can be used to add additional model directives.
+
+        prebuild_callback: A callback function that will be called after the
+            diagram builder is created, but before the diagram is built. This
+            can be used to add additional systems to the diagram.
+
     """
     if hardware:
-        return MakeHardwareStationInterface(
+        return _MakeHardwareStationInterface(
             scenario=scenario, meshcat=meshcat, package_xmls=package_xmls
         )
 
@@ -809,7 +879,7 @@ def MakeHardwareStation(
 
 
 # TODO(russt): Use the c++ version pending https://github.com/RobotLocomotion/drake/issues/20055
-def ApplyDriverConfigInterface(
+def _ApplyDriverConfigInterface(
     driver_config,
     model_instance_name,
     plant,
@@ -945,14 +1015,14 @@ def ApplyDriverConfigInterface(
         )
 
 
-def ApplyDriverConfigsInterface(
+def _ApplyDriverConfigsInterface(
     *, driver_configs, plant, models_from_directives, lcm_buses, builder
 ):
     models_from_directives_map = dict(
         [(info.model_name, info) for info in models_from_directives]
     )
     for model_instance_name, driver_config in driver_configs.items():
-        ApplyDriverConfigInterface(
+        _ApplyDriverConfigInterface(
             driver_config,
             model_instance_name,
             plant,
@@ -962,7 +1032,7 @@ def ApplyDriverConfigsInterface(
         )
 
 
-def MakeHardwareStationInterface(
+def _MakeHardwareStationInterface(
     scenario: Scenario,
     meshcat: Meshcat = None,
     *,
@@ -1007,7 +1077,7 @@ def MakeHardwareStationInterface(
     lcm_buses = ApplyLcmBusConfig(lcm_buses=scenario.lcm_buses, builder=builder)
 
     # Add drivers.
-    ApplyDriverConfigsInterface(
+    _ApplyDriverConfigsInterface(
         driver_configs=scenario.model_drivers,
         plant=plant,
         models_from_directives=added_models,
@@ -1022,7 +1092,7 @@ def MakeHardwareStationInterface(
     return diagram
 
 
-class ExtractPose(LeafSystem):
+class _ExtractPose(LeafSystem):
     def __init__(self, body_poses_output_port, body_index, X_BA=RigidTransform()):
         LeafSystem.__init__(self)
         self.body_index = body_index
@@ -1122,7 +1192,7 @@ def AddPointClouds(
             poses_output_port = station.GetOutputPort("body_poses")
 
         camera_pose = builder.AddSystem(
-            ExtractPose(poses_output_port, body.index(), X_BC)
+            _ExtractPose(poses_output_port, body.index(), X_BC)
         )
         camera_pose.set_name(f"{config.name}.pose")
         builder.Connect(

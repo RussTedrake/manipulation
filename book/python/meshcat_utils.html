@@ -92,12 +92,12 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>meshcat</strong> – A Meshcat instance.</p></li>
-<li><p><strong>path</strong> – The Meshcat path on which to attach the triad. Using relative paths will attach the triad to the path’s coordinate system.</p></li>
-<li><p><strong>length</strong> – The length of the axes in meters.</p></li>
-<li><p><strong>radius</strong> – The radius of the axes in meters.</p></li>
-<li><p><strong>opacity</strong> – The opacity of the axes in [0, 1].</p></li>
-<li><p><strong>X_PT</strong> – The pose of the triad relative to the path.</p></li>
+<li><p><strong>meshcat</strong> (<em>Meshcat</em>) – A Meshcat instance.</p></li>
+<li><p><strong>path</strong> (<em>str</em>) – The Meshcat path on which to attach the triad. Using relative paths will attach the triad to the path’s coordinate system.</p></li>
+<li><p><strong>length</strong> (<em>float</em>) – The length of the axes in meters.</p></li>
+<li><p><strong>radius</strong> (<em>float</em>) – The radius of the axes in meters.</p></li>
+<li><p><strong>opacity</strong> (<em>float</em>) – The opacity of the axes in [0, 1].</p></li>
+<li><p><strong>X_PT</strong> (<em>RigidTransform</em>) – The pose of the triad relative to the path.</p></li>
 </ul>
 </dd>
 </dl>
@@ -112,6 +112,14 @@ Each element of <cite>slider_names</cite> must itself be an iterable collection
 (list, tuple, set, …) of strings, with the names of sliders that have
 <em>already</em> been added to Meshcat via Meshcat.AddSlider().</p>
 <p>The same slider may be used in multiple ports.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>meshcat</strong> (<em>Meshcat</em>) – </p></li>
+<li><p><strong>slider_names</strong> (<em>List</em><em>[</em><em>str</em><em>]</em>) – </p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -121,11 +129,11 @@ Each element of <cite>slider_names</cite> must itself be an iterable collection
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>trajectory</strong> – A Trajectory instance.</p></li>
-<li><p><strong>root_context</strong> – The root context of the diagram containing plant.</p></li>
-<li><p><strong>plant</strong> – A MultibodyPlant instance.</p></li>
-<li><p><strong>visualizer</strong> – A MeshcatVisualizer instance.</p></li>
-<li><p><strong>time_step</strong> – The time step between published frames.</p></li>
+<li><p><strong>trajectory</strong> (<em>Trajectory</em>) – A Trajectory instance.</p></li>
+<li><p><strong>root_context</strong> (<em>Context</em>) – The root context of the diagram containing plant.</p></li>
+<li><p><strong>plant</strong> (<em>MultibodyPlant</em>) – A MultibodyPlant instance.</p></li>
+<li><p><strong>visualizer</strong> (<em>MeshcatVisualizer</em>) – A MeshcatVisualizer instance.</p></li>
+<li><p><strong>time_step</strong> (<em>float</em>) – The time step between published frames.</p></li>
 </ul>
 </dd>
 </dl>
@@ -135,6 +143,11 @@ Each element of <cite>slider_names</cite> must itself be an iterable collection
 <dt class="sig sig-object py" id="manipulation.meshcat_utils.WsgButton">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">manipulation.meshcat_utils.</span></span><span class="sig-name descname"><span class="pre">WsgButton</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">meshcat</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Meshcat</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#manipulation.meshcat_utils.WsgButton" title="Link to this definition"></a></dt>
 <dd><p>Adds a button named <cite>Open/Close Gripper</cite> to the meshcat GUI, and registers the Space key to press it. Presing this button will toggle the value of the output port from a wsg position command correspoding to an open position or a closed position.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>meshcat</strong> (<em>Meshcat</em>) – </p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -144,14 +157,14 @@ Each element of <cite>slider_names</cite> must itself be an iterable collection
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>meshcat</strong> – A Meshcat instance.</p></li>
-<li><p><strong>path</strong> – The Meshcat path to the visualization.</p></li>
-<li><p><strong>prog</strong> – A MathematicalProgram instance.</p></li>
-<li><p><strong>X</strong> – A 2D array of x values.</p></li>
-<li><p><strong>Y</strong> – A 2D array of y values.</p></li>
-<li><p><strong>result</strong> – A MathematicalProgramResult instance; if provided then the
+<li><p><strong>meshcat</strong> (<em>Meshcat</em>) – A Meshcat instance.</p></li>
+<li><p><strong>path</strong> (<em>str</em>) – The Meshcat path to the visualization.</p></li>
+<li><p><strong>prog</strong> (<em>MathematicalProgram</em>) – A MathematicalProgram instance.</p></li>
+<li><p><strong>X</strong> (<em>ndarray</em>) – A 2D array of x values.</p></li>
+<li><p><strong>Y</strong> (<em>ndarray</em>) – A 2D array of y values.</p></li>
+<li><p><strong>result</strong> (<em>MathematicalProgramResult</em>) – A MathematicalProgramResult instance; if provided then the
 solution is visualized as a point.</p></li>
-<li><p><strong>point_size</strong> – The size of the solution point.</p></li>
+<li><p><strong>point_size</strong> (<em>float</em>) – The size of the solution point.</p></li>
 </ul>
 </dd>
 </dl>
@@ -164,14 +177,14 @@ solution is visualized as a point.</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>meshcat</strong> – A Meshcat instance.</p></li>
-<li><p><strong>path</strong> – The Meshcat path to the surface.</p></li>
-<li><p><strong>X</strong> – A 2D array of x values.</p></li>
-<li><p><strong>Y</strong> – A 2D array of y values.</p></li>
-<li><p><strong>Z</strong> – A 2D array of z values.</p></li>
-<li><p><strong>rgba</strong> – The color of the surface.</p></li>
-<li><p><strong>wireframe</strong> – If true, plot the surface as a wireframe.</p></li>
-<li><p><strong>wireframe_line_width</strong> – The width of the wireframe lines.</p></li>
+<li><p><strong>meshcat</strong> (<em>Meshcat</em>) – A Meshcat instance.</p></li>
+<li><p><strong>path</strong> (<em>str</em>) – The Meshcat path to the surface.</p></li>
+<li><p><strong>X</strong> (<em>ndarray</em>) – A 2D array of x values.</p></li>
+<li><p><strong>Y</strong> (<em>ndarray</em>) – A 2D array of y values.</p></li>
+<li><p><strong>Z</strong> (<em>ndarray</em>) – A 2D array of z values.</p></li>
+<li><p><strong>rgba</strong> (<em>Rgba</em>) – The color of the surface.</p></li>
+<li><p><strong>wireframe</strong> (<em>bool</em>) – If true, plot the surface as a wireframe.</p></li>
+<li><p><strong>wireframe_line_width</strong> (<em>float</em>) – The width of the wireframe lines.</p></li>
 </ul>
 </dd>
 </dl>

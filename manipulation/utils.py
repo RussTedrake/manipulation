@@ -45,10 +45,8 @@ def FindResource(filename: str):
 
 
 def LoadDataResource(filename: str):
-    """
-    Deprecated. Use `FindDataResource` instead.
-    """
     warn("`LoadDataResource` is deprecated. Use `FindDataResource` instead.")
+    FindDataResource(filename)
 
 
 def FindDataResource(filename: str):
