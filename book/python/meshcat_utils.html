@@ -51,6 +51,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#manipulation.meshcat_utils.AddMeshcatTriad"><code class="docutils literal notranslate"><span class="pre">AddMeshcatTriad()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#manipulation.meshcat_utils.MeshcatSliders"><code class="docutils literal notranslate"><span class="pre">MeshcatSliders</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#manipulation.meshcat_utils.PublishPositionTrajectory"><code class="docutils literal notranslate"><span class="pre">PublishPositionTrajectory()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#manipulation.meshcat_utils.StopButton"><code class="docutils literal notranslate"><span class="pre">StopButton</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#manipulation.meshcat_utils.WsgButton"><code class="docutils literal notranslate"><span class="pre">WsgButton</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#manipulation.meshcat_utils.plot_mathematical_program"><code class="docutils literal notranslate"><span class="pre">plot_mathematical_program()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#manipulation.meshcat_utils.plot_surface"><code class="docutils literal notranslate"><span class="pre">plot_surface()</span></code></a></li>
@@ -140,12 +141,28 @@ Each element of <cite>slider_names</cite> must itself be an iterable collection
 </dd></dl>
 
 <dl class="py class">
-<dt class="sig sig-object py" id="manipulation.meshcat_utils.WsgButton">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">manipulation.meshcat_utils.</span></span><span class="sig-name descname"><span class="pre">WsgButton</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">meshcat</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Meshcat</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#manipulation.meshcat_utils.WsgButton" title="Link to this definition"></a></dt>
-<dd><p>Adds a button named <cite>Open/Close Gripper</cite> to the meshcat GUI, and registers the Space key to press it. Presing this button will toggle the value of the output port from a wsg position command correspoding to an open position or a closed position.</p>
+<dt class="sig sig-object py" id="manipulation.meshcat_utils.StopButton">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">manipulation.meshcat_utils.</span></span><span class="sig-name descname"><span class="pre">StopButton</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">meshcat</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Meshcat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">check_interval</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#manipulation.meshcat_utils.StopButton" title="Link to this definition"></a></dt>
+<dd><p>Adds a button named <cite>Stop Simulation</cite> to the meshcat GUI, and registers
+the <cite>Escape</cite> key to press it. Pressing this button will terminate the
+simulation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>meshcat</strong> (<em>Meshcat</em>) – </p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>meshcat</strong> (<em>Meshcat</em>) – The meshcat instance in which to register the button.</p></li>
+<li><p><strong>check_interval</strong> (<em>float</em>) – The period at which to check for button presses.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="manipulation.meshcat_utils.WsgButton">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">manipulation.meshcat_utils.</span></span><span class="sig-name descname"><span class="pre">WsgButton</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">meshcat</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Meshcat</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#manipulation.meshcat_utils.WsgButton" title="Link to this definition"></a></dt>
+<dd><p>Adds a button named <cite>Open/Close Gripper</cite> to the meshcat GUI, and registers the Space key to press it. Pressing this button will toggle the value of the output port from a wsg position command corresponding to an open position or a closed position.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>meshcat</strong> (<em>Meshcat</em>) – The meshcat instance in which to register the button.</p>
 </dd>
 </dl>
 </dd></dl>

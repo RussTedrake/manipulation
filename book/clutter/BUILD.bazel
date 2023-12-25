@@ -81,6 +81,7 @@ rt_ipynb_test(
     tags = ["no-sandbox"],  # from vtk-test-tags() in drake
     deps = [
         "//manipulation",
+        "//manipulation:meshcat_utils",
         "//manipulation:scenarios",
         "//manipulation:station",
     ],

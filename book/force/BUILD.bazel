@@ -28,6 +28,7 @@ rt_ipynb_test(
     srcs = ["writing.ipynb"],
     deps = [
       "//manipulation",
+      "//manipulation:meshcat_utils",
       "//manipulation:scenarios",
     ],
 )

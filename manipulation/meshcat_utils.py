@@ -105,15 +105,15 @@ class _MeshcatPoseSliders(LeafSystem):
         Args:
             meshcat: A Meshcat instance.
             visible: An object with boolean elements for 'roll', 'pitch',
-                     'yaw', 'x', 'y', 'z'; the intention is for this to be the
-                     PoseSliders.Visible() namedtuple.  Defaults to all true.
+                'yaw', 'x', 'y', 'z'; the intention is for this to be the
+                PoseSliders.Visible() namedtuple.  Defaults to all true.
             min_range, max_range, value: Objects with float values for 'roll',
-                      'pitch', 'yaw', 'x', 'y', 'z'; the intention is for the
-                      caller to use the PoseSliders.MinRange, MaxRange, and
-                      Value namedtuples.  See those tuples for default values.
+                'pitch', 'yaw', 'x', 'y', 'z'; the intention is for the
+                caller to use the PoseSliders.MinRange, MaxRange, and
+                Value namedtuples.  See those tuples for default values.
             body_index: if the body_poses input port is connected, then this
-                        index determine which pose is used to set the initial
-                        slider positions during the Initialization event.
+                index determine which pose is used to set the initial
+                slider positions during the Initialization event.
         """
         LeafSystem.__init__(self)
         port = self.DeclareAbstractOutputPort(
@@ -165,7 +165,7 @@ class _MeshcatPoseSliders(LeafSystem):
 
         Args:
             pose: Any viable argument for the RigidTransform
-                  constructor.
+                constructor.
         """
         tf = RigidTransform(pose)
         self.SetRpy(RollPitchYaw(tf.rotation()))
@@ -248,11 +248,15 @@ class _MeshcatPoseSliders(LeafSystem):
 
 
 class WsgButton(LeafSystem):
-    """Adds a button named `Open/Close Gripper` to the meshcat GUI, and registers the Space key to press it. Presing this button will toggle the value of the output port from a wsg position command correspoding to an open position or a closed position."""
+    """Adds a button named `Open/Close Gripper` to the meshcat GUI, and registers the Space key to press it. Pressing this button will toggle the value of the output port from a wsg position command corresponding to an open position or a closed position.
+
+    Args:
+        meshcat: The meshcat instance in which to register the button.
+    """
 
     def __init__(self, meshcat: Meshcat):
         LeafSystem.__init__(self)
-        port = self.DeclareVectorOutputPort("wsg_position", 1, self.DoCalcOutput)
+        port = self.DeclareVectorOutputPort("wsg_position", 1, self._DoCalcOutput)
         port.disable_caching_by_default()
         self._meshcat = meshcat
         self._button = "Open/Close Gripper"
@@ -262,11 +266,55 @@ class WsgButton(LeafSystem):
     def __del__(self):
         self._meshcat.DeleteButton(self._button)
 
-    def DoCalcOutput(self, context, output):
+    def _DoCalcOutput(self, context, output):
         position = 0.107  # open
         if (self._meshcat.GetButtonClicks(self._button) % 2) == 1:
             position = 0.002  # close
         output.SetAtIndex(0, position)
+
+
+class StopButton(LeafSystem):
+    """Adds a button named `Stop Simulation` to the meshcat GUI, and registers
+    the `Escape` key to press it. Pressing this button will terminate the
+    simulation.
+
+    Args:
+        meshcat: The meshcat instance in which to register the button.
+        check_interval: The period at which to check for button presses.
+    """
+
+    def __init__(self, meshcat: Meshcat, check_interval: float = 0.1):
+        LeafSystem.__init__(self)
+        self._meshcat = meshcat
+        self._button = "Stop Simulation"
+
+        self.DeclareDiscreteState([0])  # button click count
+        self.DeclareInitializationDiscreteUpdateEvent(self._Initialize)
+        self.DeclarePeriodicDiscreteUpdateEvent(check_interval, 0, self._CheckButton)
+
+        # Create the button now (rather than at initialization) so that the
+        # CheckButton method will work even if Initialize has never been
+        # called.
+        meshcat.AddButton(self._button, "Escape")
+
+    def __del__(self):
+        # TODO(russt): Provide a nicer way to check if the button is currently
+        # registered.
+        try:
+            self._meshcat.DeleteButton(self._button)
+        except:
+            pass
+
+    def _Initialize(self, context, discrete_state):
+        print("Press Escape to stop the simulation")
+        discrete_state.set_value([self._meshcat.GetButtonClicks(self._button)])
+
+    def _CheckButton(self, context, discrete_state):
+        clicks_at_initialization = context.get_discrete_state().value()[0]
+        if self._meshcat.GetButtonClicks(self._button) > clicks_at_initialization:
+            self._meshcat.DeleteButton(self._button)
+            return EventStatus.ReachedTermination(self, "Termination requested by user")
+        return EventStatus.DidNothing()
 
 
 def AddMeshcatTriad(
