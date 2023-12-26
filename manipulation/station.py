@@ -265,6 +265,195 @@ def add_directives(
     return scenario
 
 
+def _FindChildren(flattened_directives, model_instance_names):
+    """Given a list of model instances, returns model names that are welded (via
+    directives) to any one of those model instances.
+    """
+    tree = dict()
+    children = set()
+    for d in flatted_directives:
+        if d.add_weld:
+            parent = ScopedName.Parse(d.add_weld.parent).get_namespace()
+            child = ScopedName.Parse(d.add_weld.child).get_namespace()
+            if parent not in tree:
+                tree[parent] = {child}
+            else:
+                tree[parent].add(child)
+
+    def add_children(name):
+        if name in tree:
+            for child in tree[name]:
+                children.add(child)
+                add_children(child)
+
+    for name in model_instance_names:
+        add_children(name)
+
+    return children
+
+
+def _PopulatePlantOrDiagram(
+    plant: MultibodyPlant,
+    parser: Parser,
+    scenario: Scenario,
+    model_instance_names: typing.List[str] = None,
+    add_frozen_child_instances: bool = True,
+    package_xmls: typing.List[str] = [],
+    parser_preload_callback: typing.Callable[[Parser], None] = None,
+    parser_prefinalize_callback: typing.Callable[[Parser], None] = None,
+):
+    """See MakeMultibodyPlant and MakeRobotDiagram for details."""
+    ApplyMultibodyPlantConfig(scenario.plant_config, plant)
+    for p in package_xmls:
+        parser.package_map().AddPackageXml(p)
+    ConfigureParser(parser)
+    if parser_preload_callback:
+        parser_preload_callback(parser)
+
+    # Make the plant for the iiwa controller to use.
+    flattened_directives = FlattenModelDirectives(
+        ModelDirectives(directives=scenario.directives), parser.package_map()
+    ).directives
+    children_to_freeze = set()
+    if model_instance_names and add_frozen_child_instances:
+        children_to_freeze = _FindChildren(flattened_directives, model_instance_names)
+    all_model_instances = children_to_freeze.union(model_instance_names)
+
+    directives = []
+    for d in flatted_directives:
+        if d.add_model and (d.add_model.name in model_instance_names):
+            directives.append(d)
+        if (
+            d.add_weld
+            and (
+                ScopedName.Parse(d.add_weld.child).get_namespace()
+                in all_model_instances
+            )
+            and (
+                d.add_weld.parent == "world"
+                or ScopedName.Parse(d.add_weld.parent).get_namespace()
+                in all_model_instances
+            )
+        ):
+            directives.append(d)
+    ProcessModelDirectives(
+        directives=ModelDirectives(directives=directives),
+        parser=parser,
+    )
+
+    # TODO(russt): Replace all joints in children_to_freeze with weld joints.
+
+    if parser_prefinalize_callback:
+        parser_prefinalize_callback(parser)
+
+    plant.Finalize()
+
+
+def MakeMultibodyPlant(
+    scenario: Scenario,
+    *,
+    model_instance_names: typing.List[str] = None,
+    add_frozen_child_instances: bool = True,
+    package_xmls: typing.List[str] = [],
+    parser_preload_callback: typing.Callable[[Parser], None] = None,
+    parser_prefinalize_callback: typing.Callable[[Parser], None] = None,
+):
+    """Use a scenario to create a MultibodyPlant. This is intended, e.g., to facilitate
+    easily building subsets of a scenario, for instance, to make a plant for a
+    controller.
+
+    Args:
+        scenario: A Scenario structure, populated using the `load_scenario`
+            method.
+
+        model_instance_names: If specified, then only the named model instances
+            will be added to the plant. Otherwise, all model instances will be added.
+
+        add_frozen_child_instances: If True and model_instance_names is not None, then
+            model_instances that are not listed in model_instance_names, but are welded
+            to a model_instance that is listed, will be added to the plant; with all
+            joints replace by welded joints.
+
+        package_xmls: A list of package.xml file paths that will be passed to
+            the parser, using Parser.AddPackageXml().
+
+        parser_preload_callback: A callback function that will be called after
+            the Parser is created, but before any directives are processed. This can be
+            used to add additional packages to the parser, or to add additional model
+            directives.
+
+        parser_prefinalize_callback: A callback function that will be called
+            after the directives are processed, but before the plant is finalized. This
+            can be used to add additional model directives.
+    """
+    plant = MultibodyPlant(time_step=scenario.plant_config.time_step)
+    parser = Parser(plant)
+    _PopulatePlantOrDiagram(
+        plant,
+        parser,
+        scenario,
+        model_instance_names,
+        add_frozen_child_instances,
+        package_xmls,
+        parser_preload_callback,
+        parser_prefinalize_callback,
+    )
+    return plant
+
+
+def MakeRobotDiagram(
+    scenario: Scenario,
+    *,
+    model_instance_names: typing.List[str] = None,
+    add_frozen_child_instances: bool = True,
+    package_xmls: typing.List[str] = [],
+    parser_preload_callback: typing.Callable[[Parser], None] = None,
+    parser_prefinalize_callback: typing.Callable[[Parser], None] = None,
+):
+    """Use a scenario to create a RobotDiagram (MultibodyPlant + SceneGraph). This is
+    intended, e.g., to facilitate easily building subsets of a scenario, for instance,
+    to make a plant for a controller which needs to make collision queries.
+
+    Args:
+        scenario: A Scenario structure, populated using the `load_scenario`
+            method.
+
+        model_instance_names: If specified, then only the named model instances
+            will be added to the plant. Otherwise, all model instances will be added.
+
+        add_frozen_child_instances: If True and model_instance_names is not None, then
+            model_instances that are not listed in model_instance_names, but are welded
+            to a model_instance that is listed, will be added to the plant; with all
+            joints replace by welded joints.
+
+        package_xmls: A list of package.xml file paths that will be passed to
+            the parser, using Parser.AddPackageXml().
+
+        parser_preload_callback: A callback function that will be called after
+            the Parser is created, but before any directives are processed. This can be
+            used to add additional packages to the parser, or to add additional model
+            directives.
+
+        parser_prefinalize_callback: A callback function that will be called
+            after the directives are processed, but before the plant is finalized. This
+            can be used to add additional model directives.
+    """
+    robot_builder = RobotDiagramBuilder(time_step=scenario.plant_config.time_step)
+    plant = robot_builder().builder().plant()
+    parser = robot_builder().parser()
+    _PopulatePlantOrDiagram(
+        plant,
+        parser,
+        scenario,
+        model_instance_names,
+        add_frozen_child_instances,
+        package_xmls,
+        parser_preload_callback,
+        parser_prefinalize_callback,
+    )
+    return robot_builder.Build()
+
+
 class _MultiplexState(LeafSystem):
     def __init__(self, plant, model_instance_names):
         LeafSystem.__init__(self)

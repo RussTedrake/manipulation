@@ -53,6 +53,8 @@
 <li class="toctree-l2"><a class="reference internal" href="#manipulation.station.JointPdControllerGains"><code class="docutils literal notranslate"><span class="pre">JointPdControllerGains</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#manipulation.station.JointStiffnessDriver"><code class="docutils literal notranslate"><span class="pre">JointStiffnessDriver</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#manipulation.station.MakeHardwareStation"><code class="docutils literal notranslate"><span class="pre">MakeHardwareStation()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#manipulation.station.MakeMultibodyPlant"><code class="docutils literal notranslate"><span class="pre">MakeMultibodyPlant()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#manipulation.station.MakeRobotDiagram"><code class="docutils literal notranslate"><span class="pre">MakeRobotDiagram()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#manipulation.station.Scenario"><code class="docutils literal notranslate"><span class="pre">Scenario</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#manipulation.station.add_directives"><code class="docutils literal notranslate"><span class="pre">add_directives()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#manipulation.station.load_scenario"><code class="docutils literal notranslate"><span class="pre">load_scenario()</span></code></a></li>
@@ -193,6 +195,68 @@ finalized. This can be used to add additional model directives.</p></li>
 <li><p><strong>prebuild_callback</strong> (<em>Callable</em><em>[</em><em>[</em><em>DiagramBuilder</em><em>]</em><em>, </em><em>None</em><em>]</em>) – A callback function that will be called after the
 diagram builder is created, but before the diagram is built. This
 can be used to add additional systems to the diagram.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="manipulation.station.MakeMultibodyPlant">
+<span class="sig-prename descclassname"><span class="pre">manipulation.station.</span></span><span class="sig-name descname"><span class="pre">MakeMultibodyPlant</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scenario</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#manipulation.station.Scenario" title="manipulation.station.Scenario"><span class="pre">Scenario</span></a></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_instance_names</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_welded_child_instances</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">package_xmls</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parser_preload_callback</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">Parser</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parser_prefinalize_callback</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">Parser</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#manipulation.station.MakeMultibodyPlant" title="Link to this definition"></a></dt>
+<dd><p>Use a scenario to create a MultibodyPlant. This is intended, e.g., to facilitate
+easily building subsets of a scenario, for instance, to make a plant for a
+controller.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>scenario</strong> (<a class="reference internal" href="#manipulation.station.Scenario" title="manipulation.station.Scenario"><em>Scenario</em></a>) – A Scenario structure, populated using the <cite>load_scenario</cite>
+method.</p></li>
+<li><p><strong>model_instance_names</strong> (<em>List</em><em>[</em><em>str</em><em>]</em>) – If specified, then only the named model instances
+will be added to the plant. Otherwise, all model instances will be added.</p></li>
+<li><p><strong>add_welded_child_instances</strong> (<em>bool</em>) – If True and model_instance_names is not None, then
+model_instances that are not listed in model_instance_names, but are welded
+to a model_instance that is listed, will be added to the plant; with all
+joints replace by welded joints.</p></li>
+<li><p><strong>package_xmls</strong> (<em>List</em><em>[</em><em>str</em><em>]</em>) – A list of package.xml file paths that will be passed to
+the parser, using Parser.AddPackageXml().</p></li>
+<li><p><strong>parser_preload_callback</strong> (<em>Callable</em><em>[</em><em>[</em><em>Parser</em><em>]</em><em>, </em><em>None</em><em>]</em>) – A callback function that will be called after
+the Parser is created, but before any directives are processed. This can be
+used to add additional packages to the parser, or to add additional model
+directives.</p></li>
+<li><p><strong>parser_prefinalize_callback</strong> (<em>Callable</em><em>[</em><em>[</em><em>Parser</em><em>]</em><em>, </em><em>None</em><em>]</em>) – A callback function that will be called
+after the directives are processed, but before the plant is finalized. This
+can be used to add additional model directives.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="manipulation.station.MakeRobotDiagram">
+<span class="sig-prename descclassname"><span class="pre">manipulation.station.</span></span><span class="sig-name descname"><span class="pre">MakeRobotDiagram</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scenario</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#manipulation.station.Scenario" title="manipulation.station.Scenario"><span class="pre">Scenario</span></a></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_instance_names</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_welded_child_instances</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">package_xmls</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parser_preload_callback</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">Parser</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parser_prefinalize_callback</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">Parser</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#manipulation.station.MakeRobotDiagram" title="Link to this definition"></a></dt>
+<dd><p>Use a scenario to create a RobotDiagram (MultibodyPlant + SceneGraph). This is
+intended, e.g., to facilitate easily building subsets of a scenario, for instance,
+to make a plant for a controller which needs to make collision queries.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>scenario</strong> (<a class="reference internal" href="#manipulation.station.Scenario" title="manipulation.station.Scenario"><em>Scenario</em></a>) – A Scenario structure, populated using the <cite>load_scenario</cite>
+method.</p></li>
+<li><p><strong>model_instance_names</strong> (<em>List</em><em>[</em><em>str</em><em>]</em>) – If specified, then only the named model instances
+will be added to the plant. Otherwise, all model instances will be added.</p></li>
+<li><p><strong>add_welded_child_instances</strong> (<em>bool</em>) – If True and model_instance_names is not None, then
+model_instances that are not listed in model_instance_names, but are welded
+to a model_instance that is listed, will be added to the plant; with all
+joints replace by welded joints.</p></li>
+<li><p><strong>package_xmls</strong> (<em>List</em><em>[</em><em>str</em><em>]</em>) – A list of package.xml file paths that will be passed to
+the parser, using Parser.AddPackageXml().</p></li>
+<li><p><strong>parser_preload_callback</strong> (<em>Callable</em><em>[</em><em>[</em><em>Parser</em><em>]</em><em>, </em><em>None</em><em>]</em>) – A callback function that will be called after
+the Parser is created, but before any directives are processed. This can be
+used to add additional packages to the parser, or to add additional model
+directives.</p></li>
+<li><p><strong>parser_prefinalize_callback</strong> (<em>Callable</em><em>[</em><em>[</em><em>Parser</em><em>]</em><em>, </em><em>None</em><em>]</em>) – A callback function that will be called
+after the directives are processed, but before the plant is finalized. This
+can be used to add additional model directives.</p></li>
 </ul>
 </dd>
 </dl>
