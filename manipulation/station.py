@@ -196,16 +196,16 @@ def load_scenario(
     Returns a `Scenario` object loaded from the given input arguments.
 
     Args:
-        filename (optional): A yaml filename to load the scenario from.
+        filename: A yaml filename to load the scenario from.
 
-        data (optional): A yaml _string_ to load the scenario from. If both
-            filename and string are specified, then the filename is parsed
-            first, and then the string is _also_ parsed, potentially overwriting defaults from the filename..
+        data: A yaml _string_ to load the scenario from. If both filename and string are
+            specified, then the filename is parsed first, and then the string is _also_
+            parsed, potentially overwriting defaults from the filename.
 
-        scenario_name (optional): The name of the scenario/child to load from
-            the yaml file. If None, then the entire file is loaded.
+        scenario_name: The name of the scenario/child to load from the yaml file. If
+            None, then the entire file is loaded.
 
-        defaults (optional): A `Scenario` object to use as the default values.
+        defaults: A `Scenario` object to use as the default values.
     """
     result = defaults
     if filename:
@@ -239,14 +239,14 @@ def add_directives(
     Args:
         scenario: The scenario to append to.
 
-        filename (optional): A yaml filename to load the directives from.
+        filename: A yaml filename to load the directives from.
 
-        data (optional): A yaml string to load the directives from. If both
-            filename and string are specified, then the filename is parsed
-            first, and then the string is _also_ parsed, potentially overwriting defaults from the filename..
+        data: A yaml string to load the directives from. If both filename and string are
+            specified, then the filename is parsed first, and then the string is _also_
+            parsed, potentially overwriting defaults from the filename.
 
-        scenario_name (optional): The name of the scenario/child to load from
-            the yaml file. If None, then the entire file is loaded.
+        scenario_name: The name of the scenario/child to load from the yaml file. If
+            None, then the entire file is loaded.
     """
     d = Directives()
     if filename:

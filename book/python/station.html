@@ -237,12 +237,12 @@ will appear in the Diagram artifacts.</p></li>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>scenario</strong> (<a class="reference internal" href="#manipulation.station.Scenario" title="manipulation.station.Scenario"><em>Scenario</em></a>) – The scenario to append to.</p></li>
-<li><p><strong>filename</strong> (<em>optional</em>) – A yaml filename to load the directives from.</p></li>
-<li><p><strong>data</strong> (<em>optional</em>) – A yaml string to load the directives from. If both
-filename and string are specified, then the filename is parsed
-first, and then the string is _also_ parsed, potentially overwriting defaults from the filename..</p></li>
-<li><p><strong>scenario_name</strong> (<em>optional</em>) – The name of the scenario/child to load from
-the yaml file. If None, then the entire file is loaded.</p></li>
+<li><p><strong>filename</strong> (<em>str</em>) – A yaml filename to load the directives from.</p></li>
+<li><p><strong>data</strong> (<em>str</em>) – A yaml string to load the directives from. If both filename and string are
+specified, then the filename is parsed first, and then the string is _also_
+parsed, potentially overwriting defaults from the filename.</p></li>
+<li><p><strong>scenario_name</strong> (<em>str</em>) – The name of the scenario/child to load from the yaml file. If
+None, then the entire file is loaded.</p></li>
 </ul>
 </dd>
 </dl>
@@ -256,13 +256,13 @@ Returns a <cite>Scenario</cite> object loaded from the given input arguments.</p
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>filename</strong> (<em>optional</em>) – A yaml filename to load the scenario from.</p></li>
-<li><p><strong>data</strong> (<em>optional</em>) – A yaml _string_ to load the scenario from. If both
-filename and string are specified, then the filename is parsed
-first, and then the string is _also_ parsed, potentially overwriting defaults from the filename..</p></li>
-<li><p><strong>scenario_name</strong> (<em>optional</em>) – The name of the scenario/child to load from
-the yaml file. If None, then the entire file is loaded.</p></li>
-<li><p><strong>defaults</strong> (<em>optional</em>) – A <cite>Scenario</cite> object to use as the default values.</p></li>
+<li><p><strong>filename</strong> (<em>str</em>) – A yaml filename to load the scenario from.</p></li>
+<li><p><strong>data</strong> (<em>str</em>) – A yaml _string_ to load the scenario from. If both filename and string are
+specified, then the filename is parsed first, and then the string is _also_
+parsed, potentially overwriting defaults from the filename.</p></li>
+<li><p><strong>scenario_name</strong> (<em>str</em>) – The name of the scenario/child to load from the yaml file. If
+None, then the entire file is loaded.</p></li>
+<li><p><strong>defaults</strong> (<a class="reference internal" href="#manipulation.station.Scenario" title="manipulation.station.Scenario"><em>Scenario</em></a>) – A <cite>Scenario</cite> object to use as the default values.</p></li>
 </ul>
 </dd>
 </dl>
