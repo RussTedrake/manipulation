@@ -184,8 +184,30 @@ class Directives:
     directives: typing.List[ModelDirective] = dc.field(default_factory=list)
 
 
-# TODO(russt): load from url (using packagemap).
 def load_scenario(
+    *,
+    filename: str = None,
+    data: str = None,
+    scenario_name: str = None,
+    defaults: Scenario = Scenario(),
+):
+    warnings.warn("load_scenario is deprecated. Use LoadScenario instead.")
+    return LoadScenario(**kwargs)
+
+
+def add_scenario(
+    *,
+    filename: str = None,
+    data: str = None,
+    scenario_name: str = None,
+    defaults: Scenario = Scenario(),
+):
+    warnings.warn("add_directives is deprecated. Use AppendDirectives instead.")
+    return AppendDirectives(**kwargs)
+
+
+# TODO(russt): load from url (using packagemap).
+def LoadScenario(
     *,
     filename: str = None,
     data: str = None,
@@ -200,7 +222,9 @@ def load_scenario(
 
         data: A yaml _string_ to load the scenario from. If both filename and string are
             specified, then the filename is parsed first, and then the string is _also_
-            parsed, potentially overwriting defaults from the filename.
+            parsed, potentially overwriting defaults from the filename. Note: this will
+            not append additional `directives`, it will replace them; see
+            AppendDirectives.
 
         scenario_name: The name of the scenario/child to load from the yaml file. If
             None, then the entire file is loaded.
@@ -227,7 +251,7 @@ def load_scenario(
     return result
 
 
-def add_directives(
+def AppendDirectives(
     scenario: Scenario,
     *,
     filename: str = None,
@@ -243,7 +267,7 @@ def add_directives(
 
         data: A yaml string to load the directives from. If both filename and string are
             specified, then the filename is parsed first, and then the string is _also_
-            parsed, potentially overwriting defaults from the filename.
+            parsed, presumably overwriting any directives from the filename.
 
         scenario_name: The name of the scenario/child to load from the yaml file. If
             None, then the entire file is loaded.
@@ -764,8 +788,7 @@ def MakeHardwareStation(
     the network interfaces to communicate directly with the hardware drivers.
 
     Args:
-        scenario: A Scenario structure, populated using the `load_scenario`
-            method.
+        scenario: A Scenario structure, populated using the LoadScenario method.
 
         meshcat: If not None, then AddDefaultVisualization will be added to the
             subdiagram using this meshcat instance.
@@ -788,7 +811,6 @@ def MakeHardwareStation(
         prebuild_callback: A callback function that will be called after the
             diagram builder is created, but before the diagram is built. This
             can be used to add additional systems to the diagram.
-
     """
     if hardware:
         return _MakeHardwareStationInterface(
@@ -1125,7 +1147,7 @@ def AddPointClouds(
     Adds one DepthImageToPointCloud system to the `builder` for each camera in `scenario`, and connects it to the respective camera station output ports.
 
     Args:
-        scenario: A Scenario structure, populated using the `load_scenario` method.
+        scenario: A Scenario structure, populated using the `LoadScenario` method.
 
         station: A HardwareStation system (e.g. from MakeHardwareStation) that has already been added to `builder`.
 

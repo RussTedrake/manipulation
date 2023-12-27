@@ -48,14 +48,14 @@
               <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#"><code class="docutils literal notranslate"><span class="pre">manipulation.station</span></code></a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#manipulation.station.AddPointClouds"><code class="docutils literal notranslate"><span class="pre">AddPointClouds()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#manipulation.station.AppendDirectives"><code class="docutils literal notranslate"><span class="pre">AppendDirectives()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#manipulation.station.Directives"><code class="docutils literal notranslate"><span class="pre">Directives</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#manipulation.station.InverseDynamicsDriver"><code class="docutils literal notranslate"><span class="pre">InverseDynamicsDriver</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#manipulation.station.JointPdControllerGains"><code class="docutils literal notranslate"><span class="pre">JointPdControllerGains</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#manipulation.station.JointStiffnessDriver"><code class="docutils literal notranslate"><span class="pre">JointStiffnessDriver</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#manipulation.station.LoadScenario"><code class="docutils literal notranslate"><span class="pre">LoadScenario()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#manipulation.station.MakeHardwareStation"><code class="docutils literal notranslate"><span class="pre">MakeHardwareStation()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#manipulation.station.Scenario"><code class="docutils literal notranslate"><span class="pre">Scenario</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#manipulation.station.add_directives"><code class="docutils literal notranslate"><span class="pre">add_directives()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#manipulation.station.load_scenario"><code class="docutils literal notranslate"><span class="pre">load_scenario()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="meshcat_utils.html"><code class="docutils literal notranslate"><span class="pre">manipulation.meshcat_utils</span></code></a></li>
@@ -95,11 +95,30 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>scenario</strong> (<a class="reference internal" href="#manipulation.station.Scenario" title="manipulation.station.Scenario"><em>Scenario</em></a>) – A Scenario structure, populated using the <cite>load_scenario</cite> method.</p></li>
+<li><p><strong>scenario</strong> (<a class="reference internal" href="#manipulation.station.Scenario" title="manipulation.station.Scenario"><em>Scenario</em></a>) – A Scenario structure, populated using the <cite>LoadScenario</cite> method.</p></li>
 <li><p><strong>station</strong> (<em>Diagram</em>) – A HardwareStation system (e.g. from MakeHardwareStation) that has already been added to <cite>builder</cite>.</p></li>
 <li><p><strong>builder</strong> (<em>DiagramBuilder</em>) – The DiagramBuilder containing <cite>station</cite> into which the new systems will be added.</p></li>
 <li><p><strong>poses_output_port</strong> (<em>OutputPort</em>) – (optional) HardwareStation will have a body_poses output port iff it was created with <cite>hardware=False</cite>. Alternatively, one could create a MultibodyPositionsToGeometryPoses system to consume the position measurements; this optional input can be used to support that workflow.</p></li>
 <li><p><strong>meshcat</strong> (<em>Meshcat</em>) – If not None, then a MeshcatPointCloudVisualizer will be added to the builder using this meshcat instance.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="manipulation.station.AppendDirectives">
+<span class="sig-prename descclassname"><span class="pre">manipulation.station.</span></span><span class="sig-name descname"><span class="pre">AppendDirectives</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scenario</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#manipulation.station.Scenario" title="manipulation.station.Scenario"><span class="pre">Scenario</span></a></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scenario_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#manipulation.station.AppendDirectives" title="Link to this definition"></a></dt>
+<dd><p>Append additional directives to an existing scenario.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>scenario</strong> (<a class="reference internal" href="#manipulation.station.Scenario" title="manipulation.station.Scenario"><em>Scenario</em></a>) – The scenario to append to.</p></li>
+<li><p><strong>filename</strong> (<em>str</em>) – A yaml filename to load the directives from.</p></li>
+<li><p><strong>data</strong> (<em>str</em>) – A yaml string to load the directives from. If both filename and string are
+specified, then the filename is parsed first, and then the string is _also_
+parsed, presumably overwriting any directives from the filename.</p></li>
+<li><p><strong>scenario_name</strong> (<em>str</em>) – The name of the scenario/child to load from the yaml file. If
+None, then the entire file is loaded.</p></li>
 </ul>
 </dd>
 </dl>
@@ -160,6 +179,28 @@ off for this model instance (e.g. for a hand).</p></li>
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="manipulation.station.LoadScenario">
+<span class="sig-prename descclassname"><span class="pre">manipulation.station.</span></span><span class="sig-name descname"><span class="pre">LoadScenario</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scenario_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">defaults</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#manipulation.station.Scenario" title="manipulation.station.Scenario"><span class="pre">Scenario</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Scenario(random_seed=0,</span> <span class="pre">simulation_duration=inf,</span> <span class="pre">simulator_config=SimulatorConfig(integration_scheme='runge_kutta3',</span> <span class="pre">max_step_size=0.01,</span> <span class="pre">accuracy=0.01,</span> <span class="pre">use_error_control=False,</span> <span class="pre">target_realtime_rate=0.0,</span> <span class="pre">publish_every_time_step=False),</span> <span class="pre">plant_config=MultibodyPlantConfig(time_step=0.001,</span> <span class="pre">penetration_allowance=0.001,</span> <span class="pre">stiction_tolerance=0.001,</span> <span class="pre">contact_model='hydroelastic_with_fallback',</span> <span class="pre">discrete_contact_solver='sap',</span> <span class="pre">sap_near_rigid_threshold=1.0,</span> <span class="pre">contact_surface_representation='polygon',</span> <span class="pre">adjacent_bodies_collision_filters=True),</span> <span class="pre">directives=[],</span> <span class="pre">lcm_buses={'default':</span> <span class="pre">DrakeLcmParams(lcm_url='',</span> <span class="pre">channel_suffix='',</span> <span class="pre">defer_initialization=False)},</span> <span class="pre">model_drivers={},</span> <span class="pre">cameras={},</span> <span class="pre">visualization=VisualizationConfig(lcm_bus='default',</span> <span class="pre">publish_period=0.015625,</span> <span class="pre">publish_illustration=True,</span> <span class="pre">default_illustration_color=Rgba(r=0.9,</span> <span class="pre">g=0.9,</span> <span class="pre">b=0.9,</span> <span class="pre">a=1.0),</span> <span class="pre">publish_proximity=True,</span> <span class="pre">default_proximity_color=Rgba(r=1.0,</span> <span class="pre">g=0.0,</span> <span class="pre">b=0.0,</span> <span class="pre">a=0.5),</span> <span class="pre">publish_contacts=True,</span> <span class="pre">publish_inertia=True,</span> <span class="pre">enable_meshcat_creation=True,</span> <span class="pre">delete_on_initialization_event=True,</span> <span class="pre">enable_alpha_sliders=False))</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#manipulation.station.LoadScenario" title="Link to this definition"></a></dt>
+<dd><p>Implements the command-line handling logic for scenario data.
+Returns a <cite>Scenario</cite> object loaded from the given input arguments.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filename</strong> (<em>str</em>) – A yaml filename to load the scenario from.</p></li>
+<li><p><strong>data</strong> (<em>str</em>) – A yaml _string_ to load the scenario from. If both filename and string are
+specified, then the filename is parsed first, and then the string is _also_
+parsed, potentially overwriting defaults from the filename. Note: this will
+not append additional <cite>directives</cite>, it will replace them; see
+AppendDirectives.</p></li>
+<li><p><strong>scenario_name</strong> (<em>str</em>) – The name of the scenario/child to load from the yaml file. If
+None, then the entire file is loaded.</p></li>
+<li><p><strong>defaults</strong> (<a class="reference internal" href="#manipulation.station.Scenario" title="manipulation.station.Scenario"><em>Scenario</em></a>) – A <cite>Scenario</cite> object to use as the default values.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="manipulation.station.MakeHardwareStation">
 <span class="sig-prename descclassname"><span class="pre">manipulation.station.</span></span><span class="sig-name descname"><span class="pre">MakeHardwareStation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scenario</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#manipulation.station.Scenario" title="manipulation.station.Scenario"><span class="pre">Scenario</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">meshcat</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Meshcat</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">package_xmls</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hardware</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parser_preload_callback</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">Parser</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parser_prefinalize_callback</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">Parser</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prebuild_callback</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">DiagramBuilder</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#manipulation.station.MakeHardwareStation" title="Link to this definition"></a></dt>
 <dd><p>Make a diagram encapsulating a simulation of (or the communications
@@ -175,8 +216,7 @@ the network interfaces to communicate directly with the hardware drivers.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>scenario</strong> (<a class="reference internal" href="#manipulation.station.Scenario" title="manipulation.station.Scenario"><em>Scenario</em></a>) – A Scenario structure, populated using the <cite>load_scenario</cite>
-method.</p></li>
+<li><p><strong>scenario</strong> (<a class="reference internal" href="#manipulation.station.Scenario" title="manipulation.station.Scenario"><em>Scenario</em></a>) – A Scenario structure, populated using the LoadScenario method.</p></li>
 <li><p><strong>meshcat</strong> (<em>Meshcat</em>) – If not None, then AddDefaultVisualization will be added to the
 subdiagram using this meshcat instance.</p></li>
 <li><p><strong>package_xmls</strong> (<em>List</em><em>[</em><em>str</em><em>]</em>) – A list of package.xml file paths that will be passed to
@@ -224,45 +264,6 @@ for each camera is a helpful mnemonic, but does not serve a
 technical role. The CameraConfig::name field is still the name that
 will appear in the Diagram artifacts.</p></li>
 <li><p><strong>visualization</strong> (<em>VisualizationConfig</em>) – Visualization configuration.</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="manipulation.station.add_directives">
-<span class="sig-prename descclassname"><span class="pre">manipulation.station.</span></span><span class="sig-name descname"><span class="pre">add_directives</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scenario</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#manipulation.station.Scenario" title="manipulation.station.Scenario"><span class="pre">Scenario</span></a></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scenario_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#manipulation.station.add_directives" title="Link to this definition"></a></dt>
-<dd><p>Append additional directives to an existing scenario.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>scenario</strong> (<a class="reference internal" href="#manipulation.station.Scenario" title="manipulation.station.Scenario"><em>Scenario</em></a>) – The scenario to append to.</p></li>
-<li><p><strong>filename</strong> (<em>str</em>) – A yaml filename to load the directives from.</p></li>
-<li><p><strong>data</strong> (<em>str</em>) – A yaml string to load the directives from. If both filename and string are
-specified, then the filename is parsed first, and then the string is _also_
-parsed, potentially overwriting defaults from the filename.</p></li>
-<li><p><strong>scenario_name</strong> (<em>str</em>) – The name of the scenario/child to load from the yaml file. If
-None, then the entire file is loaded.</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="manipulation.station.load_scenario">
-<span class="sig-prename descclassname"><span class="pre">manipulation.station.</span></span><span class="sig-name descname"><span class="pre">load_scenario</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scenario_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">defaults</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#manipulation.station.Scenario" title="manipulation.station.Scenario"><span class="pre">Scenario</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Scenario(random_seed=0,</span> <span class="pre">simulation_duration=inf,</span> <span class="pre">simulator_config=SimulatorConfig(integration_scheme='runge_kutta3',</span> <span class="pre">max_step_size=0.01,</span> <span class="pre">accuracy=0.01,</span> <span class="pre">use_error_control=False,</span> <span class="pre">target_realtime_rate=0.0,</span> <span class="pre">publish_every_time_step=False),</span> <span class="pre">plant_config=MultibodyPlantConfig(time_step=0.001,</span> <span class="pre">penetration_allowance=0.001,</span> <span class="pre">stiction_tolerance=0.001,</span> <span class="pre">contact_model='hydroelastic_with_fallback',</span> <span class="pre">discrete_contact_solver='sap',</span> <span class="pre">sap_near_rigid_threshold=1.0,</span> <span class="pre">contact_surface_representation='polygon',</span> <span class="pre">adjacent_bodies_collision_filters=True),</span> <span class="pre">directives=[],</span> <span class="pre">lcm_buses={'default':</span> <span class="pre">DrakeLcmParams(lcm_url='',</span> <span class="pre">channel_suffix='',</span> <span class="pre">defer_initialization=False)},</span> <span class="pre">model_drivers={},</span> <span class="pre">cameras={},</span> <span class="pre">visualization=VisualizationConfig(lcm_bus='default',</span> <span class="pre">publish_period=0.015625,</span> <span class="pre">publish_illustration=True,</span> <span class="pre">default_illustration_color=Rgba(r=0.9,</span> <span class="pre">g=0.9,</span> <span class="pre">b=0.9,</span> <span class="pre">a=1.0),</span> <span class="pre">publish_proximity=True,</span> <span class="pre">default_proximity_color=Rgba(r=1.0,</span> <span class="pre">g=0.0,</span> <span class="pre">b=0.0,</span> <span class="pre">a=0.5),</span> <span class="pre">publish_contacts=True,</span> <span class="pre">publish_inertia=True,</span> <span class="pre">enable_meshcat_creation=True,</span> <span class="pre">delete_on_initialization_event=True,</span> <span class="pre">enable_alpha_sliders=False))</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#manipulation.station.load_scenario" title="Link to this definition"></a></dt>
-<dd><p>Implements the command-line handling logic for scenario data.
-Returns a <cite>Scenario</cite> object loaded from the given input arguments.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>filename</strong> (<em>str</em>) – A yaml filename to load the scenario from.</p></li>
-<li><p><strong>data</strong> (<em>str</em>) – A yaml _string_ to load the scenario from. If both filename and string are
-specified, then the filename is parsed first, and then the string is _also_
-parsed, potentially overwriting defaults from the filename.</p></li>
-<li><p><strong>scenario_name</strong> (<em>str</em>) – The name of the scenario/child to load from the yaml file. If
-None, then the entire file is loaded.</p></li>
-<li><p><strong>defaults</strong> (<a class="reference internal" href="#manipulation.station.Scenario" title="manipulation.station.Scenario"><em>Scenario</em></a>) – A <cite>Scenario</cite> object to use as the default values.</p></li>
 </ul>
 </dd>
 </dl>
