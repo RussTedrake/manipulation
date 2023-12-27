@@ -153,8 +153,9 @@ class Scenario:
 
     directives: typing.List[ModelDirective] = dc.field(default_factory=list)
 
+    # Opt-out of LCM by default.
     lcm_buses: typing.Mapping[str, DrakeLcmParams] = dc.field(
-        default_factory=lambda: dict(default=DrakeLcmParams())
+        default_factory=lambda: dict(default=DrakeLcmParams(lcm_url="memq://null"))
     )
 
     model_drivers: typing.Mapping[
@@ -851,6 +852,10 @@ def MakeHardwareStation(
 
     sim_plant.Finalize()
 
+    # Add LCM buses. (The simulator will handle polling the network for new
+    # messages and dispatching them to the receivers, i.e., "pump" the bus.)
+    lcm_buses = ApplyLcmBusConfig(lcm_buses=scenario.lcm_buses, builder=builder)
+
     # Add drivers.
     _ApplyDriverConfigsSim(
         driver_configs=scenario.model_drivers,
@@ -866,7 +871,9 @@ def MakeHardwareStation(
         _ApplyCameraConfigSim(config=camera, builder=builder)
 
     # Add visualization.
-    ApplyVisualizationConfig(scenario.visualization, builder, meshcat=meshcat)
+    ApplyVisualizationConfig(
+        scenario.visualization, builder, meshcat=meshcat, lcm_buses=lcm_buses
+    )
 
     # Export "cheat" ports.
     builder.ExportInput(
