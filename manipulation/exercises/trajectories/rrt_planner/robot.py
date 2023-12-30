@@ -1,6 +1,6 @@
 # yapf: disable
 import random
-from math import ceil, sqrt
+from math import ceil, isfinite, sqrt
 
 from .geometry import Object, Point, Pose
 
@@ -91,6 +91,8 @@ class Range:
     def __init__(self, low, high, wrap_around=False):
         self.low = low
         self.high = high
+        assert isfinite(self.low) and isfinite(self.high), \
+            "Range must be finite; perhaps you need to define a finite range then enable wrap_around (e.g. for continuous revolute joints)?"
         self.wrap_around = wrap_around
 
     def difference(self, one, two):  # difference (with wraparound)
@@ -133,7 +135,7 @@ class Range:
 class ConfigurationSpace:
     """Cspace for robot (ranges and distance)"""
 
-    def __init__(self, cspace_ranges, robot_distance, max_steps):
+    def __init__(self, cspace_ranges : Range, robot_distance, max_steps):
         self.cspace_ranges = cspace_ranges
         self.robot_distance = robot_distance
         self.max_diff_on_path = max_steps
