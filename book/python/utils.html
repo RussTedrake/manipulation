@@ -87,18 +87,18 @@
 <span id="manipulation-utils"></span><h1><code class="docutils literal notranslate"><span class="pre">manipulation.utils</span></code><a class="headerlink" href="#module-manipulation.utils" title="Link to this heading"></a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="manipulation.utils.ConfigureParser">
-<span class="sig-prename descclassname"><span class="pre">manipulation.utils.</span></span><span class="sig-name descname"><span class="pre">ConfigureParser</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parser</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Parser</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#manipulation.utils.ConfigureParser" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">manipulation.utils.</span></span><span class="sig-name descname"><span class="pre">ConfigureParser</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parser</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#manipulation.utils.ConfigureParser" title="Link to this definition"></a></dt>
 <dd><p>Add the <cite>manipulation</cite> module packages to the given Parser.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>parser</strong> (<em>Parser</em>) – </p>
+<dd class="field-odd"><p><strong>parser</strong> (<a class="reference external" href="https://drake.mit.edu/pydrake/pydrake.multibody.parsing.html#pydrake.multibody.parsing.Parser" title="(in pydrake)"><em>Parser</em></a>) – </p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="manipulation.utils.DrakeVersionGreaterThan">
-<span class="sig-prename descclassname"><span class="pre">manipulation.utils.</span></span><span class="sig-name descname"><span class="pre">DrakeVersionGreaterThan</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">minimum_date</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">date</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#manipulation.utils.DrakeVersionGreaterThan" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">manipulation.utils.</span></span><span class="sig-name descname"><span class="pre">DrakeVersionGreaterThan</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">minimum_date</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#manipulation.utils.DrakeVersionGreaterThan" title="Link to this definition"></a></dt>
 <dd><p>Check that the Drake version is at least <cite>minimum_data</cite>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -109,7 +109,7 @@
 
 <dl class="py function">
 <dt class="sig sig-object py" id="manipulation.utils.FindDataResource">
-<span class="sig-prename descclassname"><span class="pre">manipulation.utils.</span></span><span class="sig-name descname"><span class="pre">FindDataResource</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#manipulation.utils.FindDataResource" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">manipulation.utils.</span></span><span class="sig-name descname"><span class="pre">FindDataResource</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#manipulation.utils.FindDataResource" title="Link to this definition"></a></dt>
 <dd><p>Returns the absolute path to the given filename relative to the book data
 directory; fetching it from a remote host if necessary.</p>
 <dl class="field-list simple">
@@ -121,7 +121,7 @@ directory; fetching it from a remote host if necessary.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="manipulation.utils.FindResource">
-<span class="sig-prename descclassname"><span class="pre">manipulation.utils.</span></span><span class="sig-name descname"><span class="pre">FindResource</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#manipulation.utils.FindResource" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">manipulation.utils.</span></span><span class="sig-name descname"><span class="pre">FindResource</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#manipulation.utils.FindResource" title="Link to this definition"></a></dt>
 <dd><p>Returns the absolute path to the given filename relative to the
 manipulation module.</p>
 <dl class="field-list simple">
@@ -133,7 +133,7 @@ manipulation module.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="manipulation.utils.RenderDiagram">
-<span class="sig-prename descclassname"><span class="pre">manipulation.utils.</span></span><span class="sig-name descname"><span class="pre">RenderDiagram</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">System</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#manipulation.utils.RenderDiagram" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">manipulation.utils.</span></span><span class="sig-name descname"><span class="pre">RenderDiagram</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">system</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_depth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#manipulation.utils.RenderDiagram" title="Link to this definition"></a></dt>
 <dd><p>Use pydot to render the GraphViz diagram of the given system.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -149,19 +149,19 @@ block. Defaults to 1.</p></li>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="manipulation.utils.SystemHtml">
-<span class="sig-prename descclassname"><span class="pre">manipulation.utils.</span></span><span class="sig-name descname"><span class="pre">SystemHtml</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">System</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#manipulation.utils.SystemHtml" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">manipulation.utils.</span></span><span class="sig-name descname"><span class="pre">SystemHtml</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">system</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#manipulation.utils.SystemHtml" title="Link to this definition"></a></dt>
 <dd><p>Generates an HTML string for <cite>system</cite> of the style seen in the Drake
 doxygen documentation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>system</strong> (<em>System</em>) – </p>
+<dd class="field-odd"><p><strong>system</strong> (<a class="reference external" href="https://drake.mit.edu/pydrake/pydrake.systems.framework.html#pydrake.systems.framework.System" title="(in pydrake)"><em>System</em></a>) – </p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="manipulation.utils.colorize_labels">
-<span class="sig-prename descclassname"><span class="pre">manipulation.utils.</span></span><span class="sig-name descname"><span class="pre">colorize_labels</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ImageTPixelTypepkLabel16IU</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#manipulation.utils.colorize_labels" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">manipulation.utils.</span></span><span class="sig-name descname"><span class="pre">colorize_labels</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#manipulation.utils.colorize_labels" title="Link to this definition"></a></dt>
 <dd><p>Given a label image, replace the integer labels with color values that display nicely in matplotlib.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>

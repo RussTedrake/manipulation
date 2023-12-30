@@ -24,6 +24,7 @@ extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.mathjax",
     "sphinx.ext.napoleon",
+    "sphinx.ext.intersphinx",
 ]
 
 # Option available in Sphinx 1.5+.
@@ -38,4 +39,8 @@ html_css_files = [
     "custom.css",
 ]
 
-autodoc_typehints = "both"
+autodoc_typehints = "description"
+
+intersphinx_mapping = {
+    "drake": ("https://drake.mit.edu/pydrake", None),
+}
