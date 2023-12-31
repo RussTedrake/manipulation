@@ -74,6 +74,7 @@ jobs:
       - name: test
         run: ./book/htmlbook/workflows/ci/jammy/test
         shell: bash
+
   monterey:
     name: macos monterey 12
     runs-on: macos-12
@@ -110,3 +111,9 @@ jobs:
           virtualenvs-in-project: true
       - name: Test poetry install
         run: poetry install
+      - name: build the docs
+        run: |
+          pip3 install -r requirements.txt
+          pip3 install sphinx myst-parser sphinx_rtd_theme 
+          sphinx-build -M html manipulation book/python
+        shell: bash
