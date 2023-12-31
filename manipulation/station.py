@@ -18,6 +18,7 @@ from pydrake.all import (
     ApplyMultibodyPlantConfig,
     ApplyVisualizationConfig,
     BaseField,
+    BodyIndex,
     CameraConfig,
     CameraInfo,
     Demultiplexer,
@@ -31,6 +32,7 @@ from pydrake.all import (
     IiwaDriver,
     IiwaStatusReceiver,
     InverseDynamicsController,
+    LcmBuses,
     LcmPublisherSystem,
     LcmSubscriberSystem,
     LeafSystem,
@@ -41,6 +43,7 @@ from pydrake.all import (
     ModelDirective,
     ModelDirectives,
     ModelInstanceIndex,
+    ModelInstanceInfo,
     MultibodyPlant,
     MultibodyPlantConfig,
     OutputPort,
@@ -51,6 +54,7 @@ from pydrake.all import (
     RenderEngineVtkParams,
     RgbdSensor,
     RigidTransform,
+    RobotDiagram,
     RobotDiagramBuilder,
     SceneGraph,
     SchunkWsgCommandSender,
@@ -214,9 +218,8 @@ def LoadScenario(
     data: str = None,
     scenario_name: str = None,
     defaults: Scenario = Scenario(),
-):
+) -> Scenario:
     """Implements the command-line handling logic for scenario data.
-    Returns a `Scenario` object loaded from the given input arguments.
 
     Args:
         filename: A yaml filename to load the scenario from.
@@ -231,6 +234,9 @@ def LoadScenario(
             None, then the entire file is loaded.
 
         defaults: A `Scenario` object to use as the default values.
+
+    Returns:
+        A `Scenario` object loaded from the given input arguments.
     """
     result = defaults
     if filename:
@@ -258,7 +264,7 @@ def AppendDirectives(
     filename: str = None,
     data: str = None,
     scenario_name: str = None,
-):
+) -> Scenario:
     """Append additional directives to an existing scenario.
 
     Args:
@@ -272,6 +278,9 @@ def AppendDirectives(
 
         scenario_name: The name of the scenario/child to load from the yaml file. If
             None, then the entire file is loaded.
+
+    Returns:
+        The scenario with the additional directives appended.
     """
     d = Directives()
     if filename:
@@ -290,8 +299,211 @@ def AppendDirectives(
     return scenario
 
 
+def _FindChildren(
+    flattened_directives: typing.List[ModelDirective],
+    model_instance_names: typing.List[str],
+) -> typing.List[str]:
+    """Given a list of model instances, returns model names that are welded (via
+    directives) to any one of those model instances.
+
+    Returns:
+        A list of model names that are welded to any of the given model instances.
+    """
+    tree = dict()
+    children = set()
+    for d in flatted_directives:
+        if d.add_weld:
+            parent = ScopedName.Parse(d.add_weld.parent).get_namespace()
+            child = ScopedName.Parse(d.add_weld.child).get_namespace()
+            if parent not in tree:
+                tree[parent] = {child}
+            else:
+                tree[parent].add(child)
+
+    def add_children(name):
+        if name in tree:
+            for child in tree[name]:
+                children.add(child)
+                add_children(child)
+
+    for name in model_instance_names:
+        add_children(name)
+
+    return children
+
+
+def _PopulatePlantOrDiagram(
+    plant: MultibodyPlant,
+    parser: Parser,
+    scenario: Scenario,
+    model_instance_names: typing.List[str] = None,
+    add_frozen_child_instances: bool = True,
+    package_xmls: typing.List[str] = [],
+    parser_preload_callback: typing.Callable[[Parser], None] = None,
+    parser_prefinalize_callback: typing.Callable[[Parser], None] = None,
+) -> None:
+    """See MakeMultibodyPlant and MakeRobotDiagram for details."""
+    ApplyMultibodyPlantConfig(scenario.plant_config, plant)
+    for p in package_xmls:
+        parser.package_map().AddPackageXml(p)
+    ConfigureParser(parser)
+    if parser_preload_callback:
+        parser_preload_callback(parser)
+
+    # Make the plant for the iiwa controller to use.
+    flattened_directives = FlattenModelDirectives(
+        ModelDirectives(directives=scenario.directives), parser.package_map()
+    ).directives
+    children_to_freeze = set()
+    if model_instance_names and add_frozen_child_instances:
+        children_to_freeze = _FindChildren(flattened_directives, model_instance_names)
+    all_model_instances = children_to_freeze.union(model_instance_names)
+
+    directives = []
+    for d in flatted_directives:
+        if d.add_model and (d.add_model.name in model_instance_names):
+            directives.append(d)
+        if (
+            d.add_weld
+            and (
+                ScopedName.Parse(d.add_weld.child).get_namespace()
+                in all_model_instances
+            )
+            and (
+                d.add_weld.parent == "world"
+                or ScopedName.Parse(d.add_weld.parent).get_namespace()
+                in all_model_instances
+            )
+        ):
+            directives.append(d)
+    ProcessModelDirectives(
+        directives=ModelDirectives(directives=directives),
+        parser=parser,
+    )
+
+    assert (
+        len(children_to_freeze) == 0
+    ), "Adding frozen child instances is not implemented yet; it is waiting for upstream PRs in Drake."
+
+    if parser_prefinalize_callback:
+        parser_prefinalize_callback(parser)
+
+    plant.Finalize()
+
+
+def MakeMultibodyPlant(
+    scenario: Scenario,
+    *,
+    model_instance_names: typing.List[str] = None,
+    add_frozen_child_instances: bool = True,
+    package_xmls: typing.List[str] = [],
+    parser_preload_callback: typing.Callable[[Parser], None] = None,
+    parser_prefinalize_callback: typing.Callable[[Parser], None] = None,
+) -> MultibodyPlant:
+    """Use a scenario to create a MultibodyPlant. This is intended, e.g., to facilitate
+    easily building subsets of a scenario, for instance, to make a plant for a
+    controller.
+
+    Args:
+        scenario: A Scenario structure, populated using the `load_scenario`
+            method.
+
+        model_instance_names: If specified, then only the named model instances
+            will be added to the plant. Otherwise, all model instances will be added.
+
+        add_frozen_child_instances: If True and model_instance_names is not None, then
+            model_instances that are not listed in model_instance_names, but are welded
+            to a model_instance that is listed, will be added to the plant; with all
+            joints replaced by welded joints.
+
+        package_xmls: A list of package.xml file paths that will be passed to
+            the parser, using Parser.AddPackageXml().
+
+        parser_preload_callback: A callback function that will be called after
+            the Parser is created, but before any directives are processed. This can be
+            used to add additional packages to the parser, or to add additional model
+            directives.
+
+        parser_prefinalize_callback: A callback function that will be called
+            after the directives are processed, but before the plant is finalized. This
+            can be used to add additional model directives.
+
+    Returns:
+        A MultibodyPlant populated from (a subset of) the scenario.
+    """
+    plant = MultibodyPlant(time_step=scenario.plant_config.time_step)
+    parser = Parser(plant)
+    _PopulatePlantOrDiagram(
+        plant,
+        parser,
+        scenario,
+        model_instance_names,
+        add_frozen_child_instances,
+        package_xmls,
+        parser_preload_callback,
+        parser_prefinalize_callback,
+    )
+    return plant
+
+
+def MakeRobotDiagram(
+    scenario: Scenario,
+    *,
+    model_instance_names: typing.List[str] = None,
+    add_frozen_child_instances: bool = True,
+    package_xmls: typing.List[str] = [],
+    parser_preload_callback: typing.Callable[[Parser], None] = None,
+    parser_prefinalize_callback: typing.Callable[[Parser], None] = None,
+) -> RobotDiagram:
+    """Use a scenario to create a RobotDiagram (MultibodyPlant + SceneGraph). This is
+    intended, e.g., to facilitate easily building subsets of a scenario, for instance,
+    to make a plant for a controller which needs to make collision queries.
+
+    Args:
+        scenario: A Scenario structure, populated using the `load_scenario`
+            method.
+
+        model_instance_names: If specified, then only the named model instances
+            will be added to the plant. Otherwise, all model instances will be added.
+
+        add_frozen_child_instances: If True and model_instance_names is not None, then
+            model_instances that are not listed in model_instance_names, but are welded
+            to a model_instance that is listed, will be added to the plant; with all
+            joints replaced by welded joints.
+
+        package_xmls: A list of package.xml file paths that will be passed to
+            the parser, using Parser.AddPackageXml().
+
+        parser_preload_callback: A callback function that will be called after
+            the Parser is created, but before any directives are processed. This can be
+            used to add additional packages to the parser, or to add additional model
+            directives.
+
+        parser_prefinalize_callback: A callback function that will be called
+            after the directives are processed, but before the plant is finalized. This
+            can be used to add additional model directives.
+
+    Returns:
+        A RobotDiagram populated from (a subset of) the scenario.
+    """
+    robot_builder = RobotDiagramBuilder(time_step=scenario.plant_config.time_step)
+    plant = robot_builder().builder().plant()
+    parser = robot_builder().parser()
+    _PopulatePlantOrDiagram(
+        plant,
+        parser,
+        scenario,
+        model_instance_names,
+        add_frozen_child_instances,
+        package_xmls,
+        parser_preload_callback,
+        parser_prefinalize_callback,
+    )
+    return robot_builder.Build()
+
+
 class _MultiplexState(LeafSystem):
-    def __init__(self, plant, model_instance_names):
+    def __init__(self, plant: MultibodyPlant, model_instance_names: typing.List[str]):
         LeafSystem.__init__(self)
         total_states = 0
         for name in model_instance_names:
@@ -323,7 +535,7 @@ class _MultiplexState(LeafSystem):
 
 
 class _DemultiplexInput(LeafSystem):
-    def __init__(self, plant, model_instance_names):
+    def __init__(self, plant: MultibodyPlant, model_instance_names: typing.List[str]):
         LeafSystem.__init__(self)
         total_inputs = 0
         for name in model_instance_names:
@@ -347,14 +559,14 @@ class _DemultiplexInput(LeafSystem):
 
 # TODO(russt): Use the c++ version pending https://github.com/RobotLocomotion/drake/issues/20055
 def _ApplyDriverConfigSim(
-    driver_config,
-    model_instance_name,
-    sim_plant,
-    directives,
-    models_from_directives_map,
-    package_xmls,
-    builder,
-):
+    driver_config,  # See Scenario.model_drivers for typing
+    model_instance_name: str,
+    sim_plant: MultibodyPlant,
+    directives: typing.List[ModelDirective],
+    models_from_directives_map: typing.Mapping[str, typing.List[ModelInstanceInfo]],
+    package_xmls: typing.List[str],
+    builder: DiagramBuilder,
+) -> None:
     if isinstance(driver_config, IiwaDriver):
         model_instance = sim_plant.GetModelInstanceByName(model_instance_name)
         num_iiwa_positions = sim_plant.num_positions(model_instance)
@@ -628,13 +840,13 @@ def _ApplyDriverConfigSim(
 
 def _ApplyDriverConfigsSim(
     *,
-    driver_configs,
-    sim_plant,
-    directives,
-    models_from_directives,
-    package_xmls,
-    builder,
-):
+    driver_configs,  # See Scenario.model_drivers for typing
+    sim_plant: MultibodyPlant,
+    directives: typing.List[ModelDirective],
+    models_from_directives: typing.Mapping[str, typing.List[ModelInstanceInfo]],
+    package_xmls: typing.List[str],
+    builder: DiagramBuilder,
+) -> None:
     models_from_directives_map = dict(
         [(info.model_name, info) for info in models_from_directives]
     )
@@ -651,14 +863,14 @@ def _ApplyDriverConfigsSim(
 
 
 def _ApplyPrefinalizeDriverConfigSim(
-    driver_config,
-    model_instance_name,
-    sim_plant,
-    directives,
-    models_from_directives_map,
-    package_xmls,
-    builder,
-):
+    driver_config,  # See Scenario.model_drivers for typing
+    model_instance_name: str,
+    sim_plant: MultibodyPlant,
+    directives: typing.List[ModelDirective],
+    models_from_directives_map: typing.Mapping[str, typing.List[ModelInstanceInfo]],
+    package_xmls: typing.List[str],
+    builder: DiagramBuilder,
+) -> None:
     if isinstance(driver_config, JointStiffnessDriver):
         model_instance = sim_plant.GetModelInstanceByName(model_instance_name)
 
@@ -678,13 +890,13 @@ def _ApplyPrefinalizeDriverConfigSim(
 
 def _ApplyPrefinalizeDriverConfigsSim(
     *,
-    driver_configs,
-    sim_plant,
-    directives,
-    models_from_directives,
-    package_xmls,
-    builder,
-):
+    driver_configs,  # See Scenario.model_drivers for typing
+    sim_plant: MultibodyPlant,
+    directives: typing.List[ModelDirective],
+    models_from_directives: typing.Mapping[str, typing.List[ModelInstanceInfo]],
+    package_xmls: typing.List[str],
+    builder: DiagramBuilder,
+) -> None:
     models_from_directives_map = dict(
         [(info.model_name, info) for info in models_from_directives]
     )
@@ -702,7 +914,7 @@ def _ApplyPrefinalizeDriverConfigsSim(
 
 # TODO(russt): Remove this in favor of the Drake version once LCM becomes
 # optional. https://github.com/RobotLocomotion/drake/issues/20055
-def _ApplyCameraConfigSim(*, config, builder):
+def _ApplyCameraConfigSim(*, config: CameraConfig, builder: DiagramBuilder) -> None:
     if not (config.rgb or config.depth):
         return
 
@@ -774,19 +986,9 @@ def MakeHardwareStation(
     parser_preload_callback: typing.Callable[[Parser], None] = None,
     parser_prefinalize_callback: typing.Callable[[Parser], None] = None,
     prebuild_callback: typing.Callable[[DiagramBuilder], None] = None,
-):
+) -> Diagram:
     """Make a diagram encapsulating a simulation of (or the communications
     interface to/from) a physical robot, including sensors and controllers.
-
-    If `hardware=False`, (the default) returns a HardwareStation diagram
-    containing:
-    - A MultibodyPlant with populated via the directives in `scenario`.
-    - A SceneGraph
-    - The default Drake visualizers
-    - Any robot / sensors drivers specified in the YAML description.
-
-    If `hardware=True`, returns a HardwareStationInterface diagram containing
-    the network interfaces to communicate directly with the hardware drivers.
 
     Args:
         scenario: A Scenario structure, populated using the LoadScenario method.
@@ -812,6 +1014,17 @@ def MakeHardwareStation(
         prebuild_callback: A callback function that will be called after the
             diagram builder is created, but before the diagram is built. This
             can be used to add additional systems to the diagram.
+
+    Returns:
+        If `hardware=False`, (the default) returns a HardwareStation diagram
+        containing:
+        - A MultibodyPlant with populated via the directives in `scenario`.
+        - A SceneGraph
+        - The default Drake visualizers
+        - Any robot / sensors drivers specified in the YAML description.
+
+        If `hardware=True`, returns a HardwareStationInterface diagram containing
+        the network interfaces to communicate directly with the hardware drivers.
     """
     if hardware:
         return _MakeHardwareStationInterface(
@@ -909,13 +1122,13 @@ def MakeHardwareStation(
 
 # TODO(russt): Use the c++ version pending https://github.com/RobotLocomotion/drake/issues/20055
 def _ApplyDriverConfigInterface(
-    driver_config,
-    model_instance_name,
-    plant,
-    models_from_directives_map,
-    lcm_buses,
-    builder,
-):
+    driver_config,  # See Scenario.model_drivers for typing
+    model_instance_name: str,
+    plant: MultibodyPlant,
+    models_from_directives_map: typing.Mapping[str, typing.List[ModelInstanceInfo]],
+    lcm_buses: LcmBuses,
+    builder: DiagramBuilder,
+) -> None:
     if isinstance(driver_config, IiwaDriver):
         lcm = lcm_buses.Find("Driver for " + model_instance_name, driver_config.lcm_bus)
 
@@ -1045,8 +1258,13 @@ def _ApplyDriverConfigInterface(
 
 
 def _ApplyDriverConfigsInterface(
-    *, driver_configs, plant, models_from_directives, lcm_buses, builder
-):
+    *,
+    driver_configs,  # See Scenario.model_drivers for typing
+    plant: MultibodyPlant,
+    models_from_directives: typing.Mapping[str, typing.List[ModelInstanceInfo]],
+    lcm_buses: LcmBuses,
+    builder: DiagramBuilder,
+) -> None:
     models_from_directives_map = dict(
         [(info.model_name, info) for info in models_from_directives]
     )
@@ -1066,7 +1284,7 @@ def _MakeHardwareStationInterface(
     meshcat: Meshcat = None,
     *,
     package_xmls: typing.List[str] = [],
-):
+) -> Diagram:
     builder = DiagramBuilder()
 
     # Visualization
@@ -1122,7 +1340,12 @@ def _MakeHardwareStationInterface(
 
 
 class _ExtractPose(LeafSystem):
-    def __init__(self, body_poses_output_port, body_index, X_BA=RigidTransform()):
+    def __init__(
+        self,
+        body_poses_output_port: OutputPort,
+        body_index: BodyIndex,
+        X_BA: RigidTransform = RigidTransform(),
+    ):
         LeafSystem.__init__(self)
         self.body_index = body_index
         self.DeclareAbstractInputPort(
@@ -1149,7 +1372,7 @@ def AddPointClouds(
     builder: DiagramBuilder,
     poses_output_port: OutputPort = None,
     meshcat: Meshcat = None,
-):
+) -> typing.Mapping[str, DepthImageToPointCloud]:
     """
     Adds one DepthImageToPointCloud system to the `builder` for each camera in `scenario`, and connects it to the respective camera station output ports.
 
@@ -1163,6 +1386,9 @@ def AddPointClouds(
         poses_output_port: (optional) HardwareStation will have a body_poses output port iff it was created with `hardware=False`. Alternatively, one could create a MultibodyPositionsToGeometryPoses system to consume the position measurements; this optional input can be used to support that workflow.
 
         meshcat: If not None, then a MeshcatPointCloudVisualizer will be added to the builder using this meshcat instance.
+
+    Returns:
+        A mapping from camera name to the DepthImageToPointCloud system.
     """
     to_point_cloud = dict()
     for _, config in scenario.cameras.items():
