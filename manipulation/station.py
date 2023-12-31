@@ -12,13 +12,11 @@ from drake import (
     lcmt_schunk_wsg_status,
 )
 from pydrake.all import (
-    AbstractValue,
     Adder,
     ApplyLcmBusConfig,
     ApplyMultibodyPlantConfig,
     ApplyVisualizationConfig,
     BaseField,
-    BodyIndex,
     CameraConfig,
     CameraInfo,
     Demultiplexer,
@@ -53,7 +51,6 @@ from pydrake.all import (
     ProcessModelDirectives,
     RenderEngineVtkParams,
     RgbdSensor,
-    RigidTransform,
     RobotDiagram,
     RobotDiagramBuilder,
     SceneGraph,
@@ -70,6 +67,7 @@ from pydrake.all import (
 from pydrake.common.yaml import yaml_load_typed
 
 from manipulation.scenarios import AddIiwa, AddPlanarIiwa, AddWsg
+from manipulation.systems import ExtractPose
 from manipulation.utils import ConfigureParser
 
 
@@ -152,7 +150,7 @@ class Scenario:
     )
 
     plant_config: MultibodyPlantConfig = MultibodyPlantConfig(
-        discrete_contact_solver="sap"
+        discrete_contact_approximation="sap"
     )
 
     directives: typing.List[ModelDirective] = dc.field(default_factory=list)
@@ -311,7 +309,7 @@ def _FindChildren(
     """
     tree = dict()
     children = set()
-    for d in flatted_directives:
+    for d in flattened_directives:
         if d.add_weld:
             parent = ScopedName.Parse(d.add_weld.parent).get_namespace()
             child = ScopedName.Parse(d.add_weld.child).get_namespace()
@@ -360,7 +358,7 @@ def _PopulatePlantOrDiagram(
     all_model_instances = children_to_freeze.union(model_instance_names)
 
     directives = []
-    for d in flatted_directives:
+    for d in flattened_directives:
         if d.add_model and (d.add_model.name in model_instance_names):
             directives.append(d)
         if (
@@ -395,7 +393,7 @@ def MakeMultibodyPlant(
     scenario: Scenario,
     *,
     model_instance_names: typing.List[str] = None,
-    add_frozen_child_instances: bool = True,
+    add_frozen_child_instances: bool = False,
     package_xmls: typing.List[str] = [],
     parser_preload_callback: typing.Callable[[Parser], None] = None,
     parser_prefinalize_callback: typing.Callable[[Parser], None] = None,
@@ -410,6 +408,8 @@ def MakeMultibodyPlant(
 
         model_instance_names: If specified, then only the named model instances
             will be added to the plant. Otherwise, all model instances will be added.
+            `add_weld` directives connecting added model instances to each other or to
+            the world are also preserved.
 
         add_frozen_child_instances: If True and model_instance_names is not None, then
             model_instances that are not listed in model_instance_names, but are welded
@@ -1339,32 +1339,6 @@ def _MakeHardwareStationInterface(
     return diagram
 
 
-class _ExtractPose(LeafSystem):
-    def __init__(
-        self,
-        body_poses_output_port: OutputPort,
-        body_index: BodyIndex,
-        X_BA: RigidTransform = RigidTransform(),
-    ):
-        LeafSystem.__init__(self)
-        self.body_index = body_index
-        self.DeclareAbstractInputPort(
-            "poses",
-            body_poses_output_port.Allocate(),
-        )
-        self.DeclareAbstractOutputPort(
-            "pose",
-            lambda: AbstractValue.Make(RigidTransform()),
-            self.CalcOutput,
-        )
-        self.X_BA = X_BA
-
-    def CalcOutput(self, context, output):
-        poses = self.EvalAbstractInput(context, 0).get_value()
-        pose = poses[int(self.body_index)] @ self.X_BA
-        output.get_mutable_value().set(pose.rotation(), pose.translation())
-
-
 def AddPointClouds(
     *,
     scenario: Scenario,
@@ -1446,9 +1420,7 @@ def AddPointClouds(
             # mode.
             poses_output_port = station.GetOutputPort("body_poses")
 
-        camera_pose = builder.AddSystem(
-            _ExtractPose(poses_output_port, body.index(), X_BC)
-        )
+        camera_pose = builder.AddSystem(ExtractPose(int(body.index()), X_BC))
         camera_pose.set_name(f"{config.name}.pose")
         builder.Connect(
             poses_output_port,

@@ -7,6 +7,7 @@ This package contains code to support the [Robotic Manipulation](http://manipula
    :maxdepth: 2
 
    station
+   systems
    meshcat_utils
    utils
 ```

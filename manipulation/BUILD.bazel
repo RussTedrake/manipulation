@@ -36,7 +36,10 @@ rt_py_library(
 rt_py_library(
     name = "scenarios",
     data = ["//manipulation/models"],
-    deps = ["//manipulation"],
+    deps = [
+      "//manipulation",
+      "//manipulation:systems",
+    ],
     srcs = ["scenarios.py"],
     imports = [".."],
     visibility = ["//visibility:public"],
@@ -47,8 +50,16 @@ rt_py_library(
     deps = [
       "//manipulation",
       "scenarios",
+      "systems",
     ],
     srcs = ["station.py"],
+    imports = [".."],
+    visibility = ["//visibility:public"],
+)
+
+rt_py_library(
+    name = "systems",
+    srcs = ["systems.py"],
     imports = [".."],
     visibility = ["//visibility:public"],
 )

@@ -12,7 +12,7 @@ rt_ipynb_test(
     deps = [
       "//manipulation",
       "//manipulation:meshcat_utils",
-      "//manipulation:scenarios",
+      "//manipulation:systems",
       "//manipulation:station",
     ],
 )
