@@ -5,6 +5,7 @@ This file contains a number of helper systems useful for setting up diagrams.
 import numpy as np
 from pydrake.all import (
     AbstractValue,
+    Body,
     DiagramBuilder,
     DifferentialInverseKinematicsIntegrator,
     DifferentialInverseKinematicsParameters,
@@ -47,6 +48,35 @@ class ExtractPose(LeafSystem):
         output.get_mutable_value().set(pose.rotation(), pose.translation())
 
 
+class MultibodyPositionToBodyPose(LeafSystem):
+    """A system that computes a body pose from a MultibodyPlant position vector. The
+    output port calls `plant.SetPositions()` and then `plant.EvalBodyPoseInWorld()`.
+
+    Args:
+        plant: The MultibodyPlant.
+        body: A body in the plant whose pose we want to compute (e.g. `plant.
+            GetBodyByName("body")`).
+    """
+
+    def __init__(self, plant: MultibodyPlant, body: Body):
+        LeafSystem.__init__(self)
+        self.plant = plant
+        self.body = body
+        self.plant_context = plant.CreateDefaultContext()
+        self.DeclareVectorInputPort("position", plant.num_positions())
+        self.DeclareAbstractOutputPort(
+            "pose",
+            lambda: AbstractValue.Make(RigidTransform()),
+            self._CalcOutput,
+        )
+
+    def _CalcOutput(self, context, output):
+        position = self.get_input_port().Eval(context)
+        self.plant.SetPositions(self.plant_context, position)
+        pose = self.plant.EvalBodyPoseInWorld(self.plant_context, self.body)
+        output.get_mutable_value().set(pose.rotation(), pose.translation())
+
+
 def AddIiwaDifferentialIK(
     builder: DiagramBuilder, plant: MultibodyPlant, frame: Frame = None
 ) -> DifferentialInverseKinematicsIntegrator:
@@ -57,8 +87,8 @@ def AddIiwaDifferentialIK(
 
         plant: The MultibodyPlant passed to the DifferentialInverseKinematicsIntegrator.
 
-        frame: The frame to use for the end effector command. Defaults to the "body"
-            frame, which is commonly used for the wsg gripper.
+        frame: The frame to use for the end effector command. Defaults to the body
+            frame of "iiwa_link_7".
 
     Returns:
         The DifferentialInverseKinematicsIntegrator system.
@@ -71,6 +101,8 @@ def AddIiwaDifferentialIK(
     params.set_nominal_joint_position(q0)
     params.set_end_effector_angular_speed_limit(2)
     params.set_end_effector_translational_velocity_limits([-2, -2, -2], [2, 2, 2])
+    if frame is None:
+        frame = plant.GetFrameByName("iiwa_link_7")
     if plant.num_positions() == 3:  # planar iiwa
         iiwa14_velocity_limits = np.array([1.4, 1.3, 2.3])
         params.set_joint_velocity_limits(
@@ -87,8 +119,6 @@ def AddIiwaDifferentialIK(
             (-iiwa14_velocity_limits, iiwa14_velocity_limits)
         )
         params.set_joint_centering_gain(10 * np.eye(7))
-    if frame is None:
-        frame = plant.GetFrameByName("body")
     differential_ik = builder.AddSystem(
         DifferentialInverseKinematicsIntegrator(
             plant,

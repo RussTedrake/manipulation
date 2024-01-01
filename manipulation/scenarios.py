@@ -508,6 +508,8 @@ def AddIiwaDifferentialIK(
         "Please use manipulation.systems.AddIiwaDifferentialIK instead.",
         DeprecationWarning,
     )
+    if frame is None:
+        plant.GetFrameByName("body")
     return systems_AddIiwaDifferentialIK(builder, plant, frame)
 
 

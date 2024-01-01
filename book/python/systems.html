@@ -50,6 +50,7 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#"><code class="docutils literal notranslate"><span class="pre">manipulation.systems</span></code></a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#manipulation.systems.AddIiwaDifferentialIK"><code class="docutils literal notranslate"><span class="pre">AddIiwaDifferentialIK()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#manipulation.systems.ExtractPose"><code class="docutils literal notranslate"><span class="pre">ExtractPose</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#manipulation.systems.MultibodyPositionToBodyPose"><code class="docutils literal notranslate"><span class="pre">MultibodyPositionToBodyPose</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="meshcat_utils.html"><code class="docutils literal notranslate"><span class="pre">manipulation.meshcat_utils</span></code></a></li>
@@ -92,8 +93,8 @@
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>builder</strong> (<a class="reference external" href="https://drake.mit.edu/pydrake/pydrake.systems.framework.html#pydrake.systems.framework.DiagramBuilder" title="(in pydrake)"><em>DiagramBuilder</em></a>) – The DiagramBuilder to which the system should be added.</p></li>
 <li><p><strong>plant</strong> (<a class="reference external" href="https://drake.mit.edu/pydrake/pydrake.multibody.plant.html#pydrake.multibody.plant.MultibodyPlant" title="(in pydrake)"><em>MultibodyPlant</em></a>) – The MultibodyPlant passed to the DifferentialInverseKinematicsIntegrator.</p></li>
-<li><p><strong>frame</strong> (<a class="reference external" href="https://drake.mit.edu/pydrake/pydrake.multibody.tree.html#pydrake.multibody.tree.Frame" title="(in pydrake)"><em>Frame</em></a>) – The frame to use for the end effector command. Defaults to the “body”
-frame, which is commonly used for the wsg gripper.</p></li>
+<li><p><strong>frame</strong> (<a class="reference external" href="https://drake.mit.edu/pydrake/pydrake.multibody.tree.html#pydrake.multibody.tree.Frame" title="(in pydrake)"><em>Frame</em></a>) – The frame to use for the end effector command. Defaults to the body
+frame of “iiwa_link_7”.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -117,6 +118,22 @@ output of the MultibodyPlant body_poses output port.</p>
 (e.g. <cite>int(plant.GetBodyByName(“body”).index())</cite>).</p></li>
 <li><p><strong>X_BA</strong> (<a class="reference external" href="https://drake.mit.edu/pydrake/pydrake.math.html#pydrake.math.RigidTransform" title="(in pydrake)"><em>RigidTransform</em></a>) – An optional fixed transform from the frame B in the list to an output
 frame A.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="manipulation.systems.MultibodyPositionToBodyPose">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">manipulation.systems.</span></span><span class="sig-name descname"><span class="pre">MultibodyPositionToBodyPose</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plant</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">body</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#manipulation.systems.MultibodyPositionToBodyPose" title="Link to this definition"></a></dt>
+<dd><p>A system that computes a body pose from a MultibodyPlant position vector. The
+output port calls <cite>plant.SetPositions()</cite> and then <cite>plant.EvalBodyPoseInWorld()</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>plant</strong> (<a class="reference external" href="https://drake.mit.edu/pydrake/pydrake.multibody.plant.html#pydrake.multibody.plant.MultibodyPlant" title="(in pydrake)"><em>MultibodyPlant</em></a>) – The MultibodyPlant.</p></li>
+<li><p><strong>body</strong> (<a class="reference external" href="https://drake.mit.edu/pydrake/pydrake.multibody.tree.html#pydrake.multibody.tree.Body" title="(in pydrake)"><em>Body</em></a>) – A body in the plant whose pose we want to compute (e.g. <cite>plant.
+GetBodyByName(“body”)</cite>).</p></li>
 </ul>
 </dd>
 </dl>
