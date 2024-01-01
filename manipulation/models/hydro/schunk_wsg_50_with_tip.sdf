@@ -76,6 +76,7 @@
         </geometry>
         <drake:proximity_properties>
           <drake:compliant_hydroelastic/>
+          <drake:mu_dynamic>1.0</drake:mu_dynamic>
           <drake:hydroelastic_modulus>1.0e5</drake:hydroelastic_modulus>
         </drake:proximity_properties>
       </collision>
@@ -116,7 +117,7 @@
           <diffuse>0.2 0.2 0.2 1</diffuse>
         </material>
       </visual>
-      <collision name="left_tip">
+      <collision name="right_tip">
         <pose> -0.0075 0.031 0 0 0 0 </pose>
         <geometry>
           <box>
@@ -125,6 +126,7 @@
         </geometry>
         <drake:proximity_properties>
           <drake:compliant_hydroelastic/>
+          <drake:mu_dynamic>1.0</drake:mu_dynamic>
           <drake:hydroelastic_modulus>1.0e5</drake:hydroelastic_modulus>
         </drake:proximity_properties>
       </collision>
