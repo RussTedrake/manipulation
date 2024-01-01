@@ -9,7 +9,6 @@ from enum import Enum
 
 import numpy as np
 from pydrake.all import (
-    AbstractValue,
     AddCompliantHydroelasticProperties,
     AddContactMaterial,
     Adder,
@@ -28,10 +27,9 @@ from pydrake.all import (
     DepthRenderCamera,
     DiagramBuilder,
     DifferentialInverseKinematicsIntegrator,
-    DifferentialInverseKinematicsParameters,
+    Frame,
     GeometryInstance,
     InverseDynamicsController,
-    LeafSystem,
     MakeMultibodyStateToWsgStateSystem,
     MakePhongIllustrationProperties,
     MakeRenderEngineVtk,
@@ -56,6 +54,8 @@ from pydrake.all import (
     UnitInertia,
 )
 
+from manipulation.systems import AddIiwaDifferentialIK as systems_AddIiwaDifferentialIK
+from manipulation.systems import ExtractPose
 from manipulation.utils import ConfigureParser
 
 ycb = [
@@ -68,24 +68,11 @@ ycb = [
 ]
 
 
-class ExtractBodyPose(LeafSystem):
-    def __init__(self, body_poses_output_port, body_index):
-        LeafSystem.__init__(self)
-        self.body_index = body_index
-        self.DeclareAbstractInputPort(
-            "poses",
-            body_poses_output_port.Allocate(),
-        )
-        self.DeclareAbstractOutputPort(
-            "pose",
-            lambda: AbstractValue.Make(RigidTransform()),
-            self.CalcOutput,
-        )
-
-    def CalcOutput(self, context, output):
-        poses = self.EvalAbstractInput(context, 0).get_value()
-        pose = poses[int(self.body_index)]
-        output.get_mutable_value().set(pose.rotation(), pose.translation())
+def ExtractBodyPose(output_port, body_index, X_BA=RigidTransform()) -> ExtractPose:
+    warnings.warn(
+        "ExtractBodyPose is deprecated. Use manipulation.systems.ExtractPose instead."
+    )
+    return ExtractPose(body_index, X_BA)
 
 
 def AddIiwa(plant, collision_model="no_collision"):
@@ -395,9 +382,7 @@ def AddRgbdSensors(
                     to_point_cloud.color_image_input_port(),
                 )
 
-                camera_pose = builder.AddSystem(
-                    ExtractBodyPose(plant.get_body_poses_output_port(), body_index)
-                )
+                camera_pose = builder.AddSystem(ExtractPose(body_index))
                 builder.Connect(
                     plant.get_body_poses_output_port(),
                     camera_pose.get_input_port(),
@@ -516,45 +501,18 @@ def AddMultibodyTriad(frame, scene_graph, length=0.25, radius=0.01, opacity=1.0)
     )
 
 
-def AddIiwaDifferentialIK(builder, plant, frame=None):
-    params = DifferentialInverseKinematicsParameters(
-        plant.num_positions(), plant.num_velocities()
+def AddIiwaDifferentialIK(
+    builder: DiagramBuilder, plant: MultibodyPlant, frame: Frame = None
+) -> DifferentialInverseKinematicsIntegrator:
+    warnings.warn(
+        "Please use manipulation.systems.AddIiwaDifferentialIK instead.",
+        DeprecationWarning,
     )
-    time_step = plant.time_step()
-    q0 = plant.GetPositions(plant.CreateDefaultContext())
-    params.set_nominal_joint_position(q0)
-    params.set_end_effector_angular_speed_limit(2)
-    params.set_end_effector_translational_velocity_limits([-2, -2, -2], [2, 2, 2])
-    if plant.num_positions() == 3:  # planar iiwa
-        iiwa14_velocity_limits = np.array([1.4, 1.3, 2.3])
-        params.set_joint_velocity_limits(
-            (-iiwa14_velocity_limits, iiwa14_velocity_limits)
-        )
-        # These constants are in body frame
-        assert (
-            frame.name() == "iiwa_link_7"
-        ), "Still need to generalize the remaining planar diff IK params for different frames"  # noqa
-        params.set_end_effector_velocity_flag([True, False, False, True, False, True])
-    else:
-        iiwa14_velocity_limits = np.array([1.4, 1.4, 1.7, 1.3, 2.2, 2.3, 2.3])
-        params.set_joint_velocity_limits(
-            (-iiwa14_velocity_limits, iiwa14_velocity_limits)
-        )
-        params.set_joint_centering_gain(10 * np.eye(7))
-    if frame is None:
-        frame = plant.GetFrameByName("body")
-    differential_ik = builder.AddSystem(
-        DifferentialInverseKinematicsIntegrator(
-            plant,
-            frame,
-            time_step,
-            params,
-            log_only_when_result_state_changes=True,
-        )
-    )
-    return differential_ik
+    return systems_AddIiwaDifferentialIK(builder, plant, frame)
 
 
+# This method is effectively deprecated, and should not be used. See MakeHardwareStation
+# instead.
 def MakeManipulationStation(
     model_directives=None,
     filename=None,
