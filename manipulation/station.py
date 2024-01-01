@@ -1115,7 +1115,7 @@ def MakeHardwareStation(
     if prebuild_callback:
         prebuild_callback(builder)
 
-    diagram = builder.Build()
+    diagram = robot_builder.Build()
     diagram.set_name("station")
     return diagram
 
