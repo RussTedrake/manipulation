@@ -74,8 +74,8 @@ from manipulation.utils import ConfigureParser
 @dc.dataclass
 class InverseDynamicsDriver:
     """A simulation-only driver that adds the InverseDynamicsController to the
-    station and exports the output ports. Multiple model instances can be
-    provided using `instance_name1+instance_name2` as the key; the output ports
+    station and exports the output ports. Multiple model instances can be driven with a
+    single controller using `instance_name1+instance_name2` as the key; the output ports
     will be named similarly."""
 
     # TODO(russt): Support setting the gains.
