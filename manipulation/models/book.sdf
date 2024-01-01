@@ -1,0 +1,58 @@
+<?xml version="1.0"?>
+<sdf version="1.7">
+  <model name="book">
+    <link name="book">
+      <inertial>
+        <pose>0 0 0.025 0 0 0 </pose>
+        <mass>0.2</mass>
+        <inertia>
+          <ixx>0.00020833</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0.00154167</iyy>
+          <iyz>0</iyz>
+          <izz>0.00166667</izz>
+        </inertia>
+      </inertial>
+      <visual name="book">
+        <pose>0 0 0.025 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.3 0.1 0.05</size>
+          </box>
+        </geometry>
+        <material>
+          <diffuse>0.31 0.01 0.13 1.0</diffuse>
+        </material>
+      </visual>
+      <collision name="top">
+        <pose>0 0 0.0375 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.3 0.1 0.025</size>
+          </box>
+        </geometry>
+        <drake:proximity_properties>
+          <drake:compliant_hydroelastic/>
+          <!-- make the top sticky -->
+          <drake:mu_dynamic>2.0</drake:mu_dynamic>
+          <drake:hydroelastic_modulus>1.0e6</drake:hydroelastic_modulus>
+        </drake:proximity_properties>
+      </collision>
+      <collision name="bottom">
+        <pose>0 0 0.0125 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.3 0.1 0.025</size>
+          </box>
+        </geometry>
+        <drake:proximity_properties>
+          <drake:compliant_hydroelastic/>
+          <!-- make the bottom slippery -->
+          <drake:mu_dynamic>0.1</drake:mu_dynamic>
+          <drake:hydroelastic_modulus>1.0e6</drake:hydroelastic_modulus>
+        </drake:proximity_properties>
+      </collision>
+    </link>
+  </model>
+</sdf>

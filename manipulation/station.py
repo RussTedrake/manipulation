@@ -1085,9 +1085,10 @@ def MakeHardwareStation(
         _ApplyCameraConfigSim(config=camera, builder=builder)
 
     # Add visualization.
-    ApplyVisualizationConfig(
-        scenario.visualization, builder, meshcat=meshcat, lcm_buses=lcm_buses
-    )
+    if meshcat:
+        ApplyVisualizationConfig(
+            scenario.visualization, builder, meshcat=meshcat, lcm_buses=lcm_buses
+        )
 
     # Export "cheat" ports.
     builder.ExportInput(

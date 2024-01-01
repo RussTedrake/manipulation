@@ -19,7 +19,7 @@ class TestHybrid(unittest.TestCase):
         plant_context = self.notebook_locals["plant_context"]
 
         # Get final pose of the book.
-        X_WB = plant.GetFreeBodyPose(plant_context, plant.GetBodyByName("book_body"))
+        X_WB = plant.GetFreeBodyPose(plant_context, plant.GetBodyByName("book"))
 
         p_WB = X_WB.translation()
 
@@ -31,9 +31,9 @@ class TestHybrid(unittest.TestCase):
         )
 
         # 2. Check lower bound on book pose.
-        self.assertLessEqual(
-            -p_WB[0],
-            -0.5,
+        self.assertGreaterEqual(
+            p_WB[0],
+            0.35,
             "Edge of the book is not between the gap. " "It is too close.",
         )
 
@@ -46,8 +46,8 @@ class TestHybrid(unittest.TestCase):
         p_y = traj[2, :] - finger_length * np.cos(traj[0, :])
 
         for t in range(len(time)):
-            self.assertLessEqual(
-                -p_y[t],
-                -0.045,
+            self.assertGreaterEqual(
+                p_y[t],
+                0.035,
                 "The gripper tip cannot be lower than the " "surface of the book.",
             )

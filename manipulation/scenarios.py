@@ -564,6 +564,11 @@ def MakeManipulationStation(
         PackageMap.AddPackageXml().  This is useful if you need to add more
         models to your path (e.g. from your current working directory).
     """
+    warnings.warn(
+        "MakeManipulationStation is deprecated. Use MakeHardwareStation instead.",
+        DeprecationWarning,
+    )
+
     builder = DiagramBuilder()
 
     # Add (only) the iiwa, WSG, and cameras to the scene.
