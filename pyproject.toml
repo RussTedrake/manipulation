@@ -62,6 +62,17 @@ torchvision = ">=0.10.1"
 trimesh = {extras = ["recommend"], version = ">=4.0.0"}
 #wandb = ">=0.14.0"
 
+[tool.poetry.group.docs]
+optional = true
+
+# Must include all dependencies required to build the docs with sphinx + autodoc.
+[tool.poetry.group.docs.dependencies]
+drake = ">=1.24.0"
+ipython = ">=7.8.0"
+sphinx = ">=7.2.6"
+myst-parser = ">=2.0.0"
+sphinx_rtd_theme = ">=2.0.0"
+
 [tool.poetry.group.dev.dependencies]
 beautifulsoup4 = ">=4.6.3"
 black = { version = ">=23.*", extras = ["jupyter"] }

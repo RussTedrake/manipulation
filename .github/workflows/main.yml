@@ -109,11 +109,11 @@ jobs:
           version: 1.7.1
           virtualenvs-create: true
           virtualenvs-in-project: true
-      - name: Test poetry install
-        run: poetry install
       - name: build the docs
         run: |
-          pip3 install -r requirements.txt
-          pip3 install sphinx myst-parser sphinx_rtd_theme 
+          poetry install --only docs
+          source .venv/bin/activate
           sphinx-build -M html manipulation book/python
         shell: bash
+      - name: Test full poetry install
+        run: poetry install

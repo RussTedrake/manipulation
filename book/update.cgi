@@ -14,11 +14,19 @@ print "<br/>done.</p>";
 
 print "<p>building documentation...<br/>";
 chdir "..";
-system 'source venv/bin/activate';
-system 'poetry install';
-system 'pip3 install sphinx myst-parser sphinx_rtd_theme';
-print "</p><p>";
-system 'rm -rf book/python && sphinx-build -M html manipulation /tmp/manip_doc && cp -r /tmp/manip_doc/html book/python';
-print "<br/>done.</p>";
+
+my $status = system('/bin/bash', '-c', '
+    source venv/bin/activate &&
+    poetry install --only docs &&
+    rm -rf book/python &&
+    sphinx-build -M html manipulation /tmp/manip_doc &&
+    cp -r /tmp/manip_doc/html book/python
+');
+
+if ($status == 0) {
+    print "<br/>done.</p>";
+} else {
+    print "<br/>Error occurred: $status</p>";
+}
 
 print $r->end_html;

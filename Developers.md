@@ -72,6 +72,7 @@ poetry publish --build
 
 You will need to install `sphinx`:
 ```
+poetry install --with docs
 pip3 install sphinx myst-parser sphinx_rtd_theme
 ```
 
