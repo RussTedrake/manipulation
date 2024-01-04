@@ -3,6 +3,7 @@ import os
 import sys
 import typing
 import warnings
+from copy import copy
 from functools import partial
 
 import numpy as np
@@ -14,6 +15,7 @@ from drake import (
 )
 from pydrake.all import (
     Adder,
+    ApplyCameraConfig,
     ApplyLcmBusConfig,
     ApplyMultibodyPlantConfig,
     ApplyVisualizationConfig,
@@ -36,7 +38,6 @@ from pydrake.all import (
     LcmSubscriberSystem,
     LeafSystem,
     MakeMultibodyStateToWsgStateSystem,
-    MakeRenderEngineVtk,
     Meshcat,
     MeshcatPointCloudVisualizer,
     ModelDirective,
@@ -50,8 +51,6 @@ from pydrake.all import (
     PassThrough,
     PdControllerGains,
     ProcessModelDirectives,
-    RenderEngineVtkParams,
-    RgbdSensor,
     RobotDiagram,
     RobotDiagramBuilder,
     SceneGraph,
@@ -196,7 +195,9 @@ def load_scenario(
     defaults: Scenario = Scenario(),
 ):
     warnings.warn("load_scenario is deprecated. Use LoadScenario instead.")
-    return LoadScenario(**kwargs)
+    return LoadScenario(
+        filename=filename, data=data, scenario_name=scenario_name, defaults=defaults
+    )
 
 
 def add_scenario(
@@ -207,7 +208,9 @@ def add_scenario(
     defaults: Scenario = Scenario(),
 ):
     warnings.warn("add_directives is deprecated. Use AppendDirectives instead.")
-    return AppendDirectives(**kwargs)
+    return AppendDirectives(
+        filename=filename, data=data, scenario_name=scenario_name, defaults=defaults
+    )
 
 
 # TODO(russt): load from url (using packagemap).
@@ -913,60 +916,15 @@ def _ApplyPrefinalizeDriverConfigsSim(
         )
 
 
-# TODO(russt): Remove this in favor of the Drake version once LCM becomes
-# optional. https://github.com/RobotLocomotion/drake/issues/20055
-def _ApplyCameraConfigSim(*, config: CameraConfig, builder: DiagramBuilder) -> None:
-    if not (config.rgb or config.depth):
-        return
+def _ApplyCameraConfigSim(
+    *, config: CameraConfig, builder: DiagramBuilder, lcm_buses: LcmBuses
+) -> None:
+    # Always opt-out of lcm in this workflow.
+    this_config = copy(config)
+    this_config.lcm_bus = "opt_out"
+    ApplyCameraConfig(config=this_config, builder=builder, lcm_buses=lcm_buses)
 
-    plant = builder.GetMutableSubsystemByName("plant")
-    scene_graph = builder.GetMutableSubsystemByName("scene_graph")
-
-    if sys.platform == "linux" and os.getenv("DISPLAY") is None:
-        from pyvirtualdisplay import Display
-
-        virtual_display = Display(visible=0, size=(1400, 900))
-        virtual_display.start()
-
-    if not scene_graph.HasRenderer(config.renderer_name):
-        scene_graph.AddRenderer(
-            config.renderer_name, MakeRenderEngineVtk(RenderEngineVtkParams())
-        )
-
-    # frame names in local variables:
-    # P for parent frame, B for base frame, C for camera frame.
-
-    # Extract the camera extrinsics from the config struct.
-    P = (
-        GetScopedFrameByName(plant, config.X_PB.base_frame)
-        if config.X_PB.base_frame
-        else plant.world_frame()
-    )
-    X_PC = config.X_PB.GetDeterministicValue()
-
-    # convert mbp frame to geometry frame
-    body = P.body()
-    body_frame_id = plant.GetBodyFrameIdIfExists(body.index())
-    # assert body_frame_id.has_value()
-
-    X_BP = P.GetFixedPoseInBodyFrame()
-    X_BC = X_BP @ X_PC
-
-    # Extract camera intrinsics from the config struct.
-    color_camera, depth_camera = config.MakeCameras()
-
-    camera_sys = builder.AddSystem(
-        RgbdSensor(
-            parent_id=body_frame_id,
-            X_PB=X_BC,
-            color_camera=color_camera,
-            depth_camera=depth_camera,
-        )
-    )
-    camera_sys.set_name(f"rgbd_sensor_{config.name}")
-    builder.Connect(scene_graph.get_query_output_port(), camera_sys.get_input_port())
-
-    # TODO(russt): export output ports
+    camera_sys = builder.GetSubsystemByName(f"rgbd_sensor_{config.name}")
     builder.ExportOutput(
         camera_sys.color_image_output_port(), f"{config.name}.rgb_image"
     )
@@ -1066,6 +1024,9 @@ def MakeHardwareStation(
 
     sim_plant.Finalize()
 
+    # For some Apply* functions in this workflow, we _never_ want LCM.
+    scenario.lcm_buses["opt_out"] = DrakeLcmParams(lcm_url="memq://null")
+
     # Add LCM buses. (The simulator will handle polling the network for new
     # messages and dispatching them to the receivers, i.e., "pump" the bus.)
     lcm_buses = ApplyLcmBusConfig(lcm_buses=scenario.lcm_buses, builder=builder)
@@ -1080,9 +1041,16 @@ def MakeHardwareStation(
         builder=builder,
     )
 
+    # Setup a virtual display if needed (for simulating cameras)
+    if scenario.cameras and sys.platform == "linux" and os.getenv("DISPLAY") is None:
+        from pyvirtualdisplay import Display
+
+        virtual_display = Display(visible=0, size=(1400, 900))
+        virtual_display.start()
+
     # Add scene cameras.
     for _, camera in scenario.cameras.items():
-        _ApplyCameraConfigSim(config=camera, builder=builder)
+        _ApplyCameraConfigSim(config=camera, builder=builder, lcm_buses=lcm_buses)
 
     # Add visualization.
     if meshcat:
