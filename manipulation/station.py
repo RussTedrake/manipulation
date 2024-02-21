@@ -63,6 +63,7 @@ from pydrake.all import (
     StateInterpolatorWithDiscreteDerivative,
     VisualizationConfig,
     ZeroForceDriver,
+    IiwaControlMode,
 )
 from pydrake.common.yaml import yaml_load_typed
 
@@ -1103,7 +1104,16 @@ def _ApplyDriverConfigInterface(
         lcm = lcm_buses.Find("Driver for " + model_instance_name, driver_config.lcm_bus)
 
         # Publish IIWA command.
-        iiwa_command_sender = builder.AddSystem(IiwaCommandSender())
+        control_mode_str = driver_config.control_mode
+        if control_mode_str == "position_only":
+            control_mode = IiwaControlMode.kPositionOnly
+        elif control_mode_str == "position_and_torque":
+            control_mode = IiwaControlMode.kPositionAndTorque
+        else:
+            control_mode = IiwaControlMode.kTorqueOnly
+        iiwa_command_sender = builder.AddSystem(
+            IiwaCommandSender(control_mode=control_mode)
+        )
         # Note on publish period: IIWA driver won't respond faster than 200Hz
         iiwa_command_publisher = builder.AddSystem(
             LcmPublisherSystem.Make(
@@ -1115,10 +1125,11 @@ def _ApplyDriverConfigInterface(
             )
         )
         iiwa_command_publisher.set_name(model_instance_name + ".command_publisher")
-        builder.ExportInput(
-            iiwa_command_sender.get_position_input_port(),
-            model_instance_name + ".position",
-        )
+        if not control_mode == IiwaControlMode.kTorqueOnly:
+            builder.ExportInput(
+                iiwa_command_sender.get_position_input_port(),
+                model_instance_name + ".position",
+            )
         builder.ExportInput(
             iiwa_command_sender.get_torque_input_port(),
             model_instance_name + ".feedforward_torque",
@@ -1128,7 +1139,9 @@ def _ApplyDriverConfigInterface(
             iiwa_command_publisher.get_input_port(),
         )
         # Receive IIWA status and populate the output ports.
-        iiwa_status_receiver = builder.AddSystem(IiwaStatusReceiver())
+        iiwa_status_receiver = builder.AddSystem(
+            IiwaStatusReceiver(control_mode=control_mode)
+        )
         iiwa_status_subscriber = builder.AddSystem(
             LcmSubscriberSystem.Make(
                 channel="IIWA_STATUS",
