@@ -1,4 +1,5 @@
 import dataclasses as dc
+import logging
 import os
 import sys
 import typing
@@ -30,6 +31,7 @@ from pydrake.all import (
     FlattenModelDirectives,
     GetScopedFrameByName,
     IiwaCommandSender,
+    IiwaControlMode,
     IiwaDriver,
     IiwaStatusReceiver,
     InverseDynamicsController,
@@ -63,7 +65,6 @@ from pydrake.all import (
     StateInterpolatorWithDiscreteDerivative,
     VisualizationConfig,
     ZeroForceDriver,
-    IiwaControlMode,
 )
 from pydrake.common.yaml import yaml_load_typed
 
@@ -573,6 +574,13 @@ def _ApplyDriverConfigSim(
     builder: DiagramBuilder,
 ) -> None:
     if isinstance(driver_config, IiwaDriver):
+        if driver_config.control_mode != "position_and_torque":
+            logging.warning(
+                "Only position_and_torque control mode is simulated "
+                + "correctly. The simulation might be incaccurate if the iiwa is in "
+                + "torque_only mode!"
+            )
+
         model_instance = sim_plant.GetModelInstanceByName(model_instance_name)
         num_iiwa_positions = sim_plant.num_positions(model_instance)
 
