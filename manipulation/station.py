@@ -1112,23 +1112,26 @@ def _ApplyDriverConfigInterface(
         lcm = lcm_buses.Find("Driver for " + model_instance_name, driver_config.lcm_bus)
 
         # Publish IIWA command.
+        # Note on publish period: IIWA driver won't respond faster than 1000Hz in
+        # torque_only mode and 200Hz in other modes
+        publish_period = 0.005
         control_mode_str = driver_config.control_mode
         if control_mode_str == "position_only":
             control_mode = IiwaControlMode.kPositionOnly
         elif control_mode_str == "position_and_torque":
             control_mode = IiwaControlMode.kPositionAndTorque
-        else:
+        else: # torque_only
+            publish_period = 0.001
             control_mode = IiwaControlMode.kTorqueOnly
         iiwa_command_sender = builder.AddSystem(
             IiwaCommandSender(control_mode=control_mode)
         )
-        # Note on publish period: IIWA driver won't respond faster than 200Hz
         iiwa_command_publisher = builder.AddSystem(
             LcmPublisherSystem.Make(
                 channel="IIWA_COMMAND",
                 lcm_type=lcmt_iiwa_command,
                 lcm=lcm,
-                publish_period=0.005,
+                publish_period=publish_period,
                 use_cpp_serializer=True,
             )
         )
