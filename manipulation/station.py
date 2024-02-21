@@ -1147,9 +1147,7 @@ def _ApplyDriverConfigInterface(
             iiwa_command_publisher.get_input_port(),
         )
         # Receive IIWA status and populate the output ports.
-        iiwa_status_receiver = builder.AddSystem(
-            IiwaStatusReceiver(control_mode=control_mode)
-        )
+        iiwa_status_receiver = builder.AddSystem(IiwaStatusReceiver())
         iiwa_status_subscriber = builder.AddSystem(
             LcmSubscriberSystem.Make(
                 channel="IIWA_STATUS",
