@@ -1120,7 +1120,7 @@ def _ApplyDriverConfigInterface(
             control_mode = IiwaControlMode.kPositionOnly
         elif control_mode_str == "position_and_torque":
             control_mode = IiwaControlMode.kPositionAndTorque
-        else: # torque_only
+        else:  # torque_only
             publish_period = 0.001
             control_mode = IiwaControlMode.kTorqueOnly
         iiwa_command_sender = builder.AddSystem(
