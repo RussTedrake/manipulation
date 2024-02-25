@@ -37,6 +37,8 @@ load("@rules_python//python:pip.bzl", "pip_parse")
 
 pip_parse(
     name = "pip_deps",
+    requirements_darwin = "//:requirements-bazel-mac.txt",
+    requirements_linux = "//:requirements-bazel-linux.txt",
     requirements_lock = "//:requirements-bazel.txt",
 )
 
