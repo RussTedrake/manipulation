@@ -21,6 +21,9 @@ rt_ipynb_test(
 rt_ipynb_test(
     name = "tracking",
     srcs = ["tracking.ipynb"],
+    deps = [
+      "//manipulation",
+    ]
 )
 
 rt_ipynb_test(

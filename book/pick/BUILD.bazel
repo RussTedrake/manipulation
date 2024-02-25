@@ -4,6 +4,7 @@
 # Copyright 2020-2023 Massachusetts Institute of Technology.
 # Licensed under the BSD 3-Clause License. See LICENSE.TXT for details.
 
+load("@pip_deps//:requirements.bzl", "requirement")
 load("//book/htmlbook/tools/jupyter:defs.bzl", "rt_ipynb_test")
 
 rt_ipynb_test(
@@ -36,6 +37,9 @@ rt_ipynb_test(
 rt_ipynb_test(
     name = "qdot_vs_v",
     srcs = ["qdot_vs_v.ipynb"],
+    deps = [
+      requirement("drake"),
+    ]
 )
 
 rt_ipynb_test(

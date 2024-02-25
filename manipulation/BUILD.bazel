@@ -4,6 +4,7 @@
 # Copyright 2020-2023 Massachusetts Institute of Technology.
 # Licensed under the BSD 3-Clause License. See LICENSE.TXT for details.
 
+load("@pip_deps//:requirements.bzl", "requirement")
 load("//book/htmlbook/tools/python:defs.bzl", "rt_py_library", "rt_py_test")
 
 rt_py_library(
@@ -14,6 +15,11 @@ rt_py_library(
     ],
     imports = [".."],
     visibility = ["//visibility:public"],
+    deps = [
+      requirement("drake"),
+      requirement("ipython"),
+      requirement("mpld3"),
+    ],
 )
 
 rt_py_library(
@@ -76,6 +82,9 @@ rt_py_library(
     name = "icp",
     srcs = ["icp.py"],
     imports = [".."],
+    deps = [
+      requirement("scipy"),
+    ],
     visibility = ["//visibility:public"],
 )
 
@@ -93,7 +102,12 @@ rt_py_test(
         "//manipulation:create_sdf_from_mesh.py",
     ],
     imports = [".."],
-    deps = ["manipulation"],
+    deps = [
+      "manipulation",
+      requirement("lxml"),
+      requirement("trimesh"),
+      requirement("vhacdx"),
+    ],
 )
 
 rt_py_test(
@@ -105,6 +119,7 @@ rt_py_test(
       "//manipulation/envs:box_flipup",
       "manipulation",
       "scenarios",
+      requirement("stable-baselines3"),
     ],
 )
 

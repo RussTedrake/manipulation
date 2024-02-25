@@ -44,7 +44,7 @@ url = "https://drake-packages.csail.mit.edu/whl/nightly/"
 priority = "explicit"
 
 [tool.poetry.dependencies]
-python = "<3.12,>=3.10"  # <3.12 is for the newer versions of scipy
+python = "<4.0,>=3.10"
 cloudpickle = "2.2.1"  # needs to be pinned for stored files to remain compatible.
 #drake = { version = "==0.0.20231222", source = "drake-nightly" }
 drake = ">=1.24.0"
@@ -60,6 +60,7 @@ timeout-decorator = ">=0.4.1"
 torch = ">=2.0.1"
 torchvision = ">=0.10.1"
 trimesh = {extras = ["recommend"], version = ">=4.0.0"}
+vhacdx = ">=0.0.5"
 #wandb = ">=0.14.0"
 
 [tool.poetry.group.docs]

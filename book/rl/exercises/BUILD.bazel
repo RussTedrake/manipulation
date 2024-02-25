@@ -4,6 +4,7 @@
 # Copyright 2020-2021 Massachusetts Institute of Technology.
 # Licensed under the BSD 3-Clause License. See LICENSE.TXT for details.
 
+load("@pip_deps//:requirements.bzl", "requirement")
 load("//book/htmlbook/tools/jupyter:defs.bzl", "rt_ipynb_test")
 
 rt_ipynb_test(
@@ -25,5 +26,7 @@ rt_ipynb_test(
         "//manipulation/envs:planar_gripper_pushing_a_box",
         "//manipulation/exercises:grader",
         "//manipulation/exercises/rl:test_vpg",
+        requirement("scipy"),
+        requirement("torch"),
     ],
 )
