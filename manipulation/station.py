@@ -47,6 +47,7 @@ from pydrake.all import (
     MultibodyPlant,
     MultibodyPlantConfig,
     OutputPort,
+    ParseIiwaControlMode,
     Parser,
     PdControllerGains,
     ProcessModelDirectives,
@@ -69,17 +70,6 @@ from pydrake.common.yaml import yaml_load_typed
 from manipulation.scenarios import AddIiwa, AddPlanarIiwa, AddWsg
 from manipulation.systems import ExtractPose
 from manipulation.utils import ConfigureParser
-
-
-def iiwa_control_mode_from_string(control_mode: str) -> IiwaControlMode:
-    if control_mode == "position_only":
-        return IiwaControlMode.kPositionOnly
-    elif control_mode == "position_and_torque":
-        return IiwaControlMode.kPositionAndTorque
-    elif control_mode == "torque_only":
-        return IiwaControlMode.kTorqueOnly
-    else:
-        raise ValueError(f"Unknown control mode: {control_mode}")
 
 
 @dc.dataclass
@@ -597,7 +587,7 @@ def _ApplyDriverConfigSim(
         AddWsg(controller_plant, controller_iiwa, welded=True)
         controller_plant.Finalize()
 
-        control_mode = iiwa_control_mode_from_string(driver_config.control_mode)
+        control_mode = ParseIiwaControlMode(driver_config.control_mode)
         sim_iiwa_driver = AddSimIiwaDriver(
             plant=sim_plant,
             iiwa_instance=model_instance,
@@ -1032,7 +1022,7 @@ def _ApplyDriverConfigInterface(
         # Publish IIWA command.
         # Note on publish period: IIWA driver won't respond faster than 1000Hz in
         # torque_only mode and 200Hz in other modes
-        control_mode = iiwa_control_mode_from_string(driver_config.control_mode)
+        control_mode = ParseIiwaControlMode(driver_config.control_mode)
         publish_period = 0.005
         if control_mode == IiwaControlMode.kTorqueOnly:
             publish_period = 0.001
