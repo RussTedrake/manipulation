@@ -14,7 +14,6 @@ from drake import (
     lcmt_schunk_wsg_status,
 )
 from pydrake.all import (
-    AddSimIiwaDriver,
     ApplyCameraConfig,
     ApplyLcmBusConfig,
     ApplyMultibodyPlantConfig,
@@ -59,6 +58,7 @@ from pydrake.all import (
     SchunkWsgPositionController,
     SchunkWsgStatusReceiver,
     ScopedName,
+    SimIiwaDriver,
     SimulatorConfig,
     VisualizationConfig,
     ZeroForceDriver,
@@ -588,7 +588,7 @@ def _ApplyDriverConfigSim(
         controller_plant.Finalize()
 
         control_mode = ParseIiwaControlMode(driver_config.control_mode)
-        sim_iiwa_driver = AddSimIiwaDriver(
+        sim_iiwa_driver = SimIiwaDriver.AddSimIiwaDriver(
             plant=sim_plant,
             iiwa_instance=model_instance,
             controller_plant=controller_plant,
