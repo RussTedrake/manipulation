@@ -584,6 +584,8 @@ def _ApplyDriverConfigSim(
             controller_iiwa = AddPlanarIiwa(controller_plant)
         else:
             controller_iiwa = AddIiwa(controller_plant)
+        # TODO: Add the model that is welded to the iiwa link 7 rather than always
+        # adding the WSG.
         AddWsg(controller_plant, controller_iiwa, welded=True)
         controller_plant.Finalize()
 
