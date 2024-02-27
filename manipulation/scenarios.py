@@ -667,7 +667,7 @@ def MakeManipulationStation(
             )
             builder.ExportInput(
                 torque_passthrough.get_input_port(),
-                model_instance_name + "_feedforward_torque",
+                model_instance_name + "_torque",
             )
             builder.Connect(
                 adder.get_output_port(),
