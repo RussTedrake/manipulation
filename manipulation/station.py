@@ -58,6 +58,7 @@ from pydrake.all import (
     SchunkWsgPositionController,
     SchunkWsgStatusReceiver,
     ScopedName,
+    SharedPointerSystem,
     SimIiwaDriver,
     SimulatorConfig,
     VisualizationConfig,
@@ -588,6 +589,11 @@ def _ApplyDriverConfigSim(
         # adding the WSG.
         AddWsg(controller_plant, controller_iiwa, welded=True)
         controller_plant.Finalize()
+        # Keep the controller plant alive during the Diagram lifespan.
+        builder.AddNamedSystem(
+            f"{model_instance_name}_controller_plant_pointer_system",
+            SharedPointerSystem(controller_plant),
+        )
 
         control_mode = ParseIiwaControlMode(driver_config.control_mode)
         sim_iiwa_driver = SimIiwaDriver.AddToBuilder(
