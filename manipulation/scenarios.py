@@ -136,7 +136,6 @@ class WsgPositions(Enum):
     CLOSED = 0.002
 
 
-# TODO: take argument for whether we want the welded fingers version or not
 def AddWsg(plant, iiwa_model_instance, roll=np.pi / 2.0, welded=False, sphere=False):
     parser = Parser(plant)
     ConfigureParser(parser)
