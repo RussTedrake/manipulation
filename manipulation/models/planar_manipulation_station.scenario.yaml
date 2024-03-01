@@ -36,6 +36,6 @@ directives:
         translation: [0.75, 0, -0.7645]
 model_drivers:
     iiwa: !IiwaDriver
-      control_mode: position_only
+      control_mode: position_and_torque
       hand_model_name: wsg
     wsg: !SchunkWsgDriver {}
