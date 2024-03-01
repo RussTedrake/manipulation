@@ -365,7 +365,7 @@ def _PopulatePlantOrDiagram(
 
     directives = []
     for d in flattened_directives:
-        if d.add_model and (d.add_model.name in model_instance_names):
+        if d.add_model and (d.add_model.name in all_model_instances):
             directives.append(d)
         if (
             d.add_weld
@@ -568,8 +568,7 @@ def _ApplyDriverConfigSim(
     driver_config,  # See Scenario.model_drivers for typing
     model_instance_name: str,
     sim_plant: MultibodyPlant,
-    directives: typing.List[ModelDirective],
-    models_from_directives_map: typing.Mapping[str, typing.List[ModelInstanceInfo]],
+    scenario: Scenario,
     package_xmls: typing.List[str],
     builder: DiagramBuilder,
 ) -> None:
@@ -578,15 +577,19 @@ def _ApplyDriverConfigSim(
         num_iiwa_positions = sim_plant.num_positions(model_instance)
 
         # Make the plant for the iiwa controller to use.
+        # TODO: The current hardcoded implementaiton should be replaced with the
+        # MakeMultibodyPlant below, once adding frozen children is supported in Drake.
+        # controller_plant = MakeMultibodyPlant(
+        #     scenario=scenario,
+        #     model_instance_names=[model_instance_name],
+        #     add_frozen_child_instances=True,
+        #     package_xmls=package_xmls,
+        # )
         controller_plant = MultibodyPlant(time_step=sim_plant.time_step())
-        # TODO: Add the correct IIWA model (introspected from MBP). See
-        # build_iiwa_control in Drake for a slightly closer attempt.
         if num_iiwa_positions == 3:
             controller_iiwa = AddPlanarIiwa(controller_plant)
         else:
             controller_iiwa = AddIiwa(controller_plant)
-        # TODO: Add the model that is welded to the iiwa link 7 rather than always
-        # adding the WSG.
         AddWsg(controller_plant, controller_iiwa, welded=True)
         controller_plant.Finalize()
         # Keep the controller plant alive during the Diagram lifespan.
@@ -665,7 +668,7 @@ def _ApplyDriverConfigSim(
         # Make the plant for the iiwa controller to use.
         controller_directives = []
         for d in FlattenModelDirectives(
-            ModelDirectives(directives=directives), parser.package_map()
+            ModelDirectives(directives=scenario.directives), parser.package_map()
         ).directives:
             if d.add_model and (d.add_model.name in model_instance_names):
                 controller_directives.append(d)
@@ -771,23 +774,18 @@ def _ApplyDriverConfigsSim(
     *,
     driver_configs,  # See Scenario.model_drivers for typing
     sim_plant: MultibodyPlant,
-    directives: typing.List[ModelDirective],
-    models_from_directives: typing.Mapping[str, typing.List[ModelInstanceInfo]],
+    scenario: Scenario,
     package_xmls: typing.List[str],
     builder: DiagramBuilder,
 ) -> None:
-    models_from_directives_map = dict(
-        [(info.model_name, info) for info in models_from_directives]
-    )
     for model_instance_name, driver_config in driver_configs.items():
         _ApplyDriverConfigSim(
-            driver_config,
-            model_instance_name,
-            sim_plant,
-            directives,
-            models_from_directives_map,
-            package_xmls,
-            builder,
+            driver_config=driver_config,
+            model_instance_name=model_instance_name,
+            sim_plant=sim_plant,
+            scenario=scenario,
+            package_xmls=package_xmls,
+            builder=builder,
         )
 
 
@@ -960,8 +958,7 @@ def MakeHardwareStation(
     _ApplyDriverConfigsSim(
         driver_configs=scenario.model_drivers,
         sim_plant=sim_plant,
-        directives=scenario.directives,
-        models_from_directives=added_models,
+        scenario=scenario,
         package_xmls=package_xmls,
         builder=builder,
     )
