@@ -45,6 +45,7 @@ from pydrake.all import (
     ModelInstanceInfo,
     MultibodyPlant,
     MultibodyPlantConfig,
+    Multiplexer,
     OutputPort,
     ParseIiwaControlMode,
     Parser,
@@ -1095,6 +1096,20 @@ def _ApplyDriverConfigInterface(
             iiwa_status_receiver.get_torque_external_output_port(),
             model_instance_name + ".torque_external",
         )
+
+        iiwa_state_mux: Multiplexer = builder.AddSystem(Multiplexer([7, 7]))
+        builder.Connect(
+            iiwa_status_receiver.get_position_measured_output_port(),
+            iiwa_state_mux.get_input_port(0),
+        )
+        builder.Connect(
+            iiwa_status_receiver.get_velocity_estimated_output_port(),
+            iiwa_state_mux.get_input_port(1),
+        )
+        builder.ExportOutput(
+            iiwa_state_mux.get_output_port(), model_instance_name + ".state_estimated"
+        )
+
         builder.Connect(
             iiwa_status_subscriber.get_output_port(),
             iiwa_status_receiver.get_input_port(),
