@@ -578,7 +578,7 @@ def _ApplyDriverConfigSim(
         num_iiwa_positions = sim_plant.num_positions(model_instance)
 
         # Make the plant for the iiwa controller to use.
-        # TODO: The current hardcoded implementaiton should be replaced with the
+        # TODO: The current hardcoded implementation should be replaced with the
         # MakeMultibodyPlant below, once adding frozen children is supported in Drake.
         # controller_plant = MakeMultibodyPlant(
         #     scenario=scenario,
