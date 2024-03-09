@@ -873,8 +873,9 @@ ik.AddPositionConstraint(
     <p>To motivate it, let's think about why the PRM struggles to handle
     continuous curvature constraints. During the roadmap construction phase, we
     do a lot of work with the collision checker to certify that straight line
-    segments connecting two vertices are collision free (at least up to some
-    sampling resolution). Then, in the online query phase, we search the
+    segments connecting two vertices are collision free (typically only up to
+    some sampling resolution, though it is possible to do better
+    <elib>Amice23</elib>). Then, in the online query phase, we search the
     discrete graph to find a (discontinuous) piecewise-linear shortest path
     from the start to the goal. Once we go to smooth that path or approximate
     it with a continuous curve, there is no guarantee that this path is still
@@ -975,21 +976,19 @@ ik.AddPositionConstraint(
       alternatively cover a similar volume with less regions. Our current best
       algorithm for performing this convex decomposition proceeds by computing
       a "minimum clique cover" of the "visibility graph"
-      <elib>Werner23</elib> (Drake version <a
-      href="https://github.com/RobotLocomotion/drake/issues/20372">coming
-      soon</a>!).</p>
+      <elib>Werner23</elib>. This is implemented in Drake as <a href="https://drake.mit.edu/doxygen_cxx/namespacedrake_1_1planning.html#ace53f3f8045d8eb96867bcd6eda63ed0"><code>IrisInConfigurationSpaceFromCliqueCover</code></a>.</p>
 
-      <p>In practice, it seems practical to try to compute a quite dense
-      covering of the configuration space for 7-DOF manipulators, and even up
-      to say 10 degrees of freedom. But for higher dimensions, I think that
-      trying to cover every nook and cranny of the configuration space is a
-      false goal. I strongly prefer the idea of intializing the clique-cover
-      algorithm with sample points that represent the "important" regions of
-      your configuration space. Sometimes we do this by manual seeding (via
-      calls to inverse kinematics), or alternatively, we can do it by examing
-      the solutions the come from teleop demonstrations, from another planner
-      (that can generate plans, but without the same guarantees), or even from
-      a reinforcement learning policy.</p>
+      <p>In practice, it seems reasonably tractable to try to compute a quite
+      dense covering of the configuration space for 7-DOF manipulators, and
+      perhaps even up to say 10 degrees of freedom. But for higher dimensions,
+      I think that trying to cover every nook and cranny of the configuration
+      space is a false goal. I strongly prefer the idea of intializing the
+      clique-cover algorithm with sample points that represent the "important"
+      regions of your configuration space. Sometimes we do this by manual
+      seeding (via calls to inverse kinematics), or alternatively, we can do it
+      by examing the solutions that come from teleop demonstrations, from
+      another planner (that can generate plans, but without the same
+      guarantees), or even from a reinforcement learning policy.</p>
     
     </subsection>
 
@@ -1069,12 +1068,12 @@ ik.AddPositionConstraint(
       solve these problems to global optimality.</p>
 
       <p>IRIS regions provide convex sets that describe feasible <i>points</i>
-      in configuration space. But we want feasible <i>paths</i> in
-      configuration space. But if we have two points in the same IRIS region,
-      then we know that the straight line connecting them is also guaranteed to
-      be collision free. When points lie in the intersection of two IRIS
-      regions, then they can connect continuous paths through multiple
-      regions. This is the essence of our transcription.</p>
+      in configuration space. We want feasible <i>paths</i> in configuration
+      space. Observe that if we have two points in the same IRIS region, then
+      we know that the straight line connecting them is also guaranteed to be
+      collision free. When points lie in the intersection of two IRIS regions,
+      then they can connect continuous paths through multiple regions. This is
+      the essence of our transcription.</p>
 
       <p>What this implies is that for each visit to a vertex in the GCS, then
       we want to pick <i>two points</i> in an IRIS region, so that the path
@@ -1165,7 +1164,12 @@ ik.AddPositionConstraint(
       also possible to reason more directly about continuous dynamic
       constraints over continuous curves (more coming soon!).</p>
 
-      <p>Planning through contact (coming soon!).</p>
+      <p>Planning through contact. Amazingly, we now have tight convex
+      relaxations for quasi-static manipulation with contact
+      <elib>Graesdal24</elib>. The initial examples are quite simple (so that
+      we could study the problem carefully, and defer the details of scaling
+      the solver), but you can expect much more from us in this direction very
+      soon.</p>
 
       <p>Planning under uncertainty (coming soon!).</p>
 
@@ -1431,6 +1435,13 @@ PhD thesis, Carnegie Mellon University, August, <span class="year">2010</span>.
 [&nbsp;<a href="http://groups.csail.mit.edu/robotics-center/public_papers/Marcucci21.pdf">link</a>&nbsp;]
 
 </li><br>
+<li id=Amice23>
+<span class="author">Amice and Alexandre and Werner and Peter and Tedrake and Russ</span>, 
+<span class="title">"Certifying Bimanual RRT Motion Plans in a Second"</span>, 
+<span class="publisher">arxiv</span>, <span class="year">2023</span>.
+[&nbsp;<a href="http://groups.csail.mit.edu/robotics-center/public_papers/Amice23.pdf">link</a>&nbsp;]
+
+</li><br>
 <li id=Lozano-Perez90>
 <span class="author">Tomas Lozano-Perez</span>, 
 <span class="title">"Spatial planning: A configuration space approach"</span>, Springer
@@ -1501,6 +1512,12 @@ PhD thesis, Carnegie Mellon University, August, <span class="year">2010</span>.
 <span class="title">"Constrained Bimanual Planning with Analytic Inverse Kinematics"</span>, 
 <span class="publisher">arXiv preprint arXiv:2309.08770</span>, <span class="year">2023</span>.
 [&nbsp;<a href="http://groups.csail.mit.edu/robotics-center/public_papers/Cohn23a.pdf">link</a>&nbsp;]
+
+</li><br>
+<li id=Graesdal24>
+<span class="author">Bernhard P Graesdal and Shao YC Chia and Tobia Marcucci and Savva Morozov and Alexandre Amice and Pablo A Parrilo and Russ Tedrake</span>, 
+<span class="title">"Towards Tight Convex Relaxations for Contact-Rich Manipulation"</span>, 
+<span class="publisher">arXiv preprint arXiv:2402.10312</span>, <span class="year">2024</span>.
 
 </li><br>
 <li id=Kurtz23>
