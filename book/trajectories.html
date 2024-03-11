@@ -976,7 +976,7 @@ ik.AddPositionConstraint(
       alternatively cover a similar volume with less regions. Our current best
       algorithm for performing this convex decomposition proceeds by computing
       a "minimum clique cover" of the "visibility graph"
-      <elib>Werner23</elib>. This is implemented in Drake as <a href="https://drake.mit.edu/doxygen_cxx/namespacedrake_1_1planning.html#ace53f3f8045d8eb96867bcd6eda63ed0"><code>IrisInConfigurationSpaceFromCliqueCover</code></a>.</p>
+      <elib>Werner23</elib> (<a href="https://drake.mit.edu/doxygen_cxx/namespacedrake_1_1planning.html#ace53f3f8045d8eb96867bcd6eda63ed0">implemented in Drake</a>).</p>
 
       <p>In practice, it seems reasonably tractable to try to compute a quite
       dense covering of the configuration space for 7-DOF manipulators, and
@@ -997,12 +997,12 @@ ik.AddPositionConstraint(
       <p>The GCS framework was originally introduced in
       <elib>Marcucci21</elib>, and we have a mature <a
       href="https://drake.mit.edu/doxygen_cxx/classdrake_1_1geometry_1_1optimization_1_1_graph_of_convex_sets.html">implementation
-      in Drake</a>. It is a general optimization framework for combining
-      combinatorial optimizations, like graph search, with continuous
-      optimizations, like the kinematic trajectory optimization we studied
-      above. GCS can provide a continuous extension to any "network flow"
-      optimization, but for motion planning, the first problem we are
-      interested in is shortest paths on a graph.</p>
+      in Drake</a>. It is a general optimization framework for combining combinatorial
+      optimizations, like graph search, with continuous optimizations, like the
+      kinematic trajectory optimization we studied above. GCS can provide a continuous
+      extension to any "network flow" optimization (c.f. <elib>Ahuja93</elib>), but for
+      motion planning, the first problem we are interested in is shortest paths on a
+      graph.</p>
 
       <p>Consider the very classical problem of finding the (weighted) shortest
       path from a source, $s$, to a target, $t,$ on a graph, pictured on the
@@ -1479,6 +1479,12 @@ PhD thesis, Carnegie Mellon University, August, <span class="year">2010</span>.
 <span class="title">"Approximating Robot Configuration Spaces with few Convex Sets using Clique Covers of Visibility Graphs"</span>, 
 , <span class="year">2023</span>.
 [&nbsp;<a href="http://groups.csail.mit.edu/robotics-center/public_papers/Werner23.pdf">link</a>&nbsp;]
+
+</li><br>
+<li id=Ahuja93>
+<span class="author">Ravindra K Ahuja and Thomas L Magnanti and James B Orlin</span>, 
+<span class="title">"Network flows: theory, algorithms, and applications"</span>, Prentice-Hall, Inc.
+, <span class="year">1993</span>.
 
 </li><br>
 <li id=Boyd04a>
