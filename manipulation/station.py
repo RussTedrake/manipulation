@@ -26,6 +26,7 @@ from pydrake.all import (
     DiagramBuilder,
     DrakeLcmParams,
     FlattenModelDirectives,
+    Gain,
     GetScopedFrameByName,
     IiwaCommandSender,
     IiwaControlMode,
@@ -1013,6 +1014,26 @@ def MakeHardwareStation(
     return diagram
 
 
+def NegatedPort(
+    builder: DiagramBuilder, output_port: OutputPort, prefix: str = ""
+) -> OutputPort:
+    """Negates the output of the given port.
+
+    Args:
+        builder: The diagram builder to add the negation system to.
+        output_port: The output port to negate.
+        prefix: The prefix to use for the negation system.
+
+    Returns:
+        The output port of the negation system.
+    """
+    negater = builder.AddNamedSystem(
+        f"sign_flip_{prefix}{output_port.get_name()}", Gain(-1, size=output_port.size())
+    )
+    builder.Connect(output_port, negater.get_input_port())
+    return negater.get_output_port()
+
+
 # TODO(russt): Use the c++ version pending https://github.com/RobotLocomotion/drake/issues/20055
 def _ApplyDriverConfigInterface(
     driver_config,  # See Scenario.model_drivers for typing
@@ -1084,12 +1105,18 @@ def _ApplyDriverConfigInterface(
             iiwa_status_receiver.get_velocity_estimated_output_port(),
             model_instance_name + ".velocity_estimated",
         )
+        # These are *negative* w.r.t. the conventions outlined in
+        # drake/manipulation/README.
         builder.ExportOutput(
-            iiwa_status_receiver.get_torque_commanded_output_port(),
+            NegatedPort(
+                builder, iiwa_status_receiver.get_torque_commanded_output_port()
+            ),
             model_instance_name + ".torque_commanded",
         )
         builder.ExportOutput(
-            iiwa_status_receiver.get_torque_measured_output_port(),
+            NegatedPort(
+                builder, iiwa_status_receiver.get_torque_measured_output_port()
+            ),
             model_instance_name + ".torque_measured",
         )
         builder.ExportOutput(
