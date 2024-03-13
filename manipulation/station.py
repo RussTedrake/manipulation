@@ -1109,13 +1109,17 @@ def _ApplyDriverConfigInterface(
         # drake/manipulation/README.
         builder.ExportOutput(
             NegatedPort(
-                builder, iiwa_status_receiver.get_torque_commanded_output_port()
+                builder=builder,
+                output_port=iiwa_status_receiver.get_torque_commanded_output_port(),
+                prefix=model_instance_name,
             ),
             model_instance_name + ".torque_commanded",
         )
         builder.ExportOutput(
             NegatedPort(
-                builder, iiwa_status_receiver.get_torque_measured_output_port()
+                builder=builder,
+                output_port=iiwa_status_receiver.get_torque_measured_output_port(),
+                prefix=model_instance_name,
             ),
             model_instance_name + ".torque_measured",
         )
