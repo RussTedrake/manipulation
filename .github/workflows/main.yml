@@ -75,9 +75,9 @@ jobs:
         run: ./book/htmlbook/workflows/ci/jammy/test
         shell: bash
 
-  monterey:
-    name: macos monterey 12
-    runs-on: macos-12
+  sonoma:
+    name: macos sonoma 14
+    runs-on: macos-14
     steps:
       - name: checkout
         uses: actions/checkout@v2
@@ -85,11 +85,12 @@ jobs:
         run:  ./setup/submodule_checkout
         shell: zsh -efuo pipefail {0}
       - name: setup
-        run: ./book/htmlbook/workflows/ci/monterey/setup
+        run: ./book/htmlbook/workflows/ci/sonoma/setup
         shell: zsh -efuo pipefail {0}
       - name: test
-        run: ./book/htmlbook/workflows/ci/monterey/test
+        run: ./book/htmlbook/workflows/ci/sonoma/test
         shell: zsh -efuo pipefail {0}
+
   lint:
     runs-on: ubuntu-latest
     steps:
