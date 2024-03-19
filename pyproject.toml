@@ -68,7 +68,7 @@ optional = true
 
 # Must include all dependencies required to build the docs with sphinx + autodoc.
 [tool.poetry.group.docs.dependencies]
-drake = { version = "==0.0.20240302", source = "drake-nightly" }
+drake = { version = ">=0.0.20240302", source = "drake-nightly" }
 #drake = ">=1.24.0"
 ipython = ">=7.8.0"
 sphinx = ">=7.2.6"
