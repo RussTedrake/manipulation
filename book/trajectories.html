@@ -875,122 +875,35 @@ ik.AddPositionConstraint(
     do a lot of work with the collision checker to certify that straight line
     segments connecting two vertices are collision free (typically only up to
     some sampling resolution, though it is possible to do better
-    <elib>Amice23</elib>). Then, in the online query phase, we search the
-    discrete graph to find a (discontinuous) piecewise-linear shortest path
-    from the start to the goal. Once we go to smooth that path or approximate
-    it with a continuous curve, there is no guarantee that this path is still
-    collision free, and it certainly might not be the shortest path. Because
-    our offline roadmap construction only considered line segments, it didn't
-    leave any room for online optimization. This becomes even more of a concern
-    when we bring in dynamics -- paths that are kinematically feasible might
-    not be feasible once we have dynamic constraints, but for a number of
-    reasons kino-dynamic sampling-based motion planning <todo>citation</todo>
-    has not been as successful as the purely kinematic sampling-based
-    planning.</p>
+    <elib>Amice23</elib>). Then, in the online query phase, we search the discrete graph
+    to find a (discontinuous) piecewise-linear shortest path from the start to the goal.
+    Once we go to smooth that path or approximate it with a continuous curve, there is
+    no guarantee that this path is still collision free, and it certainly might not be
+    the shortest path. Because our offline roadmap construction only considered line
+    segments, it didn't leave any room for online optimization. This becomes even more
+    of a concern when we bring in dynamics -- paths that are kinematically feasible
+    might not be feasible once we have dynamic constraints. While sampling-based
+    planning <a href="https://ompl.kavrakilab.org/planners.html#control_planners">can be
+    adapted</a> to these so-called "kino-dynamic planning" or "control-based planning"
+    problems, for a number of <a
+    href="https://underactuated.mit.edu/planning.html">subtle reasonse</a> these
+    algorithms have not been as successful as the purely kinematic sampling-based
+    planning versions.</p>
 
     <todo>Add a PRM => GCS plot here.</todo>
 
-    <p>A relatively small change to the PRM workflow is this: every time we
-    pick a sample, rather than just adding the configuration-space point to the
-    graph, let's expand that point into a (convex) region in configuration
-    space. We'll happily pay some offline computation in order to find nice big
-    regions, because the payoff for the online query phase is significant.
-    First, we can make much sparser graphs -- a small number of regions can
-    cover a big portion of configuration space, which also allows us to scale
-    to higher dimensions. But perhaps more importantly, now we have the
-    flexibility to optimize online over continuous curves, so long as they stay
-    inside the convex regions. This requires a generalization of the graph
-    search algorithm which can jointly optimize the discrete path through the
-    graph along with the parameters of the continuous curves; this is exactly
-    the generalization that GCS provides.</p>
-
-    <subsection><h1>Convex decomposition of (collision-free) configuration
-    space</h1>
-
-      <p>Let's start by taking the analogy with the PRM seriously. If we sample
-      a collision-free point in the configuration space, then what is the right
-      way to inflate that point into a convex region?</p>
-
-      <p>The answer is simpler when we are dealing with convex geometries. In
-      my view, it is reasonable to approximate the geometry of a robot with
-      convex shapes in the Euclidean space, $\Re^3.$ Even though many robots
-      (like the iiwa) have nonconvex mesh geometries, we can often approximate
-      them nicely as the union of simpler convex geometries; sometimes these
-      are primitives like cylinders and spheres, alternatively we can perform a
-      convex decomposition directly on the mesh. But even when the geometries
-      are convex in the Euclidean space, it is generally <i>unreasonable</i> to
-      treat them as convex in the configuration space.</p>
-      
-      <p>There are a few exceptions. If your configuration space only involves
-      translations, or if your robot geometry is invariant to rotations (e.g. a
-      point robot or a spherical robot), then the configuration space will
-      still be convex; this was one of the first key observations that cemented
-      the notion of configuration space as a core mathematical object in
-      robotics <elib>Lozano-Perez90</elib>. This can work for a mobile robot
-      (even a quadrotor approximated by a sphere). In this case, one can easily
-      compute the minimum Euclidean distance between any pairs of convex bodies
-      at the sample point, and for instance, inflate the point into a sphere of
-      the appropriate radius <elib>Shkolnik11a</elib>. In order to find bigger
-      regions, we have made heavy use of the Iterative Region Inflation by
-      Semidefinite Program (IRIS) algorithm introduced in <elib>Deits14</elib>
-      and <a
-      href="https://drake.mit.edu/doxygen_cxx/group__geometry__optimization.html#gafd8111a93cb3461e05bec3477ee736f6">implemented
-      in Drake</a>. This algorithm alternates between finding separating
-      hyperplanes and finding the maximum volume contained ellipse to "inflate"
-      the region to locally maximize (an efficient approximation of) the volume
-      of the region.</p>
-
-      <p>It is possible to extend the IRIS algorithm to find large convex regions in the more general (nonconvex) configuration space. We've done it in two ways:
-      <ul>
-        <li><b>Using nonlinear programming (NP)</b>. In the IRIS-NP algorithm
-        <elib>Petersen23a</elib> (<a
-        href="https://drake.mit.edu/doxygen_cxx/group__geometry__optimization.html#ga3a51e0fec449a0abcf498f78a2a390a8">implemented
-        in Drake</a>), we replace the convex optimization for finding the
-        closest collision with a nonlinear optimization solver like SNOPT. We
-        randomly sample potential collisions in order to make the algorithm
-        probabilistically sound; in practice this algorithm is relatively fast
-        but does not <i>guarantee</i> that the region is completely collision
-        free.
-        </li>
-        <li><b>Using algebraic kinematics + sums-of-squares optimization</b>.
-        Leveraging the idea that the kinematics of most of our robots can be
-        expressed using (rational) polynomials, we can use tools from
-        polynomial optimization to search for rigorous certificates of
-        non-collision  <elib>Dai23</elib> (<a
-        href="https://drake.mit.edu/doxygen_cxx/classdrake_1_1geometry_1_1optimization_1_1_cspace_free_polytope.html">implemented
-        in Drake</a>). This method tends to be slower, but the results are
-        sound. The one sacrifice that we have to make here is that we find
-        convex regions in the <a
-        href="http://underactuated.mit.edu/lyapunov.html#stereographic">stereographic
-        projection</a> coordinates of the original space. In practice, this represents a slight warping of the coordinate system (and consequently a trajectory length) over the region.</li>
-      </ul></p>
-
-      <todo>visualizations and examples!</todo>
-
-      <p>If we were to continue to follow the analogy with the PRM, then we
-      could imagine performing a convex decomposition of the space by sampling
-      at random, rejecting samples that are either in collision or in an
-      existing IRIS region, and then inflating any remaining samples. But in
-      fact, we can do much better than this -- we can cover a larger percentage
-      of the configuration free space with the same number of regions, or
-      alternatively cover a similar volume with less regions. Our current best
-      algorithm for performing this convex decomposition proceeds by computing
-      a "minimum clique cover" of the "visibility graph"
-      <elib>Werner23</elib> (<a href="https://drake.mit.edu/doxygen_cxx/namespacedrake_1_1planning.html#ace53f3f8045d8eb96867bcd6eda63ed0">implemented in Drake</a>).</p>
-
-      <p>In practice, it seems reasonably tractable to try to compute a quite
-      dense covering of the configuration space for 7-DOF manipulators, and
-      perhaps even up to say 10 degrees of freedom. But for higher dimensions,
-      I think that trying to cover every nook and cranny of the configuration
-      space is a false goal. I strongly prefer the idea of intializing the
-      clique-cover algorithm with sample points that represent the "important"
-      regions of your configuration space. Sometimes we do this by manual
-      seeding (via calls to inverse kinematics), or alternatively, we can do it
-      by examing the solutions that come from teleop demonstrations, from
-      another planner (that can generate plans, but without the same
-      guarantees), or even from a reinforcement learning policy.</p>
-    
-    </subsection>
+    <p>A relatively small change to the PRM workflow is this: every time we pick a
+    sample, rather than just adding the configuration-space point to the graph, let's
+    expand that point into a (convex) region in configuration space. We'll happily pay
+    some offline computation in order to find nice big regions, because the payoff for
+    the online query phase is significant. First, we can make much sparser graphs -- a
+    small number of regions can cover a big portion of configuration space -- which also
+    allows us to scale to higher dimensions. But perhaps more importantly, now we have
+    the flexibility to optimize online over continuous curves, so long as they stay
+    inside the convex regions. This requires a generalization of the graph-search
+    algorithm which can jointly optimize the discrete path through the graph along with
+    the parameters of the continuous curves; this is exactly the generalization that GCS
+    provides.</p>
 
     <subsection><h1>Graphs of Convex Sets</h1>
     
@@ -1057,34 +970,60 @@ ik.AddPositionConstraint(
 
     <subsection><h1>GCS (Kinematic) Trajectory Optimization</h1>
     
-      <p>We have a convex decomposition of our configuration space, and we have
-      the (general purpose) GCS machinery. What remains is to transcribe the
-      motion planning problem into a GCS. We first presented the transcription
-      I'll describe here in the paper "Motion planning around obstacles with
-      convex optimization" <elib>Marcucci22</elib>. Since we've already spent
-      time in this chapter talking about the inherent nonconvexity of the
-      motion planning problem, you can see why we like this title! It should be
-      slightly surprising that we can use convex optimization to effectively
-      solve these problems to global optimality.</p>
+      <p>GCS provides a very general machinery for optimizing over the mixed
+      discrete/continuous optimization problems that are naturally represented on a
+      graph. But how do we transcribe the motion planning problem into a GCS? We first
+      presented the transcription I'll describe here in the paper titled "Motion
+      planning around obstacles with convex optimization" <elib>Marcucci22</elib>. Since
+      we've already spent time in this chapter talking about the inherent nonconvexity
+      of the motion planning problem, you can see why we like this title! It should be
+      slightly surprising that we can use convex optimization to effectively solve these
+      problems to global optimality.</p>
 
-      <p>IRIS regions provide convex sets that describe feasible <i>points</i>
-      in configuration space. We want feasible <i>paths</i> in configuration
-      space. Observe that if we have two points in the same IRIS region, then
-      we know that the straight line connecting them is also guaranteed to be
-      collision free. When points lie in the intersection of two IRIS regions,
-      then they can connect continuous paths through multiple regions. This is
-      the essence of our transcription.</p>
+      <p>Let us assume for a moment that we are given a convex decomposition of the
+      collision-free space. This is a strong assumption, which we will justify below.
+      </p>
 
-      <p>What this implies is that for each visit to a vertex in the GCS, then
-      we want to pick <i>two points</i> in an IRIS region, so that the path
-      lies in the region. So the convex sets in the GCS are not the IRIS
-      regions themselves, they are the set with $2n$ variables for an
-      $n$-dimensional configuration space where the first $n$ and the last $n$
-      are both in the IRIS region. In set notation, we'd say it's the Cartesian
-      product of the set with itself. We form undirected edges between these
-      sets iff the IRIS regions intersect, and we put a constraint on the edge
-      saying that the second point one set must be equal to the first point in
-      the second set.</p>
+      <figure>
+        <img width="49%" src="figures/gcs_simple_2d_obstacles.svg">
+        <img width="49%" src="figures/gcs_simple_2d_regions.svg">
+        <figcaption><i>Left:</i> A simple 2D configuration-space with obstacles in red.
+        <i>Right:</i> A convex decomposition of the collision-free configuration space.
+        </figcaption>
+      </figure>
+
+      <p>Observe that if we have two points in the same convex collision-free region,
+      then we know that the straight line connecting them is also guaranteed to be
+      collision free. When points lie in the intersection of two C-space regions, then
+      they can connect continuous paths through multiple regions. This is the essence of
+      our transcription. What this implies is that for each visit to a vertex in the
+      GCS, then we want to pick <i>two points</i> in a C-space region, so that the path
+      lies in the region. So the convex sets in the GCS are not the C-space
+      regions themselves, they are the set with $2n$ variables for an $n$-dimensional
+      configuration space where the first $n$ and the last $n$ are both in the C-space
+      region. In set notation, we'd say it's the Cartesian product of the set with
+      itself. We form undirected edges between these sets iff the C-space regions
+      intersect, and we put a constraint on the edge saying that the second point one
+      set must be equal to the first point in the second set.</p>
+
+      <example><h1>GcsTrajOpt in a simple 2D configuration space</h1>
+        
+        <p>Let's run GCS trajectory optimization on the simple configuration space
+        depicted above. I've put the start in the bottom left corner and the goal in the
+        top right. I'll run the algorithm twice, once with a minimum-distance objective,
+        and once with a minimum-time objective (and velocity constraints):</p>
+
+        <figure>
+        <img width="49%" src="figures/gcs_simple_2d_first_order_min_length.svg">
+        <img width="49%" src="figures/gcs_simple_2d_first_order_min_time.svg">
+        <figcaption><i>Left:</i> The GcsTrajOpt solution with a minimum-distance cost.
+        <i>Right:</i> The GcsTrajOpt solution with a minimum-time cost (and velocity constraints).
+        </figcaption>
+        </figure>
+
+        <script>document.write(notebook_link('trajectories', notebook="gcs_min_length_vs_min_time"))</script>
+        
+      </example>
 
       <p>We can generalize this significantly. Rather than just putting a line
       segment in each set, we can use the convex hull property of Bezier curves
@@ -1117,7 +1056,7 @@ ik.AddPositionConstraint(
       </ul>
       We automatically impose path continuity constraints, and the region
       constraints (that the entire trajectory stays inside the union of the
-      IRIS regions) which are guaranteed at all $t$, not just at sample points.
+      C-space regions) which are guaranteed at all $t$, not just at sample points.
       You can find the <a
       href="https://drake.mit.edu/doxygen_cxx/classdrake_1_1planning_1_1trajectory__optimization_1_1_gcs_trajectory_optimization.html">implementation
       in Drake here</a>.</p>
@@ -1137,6 +1076,93 @@ ik.AddPositionConstraint(
 
       <todo>Lots more examples</todo>
 
+    </subsection>
+
+    <subsection><h1>Convex decomposition of (collision-free) configuration
+      space</h1>
+  
+      <p>Ok, so how do we obtain a convex decomposition of collision-free configuration
+      space? Let's start by taking the analogy with the PRM seriously. If we sample a
+      collision-free point in the configuration space, then what is the right way to
+      inflate that point into a convex region?</p>
+
+      <p>The answer is simpler when we are dealing with convex geometries. In
+      my view, it is reasonable to approximate the geometry of a robot with
+      convex shapes in the Euclidean space, $\Re^3.$ Even though many robots
+      (like the iiwa) have nonconvex mesh geometries, we can often approximate
+      them nicely as the union of simpler convex geometries; sometimes these
+      are primitives like cylinders and spheres, alternatively we can perform a
+      convex decomposition directly on the mesh. But even when the geometries
+      are convex in the Euclidean space, it is generally <i>unreasonable</i> to
+      treat them as convex in the configuration space.</p>
+      
+      <p>There are a few exceptions. If your configuration space only involves
+      translations, or if your robot geometry is invariant to rotations (e.g. a
+      point robot or a spherical robot), then the configuration space will
+      still be convex; this was one of the first key observations that cemented
+      the notion of configuration space as a core mathematical object in
+      robotics <elib>Lozano-Perez90</elib>. This can work for a mobile robot
+      (even a quadrotor approximated by a sphere). In this case, one can easily
+      compute the minimum Euclidean distance between any pairs of convex bodies
+      at the sample point, and for instance, inflate the point into a sphere of
+      the appropriate radius <elib>Shkolnik11a</elib>. In order to find bigger
+      regions, we have made heavy use of the Iterative Region Inflation by
+      Semidefinite Program (IRIS) algorithm introduced in <elib>Deits14</elib>
+      and <a
+      href="https://drake.mit.edu/doxygen_cxx/group__geometry__optimization.html#gafd8111a93cb3461e05bec3477ee736f6">implemented
+      in Drake</a>. This algorithm alternates between finding separating
+      hyperplanes and finding the maximum volume contained ellipse to "inflate"
+      the region to locally maximize (an efficient approximation of) the volume
+      of the region.</p>
+
+      <p>It is possible to extend the IRIS algorithm to find large convex regions in the more general (nonconvex) configuration space. We've done it in two ways:
+      <ul>
+        <li><b>Using nonlinear programming (NP)</b>. In the IRIS-NP algorithm
+        <elib>Petersen23a</elib> (<a
+        href="https://drake.mit.edu/doxygen_cxx/group__geometry__optimization.html#ga3a51e0fec449a0abcf498f78a2a390a8">implemented
+        in Drake</a>), we replace the convex optimization for finding the
+        closest collision with a nonlinear optimization solver like SNOPT. We
+        randomly sample potential collisions in order to make the algorithm
+        probabilistically sound; in practice this algorithm is relatively fast
+        but does not <i>guarantee</i> that the region is completely collision
+        free.
+        </li>
+        <li><b>Using algebraic kinematics + sums-of-squares optimization</b>.
+        Leveraging the idea that the kinematics of most of our robots can be
+        expressed using (rational) polynomials, we can use tools from
+        polynomial optimization to search for rigorous certificates of
+        non-collision  <elib>Dai23</elib> (<a
+        href="https://drake.mit.edu/doxygen_cxx/classdrake_1_1geometry_1_1optimization_1_1_cspace_free_polytope.html">implemented
+        in Drake</a>). This method tends to be slower, but the results are
+        sound. The one sacrifice that we have to make here is that we find
+        convex regions in the <a
+        href="http://underactuated.mit.edu/lyapunov.html#stereographic">stereographic
+        projection</a> coordinates of the original space. In practice, this represents a slight warping of the coordinate system (and consequently a trajectory length) over the region.</li>
+      </ul></p>
+
+      <todo>visualizations and examples!</todo>
+
+      <p>If we were to continue to follow the analogy with the PRM, then we could
+      imagine performing a convex decomposition of the space by sampling at random,
+      rejecting samples that are either in collision or in an existing IRIS region, and
+      then inflating any remaining samples. But in fact, we can do much better than this
+      -- we can cover a larger percentage of the configuration free space with the same
+      number of regions, or alternatively cover a similar volume with less regions. Our
+      current best algorithm for performing this convex decomposition proceeds by
+      computing a "minimum clique cover" of the "visibility graph"
+      <elib>Werner23</elib> (<a href="https://drake.mit.edu/doxygen_cxx/namespacedrake_1_1planning.html#ace53f3f8045d8eb96867bcd6eda63ed0">implemented in Drake</a>).</p>
+
+      <p>In practice, it seems reasonably tractable to try to compute a quite dense
+      covering of the configuration space for 7-DOF manipulators, and perhaps even up to
+      say 10 degrees of freedom. But for higher dimensions, I think that trying to cover
+      every nook and cranny of the configuration space is a false goal. I strongly
+      prefer the idea of intializing the clique-cover algorithm with sample points that
+      represent the "important" regions of your configuration space. Sometimes we do
+      this by manual seeding (via calls to inverse kinematics), or alternatively, we can
+      do it by examing the solutions that come from teleop demonstrations, from another
+      planner (that can generate plans, but without the same guarantees), or even from a
+      reinforcement learning policy.</p>
+      
     </subsection>
 
     <subsection><h1>Variations and Extensions</h1>
@@ -1442,6 +1468,25 @@ PhD thesis, Carnegie Mellon University, August, <span class="year">2010</span>.
 [&nbsp;<a href="http://groups.csail.mit.edu/robotics-center/public_papers/Amice23.pdf">link</a>&nbsp;]
 
 </li><br>
+<li id=Ahuja93>
+<span class="author">Ravindra K Ahuja and Thomas L Magnanti and James B Orlin</span>, 
+<span class="title">"Network flows: theory, algorithms, and applications"</span>, Prentice-Hall, Inc.
+, <span class="year">1993</span>.
+
+</li><br>
+<li id=Boyd04a>
+<span class="author">Stephen Boyd and Lieven Vandenberghe</span>, 
+<span class="title">"Convex Optimization"</span>, Cambridge University Press
+, <span class="year">2004</span>.
+
+</li><br>
+<li id=Marcucci22>
+<span class="author">Tobia Marcucci and Mark Petersen and David von Wrangel and Russ Tedrake</span>, 
+<span class="title">"Motion Planning around Obstacles with Convex Optimization"</span>, 
+, <span class="year">2022</span>.
+[&nbsp;<a href="http://groups.csail.mit.edu/robotics-center/public_papers/Marcucci22.pdf">link</a>&nbsp;]
+
+</li><br>
 <li id=Lozano-Perez90>
 <span class="author">Tomas Lozano-Perez</span>, 
 <span class="title">"Spatial planning: A configuration space approach"</span>, Springer
@@ -1479,25 +1524,6 @@ PhD thesis, Carnegie Mellon University, August, <span class="year">2010</span>.
 <span class="title">"Approximating Robot Configuration Spaces with few Convex Sets using Clique Covers of Visibility Graphs"</span>, 
 , <span class="year">2023</span>.
 [&nbsp;<a href="http://groups.csail.mit.edu/robotics-center/public_papers/Werner23.pdf">link</a>&nbsp;]
-
-</li><br>
-<li id=Ahuja93>
-<span class="author">Ravindra K Ahuja and Thomas L Magnanti and James B Orlin</span>, 
-<span class="title">"Network flows: theory, algorithms, and applications"</span>, Prentice-Hall, Inc.
-, <span class="year">1993</span>.
-
-</li><br>
-<li id=Boyd04a>
-<span class="author">Stephen Boyd and Lieven Vandenberghe</span>, 
-<span class="title">"Convex Optimization"</span>, Cambridge University Press
-, <span class="year">2004</span>.
-
-</li><br>
-<li id=Marcucci22>
-<span class="author">Tobia Marcucci and Mark Petersen and David von Wrangel and Russ Tedrake</span>, 
-<span class="title">"Motion Planning around Obstacles with Convex Optimization"</span>, 
-, <span class="year">2022</span>.
-[&nbsp;<a href="http://groups.csail.mit.edu/robotics-center/public_papers/Marcucci22.pdf">link</a>&nbsp;]
 
 </li><br>
 <li id=Marcucci23>
