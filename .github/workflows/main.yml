@@ -101,7 +101,7 @@ jobs:
       - name: black
         uses: psf/black@stable
         with:
-          version: 24.2.0
+          version: 24.3.0
           jupyter: true
       - name: isort
         uses: isort/isort-action@master

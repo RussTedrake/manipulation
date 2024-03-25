@@ -59,7 +59,7 @@ stable-baselines3 = ">=2.0.0"
 timeout-decorator = ">=0.4.1"
 torch = ">=2.0.1"
 torchvision = ">=0.10.1"
-trimesh = {extras = ["recommend"], version = ">=4.0.0"}
+trimesh = {extras = ["recommend"], version = ">=4.0.0 <4.2.0"}
 vhacdx = ">=0.0.5"
 #wandb = ">=0.14.0"
 
@@ -92,6 +92,7 @@ nbconvert = [
 requests = ">=2.25.1"
 pre-commit = "^3.4.0"
 poetry-pre-commit-plugin = "^0.1.2"
+pyvirtualdisplay = ">=3.0"
 
 [tool.black]
 include = '\.ipynb?$|\.pyi?$'

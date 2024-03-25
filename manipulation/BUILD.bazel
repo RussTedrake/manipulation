@@ -19,6 +19,7 @@ rt_py_library(
       requirement("drake"),
       requirement("ipython"),
       requirement("mpld3"),
+      requirement("pyvirtualdisplay"),
     ],
 )
 
