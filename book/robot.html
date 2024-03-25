@@ -809,8 +809,8 @@ output_ports:
       var sys = jsyaml.load(`
 name: HardwareStation
 input_ports:
-- iiwa.position
-- iiwa.feedforward_torque (optional)
+- iiwa.position (optional when not in position_only mode)
+- iiwa.torque (optional when not in torque_only mode)
 - wsg.position
 - wsg.force_limit (optional)
 output_ports:

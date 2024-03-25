@@ -44,6 +44,7 @@ Clutter: &Clutter
 
   model_drivers:
       iiwa: !IiwaDriver
+        control_mode: position_only
         hand_model_name: wsg
       wsg: !SchunkWsgDriver {}
 

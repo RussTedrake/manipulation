@@ -68,5 +68,6 @@ directives:
         rotation: !Rpy { deg: [150.0, 1.3, 88]}
 model_drivers:
     iiwa: !IiwaDriver
+      control_mode: position_only
       hand_model_name: wsg
     wsg: !SchunkWsgDriver {}
