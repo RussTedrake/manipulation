@@ -1140,7 +1140,46 @@ ik.AddPositionConstraint(
         projection</a> coordinates of the original space. In practice, this represents a slight warping of the coordinate system (and consequently a trajectory length) over the region.</li>
       </ul></p>
 
-      <todo>visualizations and examples!</todo>
+      <example><h1>IRIS in Configuration Space</h1>
+      
+        <p>Let's run the <code>IrisInConfigurationSpace</code> (aka IRIS-NP) algorithm
+        on the example of iiwa reaching into a shelf that we played with before. We will
+        use the full 7 degrees of freedom of the arm, and the original collision
+        geometry. I'd like for this example to demonstrate two things: (1) the mechanics
+        of using <code>IrisInConfigurationSpace</code> and (2) the fact that these IRIS
+        regions can cover a lot of volume, even when they are up against complicated
+        configuration-space geometries.</p>
+
+        <center><img style="width:60%" src="data/shelf_ik.png"></center>
+
+        <p><code>IrisInConfigurationSpace</code> can be configured using a single seed
+        point; iterations of the algorithm will start with a small region around that
+        point and "inflate" it to maximize a local approximation of configuration space
+        volume. We can find a seed configuration, $q,$ that is reaching inside the top
+        shelf using <code>InverseKinematics</code>. But if we only run IRIS from there,
+        then the region it will find will not fill space inside the shelf, it will
+        instead creep out of the shelf in order to cover the much larger configuration
+        space outside of the shelf. To avoid this, we'll run IRIS twice; once with a
+        seed that is the "home configuration" of the robot, which will grow a region
+        outside the shelf. Then we'll run IRIS again with the IK seed inside the shelf,
+        but with an additional constraint using the first region as an obstacle (asking
+        that they do not overlap). This will force the second region to use the volume
+        inside the shelf to maximize volume.</p>
+
+        <script>document.write(notebook_link('trajectories', notebook="iris_in_configuration_space"))</script>
+
+        <p>A different approach for obtaining this volume, which I now favor, is to
+        collect many configuration space samples in the region of interest using inverse
+        kinematics, then compute the <a
+        href="https://drake.mit.edu/doxygen_cxx/classdrake_1_1geometry_1_1optimization_1_1_hyperellipsoid.html#a0783f7f2e02468471d114e49cbbfa4fd"><code>MinimumVolumeCircumscribedEllipsoid</code></a>
+        to be used as the <a
+        href="https://drake.mit.edu/doxygen_cxx/structdrake_1_1geometry_1_1optimization_1_1_iris_options.html#ae65f515b41261e98fb16dd1e810cba48"><code>starting_ellipse</code></a>
+        for IRIS. Then we run only one iteration of IRIS to get a nice region with a
+        notion of volume corresponding to covering this area of configuration space. This approach avoids the false constraint of using previous regions as obstacles (so leads to bigger regions), runs faster (due to using only one iteration of IRIS), and is more parallelizable.</p>
+
+        <script>document.write(notebook_link('trajectories', notebook="iris_in_configuration_space"))</script>
+
+      </example>
 
       <p>If we were to continue to follow the analogy with the PRM, then we could
       imagine performing a convex decomposition of the space by sampling at random,

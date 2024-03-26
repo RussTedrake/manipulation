@@ -952,8 +952,8 @@ def MakeHardwareStation(
     Args:
         scenario: A Scenario structure, populated using the LoadScenario method.
 
-        meshcat: If not None, then AddDefaultVisualization will be added to the
-            subdiagram using this meshcat instance.
+        meshcat: If not None, then ApplyVisualizationConfig will called to add
+            visualizers to the subdiagram using this meshcat instance.
 
         package_xmls: A list of package.xml file paths that will be passed to
             the parser, using Parser.AddPackageXml().
