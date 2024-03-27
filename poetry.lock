@@ -739,18 +739,18 @@ files = [
 
 [[package]]
 name = "drake"
-version = "0.0.20240302"
+version = "1.27.0"
 description = "Model-based design and verification for robotics"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "drake-0.0.20240302-cp310-cp310-manylinux_2_35_x86_64.whl", hash = "sha512:f64b2014dd62e8e8c23e74568e440d96debaa2ff60290ba9a2dab1f31843f61e4b6e559a5dffcc13936f2ba4279b400c8b8968309bc71fbb4e9c164a2dbcbdb7"},
-    {file = "drake-0.0.20240302-cp311-cp311-macosx_12_0_x86_64.whl", hash = "sha512:a45470f1039043e545333913b37f388ad4e2a181346695964cbbe3c2ca91119d9829c212e24662798fa4e92831deb901e269398c0ec9d0eabd236c768601510c"},
-    {file = "drake-0.0.20240302-cp311-cp311-macosx_13_0_arm64.whl", hash = "sha512:31027097196e134974b39d7261f42843f24af544dc436deec7b885934b2c7ab2cb7f5ea815685efdd34eb14c663f6ec798c931dc6e8c624c0b2285e5c0392ecb"},
-    {file = "drake-0.0.20240302-cp311-cp311-manylinux_2_35_x86_64.whl", hash = "sha512:c6d0228679bde8263b66c99084c2bfcb7cf2947bc9f4988bb885bef86ccc922a376b0e1e3529d6e2e01dfb7f33f71dc383c1f0d8d27d9e0e79f57c83bfb2ae3d"},
-    {file = "drake-0.0.20240302-cp312-cp312-macosx_12_0_x86_64.whl", hash = "sha512:f3086c8e453a528e415bcf6fbc24dd981a72d2d0cf58a5c0b9892dba6ad44b015bdcbe3597900d45941a62c0c352d9811e0ec1e47c25449f8084e8d212c0abc5"},
-    {file = "drake-0.0.20240302-cp312-cp312-macosx_13_0_arm64.whl", hash = "sha512:ea0536df70c30675e20d4259e300988d84411b9b87aad85bd68c9604c2b9f14c719df61bec4f2d4a24e5c293676e7d5440c2f07b61ff2c9c1b26f32f3150d585"},
-    {file = "drake-0.0.20240302-cp312-cp312-manylinux_2_35_x86_64.whl", hash = "sha512:1c9e04c0d1ed8a1c035e7308b6bcd7f616232d16a3df7d1d7f4e8e544c9b64eb4c70ca989d8dcd930362b5d511b022b23af0aedad71b4878734ee4a901774023"},
+    {file = "drake-1.27.0-cp310-cp310-manylinux_2_35_x86_64.whl", hash = "sha256:e767ee8311780a5efd253a4251be30e6ec5bcd287a775320e447494fa81b2abf"},
+    {file = "drake-1.27.0-cp311-cp311-macosx_12_0_x86_64.whl", hash = "sha256:c1b4ca3776ec88a2741e933a2dc5ac1aa8994648590118c0b410c951e6cb0d8d"},
+    {file = "drake-1.27.0-cp311-cp311-macosx_13_0_arm64.whl", hash = "sha256:44949b16779d304fb433a06d96be0891c00fccec5a8cd2832d5b8a145a5bac24"},
+    {file = "drake-1.27.0-cp311-cp311-manylinux_2_35_x86_64.whl", hash = "sha256:e352601edfeb5d3dfc48df4c0340ad00c35a3fccae0a34b89700dc6ab1c06216"},
+    {file = "drake-1.27.0-cp312-cp312-macosx_12_0_x86_64.whl", hash = "sha256:2cf6b7c55c3fb3fadbf914dabbe2b501aa6bc6aef32e64d5945839efe66234ad"},
+    {file = "drake-1.27.0-cp312-cp312-macosx_13_0_arm64.whl", hash = "sha256:e075b38aeb86d830c1fafd8fb6108be7650fd9b21ea54065ff429be32355a3f8"},
+    {file = "drake-1.27.0-cp312-cp312-manylinux_2_35_x86_64.whl", hash = "sha256:ade059a57452ecbe7dd25e0f4e206bc40e3e83187df15c0782d862e5853e26b9"},
 ]
 
 [package.dependencies]
@@ -758,11 +758,6 @@ matplotlib = "*"
 numpy = "*"
 pydot = "*"
 PyYAML = "*"
-
-[package.source]
-type = "legacy"
-url = "https://drake-packages.csail.mit.edu/whl/nightly"
-reference = "drake-nightly"
 
 [[package]]
 name = "dulwich"
@@ -917,18 +912,18 @@ devel = ["colorama", "json-spec", "jsonschema", "pylint", "pytest", "pytest-benc
 
 [[package]]
 name = "filelock"
-version = "3.13.1"
+version = "3.13.3"
 description = "A platform independent file lock."
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "filelock-3.13.1-py3-none-any.whl", hash = "sha256:57dbda9b35157b05fb3e58ee91448612eb674172fab98ee235ccb0b5bee19a1c"},
-    {file = "filelock-3.13.1.tar.gz", hash = "sha256:521f5f56c50f8426f5e03ad3b281b490a87ef15bc6c526f168290f0c7148d44e"},
+    {file = "filelock-3.13.3-py3-none-any.whl", hash = "sha256:5ffa845303983e7a0b7ae17636509bc97997d58afeafa72fb141a17b152284cb"},
+    {file = "filelock-3.13.3.tar.gz", hash = "sha256:a79895a25bbefdf55d1a2a0a80968f7dbb28edcd6d4234a0afb3f37ecde4b546"},
 ]
 
 [package.extras]
-docs = ["furo (>=2023.9.10)", "sphinx (>=7.2.6)", "sphinx-autodoc-typehints (>=1.24)"]
-testing = ["covdefaults (>=2.3)", "coverage (>=7.3.2)", "diff-cover (>=8)", "pytest (>=7.4.3)", "pytest-cov (>=4.1)", "pytest-mock (>=3.12)", "pytest-timeout (>=2.2)"]
+docs = ["furo (>=2023.9.10)", "sphinx (>=7.2.6)", "sphinx-autodoc-typehints (>=1.25.2)"]
+testing = ["covdefaults (>=2.3)", "coverage (>=7.3.2)", "diff-cover (>=8.0.1)", "pytest (>=7.4.3)", "pytest-cov (>=4.1)", "pytest-mock (>=3.12)", "pytest-timeout (>=2.2)"]
 typing = ["typing-extensions (>=4.8)"]
 
 [[package]]
@@ -4237,13 +4232,13 @@ tutorials = ["matplotlib", "pandas", "tabulate", "torch"]
 
 [[package]]
 name = "trove-classifiers"
-version = "2024.3.3"
+version = "2024.3.25"
 description = "Canonical source for classifiers on PyPI (pypi.org)."
 optional = false
 python-versions = "*"
 files = [
-    {file = "trove-classifiers-2024.3.3.tar.gz", hash = "sha256:df7edff9c67ff86b733628998330b180e81d125b1e096536d83ac0fd79673fdc"},
-    {file = "trove_classifiers-2024.3.3-py3-none-any.whl", hash = "sha256:3a84096861b385ec422c79995d1f6435dde47a9b63adaa3c886e53232ba7e6e0"},
+    {file = "trove-classifiers-2024.3.25.tar.gz", hash = "sha256:6de68d06edd6fec5032162b6af22e818a4bb6f4ae2258e74699f8a41064b7cad"},
+    {file = "trove_classifiers-2024.3.25-py3-none-any.whl", hash = "sha256:c400e0bdceb018913339d53b07682d09a42aada687d070e90ee3c08477bec024"},
 ]
 
 [[package]]
@@ -4535,4 +4530,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "<4.0,>=3.10"
-content-hash = "ca23cb325860d12286d2d53fc7f42891c72474c0bad715378ae3f37423bfcb41"
+content-hash = "b0cbca6436d22f5304cf926c0fe2a5428de5bbe0e3a56ffd60d12b0e7b699a3f"

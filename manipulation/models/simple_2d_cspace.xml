@@ -1,0 +1,31 @@
+<mujoco model="robot">
+  <default class="default">
+    <geom rgba="0.94 0.5 0.5 1" mass="1.0"/>
+  </default>
+  <asset>
+    <mesh name="simple_2d_obstacle" file="simple_2d_obstacle.obj"/>
+  </asset>
+  <worldbody>
+    <!-- border -->
+    <geom type="box" pos="2.5 -0.05 0" size="2.6 0.05 1" rgba="0 0 0 1" />
+    <geom type="box" pos="2.5 5.05 0" size="2.6 0.05 1" rgba="0 0 0 1" />
+    <geom type="box" pos="-0.05 2.5 0" size="0.05 2.6 1" rgba="0 0 0 1" />
+    <geom type="box" pos="5.05 2.5 0" size="0.05 2.6 1" rgba="0 0 0 1" />
+
+    <!-- obstacles -->
+    <geom type="mesh" pos="0 0 0" mesh="simple_2d_obstacle" class="default" />
+    <geom type="box" pos=".7 1.2 0" size="0.3 1.2 1" class="default" />
+    <geom type="box" pos=".7 3.8 0" size="0.3 1.2 1" class="default" />
+    <geom type="box" pos="1.8 3.7 0" size="0.4 0.9 1" class="default" />
+    <geom type="box" pos="2.9 3.6 0" size="0.5 1 1.1" class="default" />
+    <geom type="box" pos="4.1 4 0" size="0.3 1 1" class="default" />
+    <geom type="box" pos="4.4 2.7 0" size="0.6 0.1 1" class="default" />
+
+    <!-- robot -->
+    <body name="robot" pos="0 0 0">
+      <geom type="sphere" pos="0 0 0" size="0.01" rgba="0 0 1 1" mass="1" />
+      <joint type="slide" name="x" axis="1 0 0" range="0 5" limited="true"/>
+      <joint type="slide" name="y" axis="0 1 0" range="0 5" limited="true"/>
+    </body>
+  </worldbody>
+</mujoco>
