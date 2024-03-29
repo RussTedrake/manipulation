@@ -19,6 +19,7 @@ rt_py_test(
   name = "segmentation_data",
     srcs = ["segmentation_data.py"],
     data = ["//manipulation/models"],
+    timeout = "moderate",
     args = ["--test"],
     imports = [".."],
     deps = [
