@@ -1,5 +1,3 @@
---extra-index-url https://drake-packages.csail.mit.edu/whl/nightly
-
 asttokens==2.4.1 ; python_version >= "3.10" and python_version < "4.0"
 attrs==23.2.0 ; python_version >= "3.10" and python_version < "4.0" and (sys_platform == "darwin" or sys_platform == "linux")
 autoprop==4.1.0 ; python_version >= "3.10" and python_version < "4.0"
