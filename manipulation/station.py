@@ -14,7 +14,6 @@ from drake import (
     lcmt_schunk_wsg_status,
 )
 from pydrake.all import (
-    Adder,
     ApplyCameraConfig,
     ApplyLcmBusConfig,
     ApplyMultibodyPlantConfig,
@@ -22,14 +21,15 @@ from pydrake.all import (
     BaseField,
     CameraConfig,
     CameraInfo,
-    Demultiplexer,
     DepthImageToPointCloud,
     Diagram,
     DiagramBuilder,
     DrakeLcmParams,
     FlattenModelDirectives,
+    Gain,
     GetScopedFrameByName,
     IiwaCommandSender,
+    IiwaControlMode,
     IiwaDriver,
     IiwaStatusReceiver,
     InverseDynamicsController,
@@ -46,9 +46,10 @@ from pydrake.all import (
     ModelInstanceInfo,
     MultibodyPlant,
     MultibodyPlantConfig,
+    Multiplexer,
     OutputPort,
+    ParseIiwaControlMode,
     Parser,
-    PassThrough,
     PdControllerGains,
     ProcessModelDirectives,
     RobotDiagram,
@@ -59,10 +60,13 @@ from pydrake.all import (
     SchunkWsgPositionController,
     SchunkWsgStatusReceiver,
     ScopedName,
+    SharedPointerSystem,
+    SimIiwaDriver,
     SimulatorConfig,
-    StateInterpolatorWithDiscreteDerivative,
     VisualizationConfig,
     ZeroForceDriver,
+    position_enabled,
+    torque_enabled,
 )
 from pydrake.common.yaml import yaml_load_typed
 
@@ -363,7 +367,7 @@ def _PopulatePlantOrDiagram(
 
     directives = []
     for d in flattened_directives:
-        if d.add_model and (d.add_model.name in model_instance_names):
+        if d.add_model and (d.add_model.name in all_model_instances):
             directives.append(d)
         if (
             d.add_weld
@@ -566,8 +570,7 @@ def _ApplyDriverConfigSim(
     driver_config,  # See Scenario.model_drivers for typing
     model_instance_name: str,
     sim_plant: MultibodyPlant,
-    directives: typing.List[ModelDirective],
-    models_from_directives_map: typing.Mapping[str, typing.List[ModelInstanceInfo]],
+    scenario: Scenario,
     package_xmls: typing.List[str],
     builder: DiagramBuilder,
 ) -> None:
@@ -575,118 +578,45 @@ def _ApplyDriverConfigSim(
         model_instance = sim_plant.GetModelInstanceByName(model_instance_name)
         num_iiwa_positions = sim_plant.num_positions(model_instance)
 
-        # I need a PassThrough system so that I can export the input port.
-        iiwa_position = builder.AddSystem(PassThrough(num_iiwa_positions))
-        builder.ExportInput(
-            iiwa_position.get_input_port(),
-            model_instance_name + ".position",
-        )
-        builder.ExportOutput(
-            iiwa_position.get_output_port(),
-            model_instance_name + ".position_commanded",
-        )
-
-        # Export the iiwa "state" outputs.
-        demux = builder.AddSystem(
-            Demultiplexer(2 * num_iiwa_positions, num_iiwa_positions)
-        )
-        builder.Connect(
-            sim_plant.get_state_output_port(model_instance),
-            demux.get_input_port(),
-        )
-        builder.ExportOutput(
-            demux.get_output_port(0),
-            model_instance_name + ".position_measured",
-        )
-        builder.ExportOutput(
-            demux.get_output_port(1),
-            model_instance_name + ".velocity_estimated",
-        )
-        builder.ExportOutput(
-            sim_plant.get_state_output_port(model_instance),
-            model_instance_name + ".state_estimated",
-        )
-
         # Make the plant for the iiwa controller to use.
+        # TODO: The current hardcoded implementation should be replaced with the
+        # MakeMultibodyPlant below, once adding frozen children is supported in Drake.
+        # controller_plant = MakeMultibodyPlant(
+        #     scenario=scenario,
+        #     model_instance_names=[model_instance_name],
+        #     add_frozen_child_instances=True,
+        #     package_xmls=package_xmls,
+        # )
         controller_plant = MultibodyPlant(time_step=sim_plant.time_step())
-        # TODO: Add the correct IIWA model (introspected from MBP). See
-        # build_iiwa_control in Drake for a slightly closer attempt.
         if num_iiwa_positions == 3:
             controller_iiwa = AddPlanarIiwa(controller_plant)
         else:
             controller_iiwa = AddIiwa(controller_plant)
         AddWsg(controller_plant, controller_iiwa, welded=True)
         controller_plant.Finalize()
-
-        # Add the iiwa controller
-        iiwa_controller = builder.AddSystem(
-            InverseDynamicsController(
-                controller_plant,
-                kp=[100] * num_iiwa_positions,
-                ki=[1] * num_iiwa_positions,
-                kd=[20] * num_iiwa_positions,
-                has_reference_acceleration=False,
-            )
-        )
-        iiwa_controller.set_name(model_instance_name + ".controller")
-        builder.Connect(
-            sim_plant.get_state_output_port(model_instance),
-            iiwa_controller.get_input_port_estimated_state(),
+        # Keep the controller plant alive during the Diagram lifespan.
+        builder.AddNamedSystem(
+            f"{model_instance_name}_controller_plant_pointer_system",
+            SharedPointerSystem(controller_plant),
         )
 
-        # Add in the feed-forward torque
-        adder = builder.AddSystem(Adder(2, num_iiwa_positions))
-        builder.Connect(
-            iiwa_controller.get_output_port_control(),
-            adder.get_input_port(0),
+        control_mode = ParseIiwaControlMode(driver_config.control_mode)
+        sim_iiwa_driver = SimIiwaDriver.AddToBuilder(
+            plant=sim_plant,
+            iiwa_instance=model_instance,
+            controller_plant=controller_plant,
+            builder=builder,
+            ext_joint_filter_tau=0.01,
+            desired_iiwa_kp_gains=np.full(num_iiwa_positions, 100),
+            control_mode=control_mode,
         )
-        # Use a PassThrough to make the port optional (it will provide zero
-        # values if not connected).
-        torque_passthrough = builder.AddSystem(PassThrough([0] * num_iiwa_positions))
-        builder.Connect(torque_passthrough.get_output_port(), adder.get_input_port(1))
-        builder.ExportInput(
-            torque_passthrough.get_input_port(),
-            model_instance_name + ".feedforward_torque",
-        )
-        builder.Connect(
-            adder.get_output_port(),
-            sim_plant.get_actuation_input_port(model_instance),
-        )
-
-        # Add discrete derivative to command velocities.
-        desired_state_from_position = builder.AddSystem(
-            StateInterpolatorWithDiscreteDerivative(
-                num_iiwa_positions,
-                sim_plant.time_step(),
-                suppress_initial_transient=True,
-            )
-        )
-        desired_state_from_position.set_name(
-            model_instance_name + ".desired_state_from_position"
-        )
-        builder.Connect(
-            desired_state_from_position.get_output_port(),
-            iiwa_controller.get_input_port_desired_state(),
-        )
-        builder.Connect(
-            iiwa_position.get_output_port(),
-            desired_state_from_position.get_input_port(),
-        )
-
-        # Export commanded torques.
-        builder.ExportOutput(
-            adder.get_output_port(),
-            model_instance_name + ".torque_commanded",
-        )
-        builder.ExportOutput(
-            adder.get_output_port(),
-            model_instance_name + ".torque_measured",
-        )
-
-        builder.ExportOutput(
-            sim_plant.get_generalized_contact_forces_output_port(model_instance),
-            model_instance_name + ".torque_external",
-        )
+        for i in range(sim_iiwa_driver.num_input_ports()):
+            port = sim_iiwa_driver.get_input_port(i)
+            if not builder.IsConnectedOrExported(port):
+                builder.ExportInput(port, f"{model_instance_name}.{port.get_name()}")
+        for i in range(sim_iiwa_driver.num_output_ports()):
+            port = sim_iiwa_driver.get_output_port(i)
+            builder.ExportOutput(port, f"{model_instance_name}.{port.get_name()}")
 
     elif isinstance(driver_config, SchunkWsgDriver):
         model_instance = sim_plant.GetModelInstanceByName(model_instance_name)
@@ -740,7 +670,7 @@ def _ApplyDriverConfigSim(
         # Make the plant for the iiwa controller to use.
         controller_directives = []
         for d in FlattenModelDirectives(
-            ModelDirectives(directives=directives), parser.package_map()
+            ModelDirectives(directives=scenario.directives), parser.package_map()
         ).directives:
             if d.add_model and (d.add_model.name in model_instance_names):
                 controller_directives.append(d)
@@ -846,23 +776,18 @@ def _ApplyDriverConfigsSim(
     *,
     driver_configs,  # See Scenario.model_drivers for typing
     sim_plant: MultibodyPlant,
-    directives: typing.List[ModelDirective],
-    models_from_directives: typing.Mapping[str, typing.List[ModelInstanceInfo]],
+    scenario: Scenario,
     package_xmls: typing.List[str],
     builder: DiagramBuilder,
 ) -> None:
-    models_from_directives_map = dict(
-        [(info.model_name, info) for info in models_from_directives]
-    )
     for model_instance_name, driver_config in driver_configs.items():
         _ApplyDriverConfigSim(
-            driver_config,
-            model_instance_name,
-            sim_plant,
-            directives,
-            models_from_directives_map,
-            package_xmls,
-            builder,
+            driver_config=driver_config,
+            model_instance_name=model_instance_name,
+            sim_plant=sim_plant,
+            scenario=scenario,
+            package_xmls=package_xmls,
+            builder=builder,
         )
 
 
@@ -1035,8 +960,7 @@ def MakeHardwareStation(
     _ApplyDriverConfigsSim(
         driver_configs=scenario.model_drivers,
         sim_plant=sim_plant,
-        directives=scenario.directives,
-        models_from_directives=added_models,
+        scenario=scenario,
         package_xmls=package_xmls,
         builder=builder,
     )
@@ -1090,6 +1014,26 @@ def MakeHardwareStation(
     return diagram
 
 
+def NegatedPort(
+    builder: DiagramBuilder, output_port: OutputPort, prefix: str = ""
+) -> OutputPort:
+    """Negates the output of the given port.
+
+    Args:
+        builder: The diagram builder to add the negation system to.
+        output_port: The output port to negate.
+        prefix: The prefix to use for the negation system.
+
+    Returns:
+        The output port of the negation system.
+    """
+    negater = builder.AddNamedSystem(
+        f"sign_flip_{prefix}{output_port.get_name()}", Gain(-1, size=output_port.size())
+    )
+    builder.Connect(output_port, negater.get_input_port())
+    return negater.get_output_port()
+
+
 # TODO(russt): Use the c++ version pending https://github.com/RobotLocomotion/drake/issues/20055
 def _ApplyDriverConfigInterface(
     driver_config,  # See Scenario.model_drivers for typing
@@ -1103,26 +1047,35 @@ def _ApplyDriverConfigInterface(
         lcm = lcm_buses.Find("Driver for " + model_instance_name, driver_config.lcm_bus)
 
         # Publish IIWA command.
-        iiwa_command_sender = builder.AddSystem(IiwaCommandSender())
-        # Note on publish period: IIWA driver won't respond faster than 200Hz
+        # Note on publish period: IIWA driver won't respond faster than 1000Hz in
+        # torque_only mode and 200Hz in other modes
+        control_mode = ParseIiwaControlMode(driver_config.control_mode)
+        publish_period = 0.005
+        if control_mode == IiwaControlMode.kTorqueOnly:
+            publish_period = 0.001
+        iiwa_command_sender = builder.AddSystem(
+            IiwaCommandSender(control_mode=control_mode)
+        )
         iiwa_command_publisher = builder.AddSystem(
             LcmPublisherSystem.Make(
                 channel="IIWA_COMMAND",
                 lcm_type=lcmt_iiwa_command,
                 lcm=lcm,
-                publish_period=0.005,
+                publish_period=publish_period,
                 use_cpp_serializer=True,
             )
         )
         iiwa_command_publisher.set_name(model_instance_name + ".command_publisher")
-        builder.ExportInput(
-            iiwa_command_sender.get_position_input_port(),
-            model_instance_name + ".position",
-        )
-        builder.ExportInput(
-            iiwa_command_sender.get_torque_input_port(),
-            model_instance_name + ".feedforward_torque",
-        )
+        if position_enabled(control_mode):
+            builder.ExportInput(
+                iiwa_command_sender.get_position_input_port(),
+                model_instance_name + ".position",
+            )
+        if torque_enabled(control_mode):
+            builder.ExportInput(
+                iiwa_command_sender.get_torque_input_port(),
+                model_instance_name + ".torque",
+            )
         builder.Connect(
             iiwa_command_sender.get_output_port(),
             iiwa_command_publisher.get_input_port(),
@@ -1140,11 +1093,6 @@ def _ApplyDriverConfigInterface(
         )
         iiwa_status_subscriber.set_name(model_instance_name + ".status_subscriber")
 
-        # builder.Connect(
-        #    iiwa_status_receiver.get_position_measured_output_port(),
-        #    to_pose.get_input_port(),
-        # )
-
         builder.ExportOutput(
             iiwa_status_receiver.get_position_commanded_output_port(),
             model_instance_name + ".position_commanded",
@@ -1157,18 +1105,42 @@ def _ApplyDriverConfigInterface(
             iiwa_status_receiver.get_velocity_estimated_output_port(),
             model_instance_name + ".velocity_estimated",
         )
+        # These are *negative* w.r.t. the conventions outlined in
+        # drake/manipulation/README.
         builder.ExportOutput(
-            iiwa_status_receiver.get_torque_commanded_output_port(),
+            NegatedPort(
+                builder=builder,
+                output_port=iiwa_status_receiver.get_torque_commanded_output_port(),
+                prefix=model_instance_name,
+            ),
             model_instance_name + ".torque_commanded",
         )
         builder.ExportOutput(
-            iiwa_status_receiver.get_torque_measured_output_port(),
+            NegatedPort(
+                builder=builder,
+                output_port=iiwa_status_receiver.get_torque_measured_output_port(),
+                prefix=model_instance_name,
+            ),
             model_instance_name + ".torque_measured",
         )
         builder.ExportOutput(
             iiwa_status_receiver.get_torque_external_output_port(),
             model_instance_name + ".torque_external",
         )
+
+        iiwa_state_mux: Multiplexer = builder.AddSystem(Multiplexer([7, 7]))
+        builder.Connect(
+            iiwa_status_receiver.get_position_measured_output_port(),
+            iiwa_state_mux.get_input_port(0),
+        )
+        builder.Connect(
+            iiwa_status_receiver.get_velocity_estimated_output_port(),
+            iiwa_state_mux.get_input_port(1),
+        )
+        builder.ExportOutput(
+            iiwa_state_mux.get_output_port(), model_instance_name + ".state_estimated"
+        )
+
         builder.Connect(
             iiwa_status_subscriber.get_output_port(),
             iiwa_status_receiver.get_input_port(),
