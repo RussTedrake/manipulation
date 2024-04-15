@@ -47,7 +47,7 @@ priority = "explicit"
 python = "<4.0,>=3.10"
 cloudpickle = "2.2.1"  # needs to be pinned for stored files to remain compatible.
 #drake = { version = "==0.0.20240302", source = "drake-nightly" }
-drake = ">=1.27.0"
+drake = ">=1.28.0"
 gradescope-utils = ">=0.4.0"
 mpld3  = ">=0.5.6"
 nevergrad = ">=0.4.3"  # TODO: avoid expensive bayesian optimization dep

@@ -79,7 +79,7 @@ def ExtractBodyPose(output_port, body_index, X_BA=RigidTransform()) -> ExtractPo
 def AddIiwa(plant, collision_model="no_collision"):
     parser = Parser(plant)
     iiwa = parser.AddModelsFromUrl(
-        f"package://drake/manipulation/models/iiwa_description/iiwa7/iiwa7_{collision_model}.sdf"
+        f"package://drake_models/iiwa_description/sdf/iiwa7_{collision_model}.sdf"
     )[0]
     plant.WeldFrames(plant.world_frame(), plant.GetFrameByName("iiwa_link_0"))
 
@@ -96,7 +96,7 @@ def AddIiwa(plant, collision_model="no_collision"):
 
 
 def AddPlanarIiwa(plant):
-    urdf = "package://drake/manipulation/models/iiwa_description/urdf/planar_iiwa14_spheres_dense_elbow_collision.urdf"
+    urdf = "package://drake_models/iiwa_description/urdf/planar_iiwa14_spheres_dense_elbow_collision.urdf"
 
     parser = Parser(plant)
     iiwa = parser.AddModelsFromUrl(urdf)[0]
@@ -145,7 +145,9 @@ def AddWsg(plant, iiwa_model_instance, roll=np.pi / 2.0, welded=False, sphere=Fa
         else:
             file = "package://manipulation/schunk_wsg_50_welded_fingers.sdf"
     else:
-        file = "package://drake/manipulation/models/wsg_50_description/sdf/schunk_wsg_50_with_tip.sdf"
+        file = (
+            "package://drake_models/wsg_50_description/sdf/schunk_wsg_50_with_tip.sdf"
+        )
 
     directives = f"""
 directives:

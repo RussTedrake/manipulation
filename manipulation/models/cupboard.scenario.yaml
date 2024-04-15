@@ -1,7 +1,7 @@
 directives:
 - add_model:
     name: iiwa
-    file: package://drake/manipulation/models/iiwa_description/iiwa7/iiwa7_no_collision.sdf
+    file: package://drake_models/iiwa_description/sdf/iiwa7_no_collision.sdf
     default_joint_positions:
         iiwa_joint_1: [0]
         iiwa_joint_2: [0.6]
@@ -24,7 +24,7 @@ directives:
         rotation: !Rpy { deg: [90, 0, 90]}
 - add_model:
     name: table
-    file: package://drake/examples/manipulation_station/models/amazon_table_simplified.sdf
+    file: package://drake_models/manipulation_station/amazon_table_simplified.sdf
 - add_weld:
     parent: world
     child: table::amazon_table
