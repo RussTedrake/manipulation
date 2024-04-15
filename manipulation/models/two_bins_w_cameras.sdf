@@ -3,7 +3,7 @@
   <model name="TwoBinsWCameras">
     <include>
       <pose degrees="true">-0.05, -0.5, -0.015, 0, 0, 90</pose>
-      <uri>package://drake/examples/manipulation_station/models/bin.sdf</uri>
+      <uri>package://drake_models/manipulation_station/bin.sdf</uri>
       <name>bin0</name>
     </include>
     <joint name="weld0" type="fixed">
@@ -12,7 +12,7 @@
     </joint>
     <include>
       <pose degrees="true">0.5, 0.05, -0.015, 0, 0, 180</pose>
-      <uri>package://drake/examples/manipulation_station/models/bin.sdf</uri>
+      <uri>package://drake_models/manipulation_station/bin.sdf</uri>
       <name>bin1</name>
     </include>
     <joint name="weld1" type="fixed">
