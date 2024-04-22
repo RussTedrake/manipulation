@@ -9,7 +9,7 @@ directives:
 # Add shelves
 - add_model:
     name: shelves_1
-    file: package://drake/examples/manipulation_station/models/shelves.sdf
+    file: package://drake_models/manipulation_station/shelves.sdf
 
 - add_frame:
     name: shelf_1_origin
@@ -24,7 +24,7 @@ directives:
 
 - add_model:
     name: shelves_2
-    file: package://drake/examples/manipulation_station/models/shelves.sdf
+    file: package://drake_models/manipulation_station/shelves.sdf
 
 - add_frame:
     name: shelf_2_origin
@@ -39,7 +39,7 @@ directives:
 
 - add_model:
     name: shelves_3
-    file: package://drake/examples/manipulation_station/models/shelves.sdf
+    file: package://drake_models/manipulation_station/shelves.sdf
 
 - add_frame:
     name: shelf_3_origin
@@ -54,7 +54,7 @@ directives:
 
 - add_model:
     name: shelves_4
-    file: package://drake/examples/manipulation_station/models/shelves.sdf
+    file: package://drake_models/manipulation_station/shelves.sdf
 
 - add_frame:
     name: shelf_4_origin
@@ -70,7 +70,7 @@ directives:
 # Add table
 - add_model:
     name: table
-    file: package://drake/examples/manipulation_station/models/table_wide.sdf
+    file: package://drake_models/manipulation_station/table_wide.sdf
 
 - add_frame:
     name: table_origin

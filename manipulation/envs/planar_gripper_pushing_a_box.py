@@ -48,7 +48,7 @@ def AddPlanarBinAndManipuland(plant):
         )
     )
     box = parser.AddModelsFromUrl(
-        "package://drake/examples/manipulation_station/models/061_foam_brick.sdf"
+        "package://drake_models/manipulation_station/061_foam_brick.sdf"
     )[0]
     box_frame = plant.AddFrame(
         FixedOffsetFrame(

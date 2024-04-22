@@ -10,7 +10,7 @@ directives:
 
 - add_model:
     name: cracker
-    file: package://drake/manipulation/models/ycb/sdf/003_cracker_box.sdf
+    file: package://drake_models/ycb/003_cracker_box.sdf
 
 - add_weld:
     parent: cracker_origin
@@ -25,7 +25,7 @@ directives:
 
 - add_model:
     name: soup
-    file: package://drake/manipulation/models/ycb/sdf/005_tomato_soup_can.sdf
+    file: package://drake_models/ycb/005_tomato_soup_can.sdf
 
 - add_weld:
     parent: soup_origin
@@ -40,7 +40,7 @@ directives:
 
 - add_model:
     name: mustard
-    file: package://drake/manipulation/models/ycb/sdf/006_mustard_bottle.sdf
+    file: package://drake_models/ycb/006_mustard_bottle.sdf
 
 - add_weld:
     parent: mustard_origin

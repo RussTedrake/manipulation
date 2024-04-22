@@ -62,9 +62,7 @@ def generate_image(image_num):
     builder = DiagramBuilder()
     plant, scene_graph = AddMultibodyPlantSceneGraph(builder, time_step=0.0005)
     parser = Parser(plant)
-    parser.AddModelsFromUrl(
-        "package://drake/examples/manipulation_station/models/bin.sdf"
-    )[0]
+    parser.AddModelsFromUrl("package://drake_models/manipulation_station/bin.sdf")[0]
     plant.WeldFrames(plant.world_frame(), plant.GetFrameByName("bin_base"))
     inspector = scene_graph.model_inspector()
 
