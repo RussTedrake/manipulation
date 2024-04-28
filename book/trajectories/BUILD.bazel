@@ -27,29 +27,29 @@ rt_ipynb_test(
     ],
 )
 
-# See https://github.com/RobotLocomotion/drake/issues/21343
-#rt_ipynb_test(
-#    name = "gcs_simple_2d_cspace",
-#    srcs = ["gcs_simple_2d_cspace.ipynb"],
-#    data = ["//manipulation/models"],
-#    deps = [
-#      "//manipulation",
-#      requirement("scipy"),
-#    ],
-#    tags = ["requires-network"], # For gurobi
-#)
-
 rt_ipynb_test(
-    name = "iris_in_configuration_space",
-    srcs = ["iris_in_configuration_space.ipynb"],
-    tags = ["requires-network"], # For gurobi
+    name = "gcs_simple_2d_cspace",
+    srcs = ["gcs_simple_2d_cspace.ipynb"],
     data = ["//manipulation/models"],
     deps = [
       "//manipulation",
-      "//manipulation:meshcat_utils",
-      "//manipulation:scenarios",
+      requirement("scipy"),
     ],
+    tags = ["requires-network"], # For gurobi
 )
+
+# See https://github.com/RobotLocomotion/drake/issues/21343
+#rt_ipynb_test(
+#    name = "iris_in_configuration_space",
+#    srcs = ["iris_in_configuration_space.ipynb"],
+#    tags = ["requires-network"], # For gurobi
+#    data = ["//manipulation/models"],
+#    deps = [
+#      "//manipulation",
+#      "//manipulation:meshcat_utils",
+#      "//manipulation:scenarios",
+#    ],
+#)
 
 
 rt_ipynb_test(
