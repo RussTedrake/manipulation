@@ -28,14 +28,16 @@ LABEL org.opencontainers.image.vendor="Massachusetts Institute of Technology"
 ENV LANG en_US.UTF-8
 ENV LANGUAGE en_US.UTF-8
 ENV LC_ALL en_US.UTF-8
+COPY requirements.txt /tmp/requirements.txt
 COPY setup/docker/pip.conf /root/.config/pip/pip.conf
 COPY setup/ubuntu/22.04/install_prereqs.sh /tmp/
 RUN /tmp/install_prereqs.sh
-RUN apt install -y --no-install-recommends xvfb git
-# TODO(russt): Consider downloading this (only) instead of starting from
-# drake's docker image
-RUN /opt/drake/share/drake/setup/deepnote/install_nginx
-RUN pip3 install manipulation pyvirtualdisplay --extra-index-url https://drake-packages.csail.mit.edu/whl/nightly/       
+RUN apt -y install xvfb git nginx-light
+# We still pip install the requirements, because otherwise deepnote will
+# install old versions of e.g. scipy which cannot be upgraded in the
+# Init notebook.  Drake is also installed in /opt/drake, but is not used (since 
+# I've not added it to the path / pythonpath).
+RUN pip3 install -r /tmp/requirements.txt pyvirtualdisplay manipulation
 RUN rm -rf /root/.cache /root/.config
 RUN rm -f /tmp/install_prereqs.sh
 RUN rm -f /tmp/requirements.txt
