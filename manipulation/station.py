@@ -12,6 +12,7 @@ from drake import (
     lcmt_iiwa_status,
     lcmt_schunk_wsg_command,
     lcmt_schunk_wsg_status,
+    lcmt_image_array,
 )
 from pydrake.all import (
     ApplyCameraConfig,
@@ -32,6 +33,8 @@ from pydrake.all import (
     IiwaControlMode,
     IiwaDriver,
     IiwaStatusReceiver,
+    ImageDepth16U,
+    ImageRgba8U,
     InverseDynamicsController,
     LcmBuses,
     LcmPublisherSystem,
@@ -69,6 +72,7 @@ from pydrake.all import (
     torque_enabled,
 )
 from pydrake.common.yaml import yaml_load_typed
+from pydrake.common.value import Value
 
 from manipulation.scenarios import AddIiwa, AddPlanarIiwa, AddWsg
 from manipulation.systems import ExtractPose
@@ -116,6 +120,14 @@ class JointStiffnessDriver:
 
     hand_model_name: str = ""
 
+@dc.dataclass
+class RealsenseDriver:
+    """A driver that creates LCM subscriber on the 
+    `DRAKE_RGBD_CAMERA_IMAGES_{sensor_id}` channel
+    """
+
+    sensor_id: str = ""
+    lcm_bus: str = ""
 
 @dc.dataclass
 class Scenario:
@@ -1034,6 +1046,34 @@ def NegatedPort(
     return negater.get_output_port()
 
 
+class RealsenseImageReciever(LeafSystem):
+    def __init__(self):
+        LeafSystem.__init__(self)
+        self.DeclareAbstractInputPort("lcmt_image_array", Value(lcmt_iiwa_command()))
+
+        self.DeclareAbstractOutputPort("rgb_out", Value(ImageRgba8U()), self.ExtractRGB)
+        self.DeclareAbstractOutputPort("depth_out", Value(ImageDepth16U()), self.ExtractDepth)
+    
+    def ExtractRGB(self, context, output):
+        image_array = self.GetInputPort("lcmt_image_array").Eval(context)
+        lcmt_image_rgb = image_array[0]
+        image = ImageRgba8U(
+            width=lcmt_image_rgb.width,
+            height=lcmt_image_rgb.height,
+        )
+        image.mutable_data = lcmt_image_rgb.data
+        output.set_value(image)
+
+    def ExtractDepth(self, context, output):
+        image_array = self.GetInputPort("lcmt_image_array").Eval(context)
+        lcmt_image_depth = image_array[1]
+        image = ImageDepth16U(
+            width=lcmt_image_depth.width,
+            height=lcmt_image_depth.height,
+        )
+        image.mutable_data = lcmt_image_depth.data
+        output.set_value(image)
+
 # TODO(russt): Use the c++ version pending https://github.com/RobotLocomotion/drake/issues/20055
 def _ApplyDriverConfigInterface(
     driver_config,  # See Scenario.model_drivers for typing
@@ -1197,6 +1237,35 @@ def _ApplyDriverConfigInterface(
             wsg_status_subscriber.get_output_port(),
             wsg_status_receiver.get_input_port(0),
         )
+    if isinstance(driver_config, RealsenseDriver):
+        lcm = lcm_buses.Find("Driver for " + model_instance_name, driver_config.lcm_bus)
+        
+        camera_data_receiver = builder.AddSystem(RealsenseImageReciever())
+        camera_data_subscriber = builder.AddSystem(
+            LcmSubscriberSystem.Make(
+                channel=f"DRAKE_RGBD_CAMERA_IMAGES_{driver_config.sensor_id}",
+                lcm_type=lcmt_image_array,
+                lcm=lcm,
+                use_cpp_serializer=True,
+                wait_for_message_on_initialization_timeout=10,
+            )
+        )
+        camera_data_subscriber.set_name(model_instance_name + ".data_subscriber")
+
+        builder.ExportOutput(
+            camera_data_receiver.GetOutputPort("rgb_out"),
+            f"camera_{model_instance_name}.rgb_image",
+        )
+        builder.ExportOutput(
+            camera_data_receiver.GetOutputPort("depth_out"),
+            f"camera_{model_instance_name}.depth_image",
+        )
+
+        builder.Connect(
+            camera_data_subscriber.get_output_port(),
+            camera_data_receiver.get_input_port(),
+        )
+
 
 
 def _ApplyDriverConfigsInterface(
