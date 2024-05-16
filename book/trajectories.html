@@ -867,8 +867,7 @@ ik.AddPositionConstraint(
     <p>My students and I have been working on new approach to motion planning
     that attempts to bridge this gap. It builds on a general optimization
     framework for mixing continuous optimization and combinatorial optimization
-    (e.g. on a graph), which we call "Graphs of Convex Sets" (GCS)
-    <elib>Marcucci21</elib>.</p>
+    (e.g. on a graph), which we call "Graphs of Convex Sets" (GCS).</p>
 
     <p>To motivate it, let's think about why the PRM struggles to handle
     continuous curvature constraints. During the roadmap construction phase, we
@@ -945,7 +944,10 @@ ik.AddPositionConstraint(
       sufficient to recover the optimal solution. Nowadays, we almost never
       solve the full MICP in our robotics applications of GCS.</p>
       
-      <p>You can find more details and examples about GCS in my <a href="http://underactuated.mit.edu/optimization.html#gcs">underactuated notes</a>.</p>
+      <p>You can find more details and examples about GCS in my <a
+      href="http://underactuated.mit.edu/optimization.html#gcs">underactuated notes</a>,
+      and a thorough and very readable treatment of GCS as a general tool for
+      mixed-discrete and continous optimization in <elib>Marcucci24a</elib>.</p>
 
     </subsection>
 
@@ -1474,13 +1476,6 @@ PhD thesis, Carnegie Mellon University, August, <span class="year">2010</span>.
 , <span class="year">2006</span>.
 
 </li><br>
-<li id=Marcucci21>
-<span class="author">Tobia Marcucci and Jack Umenberger and Pablo A. Parrilo and Russ Tedrake</span>, 
-<span class="title">"Shortest Paths in Graphs of Convex Sets"</span>, 
-<span class="publisher">arXiv preprint</span>, <span class="year">2023</span>.
-[&nbsp;<a href="http://groups.csail.mit.edu/robotics-center/public_papers/Marcucci21.pdf">link</a>&nbsp;]
-
-</li><br>
 <li id=Amice23>
 <span class="author">Amice and Alexandre and Werner and Peter and Tedrake and Russ</span>, 
 <span class="title">"Certifying Bimanual RRT Motion Plans in a Second"</span>, 
@@ -1488,10 +1483,24 @@ PhD thesis, Carnegie Mellon University, August, <span class="year">2010</span>.
 [&nbsp;<a href="http://groups.csail.mit.edu/robotics-center/public_papers/Amice23.pdf">link</a>&nbsp;]
 
 </li><br>
+<li id=Marcucci21>
+<span class="author">Tobia Marcucci and Jack Umenberger and Pablo A. Parrilo and Russ Tedrake</span>, 
+<span class="title">"Shortest Paths in Graphs of Convex Sets"</span>, 
+<span class="publisher">arXiv preprint</span>, <span class="year">2023</span>.
+[&nbsp;<a href="http://groups.csail.mit.edu/robotics-center/public_papers/Marcucci21.pdf">link</a>&nbsp;]
+
+</li><br>
 <li id=Ahuja93>
 <span class="author">Ravindra K Ahuja and Thomas L Magnanti and James B Orlin</span>, 
 <span class="title">"Network flows: theory, algorithms, and applications"</span>, Prentice-Hall, Inc.
 , <span class="year">1993</span>.
+
+</li><br>
+<li id=Marcucci24a>
+<span class="author">Tobia Marcucci</span>, 
+<span class="title">"Graphs of Convex Sets with Applications to Optimal Control and Motion Planning"</span>, 
+PhD thesis, Massachusetts Institute of Technology, May, <span class="year">2024</span>.
+[&nbsp;<a href="http://groups.csail.mit.edu/robotics-center/public_papers/Marcucci24a.pdf">link</a>&nbsp;]
 
 </li><br>
 <li id=Marcucci22>
