@@ -86,8 +86,9 @@ class JointPidControllerGains:
     """
 
     kp: float = 100  # Position gain
-    ki: float = 1    # Integral gain
-    kd: float = 20   # Velocity gain
+    ki: float = 1  # Integral gain
+    kd: float = 20  # Velocity gain
+
 
 @dc.dataclass
 class InverseDynamicsDriver:
@@ -719,12 +720,15 @@ def _ApplyDriverConfigSim(
         # Check that all actuator names are valid.
         for actuator_name in driver_config.gains.keys():
             if actuator_name not in actuator_names:
-                raise ValueError(f"Actuator '{actuator_name}' not found. Valid names are: {actuator_names}")
+                raise ValueError(
+                    f"Actuator '{actuator_name}' not found. Valid names are: {actuator_names}"
+                )
 
         # Get gains for each joint from the config. Use default gains if it doesn't exist in the config.
-        gains: typing.List[JointPidControllerGains] = [] 
+        default_gains = JointPidControllerGains()
+        gains: typing.List[JointPidControllerGains] = []
         for actuator_name in actuator_names:
-            joint_gains = driver_config.gains.get(actuator_name, JointPidControllerGains())
+            joint_gains = driver_config.gains.get(actuator_name, default_gains)
             gains.append(joint_gains)
 
         controller = builder.AddSystem(
