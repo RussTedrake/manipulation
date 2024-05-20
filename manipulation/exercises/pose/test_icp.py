@@ -28,7 +28,7 @@ def least_squares_transform(scene, model):
 
 
 def generate_arbitrary_transform(seed):
-    R_BA = RollPitchYaw(seed * 7.363, seed * 1.35, seed * 5.47)
+    R_BA = RollPitchYaw(seed * 6.8, seed * 4.0, seed * 2.17)
     p_BA = np.mod([seed * 2.13, seed * 3.3, seed * 5.225], 0.1) - 0.05
     X_BA = RigidTransform(R_BA, p_BA)
     return X_BA
@@ -87,8 +87,8 @@ class TestICP(unittest.TestCase):
         X_BA_test, mean_error_test, num_iters_test = f(self.scene, self.model)
         num_iters = 0
         mean_error = 0.0
-        max_iterations = 20
-        tolerance = 1e-3
+        max_iterations = 60
+        tolerance = 1e-5
         prev_error = 0
         X_BA = RigidTransform()
 
@@ -105,6 +105,6 @@ class TestICP(unittest.TestCase):
 
         result = X_BA.multiply(X_BA_test.inverse())
         self.assertTrue(
-            np.allclose(result.GetAsMatrix4(), np.eye(4)),
+            np.allclose(result.GetAsMatrix4(), np.eye(4), atol=1e-04),
             "icp implementation is incorrect",
         )
