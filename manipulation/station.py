@@ -189,6 +189,7 @@ class Scenario:
             JointStiffnessDriver,
             SchunkWsgDriver,
             ZeroForceDriver,
+            RealsenseDriver,
         ],
     ] = dc.field(default_factory=dict)
 
