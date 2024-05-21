@@ -79,9 +79,9 @@ from manipulation.scenarios import AddIiwa, AddPlanarIiwa, AddWsg
 from manipulation.systems import ExtractPose
 from manipulation.utils import ConfigureParser
 
-from camera_description_t import camera_description_t
-from image_description_t import image_description_t
-from intrinsics_t import intrinsics_t
+from rs2_lcm import camera_description_t
+from rs2_lcm import image_description_t
+from rs2_lcm import intrinsics_t
 
 
 @dc.dataclass
@@ -1058,8 +1058,12 @@ class RealsenseImageReciever(LeafSystem):
         self.DeclareAbstractInputPort("lcmt_image_array", Value(lcmt_image_array()))
         self.DeclareAbstractInputPort("camera_description_t", Value(camera_description_t()))
 
-        self.DeclareAbstractOutputPort("rgb_out", Value(ImageRgba8U()), self.ExtractRGB)
-        self.DeclareAbstractOutputPort("depth_out", Value(ImageDepth16U()), self.ExtractDepth)
+        self.DeclareAbstractOutputPort("rgb_out", lambda: AbstractValue.Make(ImageRgba8U()), self.ExtractRGB)
+        self.DeclareAbstractOutputPort("depth_out", lambda: AbstractValue.Make(ImageDepth16U()), self.ExtractDepth)
+
+        camera_info_model = CameraInfo(width=640, height=480, fov_y=np.pi / 4.0)
+        self.DeclareAbstractOutputPort("rgb_camera_info_out", lambda: AbstractValue.Make(camera_info_model), self.ExtractRGBCameraInfo)
+        self.DeclareAbstractOutputPort("depth_camera_info_out", lambda: AbstractValue.Make(camera_info_model), self.ExtractDepthCameraInfo)
     
     def ExtractRGB(self, context, output):
         camera_description = self.GetInputPort("camera_description_t").Eval(context)
@@ -1100,15 +1104,6 @@ class RealsenseImageReciever(LeafSystem):
         )
         image.mutable_data = lcmt_image_depth.data
         output.set_value(image)
-
-
-class RealsenseDescriptionReciever(LeafSystem):
-    def __init__(self):
-        LeafSystem.__init__(self)
-        self.DeclareAbstractInputPort("camera_description_t", Value(camera_description_t()))
-
-        self.DeclareAbstractOutputPort("rgb_camera_info_out", AbstractValue.Make(CameraInfo()), self.ExtractRGBCameraInfo)
-        self.DeclareAbstractOutputPort("depth_camera_info_out", AbstractValue.Make(CameraInfo()), self.ExtractDepthCameraInfo)
     
     def ExtractRGBCameraInfo(self, context, output):
         camera_description = self.GetInputPort("camera_description_t").Eval(context)
@@ -1149,6 +1144,7 @@ class RealsenseDescriptionReciever(LeafSystem):
                 break
 
         output.set_value(intrinsics)
+
 
 # TODO(russt): Use the c++ version pending https://github.com/RobotLocomotion/drake/issues/20055
 def _ApplyDriverConfigInterface(
@@ -1322,19 +1318,18 @@ def _ApplyDriverConfigInterface(
                 channel=f"DRAKE_RGBD_CAMERA_IMAGES_{driver_config.sensor_id}",
                 lcm_type=lcmt_image_array,
                 lcm=lcm,
-                use_cpp_serializer=True,
+                use_cpp_serializer=False,
                 wait_for_message_on_initialization_timeout=10,
             )
         )
         camera_data_subscriber.set_name(model_instance_name + ".data_subscriber")
 
-        camera_description_receiver = builder.AddSystem(RealsenseDescriptionReciever())
         camera_description_subscriber = builder.AddSystem(
             LcmSubscriberSystem.Make(
-                channel=f"DRAKE_RGBD_CAMERA_{driver_config.sensor_id}",
+                channel=f"DRAKE_RGBD_CAMERAS_{driver_config.sensor_id}",
                 lcm_type=camera_description_t,
                 lcm=lcm,
-                use_cpp_serializer=True,
+                use_cpp_serializer=False,
                 wait_for_message_on_initialization_timeout=10,
             )
         )
@@ -1351,21 +1346,20 @@ def _ApplyDriverConfigInterface(
 
         builder.Connect(
             camera_data_subscriber.get_output_port(),
-            camera_data_receiver.get_input_port(),
+            camera_data_receiver.GetInputPort("lcmt_image_array"),
+        )
+        builder.Connect(
+            camera_description_subscriber.get_output_port(),
+            camera_data_receiver.GetInputPort("camera_description_t"),
         )
 
         builder.ExportOutput(
-            camera_description_receiver.GetOutputPort("rgb_camera_info_out"),
+            camera_data_receiver.GetOutputPort("rgb_camera_info_out"),
             f"camera_{model_instance_name}.rgb_camera_info",
         )
         builder.ExportOutput(
-            camera_description_receiver.GetOutputPort("depth_camera_info_out"),
+            camera_data_receiver.GetOutputPort("depth_camera_info_out"),
             f"camera_{model_instance_name}.depth_camera_info",
-        )
-
-        builder.Connect(
-            camera_description_subscriber.get_output_port(),
-            camera_description_receiver.get_input_port(),
         )
 
 
