@@ -23,6 +23,7 @@ from pydrake.all import (
     BaseField,
     CameraConfig,
     CameraInfo,
+    ConvertDepth16UTo32F,
     DepthImageToPointCloud,
     Diagram,
     DiagramBuilder,
@@ -35,9 +36,11 @@ from pydrake.all import (
     IiwaDriver,
     IiwaStatusReceiver,
     ImageDepth16U,
+    ImageDepth32F,
     ImageRgba8U,
     InverseDynamicsController,
     LcmBuses,
+    LcmImageArrayToImages,
     LcmPublisherSystem,
     LcmSubscriberSystem,
     LeafSystem,
@@ -1051,59 +1054,14 @@ def NegatedPort(
     builder.Connect(output_port, negater.get_input_port())
     return negater.get_output_port()
 
-
-class RealsenseImageReciever(LeafSystem):
+class RealsenseDescriptionReciever(LeafSystem):
     def __init__(self):
         LeafSystem.__init__(self)
-        self.DeclareAbstractInputPort("lcmt_image_array", Value(lcmt_image_array()))
         self.DeclareAbstractInputPort("camera_description_t", Value(camera_description_t()))
-
-        self.DeclareAbstractOutputPort("rgb_out", lambda: AbstractValue.Make(ImageRgba8U()), self.ExtractRGB)
-        self.DeclareAbstractOutputPort("depth_out", lambda: AbstractValue.Make(ImageDepth16U()), self.ExtractDepth)
 
         camera_info_model = CameraInfo(width=640, height=480, fov_y=np.pi / 4.0)
         self.DeclareAbstractOutputPort("rgb_camera_info_out", lambda: AbstractValue.Make(camera_info_model), self.ExtractRGBCameraInfo)
         self.DeclareAbstractOutputPort("depth_camera_info_out", lambda: AbstractValue.Make(camera_info_model), self.ExtractDepthCameraInfo)
-    
-    def ExtractRGB(self, context, output):
-        camera_description = self.GetInputPort("camera_description_t").Eval(context)
-        num_image_types = camera_description.num_image_types
-        images = camera_description.image_types
-
-        rgb_ind = 0
-        for i in range(num_image_types):
-            if images[i].type == 0:
-                rgb_ind = i
-                break
-
-        image_array = self.GetInputPort("lcmt_image_array").Eval(context)
-        lcmt_image_rgb = image_array[rgb_ind]
-        image = ImageRgba8U(
-            width=lcmt_image_rgb.width,
-            height=lcmt_image_rgb.height,
-        )
-        image.mutable_data = lcmt_image_rgb.data
-        output.set_value(image)
-
-    def ExtractDepth(self, context, output):
-        camera_description = self.GetInputPort("camera_description_t").Eval(context)
-        num_image_types = camera_description.num_image_types
-        images = camera_description.image_types
-
-        depth_ind = 0
-        for i in range(num_image_types):
-            if images[i].type == 1:
-                depth_ind = i
-                break
-
-        image_array = self.GetInputPort("lcmt_image_array").Eval(context)
-        lcmt_image_depth = image_array[depth_ind]
-        image = ImageDepth16U(
-            width=lcmt_image_depth.width,
-            height=lcmt_image_depth.height,
-        )
-        image.mutable_data = lcmt_image_depth.data
-        output.set_value(image)
     
     def ExtractRGBCameraInfo(self, context, output):
         camera_description = self.GetInputPort("camera_description_t").Eval(context)
@@ -1312,18 +1270,19 @@ def _ApplyDriverConfigInterface(
     if isinstance(driver_config, RealsenseDriver):
         lcm = lcm_buses.Find("Driver for " + model_instance_name, driver_config.lcm_bus)
         
-        camera_data_receiver = builder.AddSystem(RealsenseImageReciever())
+        camera_data_receiver = builder.AddSystem(LcmImageArrayToImages())
         camera_data_subscriber = builder.AddSystem(
             LcmSubscriberSystem.Make(
                 channel=f"DRAKE_RGBD_CAMERA_IMAGES_{driver_config.sensor_id}",
                 lcm_type=lcmt_image_array,
                 lcm=lcm,
-                use_cpp_serializer=False,
+                use_cpp_serializer=True,
                 wait_for_message_on_initialization_timeout=10,
             )
         )
         camera_data_subscriber.set_name(model_instance_name + ".data_subscriber")
 
+        camera_description_receiver = builder.AddSystem(RealsenseDescriptionReciever())
         camera_description_subscriber = builder.AddSystem(
             LcmSubscriberSystem.Make(
                 channel=f"DRAKE_RGBD_CAMERAS_{driver_config.sensor_id}",
@@ -1336,30 +1295,34 @@ def _ApplyDriverConfigInterface(
         camera_description_subscriber.set_name(model_instance_name + ".description_subscriber")
 
         builder.ExportOutput(
-            camera_data_receiver.GetOutputPort("rgb_out"),
-            f"camera_{model_instance_name}.rgb_image",
+            camera_data_receiver.color_image_output_port(),
+            f"{model_instance_name}.rgb_image",
         )
         builder.ExportOutput(
-            camera_data_receiver.GetOutputPort("depth_out"),
-            f"camera_{model_instance_name}.depth_image",
+            camera_data_receiver.depth_image_output_port(),
+            f"{model_instance_name}.depth_image",
+        )
+        builder.ExportOutput(
+            camera_data_receiver.label_image_output_port(),
+            f"{model_instance_name}.label_image",
         )
 
         builder.Connect(
             camera_data_subscriber.get_output_port(),
-            camera_data_receiver.GetInputPort("lcmt_image_array"),
+            camera_data_receiver.image_array_t_input_port(),
         )
         builder.Connect(
             camera_description_subscriber.get_output_port(),
-            camera_data_receiver.GetInputPort("camera_description_t"),
+            camera_description_receiver.GetInputPort("camera_description_t"),
         )
 
         builder.ExportOutput(
-            camera_data_receiver.GetOutputPort("rgb_camera_info_out"),
-            f"camera_{model_instance_name}.rgb_camera_info",
+            camera_description_receiver.GetOutputPort("rgb_camera_info_out"),
+            f"{model_instance_name}.rgb_camera_info",
         )
         builder.ExportOutput(
-            camera_data_receiver.GetOutputPort("depth_camera_info_out"),
-            f"camera_{model_instance_name}.depth_camera_info",
+            camera_description_receiver.GetOutputPort("depth_camera_info_out"),
+            f"{model_instance_name}.depth_camera_info",
         )
 
 
