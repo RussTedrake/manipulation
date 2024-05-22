@@ -1071,7 +1071,7 @@ class RealsenseDescriptionReciever(LeafSystem):
         intrinsics = None
         for i in range(num_image_types):
             image = images[i]
-            if images.type == 0:
+            if image.type == 0:
                 image_intrinsics = image.intrinsics
                 intrinsics = CameraInfo(image_intrinsics.width,
                                         image_intrinsics.height,
@@ -1091,7 +1091,7 @@ class RealsenseDescriptionReciever(LeafSystem):
         intrinsics = None
         for i in range(num_image_types):
             image = images[i]
-            if images.type == 1:
+            if image.type == 1:
                 image_intrinsics = image.intrinsics
                 intrinsics = CameraInfo(image_intrinsics.width,
                                         image_intrinsics.height,
