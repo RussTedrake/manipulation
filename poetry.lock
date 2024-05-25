@@ -1728,6 +1728,20 @@ htmlsoup = ["BeautifulSoup4"]
 source = ["Cython (>=3.0.10)"]
 
 [[package]]
+name = "lxml-html-clean"
+version = "0.1.1"
+description = "HTML cleaner from lxml project"
+optional = false
+python-versions = "*"
+files = [
+    {file = "lxml_html_clean-0.1.1-py3-none-any.whl", hash = "sha256:58c04176593c9caf72ec92e033d2f38859e918b3eff0cc0f8051ad27dc2ab8ef"},
+    {file = "lxml_html_clean-0.1.1.tar.gz", hash = "sha256:8a644ed01dbbe132fabddb9467f077f6dad12a1d4f3a6a553e280f3815fa46df"},
+]
+
+[package.dependencies]
+lxml = "*"
+
+[[package]]
 name = "manifold3d"
 version = "2.4.5"
 description = "Library for geometric robustness"
@@ -4637,4 +4651,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "jaraco.test", "more
 [metadata]
 lock-version = "2.0"
 python-versions = "<4.0,>=3.10"
-content-hash = "8d77fed3060c20bff77bc1d4155e66242d318a3b2cc64d3fdc80de0683db343f"
+content-hash = "6034da56c1efec774bf78fdfefd914cb780d1ed469c718d9d420fe12fccef11f"
