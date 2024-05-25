@@ -46,8 +46,8 @@ priority = "explicit"
 [tool.poetry.dependencies]
 python = "<4.0,>=3.10"
 cloudpickle = "2.2.1"  # needs to be pinned for stored files to remain compatible.
-#drake = { version = "==0.0.20240302", source = "drake-nightly" }
-drake = ">=1.28.0"
+#drake = { version = ">=0.0.20240524", source = "drake-nightly" }
+drake = ">=1.29.0"
 gradescope-utils = ">=0.4.0"
 mpld3  = ">=0.5.6"
 nevergrad = ">=0.4.3"  # TODO: avoid expensive bayesian optimization dep
@@ -68,8 +68,8 @@ optional = true
 
 # Must include all dependencies required to build the docs with sphinx + autodoc.
 [tool.poetry.group.docs.dependencies]
-#drake = { version = ">=0.0.20240302", source = "drake-nightly" }
-drake = ">=1.28.0"
+#drake = { version = ">=0.0.20240524", source = "drake-nightly" }
+drake = ">=1.29.0"
 ipython = ">=7.8.0"
 sphinx = ">=7.2.6"
 myst-parser = ">=2.0.0"

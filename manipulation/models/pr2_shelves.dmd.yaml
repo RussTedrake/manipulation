@@ -4,7 +4,7 @@ directives:
 # Add iiwa
 - add_model:
     name: pr2
-    file: package://manipulation/pr2_collision_fixed.urdf
+    file: package://drake_models/pr2_description/urdf/pr2_simplified.urdf
 
 # Add shelves
 - add_model:
