@@ -23,7 +23,6 @@ from pydrake.all import (
     BaseField,
     CameraConfig,
     CameraInfo,
-    ConvertDepth16UTo32F,
     DepthImageToPointCloud,
     Diagram,
     DiagramBuilder,
@@ -35,9 +34,6 @@ from pydrake.all import (
     IiwaControlMode,
     IiwaDriver,
     IiwaStatusReceiver,
-    ImageDepth16U,
-    ImageDepth32F,
-    ImageRgba8U,
     InverseDynamicsController,
     LcmBuses,
     LcmImageArrayToImages,
@@ -81,8 +77,6 @@ from pydrake.common.value import Value
 from manipulation.scenarios import AddIiwa, AddPlanarIiwa, AddWsg
 from manipulation.systems import ExtractPose
 from manipulation.utils import ConfigureParser
-
-from rs2_lcm import camera_description_t
 
 
 @dc.dataclass
@@ -1088,55 +1082,6 @@ def NegatedPort(
     builder.Connect(output_port, negater.get_input_port())
     return negater.get_output_port()
 
-class RealsenseDescriptionReciever(LeafSystem):
-    def __init__(self):
-        LeafSystem.__init__(self)
-        self.DeclareAbstractInputPort("camera_description_t", Value(camera_description_t()))
-
-        camera_info_model = CameraInfo(width=640, height=480, fov_y=np.pi / 4.0)
-        self.DeclareAbstractOutputPort("rgb_camera_info_out", lambda: AbstractValue.Make(camera_info_model), self.ExtractRGBCameraInfo)
-        self.DeclareAbstractOutputPort("depth_camera_info_out", lambda: AbstractValue.Make(camera_info_model), self.ExtractDepthCameraInfo)
-    
-    def ExtractRGBCameraInfo(self, context, output):
-        camera_description = self.GetInputPort("camera_description_t").Eval(context)
-        num_image_types = camera_description.num_image_types
-        images = camera_description.image_types
-
-        intrinsics = None
-        for i in range(num_image_types):
-            image = images[i]
-            if image.type == 0:
-                image_intrinsics = image.intrinsics
-                intrinsics = CameraInfo(image_intrinsics.width,
-                                        image_intrinsics.height,
-                                        image_intrinsics.focal_length_x,
-                                        image_intrinsics.focal_length_y,
-                                        image_intrinsics.principal_point_x,
-                                        image_intrinsics.principal_point_y)
-                break
-
-        output.set_value(intrinsics)
-
-    def ExtractDepthCameraInfo(self, context, output):
-        camera_description = self.GetInputPort("camera_description_t").Eval(context)
-        num_image_types = camera_description.num_image_types
-        images = camera_description.image_types
-
-        intrinsics = None
-        for i in range(num_image_types):
-            image = images[i]
-            if image.type == 1:
-                image_intrinsics = image.intrinsics
-                intrinsics = CameraInfo(image_intrinsics.width,
-                                        image_intrinsics.height,
-                                        image_intrinsics.focal_length_x,
-                                        image_intrinsics.focal_length_y,
-                                        image_intrinsics.principal_point_x,
-                                        image_intrinsics.principal_point_y)
-                break
-
-        output.set_value(intrinsics)
-
 
 # TODO(russt): Use the c++ version pending https://github.com/RobotLocomotion/drake/issues/20055
 def _ApplyDriverConfigInterface(
@@ -1316,18 +1261,6 @@ def _ApplyDriverConfigInterface(
         )
         camera_data_subscriber.set_name(model_instance_name + ".data_subscriber")
 
-        camera_description_receiver = builder.AddSystem(RealsenseDescriptionReciever())
-        camera_description_subscriber = builder.AddSystem(
-            LcmSubscriberSystem.Make(
-                channel=f"DRAKE_RGBD_CAMERAS_{driver_config.sensor_id}",
-                lcm_type=camera_description_t,
-                lcm=lcm,
-                use_cpp_serializer=False,
-                wait_for_message_on_initialization_timeout=10,
-            )
-        )
-        camera_description_subscriber.set_name(model_instance_name + ".description_subscriber")
-
         builder.ExportOutput(
             camera_data_receiver.color_image_output_port(),
             f"{model_instance_name}.rgb_image",
@@ -1345,20 +1278,6 @@ def _ApplyDriverConfigInterface(
             camera_data_subscriber.get_output_port(),
             camera_data_receiver.image_array_t_input_port(),
         )
-        builder.Connect(
-            camera_description_subscriber.get_output_port(),
-            camera_description_receiver.GetInputPort("camera_description_t"),
-        )
-
-        builder.ExportOutput(
-            camera_description_receiver.GetOutputPort("rgb_camera_info_out"),
-            f"{model_instance_name}.rgb_camera_info",
-        )
-        builder.ExportOutput(
-            camera_description_receiver.GetOutputPort("depth_camera_info_out"),
-            f"{model_instance_name}.depth_camera_info",
-        )
-
 
 
 def _ApplyDriverConfigsInterface(
