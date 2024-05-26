@@ -55,7 +55,6 @@ class TestMobileBaseIk(unittest.TestCase):
             context = diagram.CreateDefaultContext()
             plant_context = plant.GetMyContextFromRoot(context)
             sg_context = scene_graph.GetMyContextFromRoot(context)
-            self.notebook_locals["filterCollsionGeometry"](scene_graph, sg_context)
 
             plant.SetPositions(plant_context, q)
 

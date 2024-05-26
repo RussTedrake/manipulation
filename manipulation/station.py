@@ -88,13 +88,29 @@ from rs2_lcm import intrinsics_t
 
 
 @dc.dataclass
+class JointPidControllerGains:
+    """Defines the Proportional-Integral-Derivative gains for a single joint.
+
+    Args:
+        kp: The proportional gain.
+        ki: The integral gain.
+        kd: The derivative gain.
+    """
+
+    kp: float = 100  # Position gain
+    ki: float = 1  # Integral gain
+    kd: float = 20  # Velocity gain
+
+
+@dc.dataclass
 class InverseDynamicsDriver:
     """A simulation-only driver that adds the InverseDynamicsController to the
     station and exports the output ports. Multiple model instances can be driven with a
     single controller using `instance_name1+instance_name2` as the key; the output ports
     will be named similarly."""
 
-    # TODO(russt): Support setting the gains.
+    # Must have one element for every (named) actuator in the model_instance.
+    gains: typing.Mapping[str, JointPidControllerGains] = dc.field(default_factory=dict)
 
 
 @dc.dataclass
@@ -715,13 +731,33 @@ def _ApplyDriverConfigSim(
         controller_plant.Finalize()
 
         # Add the controller
-        # TODO(russt): Take the gains as parameters.
+
+        # When using multiple model instances, the model instance name must be prefixed.
+        # The strings should take the form {model_instance_name}_{joint_actuator_name}, as
+        # prescribed by MultiBodyPlant::GetActuatorNames().
+        add_model_instance_prefix = len(model_instance_names) > 1
+        actuator_names = controller_plant.GetActuatorNames(add_model_instance_prefix)
+
+        # Check that all actuator names are valid.
+        for actuator_name in driver_config.gains.keys():
+            if actuator_name not in actuator_names:
+                raise ValueError(
+                    f"Actuator '{actuator_name}' not found. Valid names are: {actuator_names}"
+                )
+
+        # Get gains for each joint from the config. Use default gains if it doesn't exist in the config.
+        default_gains = JointPidControllerGains()
+        gains: typing.List[JointPidControllerGains] = []
+        for actuator_name in actuator_names:
+            joint_gains = driver_config.gains.get(actuator_name, default_gains)
+            gains.append(joint_gains)
+
         controller = builder.AddSystem(
             InverseDynamicsController(
                 controller_plant,
-                kp=[100] * controller_plant.num_positions(),
-                ki=[1] * controller_plant.num_positions(),
-                kd=[20] * controller_plant.num_positions(),
+                kp=[joint_gains.kp for joint_gains in gains],
+                ki=[joint_gains.ki for joint_gains in gains],
+                kd=[joint_gains.kd for joint_gains in gains],
                 has_reference_acceleration=False,
             )
         )

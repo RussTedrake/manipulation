@@ -2,7 +2,7 @@
 name = "manipulation"
 # Use e.g. 2023.10.4.rc0 if I need to release a release candidate.
 # Use e.g. 2023.10.4.post1 if I need to rerelease on the same day.
-version = "2024.04.22"
+version = "2024.05.25"
 description = "MIT 6.421 - Robotic Manipulation"
 authors = ["Russ Tedrake <russt@mit.edu>"]
 license = "BSD License"
@@ -46,8 +46,8 @@ priority = "explicit"
 [tool.poetry.dependencies]
 python = "<4.0,>=3.10"
 cloudpickle = "2.2.1"  # needs to be pinned for stored files to remain compatible.
-#drake = { version = "==0.0.20240302", source = "drake-nightly" }
-drake = ">=1.28.0"
+#drake = { version = ">=0.0.20240524", source = "drake-nightly" }
+drake = ">=1.29.0"
 gradescope-utils = ">=0.4.0"
 mpld3  = ">=0.5.6"
 nevergrad = ">=0.4.3"  # TODO: avoid expensive bayesian optimization dep
@@ -68,8 +68,8 @@ optional = true
 
 # Must include all dependencies required to build the docs with sphinx + autodoc.
 [tool.poetry.group.docs.dependencies]
-#drake = { version = ">=0.0.20240302", source = "drake-nightly" }
-drake = ">=1.28.0"
+#drake = { version = ">=0.0.20240524", source = "drake-nightly" }
+drake = ">=1.29.0"
 ipython = ">=7.8.0"
 sphinx = ">=7.2.6"
 myst-parser = ">=2.0.0"
@@ -79,6 +79,7 @@ sphinx_rtd_theme = ">=2.0.0"
 beautifulsoup4 = ">=4.6.3"
 black = { version = ">=23.*", extras = ["jupyter"] }
 lxml = ">=4.9.2" # seems to be needed on python 3.11
+lxml-html-clean = ">=0.1.0"
 # Blocked on poetry known issue; see Developers.md
 #matplotlib = [ 
 #  {platform="darwin", version=">=3.7.0"}, # old versions don't build in XCode

@@ -7,6 +7,8 @@
 This is the companion software for the textbook available at:
 https://manipulation.mit.edu/
 
+For contributions, please see [developer instructions](Developers.md).
+
 To cite this software (or the corresponding textbook), please use:
 
 Russ Tedrake. _Robotic Manipulation: Perception, Planning, and Control (Course

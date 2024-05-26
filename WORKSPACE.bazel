@@ -65,12 +65,12 @@ load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 http_archive(
     name = "drake_models",
     urls = [
-        "https://github.com/RobotLocomotion/models/archive/69c92595a391eb023c27ab6ac8f80d58a3e4612d.tar.gz",
-        "https://drake-mirror.csail.mit.edu/github/RobotLocomotion/models/69c92595a391eb023c27ab6ac8f80d58a3e4612d.tar.gz",
-        "https://s3.amazonaws.com/drake-mirror/github/RobotLocomotion/models/69c92595a391eb023c27ab6ac8f80d58a3e4612d.tar.gz",
+        "https://github.com/RobotLocomotion/models/archive/2799af70868d0cb4b25e046209fbd5d578b3e1b1.tar.gz",
+        "https://drake-mirror.csail.mit.edu/github/RobotLocomotion/models/2799af70868d0cb4b25e046209fbd5d578b3e1b1.tar.gz",
+        "https://s3.amazonaws.com/drake-mirror/github/RobotLocomotion/models/2799af70868d0cb4b25e046209fbd5d578b3e1b1.tar.gz",
     ],
-    sha256 = "ba571c8b369a62c3764d250944b27d72071488789b2494604d23342994141fe2",
-    strip_prefix = "models-69c92595a391eb023c27ab6ac8f80d58a3e4612d",
+    sha256 = "fd2dc12d0701f41199eb4ea6bf3e09b5a5041d92f5103e8322013f63a3c380b8",
+    strip_prefix = "models-2799af70868d0cb4b25e046209fbd5d578b3e1b1",
     build_file_content = """
 package(default_visibility = ["//visibility:public"])
 
