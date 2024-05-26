@@ -83,8 +83,6 @@ from manipulation.systems import ExtractPose
 from manipulation.utils import ConfigureParser
 
 from rs2_lcm import camera_description_t
-from rs2_lcm import image_description_t
-from rs2_lcm import intrinsics_t
 
 
 @dc.dataclass
