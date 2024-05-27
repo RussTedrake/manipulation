@@ -511,7 +511,7 @@ def AddIiwaDifferentialIK(
         DeprecationWarning,
     )
     if frame is None:
-        plant.GetFrameByName("body")
+        frame = plant.GetFrameByName("body")
     return systems_AddIiwaDifferentialIK(builder, plant, frame)
 
 
