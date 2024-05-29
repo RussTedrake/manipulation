@@ -1271,6 +1271,7 @@ def _ApplyCameraLcmIdInterface(
     lcm = lcm_buses.Find("Driver for " + camera_config.name, camera_config.lcm_bus)
     
     camera_data_receiver = builder.AddSystem(LcmImageArrayToImages())
+    camera_data_receiver.set_name(camera_config.name + ".data_receiver")
     camera_data_subscriber = builder.AddSystem(
         LcmSubscriberSystem.Make(
             channel=camera_id,
