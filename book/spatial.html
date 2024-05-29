@@ -68,12 +68,13 @@ quantities</a> and how they map to the monogram notation.</p>
 
 <section><h1>Position, Rotation, and Pose</h1></section>
 
-<p>We use ${}^Bp^A_C$ to denote a position of point or frame $A$ relative to point or
-frame $B$ expressed in frame $C$. We use ${}^BR^A$ to denote the orientation of frame
-$A$ measured from frame $B$; unlike vectors, pure rotations do not have an additional
-"expressed in" frame. Similarly, we use ${}^BX^A$ to denote the pose/transform of frame
-$A$ measured from frame $B$. We do not use the "expressed in" frame subscript for pose;
-we always want the pose expressed in the reference frame.</p>
+<p>As we introduced <a href="pick.html#spatial_algebra">here</a>, we use ${}^Bp^A_C$ to
+denote a position of point or frame $A$ relative to point or frame $B$ expressed in
+frame $C$. We use ${}^BR^A$ to denote the orientation of frame $A$ measured from frame
+$B$; unlike vectors, pure rotations do not have an additional "expressed in" frame.
+Similarly, we use ${}^BX^A$ to denote the pose/transform of frame $A$ measured from
+frame $B$. We do not use the "expressed in" frame subscript for pose; we always want the
+pose expressed in the reference frame.</p>
 
 <p>
   The basic rules of spatial algebra are as follows:  
@@ -113,7 +114,8 @@ we always want the pose expressed in the reference frame.</p>
   
     <todo>Add acceleration</todo>
     
-    <p>We represent the rate of change in pose using a six-component vector for <a
+    <p>As we introduced <a href="pick.html#jacobian">here</a>, we represent the rate of
+    change in pose using a six-component vector for <a
     href="https://drake.mit.edu/doxygen_cxx/group__multibody__spatial__vectors.html"><i>spatial
     velocity</i></a>: \begin{equation}{}^AV^B_C = \begin{bmatrix} {}^A\omega^B_C \\
     {}^A\text{v}^B_C \end{bmatrix}.\end{equation} ${}^AV^B_C$ is the spatial velocity
@@ -145,7 +147,8 @@ we always want the pose expressed in the reference frame.</p>
 
   <section><h1>Spatial force</h1>
 
-    <p>We define a six-component vector for <a
+    <p>As we introduced <a href="clutter.html#spatial_force">here</a>, we define a
+    six-component vector for <a
     href="https://drake.mit.edu/doxygen_cxx/group__multibody__spatial__vectors.html"><i>spatial
     force</i></a>, using the monogram notation:
     \begin{equation}F^{B_p}_{{\text{name}},C} = \begin{bmatrix}
@@ -153,10 +156,11 @@ we always want the pose expressed in the reference frame.</p>
     if you prefer } \quad \left[F^{B_p}_{\text{name}}\right]_C = \begin{bmatrix}
     \left[\tau^{B_p}_{\text{name}}\right]_C \\ \left[f^{B_p}_{\text{name}}\right]_C
     \end{bmatrix}.\end{equation} $F^{B_p}_{\text{name},C}$ is the named spatial force
-    applied to a point, or frame origin, $B_p$, expressed in frame $C$. The name is optional, and the expressed in frame, if unspecified, is the
-    world frame. For forces in particular, it is recommended that we include the body,
-    $B$, that the force is being applied to in the symbol for the point $B_p$,
-    especially since we will often have equal and opposite forces.</p>
+    applied to a point, or frame origin, $B_p$, expressed in frame $C$. The name is
+    optional, and the expressed in frame, if unspecified, is the world frame. For forces
+    in particular, it is recommended that we include the body, $B$, that the force is
+    being applied to in the symbol for the point $B_p$, especially since we will often
+    have equal and opposite forces.</p>
       
     <p id="spatial_force_algebra">Spatial forces fit neatly into our spatial algebra:
     <ul>
