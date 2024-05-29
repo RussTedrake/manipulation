@@ -12,6 +12,7 @@
     "deep_perception",
     "rl",
     "tactile",
+    "spatial",
     "drake",
     "environments",
     "station",
@@ -37,7 +38,7 @@
   ],
   "parts_format": "dict(first chapter id, name of the part)",
   "parts" : {
-    "drake": "Appendix"
+    "spatial": "Appendix"
   },
   "other_potential_parts" : [
     "Special topics"

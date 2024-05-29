@@ -531,10 +531,11 @@ pose = plant.EvalBodyPoseInWorld(context, gripper)</pre></code>
     href="https://drake.mit.edu/doxygen_cxx/classdrake_1_1multibody_1_1_multibody_plant.html#a7bb24fed19f16a76450eece1857b92dc">nonlinear
     change of coordinates</a>.  Spatial velocities fit nicely into our spatial
     algebra:<ul>
-      <li>Angular velocities add (when the frames match): \begin{equation}
-      {}^A\omega^B_F + {}^B\omega^C_F = {}^A\omega^C_F,\end{equation} (this <a
-      href="#angular_velocity_addition">deserves to be verified</a>) and have
-      the additive inverse, ${}^A\omega^C_F = - {}^C\omega^A_F,$.</li>
+      <li>Velocities add when they are expressed in the same frame: \begin{gather}
+      {}^Av^B_F + {}^Bv^C_F = {}^Av^C_F, \qquad {}^A\omega^B_F + {}^B\omega^C_F =
+      {}^A\omega^C_F,\end{gather} (especially for angular velocities, this <a
+      href="#angular_velocity_addition">deserves to be verified</a>) and have the
+      additive inverse, ${}^AV^C_F = - {}^CV^A_F,$.</li>
       <li>Rotations can be used to change between the "expressed-in"
       frames: \begin{equation} {}^A\text{v}^B_G = {}^GR^F {}^A\text{v}^B_F,
       \qquad {}^A\omega^B_G = {}^GR^F {}^A\omega^B_F.\end{equation}
