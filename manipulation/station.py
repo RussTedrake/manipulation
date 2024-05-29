@@ -137,15 +137,6 @@ class JointStiffnessDriver:
     hand_model_name: str = ""
 
 @dc.dataclass
-class RealsenseDriver:
-    """A driver that creates LCM subscriber on the 
-    `DRAKE_RGBD_CAMERA_IMAGES_{sensor_id}` channel
-    """
-
-    sensor_id: str = ""
-    lcm_bus: str = ""
-
-@dc.dataclass
 class Scenario:
     """Defines the YAML format for a (possibly stochastic) scenario to be
     simulated.
@@ -200,11 +191,12 @@ class Scenario:
             JointStiffnessDriver,
             SchunkWsgDriver,
             ZeroForceDriver,
-            RealsenseDriver,
         ],
     ] = dc.field(default_factory=dict)
 
     cameras: typing.Mapping[str, CameraConfig] = dc.field(default_factory=dict)
+
+    camera_ids: typing.Mapping[str, str] = dc.field(default_factory=dict)
 
     visualization: VisualizationConfig = VisualizationConfig()
 
@@ -1246,38 +1238,6 @@ def _ApplyDriverConfigInterface(
             wsg_status_subscriber.get_output_port(),
             wsg_status_receiver.get_input_port(0),
         )
-    if isinstance(driver_config, RealsenseDriver):
-        lcm = lcm_buses.Find("Driver for " + model_instance_name, driver_config.lcm_bus)
-        
-        camera_data_receiver = builder.AddSystem(LcmImageArrayToImages())
-        camera_data_subscriber = builder.AddSystem(
-            LcmSubscriberSystem.Make(
-                channel=f"DRAKE_RGBD_CAMERA_IMAGES_{driver_config.sensor_id}",
-                lcm_type=lcmt_image_array,
-                lcm=lcm,
-                use_cpp_serializer=True,
-                wait_for_message_on_initialization_timeout=10,
-            )
-        )
-        camera_data_subscriber.set_name(model_instance_name + ".data_subscriber")
-
-        builder.ExportOutput(
-            camera_data_receiver.color_image_output_port(),
-            f"{model_instance_name}.rgb_image",
-        )
-        builder.ExportOutput(
-            camera_data_receiver.depth_image_output_port(),
-            f"{model_instance_name}.depth_image",
-        )
-        builder.ExportOutput(
-            camera_data_receiver.label_image_output_port(),
-            f"{model_instance_name}.label_image",
-        )
-
-        builder.Connect(
-            camera_data_subscriber.get_output_port(),
-            camera_data_receiver.image_array_t_input_port(),
-        )
 
 
 def _ApplyDriverConfigsInterface(
@@ -1297,6 +1257,60 @@ def _ApplyDriverConfigsInterface(
             model_instance_name,
             plant,
             models_from_directives_map,
+            lcm_buses,
+            builder,
+        )
+
+
+def _ApplyCameraLcmIdInterface(
+    camera_config,   # See Scenario.cameras for typing
+    camera_id: str, 
+    lcm_buses: LcmBuses,
+    builder: DiagramBuilder,
+) -> None:
+    lcm = lcm_buses.Find("Driver for " + camera_config.name, camera_config.lcm_bus)
+    
+    camera_data_receiver = builder.AddSystem(LcmImageArrayToImages())
+    camera_data_subscriber = builder.AddSystem(
+        LcmSubscriberSystem.Make(
+            channel=camera_id,
+            lcm_type=lcmt_image_array,
+            lcm=lcm,
+            use_cpp_serializer=True,
+            wait_for_message_on_initialization_timeout=10,
+        )
+    )
+    camera_data_subscriber.set_name(camera_config.name + ".data_subscriber")
+
+    builder.ExportOutput(
+        camera_data_receiver.color_image_output_port(),
+        f"{camera_config.name}.rgb_image",
+    )
+    builder.ExportOutput(
+        camera_data_receiver.depth_image_output_port(),
+        f"{camera_config.name}.depth_image",
+    )
+    builder.ExportOutput(
+        camera_data_receiver.label_image_output_port(),
+        f"{camera_config.name}.label_image",
+    )
+
+    builder.Connect(
+        camera_data_subscriber.get_output_port(),
+        camera_data_receiver.image_array_t_input_port(),
+    )
+
+
+def _ApplyCameraLcmIdsInterface(
+    camera_configs,   # See Scenario.cameras for typing
+    camera_ids: str, 
+    lcm_buses: LcmBuses,
+    builder: DiagramBuilder,
+) -> None:
+    for camera_name, camera_id in camera_ids.items():
+        _ApplyCameraLcmIdInterface(
+            camera_configs[camera_name],
+            camera_id,
             lcm_buses,
             builder,
         )
@@ -1355,7 +1369,13 @@ def _MakeHardwareStationInterface(
         builder=builder,
     )
 
-    # Add cameras.
+    # Add camera ids
+    _ApplyCameraLcmIdsInterface(
+        camera_configs=scenario.cameras,
+        camera_ids=scenario.camera_ids,
+        lcm_buses=lcm_buses,
+        builder=builder,
+    )
 
     diagram = builder.Build()
     diagram.set_name("HardwareStationInterface")
