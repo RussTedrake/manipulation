@@ -1,15 +1,13 @@
 import unittest
 
-from manipulation.station import (
-    LoadScenario,
-    MakeHardwareStation
-)
 from pydrake.all import (
     DiagramBuilder,
     LcmImageArrayToImages,
     LcmSubscriberSystem,
-    StartMeshcat
+    StartMeshcat,
 )
+
+from manipulation.station import LoadScenario, MakeHardwareStation
 
 
 class StationCameraIdsTest(unittest.TestCase):
@@ -41,7 +39,9 @@ camera_ids:
         meshcat.ResetRenderMode()
         builder = DiagramBuilder()
         scenario = LoadScenario(data=scenario_data)
-        station = builder.AddSystem(MakeHardwareStation(scenario, meshcat, hardware=True))
+        station = builder.AddSystem(
+            MakeHardwareStation(scenario, meshcat, hardware=True)
+        )
 
         self.assertTrue(station.HasSubsystemNamed("camera0.data_subscriber"))
         self.assertTrue(station.HasSubsystemNamed("camera0.data_receiver"))
