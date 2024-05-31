@@ -10,6 +10,7 @@ import numpy as np
 from drake import (
     lcmt_iiwa_command,
     lcmt_iiwa_status,
+    lcmt_image_array,
     lcmt_schunk_wsg_command,
     lcmt_schunk_wsg_status,
 )
@@ -34,6 +35,7 @@ from pydrake.all import (
     IiwaStatusReceiver,
     InverseDynamicsController,
     LcmBuses,
+    LcmImageArrayToImages,
     LcmPublisherSystem,
     LcmSubscriberSystem,
     LeafSystem,
@@ -192,6 +194,8 @@ class Scenario:
     ] = dc.field(default_factory=dict)
 
     cameras: typing.Mapping[str, CameraConfig] = dc.field(default_factory=dict)
+
+    camera_ids: typing.Mapping[str, str] = dc.field(default_factory=dict)
 
     visualization: VisualizationConfig = VisualizationConfig()
 
@@ -1257,6 +1261,46 @@ def _ApplyDriverConfigsInterface(
         )
 
 
+def _ApplyCameraLcmIdInterface(
+    camera_config,  # See Scenario.cameras for typing
+    camera_id: str,
+    lcm_buses: LcmBuses,
+    builder: DiagramBuilder,
+) -> None:
+    lcm = lcm_buses.Find("Driver for " + camera_config.name, camera_config.lcm_bus)
+
+    camera_data_receiver = builder.AddSystem(LcmImageArrayToImages())
+    camera_data_receiver.set_name(camera_config.name + ".data_receiver")
+    camera_data_subscriber = builder.AddSystem(
+        LcmSubscriberSystem.Make(
+            channel=camera_id,
+            lcm_type=lcmt_image_array,
+            lcm=lcm,
+            use_cpp_serializer=True,
+            wait_for_message_on_initialization_timeout=10,
+        )
+    )
+    camera_data_subscriber.set_name(camera_config.name + ".data_subscriber")
+
+    builder.ExportOutput(
+        camera_data_receiver.color_image_output_port(),
+        f"{camera_config.name}.rgb_image",
+    )
+    builder.ExportOutput(
+        camera_data_receiver.depth_image_output_port(),
+        f"{camera_config.name}.depth_image",
+    )
+    builder.ExportOutput(
+        camera_data_receiver.label_image_output_port(),
+        f"{camera_config.name}.label_image",
+    )
+
+    builder.Connect(
+        camera_data_subscriber.get_output_port(),
+        camera_data_receiver.image_array_t_input_port(),
+    )
+
+
 def _MakeHardwareStationInterface(
     scenario: Scenario,
     meshcat: Meshcat = None,
@@ -1310,7 +1354,14 @@ def _MakeHardwareStationInterface(
         builder=builder,
     )
 
-    # Add cameras.
+    # Add camera ids
+    for camera_name, camera_id in scenario.camera_ids.items():
+        _ApplyCameraLcmIdInterface(
+            scenario.cameras[camera_name],
+            camera_id,
+            lcm_buses,
+            builder,
+        )
 
     diagram = builder.Build()
     diagram.set_name("HardwareStationInterface")
