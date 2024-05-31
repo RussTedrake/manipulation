@@ -15,7 +15,6 @@ from drake import (
     lcmt_image_array,
 )
 from pydrake.all import (
-    AbstractValue,
     ApplyCameraConfig,
     ApplyLcmBusConfig,
     ApplyMultibodyPlantConfig,
@@ -72,7 +71,6 @@ from pydrake.all import (
     torque_enabled,
 )
 from pydrake.common.yaml import yaml_load_typed
-from pydrake.common.value import Value
 
 from manipulation.scenarios import AddIiwa, AddPlanarIiwa, AddWsg
 from manipulation.systems import ExtractPose
@@ -1302,21 +1300,6 @@ def _ApplyCameraLcmIdInterface(
     )
 
 
-def _ApplyCameraLcmIdsInterface(
-    camera_configs,   # See Scenario.cameras for typing
-    camera_ids: str, 
-    lcm_buses: LcmBuses,
-    builder: DiagramBuilder,
-) -> None:
-    for camera_name, camera_id in camera_ids.items():
-        _ApplyCameraLcmIdInterface(
-            camera_configs[camera_name],
-            camera_id,
-            lcm_buses,
-            builder,
-        )
-
-
 def _MakeHardwareStationInterface(
     scenario: Scenario,
     meshcat: Meshcat = None,
@@ -1371,12 +1354,13 @@ def _MakeHardwareStationInterface(
     )
 
     # Add camera ids
-    _ApplyCameraLcmIdsInterface(
-        camera_configs=scenario.cameras,
-        camera_ids=scenario.camera_ids,
-        lcm_buses=lcm_buses,
-        builder=builder,
-    )
+    for camera_name, camera_id in scenario.camera_ids.items():
+        _ApplyCameraLcmIdInterface(
+            scenario.cameras[camera_name],
+            camera_id,
+            lcm_buses,
+            builder,
+        )
 
     diagram = builder.Build()
     diagram.set_name("HardwareStationInterface")
