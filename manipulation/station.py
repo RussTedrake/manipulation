@@ -10,9 +10,9 @@ import numpy as np
 from drake import (
     lcmt_iiwa_command,
     lcmt_iiwa_status,
+    lcmt_image_array,
     lcmt_schunk_wsg_command,
     lcmt_schunk_wsg_status,
-    lcmt_image_array,
 )
 from pydrake.all import (
     ApplyCameraConfig,
@@ -133,6 +133,7 @@ class JointStiffnessDriver:
     gains: typing.Mapping[str, JointPdControllerGains] = dc.field(default_factory=dict)
 
     hand_model_name: str = ""
+
 
 @dc.dataclass
 class Scenario:
@@ -1261,13 +1262,13 @@ def _ApplyDriverConfigsInterface(
 
 
 def _ApplyCameraLcmIdInterface(
-    camera_config,   # See Scenario.cameras for typing
-    camera_id: str, 
+    camera_config,  # See Scenario.cameras for typing
+    camera_id: str,
     lcm_buses: LcmBuses,
     builder: DiagramBuilder,
 ) -> None:
     lcm = lcm_buses.Find("Driver for " + camera_config.name, camera_config.lcm_bus)
-    
+
     camera_data_receiver = builder.AddSystem(LcmImageArrayToImages())
     camera_data_receiver.set_name(camera_config.name + ".data_receiver")
     camera_data_subscriber = builder.AddSystem(
