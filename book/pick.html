@@ -522,20 +522,18 @@ pose = plant.EvalBodyPoseInWorld(context, gripper)</pre></code>
     frame $A$ expressed in frame $C$, ${}^A\omega^B_C \in \Re^3$ is the
     <i>angular velocity</i> (of frame $B$ measured in $A$ expressed in frame
     $C$), and ${}^A\text{v}^B_C \in \Re^3$ is the <i>translational velocity</i>
-    (along with the same shorthands as for positions).  The angular velocity is
-    a 3D vector (with $w_x$, $w_y$, $w_z$ components); the magnitude of this
-    vector represents the angular speed and the direction represents the
-    (instantaneous) axis of rotation. It's tempting to think of it as the time
-    derivatives of roll, pitch, and yaw, but that's not true; it can easily be
-    converted into that representation through a <a
-    href="https://drake.mit.edu/doxygen_cxx/classdrake_1_1multibody_1_1_multibody_plant.html#a7bb24fed19f16a76450eece1857b92dc">nonlinear
-    change of coordinates</a>.  Spatial velocities fit nicely into our spatial
-    algebra:<ul>
+    (along with the same shorthands as for positions).  The angular velocity is a 3D
+    vector (with $w_x$, $w_y$, $w_z$ components); the magnitude of this vector
+    represents the angular speed and the direction represents the (instantaneous) axis
+    of rotation. It's tempting to think of it as the time derivatives of roll, pitch,
+    and yaw, but that's not true; it can easily be converted to (or from) that
+    representation through a <a
+    href="https://github.com/RobotLocomotion/drake/blob/d1a1d14b323c8a4a481a8d11fc8e9c527d63bf20/multibody/tree/rpy_ball_mobilizer.cc#L223">linear map</a>.  Spatial velocities fit nicely into our spatial algebra:<ul>
       <li>Velocities add when they are expressed in the same frame: \begin{gather}
-      {}^Av^B_F + {}^Bv^C_F = {}^Av^C_F, \qquad {}^A\omega^B_F + {}^B\omega^C_F =
-      {}^A\omega^C_F,\end{gather} (especially for angular velocities, this <a
-      href="#angular_velocity_addition">deserves to be verified</a>) and have the
-      additive inverse, ${}^AV^C_F = - {}^CV^A_F,$.</li>
+      {}^A\text{v}^B_F + {}^B\text{v}^C_F = {}^A\text{v}^C_F, \qquad {}^A\omega^B_F +
+      {}^B\omega^C_F = {}^A\omega^C_F,\end{gather} (especially for angular velocities,
+      this <a href="#angular_velocity_addition">deserves to be verified</a>) and have
+      the additive inverse, ${}^AV^C_F = - {}^CV^A_F,$.</li>
       <li>Rotations can be used to change between the "expressed-in"
       frames: \begin{equation} {}^A\text{v}^B_G = {}^GR^F {}^A\text{v}^B_F,
       \qquad {}^A\omega^B_G = {}^GR^F {}^A\omega^B_F.\end{equation}
@@ -543,22 +541,21 @@ pose = plant.EvalBodyPoseInWorld(context, gripper)</pre></code>
         <li>Translational velocities compose across frames with:
         \begin{equation}{}^A\text{v}^C_F = {}^A\text{v}^B_F + {}^B\text{v}^C_F
         + {}^A\omega^B_F \times {}^Bp^C_F.\end{equation} 
-      <details><summary>This can be derived in a few steps (click the triangle
-      to expand)</summary><p>Differentiating $${}^Ap^C = {}^AX^B {}^Bp^C =
-      {}^Ap^B + {}^AR^B {}^Bp^C,$$ yields \begin{align} {}^A\text{v}^C =&
-      {}^A\text{v}^B + {}^A\dot{R}^B {}^Bp^C + {}^AR^B {}^B\text{v}^C \nonumber
-      \\ =& {}^A\text{v}^B_A + {}^A\dot{R}^B {}^BR^A {}^Bp^C_A +
-      {}^B\text{v}^C_A.\end{align} Allow me to write $\dot{R}R^{-1}$ for
-      ${}^A\dot{R}^B {}^BR^A$ (dropping the frames for a moment). It turns out
-      that $\dot{R}R^{-1}$, is always a skew-symmetric matrix.  To see this,
+      <details><summary>This can be derived in a few steps (click the triangle to
+      expand)</summary><p>Differentiating $${}^Ap^C = {}^AX^B {}^Bp^C = {}^Ap^B +
+      {}^AR^B {}^Bp^C,$$ yields \begin{align} {}^A\text{v}^C =& {}^A\text{v}^B +
+      {}^A\dot{R}^B {}^Bp^C + {}^AR^B {}^B\text{v}^C \nonumber \\ =& {}^A\text{v}^B_A +
+      {}^A\dot{R}^B {}^BR^A {}^Bp^C_A + {}^B\text{v}^C_A.\end{align} Allow me to write
+      $\dot{R}R^{-1}$ for ${}^A\dot{R}^B {}^BR^A$ (dropping the frames for a moment). It
+      turns out that $\dot{R}R^{-1}$, is always a skew-symmetric matrix.  To see this,
       differentiate $RR^T = I$ to get $$\dot{R}R^T + R\dot{R}^T = 0 \Rightarrow
-      \dot{R}R^T = - R\dot{R}^T \Rightarrow \dot{R} R^T = - (\dot{R} R^T)^T,$$
-      which is the definition of a skew-symmetric matrix. Any 3$\times$3
-      skew-symmetric matrix can be parameterized by three numbers (we'll use
-      the three-element vector $\omega$), and can be written as a cross
-      product, so $\dot{R}R^Tp = \omega \times p.$</p>  <p>Multiply the right
-      and left sides by ${}^FR^A$ to change the expressed-in frame, and we have
-      our result.</p></details></li>
+      \dot{R}R^T = - R\dot{R}^T \Rightarrow \dot{R} R^T = - (\dot{R} R^T)^T,$$ which is
+      the definition of a skew-symmetric matrix. Any 3$\times$3 skew-symmetric matrix
+      can be parameterized by three numbers (for $\dot{R}R^T$ in particular, this is
+      exactly our angular velocity vector, $\omega$), and can be written as a cross
+      product, so $\dot{R}R^Tp = \omega \times p.$</p>  <p>Multiply the right and left
+      sides by ${}^FR^A$ to change the expressed-in frame, and we have our
+      result.</p></details></li>
       <li>This reveals that additive inverse for translational velocities is
       not obtained by switching the reference and measured-in frames; it is
       slightly more complicated: \begin{equation}-{}^A\text{v}^B_F =
@@ -1259,6 +1256,20 @@ Velocity names: ['$world_base_link_wx', '$world_base_link_wy', '$world_base_link
 
     </subsection>
 
+    <subsection><h1>Tracking a desired pose</h1>
+    
+      <p>Sometimes it can be more natural to specify the goal for differential IK as
+      tracking a desired pose, ${}^AX^{G_d}$, rather than explicitly specifying the
+      desired spatial velocity. But we can naturally convert the pose command into a
+      spatial velocity command, ${}^AV^{G_d}_A.$ The translational component is simple
+      enough, we'll use $${}^Ap^{G_d}_A = {}^Ap^G_A + h {}^Av^{G}_A \quad \Rightarrow
+      \quad {}^A\text{v}^{G}_A  = \frac{1}{h} \left({}^Ap^{G_d}_A - {}^Ap^G_A\right) =
+      \frac{1}{h}{}^Gp^{G_d}_A.$$ Similarly, for the angular velocity, we will choose
+      $${}^A\omega^{G}_A = \frac{1}{h} {}^GR^{G_d},$$ where ${}^GR^{G_d}$ is represented
+      in <a href="#axis-angle">axis-angle</a> form.</p>
+    
+    </subsection>
+
     <subsection><h1>Alternative formulations</h1>
     
       <p>Once we have embraced the idea of solving a small optimization problem
@@ -1285,6 +1296,34 @@ Velocity names: ['$world_base_link_wx', '$world_base_link_wy', '$world_base_link
       Observe that $v_n = 0, \alpha = 0$ is always a feasible solution for this
       problem.  So if it's not possible to move in the commanded direction,
       then the robot will just stop.</p>
+
+      <p id="rpy_diffik">For teleop with human operators, coming to a complete stop when
+      one cannot move in exactly the commanded direction can be too restrictive -- the
+      operator feels like the robot gets "stuck" every time that the robot approaches a
+      constraint. For instance, imagine if we have a collision avoidance constraint
+      between the robot gripper and a table, and the operator wants to move the hand
+      along the table top. This would be effectively impossible given the strict
+      formulation. We have found that the following relaxation is more intuitive for the
+      operator:
+      <p>\begin{align} \max_{v_n, \alpha} \quad & \sum_i \alpha_i, \\ \subjto \quad &
+      J^G(q)v_n = E(q) \text{diag}(\alpha) E^{-1}(q) V^{G_d}, \nonumber \\ & 0 \le
+      \alpha_i \le 1, \nonumber \\ & \text{additional constraints}. \nonumber
+      \end{align} Here $E(q)$ is the <a
+      href="https://github.com/RobotLocomotion/drake/blob/d1a1d14b323c8a4a481a8d11fc8e9c527d63bf20/multibody/tree/rpy_ball_mobilizer.cc#L223">linear
+      map</a> from the derivative of the Euler angle representation (e.g.
+      $\frac{d}{dt}[roll, pitch, yaw, x, y, z]$) to the spatial velocity. Note that we
+      can avoid the $E^{-1}(q)$, which can become singular, by accepting the spatial
+      velocity command using the Euler angle derivatives. To someone familiar with
+      optimization, this looks a bit strange -- the diagonal matrix is a
+      <i>coordinate-dependent</i>
+      scaling of the velocity. But that is exactly the point -- for human operators is
+      it more intuitive to saturate the velocity commands component-wise in the
+      coordinates of x, y, z, roll, pitch, and yaw, typically specified in the robot's
+      base frame. When you're trying to slide the robot end-effector along the table
+      top, the velocity component going into the table will saturate, but the components
+      orthogonal the table need not saturate. For example, you won't ever see the
+      end-effector twist when you are commanding pure translation, and won't see the
+      end-effector translate when you are commanding a pure rotation.</p>
 
       <todo>Updated block diagram</todo>
 
@@ -1550,7 +1589,7 @@ Velocity names: ['$world_base_link_wx', '$world_base_link_wy', '$world_base_link
   <ol type="a">
     <li><i>Roll-Pitch-Yaw:</i> One way we can represent a rotation is with a set of "roll-pitch-yaw" angles $(r,p,y)$. Refer to Drake's <a href="https://drake.mit.edu/doxygen_cxx/classdrake_1_1math_1_1_roll_pitch_yaw.html">RollPitchYaw</a> class for conventions on the ordering of these individual angle rotations into a single rotation matrix. Given that $p=-\pi/2$, compute a rotation matrix in terms of $r$ and $y$. In the resulting matrix, how does a change in $r$ compare to a change in $y$? What does this tell us about "roll-pitch-yaw" as a representation for rotations?<br /><br />
     Hint: Try simplifying your solution using the <a href="https://en.wikipedia.org/wiki/List_of_trigonometric_identities#Angle_sum_and_difference_identities">angle sum trigonometric identities</a> $$\sin(\alpha+\beta)=\sin\alpha\cos\beta+\cos\alpha\sin\beta$$ $$\cos(\alpha+\beta)=\cos\alpha\cos\beta-\sin\alpha\sin\beta$$.</li>
-    <li><i>Axis-Angle:</i> Consider an orientation obtained by rotating a right-handed coordinate frame about its z-axis by an angle of $\pi/2$ radians. This rotation would result in the positive x-axis pointing in the direction where the positive y-axis was pointing before rotation. One way to represent this rotation is with the axis-angles vector $(0,0,\pi/2)$. (Recall that the vector describes the axis about which the rotation occurs, and its magnitude is the angle of rotation). This representation is not unique. Find two other sets of axis-angles that would give the same rotation.</li>
+    <li id="axis-angle"><i>Axis-Angle:</i> Consider an orientation obtained by rotating a right-handed coordinate frame about its z-axis by an angle of $\pi/2$ radians. This rotation would result in the positive x-axis pointing in the direction where the positive y-axis was pointing before rotation. One way to represent this rotation is with the axis-angles vector $(0,0,\pi/2)$. (Recall that the vector describes the axis about which the rotation occurs, and its magnitude is the angle of rotation). This representation is not unique. Find two other sets of axis-angles that would give the same rotation.</li>
     <li><i>Quaternion:</i> A unit quaternion is a set of four numbers $(w,x,y,z)$ such that $w^2+x^2+y^2+z^2=1$. Unit quaternions are an excellent way of representing orientations, since they don't suffer from singularities (unlike the roll-pitch-yaw and axis-angle representations). This makes them reliable for <a href="#pick_and_place_trajectory">interpolating orientations</a>, but unit quaternions still suffer from the "multiple representations" problem.<br /><br />
     We can turn a unit quaternion $(w,x,y,z)$ into an axis-angle vector $(a_x,a_y,a_z)$ by computing $\theta=2\arccos(w)$, and then $$(a_x,a_y,a_z)=\left\{\begin{array}{ll} \displaystyle\frac{\theta}{\sin(\theta/2)}(x,y,z) & \theta\ne 0\\ (0,0,0) & \theta=0 \end{array}\right.$$ Show that for any unit quaternion $(w,x,y,z)$, $(-w,-x,-y,-z)$ represents the same orientation by converting to axis-angle form, and simplifying the resulting trigonometric expressions.<br /><br />
     As it turns out, there are precisely two unit quaternions corresponding to each orientation!<br /><br />
