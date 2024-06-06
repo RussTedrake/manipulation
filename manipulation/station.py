@@ -72,7 +72,6 @@ from pydrake.all import (
 )
 from pydrake.common.yaml import yaml_load_typed
 
-from manipulation.scenarios import AddIiwa, AddPlanarIiwa, AddWsg
 from manipulation.systems import ExtractPose
 from manipulation.utils import ConfigureParser
 
@@ -407,9 +406,27 @@ def _PopulatePlantOrDiagram(
         parser=parser,
     )
 
-    assert (
-        len(children_to_freeze) == 0
-    ), "Adding frozen child instances is not implemented yet; it is waiting for upstream PRs in Drake."
+    # freeze child instances
+    for child_instance_name in children_to_freeze:
+        child_instance = plant.GetModelInstanceByName(child_instance_name)
+
+        # TODO (sancha): for some reason, GetJointActuatorIndices() returns an
+        # empty list, even though it finds actuators for the entire plant.
+        # Debug this.
+
+        # remove joint actuators
+        for actuator_index in plant.GetJointActuatorIndices(child_instance):
+            actuator = plant.get_joint_actuator(actuator_index)
+            plant.RemoveJointActuator(actuator)
+
+        # remove non-weld joints and replace them with weld joints
+        for joint_index in plant.GetJointIndices(child_instance):
+            joint = plant.get_joint(joint_index)
+            if joint.type_name() != "weld":
+                frame_on_parent = joint.frame_on_parent()
+                frame_on_child = joint.frame_on_child()
+                plant.RemoveJoint(joint)
+                plant.WeldFrames(frame_on_parent, frame_on_child)
 
     if parser_prefinalize_callback:
         parser_prefinalize_callback(parser)
@@ -599,21 +616,12 @@ def _ApplyDriverConfigSim(
         num_iiwa_positions = sim_plant.num_positions(model_instance)
 
         # Make the plant for the iiwa controller to use.
-        # TODO: The current hardcoded implementation should be replaced with the
-        # MakeMultibodyPlant below, once adding frozen children is supported in Drake.
-        # controller_plant = MakeMultibodyPlant(
-        #     scenario=scenario,
-        #     model_instance_names=[model_instance_name],
-        #     add_frozen_child_instances=True,
-        #     package_xmls=package_xmls,
-        # )
-        controller_plant = MultibodyPlant(time_step=sim_plant.time_step())
-        if num_iiwa_positions == 3:
-            controller_iiwa = AddPlanarIiwa(controller_plant)
-        else:
-            controller_iiwa = AddIiwa(controller_plant)
-        AddWsg(controller_plant, controller_iiwa, welded=True)
-        controller_plant.Finalize()
+        controller_plant = MakeMultibodyPlant(
+            scenario=scenario,
+            model_instance_names=[model_instance_name],
+            add_frozen_child_instances=True,
+            package_xmls=package_xmls,
+        )
         # Keep the controller plant alive during the Diagram lifespan.
         builder.AddNamedSystem(
             f"{model_instance_name}_controller_plant_pointer_system",
