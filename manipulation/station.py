@@ -55,6 +55,7 @@ from pydrake.all import (
     Parser,
     PdControllerGains,
     ProcessModelDirectives,
+    RigidTransform,
     RobotDiagram,
     RobotDiagramBuilder,
     SceneGraph,
@@ -67,6 +68,7 @@ from pydrake.all import (
     SimIiwaDriver,
     SimulatorConfig,
     VisualizationConfig,
+    WeldJoint,
     ZeroForceDriver,
     position_enabled,
     torque_enabled,
@@ -389,10 +391,14 @@ def _FreezeChildren(
 
     # Remove non-weld joints and replace them with weld joints.
     for joint in joints_to_freeze:
-        frame_on_parent = joint.frame_on_parent()
-        frame_on_child = joint.frame_on_child()
+        weld = WeldJoint(
+            joint.name(),
+            joint.frame_on_parent(),
+            joint.frame_on_child(),
+            RigidTransform(),
+        )
         plant.RemoveJoint(joint)
-        plant.WeldFrames(frame_on_parent, frame_on_child)
+        plant.AddJoint(weld)
 
 
 def _PopulatePlantOrDiagram(
