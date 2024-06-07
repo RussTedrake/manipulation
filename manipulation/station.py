@@ -34,6 +34,7 @@ from pydrake.all import (
     IiwaDriver,
     IiwaStatusReceiver,
     InverseDynamicsController,
+    Joint,
     LcmBuses,
     LcmImageArrayToImages,
     LcmPublisherSystem,
@@ -406,27 +407,30 @@ def _PopulatePlantOrDiagram(
         parser=parser,
     )
 
-    # freeze child instances
+    # Freeze child instances
     for child_instance_name in children_to_freeze:
         child_instance = plant.GetModelInstanceByName(child_instance_name)
 
-        # TODO (sancha): for some reason, GetJointActuatorIndices() returns an
-        # empty list, even though it finds actuators for the entire plant.
-        # Debug this.
-
-        # remove joint actuators
-        for actuator_index in plant.GetJointActuatorIndices(child_instance):
-            actuator = plant.get_joint_actuator(actuator_index)
-            plant.RemoveJointActuator(actuator)
-
-        # remove non-weld joints and replace them with weld joints
+        # Enumerate joints that need to be frozen. These are non-weld joints
+        # that should be removed and replaced by weld joints.
+        joints_to_freeze: typing.Set[Joint] = set()
         for joint_index in plant.GetJointIndices(child_instance):
             joint = plant.get_joint(joint_index)
             if joint.type_name() != "weld":
-                frame_on_parent = joint.frame_on_parent()
-                frame_on_child = joint.frame_on_child()
-                plant.RemoveJoint(joint)
-                plant.WeldFrames(frame_on_parent, frame_on_child)
+                joints_to_freeze.add(joint)
+
+        # Before removing joints, we need to remove associated actuators.
+        for actuator_index in plant.GetJointActuatorIndices():
+            actuator = plant.get_joint_actuator(actuator_index)
+            if actuator.joint() in joints_to_freeze:
+                plant.RemoveJointActuator(actuator)
+
+        # Remove non-weld joints and replace them with weld joints.
+        for joint in joints_to_freeze:
+            frame_on_parent = joint.frame_on_parent()
+            frame_on_child = joint.frame_on_child()
+            plant.RemoveJoint(joint)
+            plant.WeldFrames(frame_on_parent, frame_on_child)
 
     if parser_prefinalize_callback:
         parser_prefinalize_callback(parser)
