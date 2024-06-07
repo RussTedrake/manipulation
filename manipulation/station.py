@@ -34,6 +34,7 @@ from pydrake.all import (
     IiwaDriver,
     IiwaStatusReceiver,
     InverseDynamicsController,
+    Joint,
     LcmBuses,
     LcmImageArrayToImages,
     LcmPublisherSystem,
@@ -54,6 +55,7 @@ from pydrake.all import (
     Parser,
     PdControllerGains,
     ProcessModelDirectives,
+    RigidTransform,
     RobotDiagram,
     RobotDiagramBuilder,
     SceneGraph,
@@ -66,13 +68,13 @@ from pydrake.all import (
     SimIiwaDriver,
     SimulatorConfig,
     VisualizationConfig,
+    WeldJoint,
     ZeroForceDriver,
     position_enabled,
     torque_enabled,
 )
 from pydrake.common.yaml import yaml_load_typed
 
-from manipulation.scenarios import AddIiwa, AddPlanarIiwa, AddWsg
 from manipulation.systems import ExtractPose
 from manipulation.utils import ConfigureParser
 
@@ -358,6 +360,47 @@ def _FindChildren(
     return children
 
 
+def _FreezeChildren(
+    plant: MultibodyPlant,
+    children_to_freeze: typing.List[str],
+) -> None:
+    """
+    Freeze the joints of the given children in the plant.
+
+    Freezing really means removing a joint belonging to any of the children,
+    and replacing it with a weld joint.
+    """
+    if len(children_to_freeze) == 0:
+        return
+
+    # Enumerate joints that need to be frozen i.e. removed and replaced by weld
+    # joints. These are joints of child instances that are not already welds.
+    joints_to_freeze: typing.Set[Joint] = set()
+    for child_instance_name in children_to_freeze:
+        child_instance = plant.GetModelInstanceByName(child_instance_name)
+        for joint_index in plant.GetJointIndices(child_instance):
+            joint = plant.get_joint(joint_index)
+            if joint.type_name() != "weld":
+                joints_to_freeze.add(joint)
+
+    # Before removing joints, we need to remove associated actuators.
+    for actuator_index in plant.GetJointActuatorIndices():
+        actuator = plant.get_joint_actuator(actuator_index)
+        if actuator.joint() in joints_to_freeze:
+            plant.RemoveJointActuator(actuator)
+
+    # Remove non-weld joints and replace them with weld joints.
+    for joint in joints_to_freeze:
+        weld = WeldJoint(
+            joint.name(),
+            joint.frame_on_parent(),
+            joint.frame_on_child(),
+            RigidTransform(),
+        )
+        plant.RemoveJoint(joint)
+        plant.AddJoint(weld)
+
+
 def _PopulatePlantOrDiagram(
     plant: MultibodyPlant,
     parser: Parser,
@@ -407,9 +450,7 @@ def _PopulatePlantOrDiagram(
         parser=parser,
     )
 
-    assert (
-        len(children_to_freeze) == 0
-    ), "Adding frozen child instances is not implemented yet; it is waiting for upstream PRs in Drake."
+    _FreezeChildren(plant, children_to_freeze)
 
     if parser_prefinalize_callback:
         parser_prefinalize_callback(parser)
@@ -599,21 +640,12 @@ def _ApplyDriverConfigSim(
         num_iiwa_positions = sim_plant.num_positions(model_instance)
 
         # Make the plant for the iiwa controller to use.
-        # TODO: The current hardcoded implementation should be replaced with the
-        # MakeMultibodyPlant below, once adding frozen children is supported in Drake.
-        # controller_plant = MakeMultibodyPlant(
-        #     scenario=scenario,
-        #     model_instance_names=[model_instance_name],
-        #     add_frozen_child_instances=True,
-        #     package_xmls=package_xmls,
-        # )
-        controller_plant = MultibodyPlant(time_step=sim_plant.time_step())
-        if num_iiwa_positions == 3:
-            controller_iiwa = AddPlanarIiwa(controller_plant)
-        else:
-            controller_iiwa = AddIiwa(controller_plant)
-        AddWsg(controller_plant, controller_iiwa, welded=True)
-        controller_plant.Finalize()
+        controller_plant = MakeMultibodyPlant(
+            scenario=scenario,
+            model_instance_names=[model_instance_name],
+            add_frozen_child_instances=True,
+            package_xmls=package_xmls,
+        )
         # Keep the controller plant alive during the Diagram lifespan.
         builder.AddNamedSystem(
             f"{model_instance_name}_controller_plant_pointer_system",
