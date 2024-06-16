@@ -27,14 +27,13 @@ rt_ipynb_test(
     ],
 )
 
-# Waiting on https://github.com/RobotLocomotion/drake/pull/21504
-#rt_ipynb_test(
-#    name = "gcs_derivatives",
-#    srcs = ["gcs_derivatives.ipynb"],
-#    deps = [ 
-#      requirement("drake"),
-#    ],
-#)
+rt_ipynb_test(
+    name = "gcs_derivatives",
+    srcs = ["gcs_derivatives.ipynb"],
+    deps = [ 
+      requirement("drake"),
+    ],
+)
 
 rt_ipynb_test(
     name = "gcs_simple_2d_cspace",
