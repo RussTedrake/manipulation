@@ -32,6 +32,7 @@ rt_ipynb_test(
     srcs = ["gcs_derivatives.ipynb"],
     deps = [ 
       requirement("drake"),
+      requirement("ipython"),
     ],
 )
 
