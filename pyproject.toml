@@ -49,6 +49,7 @@ cloudpickle = "2.2.1"  # needs to be pinned for stored files to remain compatibl
 drake = { version = ">=0.0.20240615", source = "drake-nightly" }
 #drake = ">=1.33.0"
 gradescope-utils = ">=0.4.0"
+ipywidgets = ">=8"
 mpld3  = ">=0.5.6"
 nevergrad = ">=0.4.3"  # TODO: avoid expensive bayesian optimization dep
 numpy = "<2.0.0"  # https://stackoverflow.com/questions/78533824/local-installation-of-drake-on-macos-sonoma
@@ -60,6 +61,7 @@ stable-baselines3 = ">=2.0.0"
 timeout-decorator = ">=0.4.1"
 torch = ">=2.0.1"
 torchvision = ">=0.10.1"
+tqdm = ">=4"
 trimesh = {extras = ["recommend"], version = ">=4.0.0 <4.2.0"}
 vhacdx = ">=0.0.5"
 #wandb = ">=0.14.0"
