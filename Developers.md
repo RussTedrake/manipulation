@@ -54,9 +54,6 @@ bazel test //...
 
 ## To update the pip wheels
 
-Note: This should really only happen when drake publishes new wheels (since I'm
-testing on drake master, not on the drake release).
-
 Update the version number in `pyproject.toml`, and the drake version, then from
 the root directory, run:
 ```
