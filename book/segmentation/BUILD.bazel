@@ -12,7 +12,7 @@ load("//book/htmlbook/tools/python:defs.bzl", "rt_py_test")
 #    name = "segmentation_inference",
 #    srcs = ["segmentation_inference.ipynb"],
 #    deps = ["//manipulation"],
-#    data = ["//data:clutter_maskrcnn_data"],
+#    data = ["//book/data:clutter_maskrcnn_data"],
 #)
 
 rt_py_test(

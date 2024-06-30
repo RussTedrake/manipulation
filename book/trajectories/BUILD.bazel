@@ -60,6 +60,16 @@ rt_ipynb_test(
 #    ],
 #)
 
+rt_ipynb_test(
+    name = "iris_builder",
+    srcs = ["iris_builder.ipynb"],
+    deps = [
+      "//manipulation",
+      requirement("scipy"),
+    ],
+    data = ["//book/data:iiwa_shelve_and_bins_science_robotics.yaml"],
+    tags = ["requires-network"], # For gurobi
+)
 
 rt_ipynb_test(
     name = "kinematic_trajectory_optimization",
