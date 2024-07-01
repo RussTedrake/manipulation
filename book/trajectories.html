@@ -1184,12 +1184,33 @@ ik.AddPositionConstraint(
       do it by examing the solutions that come from teleop demonstrations, from another
       planner (that can generate plans, but without the same guarantees), or even from a
       reinforcement learning policy.</p>
+
+      <example><h1>The IRIS Builder</h1>
+
+        <p>Here is a notebook that contains a handful of different tools for steering
+        the creation of your IRIS regions.</p>
+
+        <script>document.write(notebook_link('trajectories', notebook = "iris_builder"))</script>
       
+      </example>
+
     </subsection>
 
     <subsection><h1>GcsTrajOpt Examples</h1>
 
-      <example><h1>iiwa reaching into shelves</h1></example>
+      <example><h1>What's the right cost function for smooth curves?</h1>
+
+        <script>document.write(notebook_link('trajectories', notebook="gcs_derivatives"))</script>
+      
+      </example>
+
+      <example><h1>iiwa reaching into shelves</h1>
+      
+        <script>document.write(notebook_link('trajectories', notebook = "iris_builder"))</script>
+
+        <!-- Pull this out into it's own notebook (without the building?). Add Savva's
+example, too?-->
+      </example>
 
       <!-- clutter clearing -->
 
