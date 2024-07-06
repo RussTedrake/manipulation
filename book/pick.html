@@ -528,7 +528,13 @@ pose = plant.EvalBodyPoseInWorld(context, gripper)</pre></code>
     of rotation. It's tempting to think of it as the time derivatives of roll, pitch,
     and yaw, but that's not true; it can easily be converted to (or from) that
     representation through a <a
-    href="https://github.com/RobotLocomotion/drake/blob/d1a1d14b323c8a4a481a8d11fc8e9c527d63bf20/multibody/tree/rpy_ball_mobilizer.cc#L223">linear map</a>.  Spatial velocities fit nicely into our spatial algebra:<ul>
+    href="https://github.com/RobotLocomotion/drake/blob/d1a1d14b323c8a4a481a8d11fc8e9c527d63bf20/multibody/tree/rpy_ball_mobilizer.cc#L223">linear
+    map</a>. It is also not the time-derivative of the axis-angle representation; that
+    conversion can be found e.g. <a
+    href="https://math.stackexchange.com/questions/4534687/axis-angle-representation-of-angular-velocity">here</a>.</p>
+  
+    <p>Spatial velocities fit nicely into our spatial algebra:
+    <ul>
       <li>Velocities add when they are expressed in the same frame: \begin{gather}
       {}^A\text{v}^B_F + {}^B\text{v}^C_F = {}^A\text{v}^C_F, \qquad {}^A\omega^B_F +
       {}^B\omega^C_F = {}^A\omega^C_F,\end{gather} (especially for angular velocities,
