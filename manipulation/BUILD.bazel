@@ -144,6 +144,14 @@ rt_py_test(
 )
 
 rt_py_test(
+    name = "test_directives_tree",
+    srcs = ["test/test_directives_tree.py"],
+    data = ["//manipulation:station"],
+    imports = [".."],
+    deps = ["manipulation"],
+)
+
+rt_py_test(
     name = "test_utils",
     srcs = ["test/test_utils.py"],
     imports = [".."],
