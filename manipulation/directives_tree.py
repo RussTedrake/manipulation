@@ -22,13 +22,13 @@ DirectivesTree: A set of `add_weld` and `add_frame` directives induces a tree.
 """
 
 
-@dc.dataclass
+@dc.dataclass(frozen=True)
 class Node:
     name: str
     type: Literal["frame", "model"]
 
 
-@dc.dataclass
+@dc.dataclass(frozen=True)
 class Edge:
     parent: Node
     child: Node
