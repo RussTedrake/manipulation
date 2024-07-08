@@ -1,5 +1,5 @@
 import dataclasses as dc
-from typing import Dict, List, Literal, Set
+from typing import Dict, List, Literal, Set, Tuple
 
 from pydrake.all import AddFrame, AddWeld, ModelDirective, ScopedName
 
@@ -87,3 +87,13 @@ class DirectivesTree:
             f"Node {name} not found in the tree. It neither corresponds to a ",
             f"frame [{self.frame_names}] nor a model instance [{self.model_names}].",
         )
+
+    def GetWeldedChildrenAndDirectives(
+        self, model_instance_names: List[str]
+    ) -> Tuple[List[str], List[ModelDirective]]:
+        pass
+
+    def GetWeldToWorldDirectives(
+        self, model_instance_names: List[str]
+    ) -> List[ModelDirective]:
+        pass
