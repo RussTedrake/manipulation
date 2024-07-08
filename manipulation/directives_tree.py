@@ -92,7 +92,7 @@ class DirectivesTree:
             f"frame [{self.frame_names}] nor a model instance [{self.model_names}].",
         )
 
-    def GetWeldedChildrenAndDirectives(
+    def GetWeldedDescendantsAndDirectives(
         self, model_instance_names: List[str]
     ) -> Tuple[Set[str], Set[ModelDirective]]:
 
@@ -138,7 +138,8 @@ class DirectivesTree:
             descendants.update(_descendants)
             directives.update(_directives)
 
-        return descendants, directives
+        proper_descendants = descendants - set(model_instance_names)
+        return proper_descendants, directives
 
     def GetWeldToWorldDirectives(
         self, model_instance_names: List[str]

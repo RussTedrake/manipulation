@@ -403,7 +403,7 @@ def _PopulatePlantOrDiagram(
 
         if add_frozen_child_instances:
             children_to_freeze, additional_directives = (
-                tree.GetWeldedChildrenAndDirectives(model_instance_names)
+                tree.GetWeldedDescendantsAndDirectives(model_instance_names)
             )
             directives.update(additional_directives)
 
