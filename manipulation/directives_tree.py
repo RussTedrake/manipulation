@@ -76,12 +76,12 @@ class DirectivesTree:
     def make_node(self, name: str):
         # Check if this is an added frame
         if name in self.frame_names:
-            return self.Node(name, "frame")
+            return Node(name, "frame")
 
         # Check if this corresponds to an added model
         model_name = ScopedName.Parse(name).get_namespace()
         if model_name in self.model_names:
-            return self.Node(name, "model")
+            return Node(name, "model")
 
         raise ValueError(
             f"Node {name} not found in the tree. It neither corresponds to a ",
