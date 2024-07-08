@@ -88,8 +88,8 @@ class DirectivesTree:
             return Node(model_name, "model")
 
         raise ValueError(
-            f"Node {name} not found in the tree. It neither corresponds to a ",
-            f"frame [{self.frame_names}] nor a model instance [{self.model_names}].",
+            f"Node {name} not found in the tree. It neither corresponds to a "
+            + f"frame {self.frame_names} nor a model instance {self.model_names}."
         )
 
     def GetWeldedDescendantsAndDirectives(
