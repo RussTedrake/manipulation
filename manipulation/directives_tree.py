@@ -1,7 +1,7 @@
 import dataclasses as dc
 from typing import Dict, List, Literal, Set, Tuple
 
-from pydrake.all import AddFrame, AddModel, AddWeld, ModelDirective, ScopedName
+from pydrake.all import ModelDirective, ScopedName
 
 """
 ===============================================================================
@@ -32,19 +32,19 @@ class Node:
 class Edge:
     parent: Node
     child: Node
-    directive: AddWeld | AddFrame
+    directive: ModelDirective  # either AddFrame or AddWeld
 
 
 class DirectivesTree:
     def __init__(self, flattened_directives: List[ModelDirective]):
-        self.add_model_directives: Dict[str, AddModel] = dict()
+        self.add_model_directives: Dict[str, ModelDirective] = dict()
 
         # Names of frames added by `add_frame` directives
         # The default "world" frame exists implicitly.
         self.frame_names: Set[str] = {"world"}
 
         # Names of models added by `add_model` directives
-        self.model_names: Set[str] = {}
+        self.model_names: Set[str] = set()
 
         # Mapping from parent nodes to the set of its outgoing edges.
         self.edges: Dict[Node, Set[Edge]] = dict()
@@ -53,7 +53,7 @@ class DirectivesTree:
         for d in flattened_directives:
             if d.add_model:
                 self.model_names.add(d.add_model.name)
-                self.add_model_directives[d.add_model.name] = d.add_model
+                self.add_model_directives[d.add_model.name] = d
             if d.add_frame:
                 self.frame_names.add(d.add_frame.name)
 
@@ -62,7 +62,7 @@ class DirectivesTree:
             if d.add_weld:
                 parent = self._MakeNode(d.add_weld.parent)
                 child = self._MakeNode(d.add_weld.child)
-                edge = Edge(parent, child, d.add_weld)
+                edge = Edge(parent, child, d)
                 if parent not in self.edges:
                     self.edges[parent] = {edge}
                 else:
@@ -71,7 +71,7 @@ class DirectivesTree:
             if d.add_frame:
                 parent = self._MakeNode(d.add_frame.X_PF.base_frame)
                 child = self._MakeNode(d.add_frame.name)
-                edge = Edge(parent, child, d.add_weld)
+                edge = Edge(parent, child, d)
                 if parent not in self.edges:
                     self.edges[parent] = {edge}
                 else:
@@ -85,7 +85,7 @@ class DirectivesTree:
         # Check if this corresponds to an added model
         model_name = ScopedName.Parse(name).get_namespace()
         if model_name in self.model_names:
-            return Node(name, "model")
+            return Node(model_name, "model")
 
         raise ValueError(
             f"Node {name} not found in the tree. It neither corresponds to a ",
@@ -107,8 +107,8 @@ class DirectivesTree:
                 Set[ModelDirective]: The directives that need to be added to
                     weld the descendant models to the input node.
             """
-            descendants: Set[str] = {}
-            directives: Set[ModelDirective] = {}
+            descendants: Set[str] = set()
+            directives: Set[ModelDirective] = set()
 
             # if the node is a model instance, add its AddModel directive,
             # and add the model's name to the set of descendants.
@@ -129,8 +129,8 @@ class DirectivesTree:
 
             return descendants, directives
 
-        descendants: Set[str] = {}
-        directives: Set[ModelDirective] = {}
+        descendants: Set[str] = set()
+        directives: Set[ModelDirective] = set()
         for model_instance_name in model_instance_names:
             assert model_instance_name in self.add_model_directives
             node = Node(model_instance_name, "model")
@@ -153,7 +153,7 @@ class DirectivesTree:
                 Set[ModelDirective]: The directives that need to be added to
                     weld all `model_instance_names` to the "world" frame.
             """
-            directives: Set[ModelDirective] = {}
+            directives: Set[ModelDirective] = set()
 
             # if the node is one of the model instances, add its AddModel
             # directive and return.

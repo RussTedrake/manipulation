@@ -53,11 +53,22 @@ rt_py_library(
 )
 
 rt_py_library(
+    name = "directives_tree",
+    deps = [
+      "//manipulation",
+    ],
+    srcs = ["directives_tree.py"],
+    imports = [".."],
+    visibility = ["//visibility:public"],
+)
+
+rt_py_library(
     name = "station",
     deps = [
       "//manipulation",
       "scenarios",
       "systems",
+      "directives_tree",
     ],
     srcs = ["station.py"],
     imports = [".."],
