@@ -40,11 +40,11 @@ class DirectivesTree:
         self.flattened_directives = flattened_directives
         self.add_model_directives: typing.Dict[str, ModelDirective] = dict()
 
-        # Names of frames added by `add_frame` directives
+        # Names of frames added by `add_frame` directives.
         # The default "world" frame exists implicitly.
         self.frame_names: typing.Set[str] = {"world"}
 
-        # Names of models added by `add_model` directives
+        # Names of models added by `add_model` directives.
         self.model_names: typing.Set[str] = set()
 
         # Mapping from parent nodes to the set of its outgoing edges.
@@ -79,11 +79,11 @@ class DirectivesTree:
                     self.edges[parent].add(edge)
 
     def _MakeNode(self, name: str):
-        # Check if this is an added frame
+        # Check if this is an added frame.
         if name in self.frame_names:
             return Node(name, "frame")
 
-        # Check if this corresponds to an added model
+        # Check if this corresponds to an added model.
         model_name = ScopedName.Parse(name).get_namespace()
         if model_name in self.model_names:
             return Node(model_name, "model")
@@ -122,8 +122,7 @@ class DirectivesTree:
                     _descendants.add(edge.child.name)
                     _directives.add(self.add_model_directives[edge.child.name])
 
-                # If the child node has non-zero descendants, add the
-                # edge directive that leads to the child node.
+                # If the child node has non-zero descendants, add the edge directive that leads to the child node.
                 if len(_descendants) > 0:
                     directives.add(edge.directive)
 
@@ -168,8 +167,7 @@ class DirectivesTree:
             for edge in self.edges.get(node, set()):
                 _directives = _RecursionCall(edge.child)
 
-                # If the child node has non-zero directives, add the
-                # edge directive that leads to the child node.
+                # If the child node has non-zero directives, add the edge directive that leads to the child node.
                 if len(_directives) > 0:
                     directives.add(edge.directive)
 
