@@ -184,4 +184,8 @@ class DirectivesTree:
     def TopologicallySortDirectives(
         self, directives: typing.Set[ModelDirective]
     ) -> typing.List[ModelDirective]:
+        """
+        This assumes that the flattened directives are in a valid topologically
+        sorted order.
+        """
         return [d for d in self.flattened_directives if d in directives]
