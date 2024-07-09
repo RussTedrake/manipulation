@@ -16,7 +16,7 @@ from manipulation.station import MakeHardwareStation, Scenario
 
 
 class DirectivesTreeTest(unittest.TestCase):
-    def GetFlattenedDirectives(self) -> typing.List[ModelDirective]:
+    def get_flattened_directives(self) -> typing.List[ModelDirective]:
         return [
             ModelDirective(
                 add_model=AddModel(
@@ -86,7 +86,7 @@ class DirectivesTreeTest(unittest.TestCase):
         ]
 
     def test_get_welded_descendants_and_directives(self):
-        directives = self.GetFlattenedDirectives()
+        directives = self.get_flattened_directives()
         tree = DirectivesTree(directives)
 
         children, wsg_directives = tree.GetWeldedDescendantsAndDirectives(["iiwa"])
@@ -94,7 +94,7 @@ class DirectivesTreeTest(unittest.TestCase):
         self.assertEqual(wsg_directives, directives[3:6])  # wsg-related directives
 
     def test_get_weld_to_world_directives(self):
-        directives = self.GetFlattenedDirectives()
+        directives = self.get_flattened_directives()
         tree = DirectivesTree(directives)
 
         iiwa_directives = tree.GetWeldToWorldDirectives(["iiwa"])
@@ -102,7 +102,7 @@ class DirectivesTreeTest(unittest.TestCase):
 
     def test_load_scenario(self):
         scenario = Scenario()
-        scenario.directives = self.GetFlattenedDirectives()
+        scenario.directives = self.get_flattened_directives()
         scenario.model_drivers = {
             "iiwa": IiwaDriver(
                 control_mode="position_only",
