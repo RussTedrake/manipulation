@@ -8,6 +8,8 @@ from pydrake.all import (
     AddWeld,
     IiwaDriver,
     ModelDirective,
+    MultibodyPlant,
+    RobotDiagram,
     Rotation,
     Transform,
 )
@@ -111,7 +113,15 @@ class DirectivesTreeTest(unittest.TestCase):
                 hand_model_name="wsg",
             )
         }
-        station = MakeHardwareStation(scenario, hardware=False)
+        station: RobotDiagram = MakeHardwareStation(scenario, hardware=False)
+        controller_plant: MultibodyPlant = station.GetSubsystemByName(
+            "iiwa_controller_plant_pointer_system"
+        ).get()
+
+        # Check that the controller plant contains "iiwa" and "wsg" but not "table".
+        self.assertTrue(controller_plant.HasModelInstanceNamed("iiwa"))
+        self.assertTrue(controller_plant.HasModelInstanceNamed("wsg"))
+        self.assertFalse(controller_plant.HasModelInstanceNamed("table"))
 
 
 if __name__ == "__main__":
