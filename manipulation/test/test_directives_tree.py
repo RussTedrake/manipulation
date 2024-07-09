@@ -12,6 +12,7 @@ from pydrake.all import (
     Transform,
 )
 
+from manipulation.directives_tree import DirectivesTree
 from manipulation.station import MakeHardwareStation, Scenario
 
 
@@ -100,6 +101,21 @@ class DirectivesTreeTest(unittest.TestCase):
         meshcat = StartMeshcat()
         scenario = self.LoadScenario()
         station = MakeHardwareStation(scenario, meshcat, hardware=False)
+
+    def test_get_welded_descendants_and_directives(self):
+        directives = self.GetFlattenedDirectives()
+        tree = DirectivesTree(directives)
+
+        children, iiwa_directives = tree.GetWeldedDescendantsAndDirectives(["iiwa"])
+        self.assertEqual(children, {"wsg"})
+        self.assertEqual(iiwa_directives, directives[3:6])  # wsg-related directives
+
+    def test_get_weld_to_world_directives(self):
+        directives = self.GetFlattenedDirectives()
+        tree = DirectivesTree(directives)
+
+        iiwa_directives = tree.GetWeldToWorldDirectives(["iiwa"])
+        self.assertEqual(iiwa_directives, directives[:3])  # iiwa-related directives
 
 
 if __name__ == "__main__":
