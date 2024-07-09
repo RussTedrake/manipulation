@@ -122,7 +122,8 @@ class DirectivesTree:
                     _descendants.add(edge.child.name)
                     _directives.add(self.add_model_directives[edge.child.name])
 
-                # If the child node has non-zero descendants, add the edge directive that leads to the child node.
+                # If the child node has non-zero descendants, add the edge
+                # directive that leads to the child node.
                 if len(_descendants) > 0:
                     directives.add(edge.directive)
 
@@ -167,7 +168,8 @@ class DirectivesTree:
             for edge in self.edges.get(node, set()):
                 _directives = _RecursionCall(edge.child)
 
-                # If the child node has non-zero directives, add the edge directive that leads to the child node.
+                # If the child node has non-zero directives, add the edge
+                # directive that leads to the child node.
                 if len(_directives) > 0:
                     directives.add(edge.directive)
 
