@@ -97,12 +97,12 @@ class DirectivesTree:
         self, model_instance_names: typing.List[str]
     ) -> typing.Tuple[typing.Set[str], typing.List[ModelDirective]]:
 
-        def _RecursionCall(
+        def _RecursiveCall(
             node: Node,
         ) -> typing.Tuple[typing.Set[str], typing.Set[ModelDirective]]:
             """
             Args:
-                node (Node): The node to start this recursion call from.
+                node (Node): The node to start this recursive call from.
 
             Returns:
                 Set[str]: Names of proper descendant models that are welded to
@@ -114,7 +114,7 @@ class DirectivesTree:
             directives: typing.Set[ModelDirective] = set()
 
             for edge in self.edges.get(node, set()):
-                _descendants, _directives = _RecursionCall(edge.child)
+                _descendants, _directives = _RecursiveCall(edge.child)
 
                 # If the child is a model instance, add its AddModel directive,
                 # and add its model's name to the set of descendants.
@@ -138,7 +138,7 @@ class DirectivesTree:
         for model_instance_name in model_instance_names:
             assert model_instance_name in self.add_model_directives
             node = Node(model_instance_name, "model")
-            _descendants, _directives = _RecursionCall(node)
+            _descendants, _directives = _RecursiveCall(node)
             descendants.update(_descendants)
             directives.update(_directives)
 
@@ -148,10 +148,10 @@ class DirectivesTree:
         self, model_instance_names: typing.List[str]
     ) -> typing.List[ModelDirective]:
 
-        def _RecursionCall(node: Node) -> typing.Set[ModelDirective]:
+        def _RecursiveCall(node: Node) -> typing.Set[ModelDirective]:
             """
             Args:
-                node (Node): The node to start this recursion call from.
+                node (Node): The node to start this recursive call from.
 
             Returns:
                 Set[ModelDirective]: The directives that need to be added to
@@ -166,7 +166,7 @@ class DirectivesTree:
                 return directives
 
             for edge in self.edges.get(node, set()):
-                _directives = _RecursionCall(edge.child)
+                _directives = _RecursiveCall(edge.child)
 
                 # If the child node has non-zero directives, add the edge
                 # directive that leads to the child node.
@@ -179,7 +179,7 @@ class DirectivesTree:
             return directives
 
         world_node = Node("world", "frame")
-        return self.TopologicallySortDirectives(_RecursionCall(world_node))
+        return self.TopologicallySortDirectives(_RecursiveCall(world_node))
 
     def TopologicallySortDirectives(
         self, directives: typing.Set[ModelDirective]

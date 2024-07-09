@@ -89,9 +89,9 @@ class DirectivesTreeTest(unittest.TestCase):
         directives = self.GetFlattenedDirectives()
         tree = DirectivesTree(directives)
 
-        children, iiwa_directives = tree.GetWeldedDescendantsAndDirectives(["iiwa"])
+        children, wsg_directives = tree.GetWeldedDescendantsAndDirectives(["iiwa"])
         self.assertEqual(children, {"wsg"})
-        self.assertEqual(iiwa_directives, directives[3:6])  # wsg-related directives
+        self.assertEqual(wsg_directives, directives[3:6])  # wsg-related directives
 
     def test_get_weld_to_world_directives(self):
         directives = self.GetFlattenedDirectives()
