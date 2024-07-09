@@ -38,6 +38,8 @@ class Edge:
 class DirectivesTree:
     def __init__(self, flattened_directives: typing.List[ModelDirective]):
         self.flattened_directives = flattened_directives
+
+        # Dictionary of all `add_model` directives indexed by the model names.
         self.add_model_directives: typing.Dict[str, ModelDirective] = dict()
 
         # Names of frames added by `add_frame` directives.
