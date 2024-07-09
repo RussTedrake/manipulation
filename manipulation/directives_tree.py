@@ -1,5 +1,5 @@
 import dataclasses as dc
-from typing import Dict, List, Literal, Set, Tuple
+import typing
 
 from pydrake.all import ModelDirective, ScopedName
 
@@ -25,7 +25,7 @@ DirectivesTree: A set of `add_weld` and `add_frame` directives induces a tree.
 @dc.dataclass(frozen=True)
 class Node:
     name: str
-    type: Literal["frame", "model"]
+    type: typing.Literal["frame", "model"]
 
 
 @dc.dataclass(frozen=True)
@@ -36,19 +36,19 @@ class Edge:
 
 
 class DirectivesTree:
-    def __init__(self, flattened_directives: List[ModelDirective]):
+    def __init__(self, flattened_directives: typing.List[ModelDirective]):
         self.flattened_directives = flattened_directives
-        self.add_model_directives: Dict[str, ModelDirective] = dict()
+        self.add_model_directives: typing.Dict[str, ModelDirective] = dict()
 
         # Names of frames added by `add_frame` directives
         # The default "world" frame exists implicitly.
-        self.frame_names: Set[str] = {"world"}
+        self.frame_names: typing.Set[str] = {"world"}
 
         # Names of models added by `add_model` directives
-        self.model_names: Set[str] = set()
+        self.model_names: typing.Set[str] = set()
 
         # Mapping from parent nodes to the set of its outgoing edges.
-        self.edges: Dict[Node, Set[Edge]] = dict()
+        self.edges: typing.Dict[Node, typing.Set[Edge]] = dict()
 
         # Read node names.
         for d in self.flattened_directives:
@@ -94,10 +94,12 @@ class DirectivesTree:
         )
 
     def GetWeldedDescendantsAndDirectives(
-        self, model_instance_names: List[str]
-    ) -> Tuple[Set[str], List[ModelDirective]]:
+        self, model_instance_names: typing.List[str]
+    ) -> typing.Tuple[typing.Set[str], typing.List[ModelDirective]]:
 
-        def _RecursionCall(node: Node) -> Tuple[Set[str], Set[ModelDirective]]:
+        def _RecursionCall(
+            node: Node,
+        ) -> typing.Tuple[typing.Set[str], typing.Set[ModelDirective]]:
             """
             Args:
                 node (Node): The node to start this recursion call from.
@@ -108,8 +110,8 @@ class DirectivesTree:
                 Set[ModelDirective]: The directives that need to be added to
                     weld the proper descendant models to the input node.
             """
-            descendants = set()
-            directives = set()
+            descendants: typing.Set[str] = set()
+            directives: typing.Set[ModelDirective] = set()
 
             for edge in self.edges.get(node, set()):
                 _descendants, _directives = _RecursionCall(edge.child)
@@ -131,8 +133,8 @@ class DirectivesTree:
 
             return descendants, directives
 
-        descendants = set()
-        directives = set()
+        descendants: typing.Set[str] = set()
+        directives: typing.Set[ModelDirective] = set()
         for model_instance_name in model_instance_names:
             assert model_instance_name in self.add_model_directives
             node = Node(model_instance_name, "model")
@@ -143,10 +145,10 @@ class DirectivesTree:
         return descendants, self.TopologicallySortDirectives(directives)
 
     def GetWeldToWorldDirectives(
-        self, model_instance_names: List[str]
-    ) -> List[ModelDirective]:
+        self, model_instance_names: typing.List[str]
+    ) -> typing.List[ModelDirective]:
 
-        def _RecursionCall(node: Node) -> Set[ModelDirective]:
+        def _RecursionCall(node: Node) -> typing.Set[ModelDirective]:
             """
             Args:
                 node (Node): The node to start this recursion call from.
@@ -155,7 +157,7 @@ class DirectivesTree:
                 Set[ModelDirective]: The directives that need to be added to
                     weld all `model_instance_names` to the "world" frame.
             """
-            directives: Set[ModelDirective] = set()
+            directives: typing.Set[ModelDirective] = set()
 
             # Base case: if the node is one of the model instances, add its
             # AddModel directive and return immediately.
@@ -180,6 +182,6 @@ class DirectivesTree:
         return self.TopologicallySortDirectives(_RecursionCall(world_node))
 
     def TopologicallySortDirectives(
-        self, directives: Set[ModelDirective]
-    ) -> List[ModelDirective]:
+        self, directives: typing.Set[ModelDirective]
+    ) -> typing.List[ModelDirective]:
         return [d for d in self.flattened_directives if d in directives]
