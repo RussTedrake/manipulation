@@ -132,8 +132,9 @@ class DirectivesTree:
                 # If the child is a model instance, add its AddModel directive,
                 # and add its model's name to the set of descendants.
                 if edge.child.type == "model":
-                    _descendants.add(edge.child.name)
-                    _directives.add(self.add_model_directives[edge.child.name])
+                    child_model_name = edge.child.name
+                    _descendants.add(child_model_name)
+                    _directives.add(self.add_model_directives[child_model_name])
 
                 # If the child node has non-zero descendants, add the edge
                 # directive that leads to the child node.
