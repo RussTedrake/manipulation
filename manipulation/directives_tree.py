@@ -101,6 +101,14 @@ class DirectivesTree:
     def GetWeldedDescendantsAndDirectives(
         self, model_instance_names: typing.List[str]
     ) -> typing.Tuple[typing.Set[str], typing.List[ModelDirective]]:
+        """
+        Returns:
+            Set[str]: Names of proper descendant models of the input
+                `model_instance_names` in this directives tree.
+            List[ModelDirective]: The directives that need to be added to weld
+                the proper descendant models to the input model instances. The
+                directives list is in a valid topologically sorted order.
+        """
 
         def _RecursiveCall(
             node: Node,
@@ -152,6 +160,14 @@ class DirectivesTree:
     def GetWeldToWorldDirectives(
         self, model_instance_names: typing.List[str]
     ) -> typing.List[ModelDirective]:
+        """
+        Returns:
+            List[ModelDirective]: The directives that need to be added to
+                weld all `model_instance_names` to the "world" frame. This is
+                the minimal set of directives necessary to support all
+                `model_instance_names` in a plant. The directives list is in a
+                valid topologically sorted order.
+        """
 
         def _RecursiveCall(node: Node) -> typing.Set[ModelDirective]:
             """
