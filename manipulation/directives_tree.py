@@ -86,7 +86,7 @@ class DirectivesTree:
 
         raise ValueError(
             f"Node {name} not found in the tree. It neither corresponds to a "
-            + f"frame {self.frame_names} nor a model instance {self.model_names}."
+            f"frame {self.frame_names} nor a model instance {self.model_names}."
         )
 
     def _AddEdge(self, parent_name: str, child_name: str, directive: ModelDirective):
