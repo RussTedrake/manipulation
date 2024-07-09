@@ -3,24 +3,6 @@ import typing
 
 from pydrake.all import ModelDirective, ScopedName
 
-"""
-===============================================================================
-DirectivesTree: A set of `add_weld` and `add_frame` directives induces a tree.
-===============================================================================
-
-• Nodes of the tree
-  -----------------
-    • Each added frame is a node in the tree.
-    • Each model instance (identified by its namespace is a node in the tree).
-
-• Edges of the tree
-  -----------------
-    • Each `add_weld` directive is a directed edge from its parent frame/model
-        to its child frame/model.
-    • Each `add_frame` directive is a directed edge from its base frame/model
-        to its child frame/model.
-"""
-
 
 @dc.dataclass(frozen=True)
 class Node:
@@ -36,6 +18,24 @@ class Edge:
 
 
 class DirectivesTree:
+    """
+    ===========================================================================
+    DirectivesTree: A set of `add_weld` & `add_frame` directives induce a tree
+    ===========================================================================
+
+    • Nodes of the tree
+      -----------------
+        • Each added frame is a node in the tree.
+        • Each model instance (identified by its namespace is a node in the tree).
+
+    • Edges of the tree
+      -----------------
+        • Each `add_weld` directive is a directed edge from its parent
+          frame/model to its child frame/model.
+        • Each `add_frame` directive is a directed edge from its base
+          frame/model to its child frame/model.
+    """
+
     def __init__(self, flattened_directives: typing.List[ModelDirective]):
         self.flattened_directives = flattened_directives
 
