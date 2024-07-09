@@ -74,7 +74,7 @@ class DirectivesTree:
                 child_name = d.add_frame.name
                 self._AddEdge(parent_name, child_name, d)
 
-    def _MakeNode(self, name: str):
+    def _MakeNode(self, name: str) -> None:
         # Check if this is an added frame.
         if name in self.frame_names:
             return Node(name, "frame")
@@ -89,7 +89,9 @@ class DirectivesTree:
             f"frame {self.frame_names} nor a model instance {self.model_names}."
         )
 
-    def _AddEdge(self, parent_name: str, child_name: str, directive: ModelDirective):
+    def _AddEdge(
+        self, parent_name: str, child_name: str, directive: ModelDirective
+    ) -> None:
         parent = self._MakeNode(parent_name)
         child = self._MakeNode(child_name)
         edge = Edge(parent, child, directive)
