@@ -55,10 +55,12 @@ class DirectivesTree:
         # Read node names.
         for d in self.flattened_directives:
             if d.add_model:
-                self.model_names.add(d.add_model.name)
-                self.add_model_directives[d.add_model.name] = d
+                model_name = d.add_model.name
+                self.model_names.add(model_name)
+                self.add_model_directives[model_name] = d
             if d.add_frame:
-                self.frame_names.add(d.add_frame.name)
+                frame_name = d.add_frame.name
+                self.frame_names.add(frame_name)
 
         # Create edges.
         for d in self.flattened_directives:
