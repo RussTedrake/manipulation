@@ -408,7 +408,9 @@ def _PopulatePlantOrDiagram(
             directives.update(additional_directives)
 
     ProcessModelDirectives(
-        directives=ModelDirectives(directives=list(directives)),
+        directives=ModelDirectives(
+            directives=tree.TopologicallySortDirectives(directives)
+        ),
         parser=parser,
     )
 

@@ -37,6 +37,7 @@ class Edge:
 
 class DirectivesTree:
     def __init__(self, flattened_directives: List[ModelDirective]):
+        self.flattened_directives = flattened_directives
         self.add_model_directives: Dict[str, ModelDirective] = dict()
 
         # Names of frames added by `add_frame` directives
@@ -50,7 +51,7 @@ class DirectivesTree:
         self.edges: Dict[Node, Set[Edge]] = dict()
 
         # Read node names.
-        for d in flattened_directives:
+        for d in self.flattened_directives:
             if d.add_model:
                 self.model_names.add(d.add_model.name)
                 self.add_model_directives[d.add_model.name] = d
@@ -58,7 +59,7 @@ class DirectivesTree:
                 self.frame_names.add(d.add_frame.name)
 
         # Create edges.
-        for d in flattened_directives:
+        for d in self.flattened_directives:
             if d.add_weld:
                 parent = self._MakeNode(d.add_weld.parent)
                 child = self._MakeNode(d.add_weld.child)
@@ -176,3 +177,8 @@ class DirectivesTree:
 
         world_node = Node("world", "frame")
         return _RecursionCall(world_node)
+
+    def TopologicallySortDirectives(
+        self, directives: Set[ModelDirective]
+    ) -> List[ModelDirective]:
+        return [d for d in self.flattened_directives if d in directives]
