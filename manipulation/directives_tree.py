@@ -65,22 +65,14 @@ class DirectivesTree:
         # Create edges.
         for d in self.flattened_directives:
             if d.add_weld:
-                parent = self._MakeNode(d.add_weld.parent)
-                child = self._MakeNode(d.add_weld.child)
-                edge = Edge(parent, child, d)
-                if parent not in self.edges:
-                    self.edges[parent] = {edge}
-                else:
-                    self.edges[parent].add(edge)
+                parent_name = d.add_weld.parent
+                child_name = d.add_weld.child
+                self._AddEdge(parent_name, child_name, d)
 
             if d.add_frame:
-                parent = self._MakeNode(d.add_frame.X_PF.base_frame)
-                child = self._MakeNode(d.add_frame.name)
-                edge = Edge(parent, child, d)
-                if parent not in self.edges:
-                    self.edges[parent] = {edge}
-                else:
-                    self.edges[parent].add(edge)
+                parent_name = d.add_frame.X_PF.base_frame
+                child_name = d.add_frame.name
+                self._AddEdge(parent_name, child_name, d)
 
     def _MakeNode(self, name: str):
         # Check if this is an added frame.
@@ -96,6 +88,15 @@ class DirectivesTree:
             f"Node {name} not found in the tree. It neither corresponds to a "
             + f"frame {self.frame_names} nor a model instance {self.model_names}."
         )
+
+    def _AddEdge(self, parent_name: str, child_name: str, directive: ModelDirective):
+        parent = self._MakeNode(parent_name)
+        child = self._MakeNode(child_name)
+        edge = Edge(parent, child, directive)
+        if parent not in self.edges:
+            self.edges[parent] = {edge}
+        else:
+            self.edges[parent].add(edge)
 
     def GetWeldedDescendantsAndDirectives(
         self, model_instance_names: typing.List[str]
