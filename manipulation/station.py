@@ -373,7 +373,7 @@ def _PopulatePlantOrDiagram(
     plant: MultibodyPlant,
     parser: Parser,
     scenario: Scenario,
-    model_instance_names: typing.List[str] = None,
+    model_instance_names: typing.List[str],
     add_frozen_child_instances: bool = True,
     package_xmls: typing.List[str] = [],
     parser_preload_callback: typing.Callable[[Parser], None] = None,
@@ -392,20 +392,15 @@ def _PopulatePlantOrDiagram(
         ModelDirectives(directives=scenario.directives), parser.package_map()
     ).directives
 
-    if model_instance_names is None:
-        # Add all model instances, and hence, all directives.
-        directives = flattened_directives
-        children_to_freeze = set()
-    else:
-        tree = DirectivesTree(flattened_directives)
-        directives = tree.GetWeldToWorldDirectives(model_instance_names)
-        children_to_freeze = set()
+    tree = DirectivesTree(flattened_directives)
+    directives = tree.GetWeldToWorldDirectives(model_instance_names)
+    children_to_freeze = set()
 
-        if add_frozen_child_instances:
-            children_to_freeze, additional_directives = (
-                tree.GetWeldedDescendantsAndDirectives(model_instance_names)
-            )
-            directives.extend(additional_directives)
+    if add_frozen_child_instances:
+        children_to_freeze, additional_directives = (
+            tree.GetWeldedDescendantsAndDirectives(model_instance_names)
+        )
+        directives.extend(additional_directives)
 
     ProcessModelDirectives(
         directives=ModelDirectives(directives=directives),
