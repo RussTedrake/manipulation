@@ -8,7 +8,6 @@ from pydrake.all import (
     IiwaDriver,
     ModelDirective,
     Rotation,
-    StartMeshcat,
     Transform,
 )
 
@@ -86,22 +85,6 @@ class DirectivesTreeTest(unittest.TestCase):
             ),
         ]
 
-    def LoadScenario(self):
-        scenario = Scenario()
-        scenario.directives = self.GetFlattenedDirectives()
-        scenario.model_drivers = {
-            "iiwa": IiwaDriver(
-                control_mode="position_only",
-                hand_model_name="wsg",
-            )
-        }
-        return scenario
-
-    def test_load_scenario(self):
-        meshcat = StartMeshcat()
-        scenario = self.LoadScenario()
-        station = MakeHardwareStation(scenario, meshcat, hardware=False)
-
     def test_get_welded_descendants_and_directives(self):
         directives = self.GetFlattenedDirectives()
         tree = DirectivesTree(directives)
@@ -116,6 +99,17 @@ class DirectivesTreeTest(unittest.TestCase):
 
         iiwa_directives = tree.GetWeldToWorldDirectives(["iiwa"])
         self.assertEqual(iiwa_directives, directives[:3])  # iiwa-related directives
+
+    def test_load_scenario(self):
+        scenario = Scenario()
+        scenario.directives = self.GetFlattenedDirectives()
+        scenario.model_drivers = {
+            "iiwa": IiwaDriver(
+                control_mode="position_only",
+                hand_model_name="wsg",
+            )
+        }
+        station = MakeHardwareStation(scenario, hardware=False)
 
 
 if __name__ == "__main__":
