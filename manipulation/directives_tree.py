@@ -95,7 +95,7 @@ class DirectivesTree:
 
     def GetWeldedDescendantsAndDirectives(
         self, model_instance_names: List[str]
-    ) -> Tuple[Set[str], Set[ModelDirective]]:
+    ) -> Tuple[Set[str], List[ModelDirective]]:
 
         def _RecursionCall(node: Node) -> Tuple[Set[str], Set[ModelDirective]]:
             """
@@ -103,35 +103,36 @@ class DirectivesTree:
                 node (Node): The node to start this recursion call from.
 
             Returns:
-                Set[str]: Names of descendant models that are welded to the
-                    input node (including itself).
+                Set[str]: Names of proper descendant models that are welded to
+                    the input node.
                 Set[ModelDirective]: The directives that need to be added to
-                    weld the descendant models to the input node.
+                    weld the proper descendant models to the input node.
             """
-            descendants: Set[str] = set()
-            directives: Set[ModelDirective] = set()
-
-            # if the node is a model instance, add its AddModel directive,
-            # and add the model's name to the set of descendants.
-            if node.type == "model":
-                descendants.add(node.name)
-                directives.add(self.add_model_directives[node.name])
+            descendants = set()
+            directives = set()
 
             for edge in self.edges.get(node, set()):
-                # add the descendant and directives of the child node
                 _descendants, _directives = _RecursionCall(edge.child)
-                descendants.update(_descendants)
-                directives.update(_directives)
 
-                # if the child node has non-zero descendants, add the
+                # If the child is a model instance, add its AddModel directive,
+                # and add its model's name to the set of descendants.
+                if edge.child.type == "model":
+                    _descendants.add(edge.child.name)
+                    _directives.add(self.add_model_directives[edge.child.name])
+
+                # If the child node has non-zero descendants, add the
                 # edge directive that leads to the child node.
                 if len(_descendants) > 0:
                     directives.add(edge.directive)
 
+                    # Add the recursion results.
+                    descendants.update(_descendants)
+                    directives.update(_directives)
+
             return descendants, directives
 
-        descendants: Set[str] = set()
-        directives: Set[ModelDirective] = set()
+        descendants = set()
+        directives = set()
         for model_instance_name in model_instance_names:
             assert model_instance_name in self.add_model_directives
             node = Node(model_instance_name, "model")
@@ -139,12 +140,11 @@ class DirectivesTree:
             descendants.update(_descendants)
             directives.update(_directives)
 
-        proper_descendants = descendants - set(model_instance_names)
-        return proper_descendants, directives
+        return descendants, self.TopologicallySortDirectives(directives)
 
     def GetWeldToWorldDirectives(
         self, model_instance_names: List[str]
-    ) -> Set[ModelDirective]:
+    ) -> List[ModelDirective]:
 
         def _RecursionCall(node: Node) -> Set[ModelDirective]:
             """
@@ -157,26 +157,27 @@ class DirectivesTree:
             """
             directives: Set[ModelDirective] = set()
 
-            # if the node is one of the model instances, add its AddModel
-            # directive and return.
+            # Base case: if the node is one of the model instances, add its
+            # AddModel directive and return immediately.
             if node.type == "model" and node.name in model_instance_names:
                 directives.add(self.add_model_directives[node.name])
                 return directives
 
             for edge in self.edges.get(node, set()):
-                # add the directives of the child node
                 _directives = _RecursionCall(edge.child)
-                directives.update(_directives)
 
-                # if the child node has non-zero directives, add the
+                # If the child node has non-zero directives, add the
                 # edge directive that leads to the child node.
                 if len(_directives) > 0:
                     directives.add(edge.directive)
 
+                    # Add the recursion results.
+                    directives.update(_directives)
+
             return directives
 
         world_node = Node("world", "frame")
-        return _RecursionCall(world_node)
+        return self.TopologicallySortDirectives(_RecursionCall(world_node))
 
     def TopologicallySortDirectives(
         self, directives: Set[ModelDirective]
