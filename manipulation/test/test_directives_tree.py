@@ -1,5 +1,6 @@
 import typing
 import unittest
+from functools import cache
 
 from pydrake.all import (
     AddFrame,
@@ -16,6 +17,7 @@ from manipulation.station import MakeHardwareStation, Scenario
 
 
 class DirectivesTreeTest(unittest.TestCase):
+    @cache
     def get_flattened_directives(self) -> typing.List[ModelDirective]:
         return [
             ModelDirective(
