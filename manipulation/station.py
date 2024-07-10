@@ -75,6 +75,7 @@ from pydrake.all import (
 )
 from pydrake.common.yaml import yaml_load_typed
 
+from manipulation.directives_tree import DirectivesTree
 from manipulation.systems import ExtractPose
 from manipulation.utils import ConfigureParser
 
@@ -327,39 +328,6 @@ def AppendDirectives(
     return scenario
 
 
-def _FindChildren(
-    flattened_directives: typing.List[ModelDirective],
-    model_instance_names: typing.List[str],
-) -> typing.List[str]:
-    """Given a list of model instances, returns model names that are welded (via
-    directives) to any one of those model instances.
-
-    Returns:
-        A list of model names that are welded to any of the given model instances.
-    """
-    tree = dict()
-    children = set()
-    for d in flattened_directives:
-        if d.add_weld:
-            parent = ScopedName.Parse(d.add_weld.parent).get_namespace()
-            child = ScopedName.Parse(d.add_weld.child).get_namespace()
-            if parent not in tree:
-                tree[parent] = {child}
-            else:
-                tree[parent].add(child)
-
-    def add_children(name):
-        if name in tree:
-            for child in tree[name]:
-                children.add(child)
-                add_children(child)
-
-    for name in model_instance_names:
-        add_children(name)
-
-    return children
-
-
 def _FreezeChildren(
     plant: MultibodyPlant,
     children_to_freeze: typing.List[str],
@@ -405,7 +373,7 @@ def _PopulatePlantOrDiagram(
     plant: MultibodyPlant,
     parser: Parser,
     scenario: Scenario,
-    model_instance_names: typing.List[str] = None,
+    model_instance_names: typing.List[str],
     add_frozen_child_instances: bool = True,
     package_xmls: typing.List[str] = [],
     parser_preload_callback: typing.Callable[[Parser], None] = None,
@@ -423,28 +391,17 @@ def _PopulatePlantOrDiagram(
     flattened_directives = FlattenModelDirectives(
         ModelDirectives(directives=scenario.directives), parser.package_map()
     ).directives
-    children_to_freeze = set()
-    if model_instance_names and add_frozen_child_instances:
-        children_to_freeze = _FindChildren(flattened_directives, model_instance_names)
-    all_model_instances = children_to_freeze.union(model_instance_names)
 
-    directives = []
-    for d in flattened_directives:
-        if d.add_model and (d.add_model.name in all_model_instances):
-            directives.append(d)
-        if (
-            d.add_weld
-            and (
-                ScopedName.Parse(d.add_weld.child).get_namespace()
-                in all_model_instances
-            )
-            and (
-                d.add_weld.parent == "world"
-                or ScopedName.Parse(d.add_weld.parent).get_namespace()
-                in all_model_instances
-            )
-        ):
-            directives.append(d)
+    tree = DirectivesTree(flattened_directives)
+    directives = tree.GetWeldToWorldDirectives(model_instance_names)
+    children_to_freeze = set()
+
+    if add_frozen_child_instances:
+        children_to_freeze, additional_directives = (
+            tree.GetWeldedDescendantsAndDirectives(model_instance_names)
+        )
+        directives.extend(additional_directives)
+
     ProcessModelDirectives(
         directives=ModelDirectives(directives=directives),
         parser=parser,

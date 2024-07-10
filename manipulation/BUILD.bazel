@@ -53,11 +53,22 @@ rt_py_library(
 )
 
 rt_py_library(
+    name = "directives_tree",
+    deps = [
+      "//manipulation",
+    ],
+    srcs = ["directives_tree.py"],
+    imports = [".."],
+    visibility = ["//visibility:public"],
+)
+
+rt_py_library(
     name = "station",
     deps = [
       "//manipulation",
       "scenarios",
       "systems",
+      "directives_tree",
     ],
     srcs = ["station.py"],
     imports = [".."],
@@ -139,6 +150,14 @@ rt_py_test(
     name = "test_model_directives",
     srcs = ["test/test_model_directives.py"],
     data = ["//manipulation:models"],
+    imports = [".."],
+    deps = ["manipulation"],
+)
+
+rt_py_test(
+    name = "test_directives_tree",
+    srcs = ["test/test_directives_tree.py"],
+    data = ["//manipulation:station"],
     imports = [".."],
     deps = ["manipulation"],
 )
