@@ -1278,7 +1278,7 @@ def _WireDriverStatusReceiversToToPose(
             )
 
         def Calc(self, context, output):
-            output_vector = np.zeros(self.total_positions)
+            output_vector = np.zeros(self.num_total_positions)
 
             start_index = 0
             for i in range(self.num_input_ports()):
