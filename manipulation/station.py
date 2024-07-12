@@ -1067,8 +1067,6 @@ def NegatedPort(
 def _ApplyDriverConfigInterface(
     driver_config,  # See Scenario.model_drivers for typing
     model_instance_name: str,
-    plant: MultibodyPlant,
-    models_from_directives_map: typing.Mapping[str, typing.List[ModelInstanceInfo]],
     lcm_buses: LcmBuses,
     builder: DiagramBuilder,
 ) -> None:
@@ -1231,20 +1229,13 @@ def _ApplyDriverConfigInterface(
 def _ApplyDriverConfigsInterface(
     *,
     driver_configs,  # See Scenario.model_drivers for typing
-    plant: MultibodyPlant,
-    models_from_directives: typing.Mapping[str, typing.List[ModelInstanceInfo]],
     lcm_buses: LcmBuses,
     builder: DiagramBuilder,
 ) -> None:
-    models_from_directives_map = dict(
-        [(info.model_name, info) for info in models_from_directives]
-    )
     for model_instance_name, driver_config in driver_configs.items():
         _ApplyDriverConfigInterface(
             driver_config,
             model_instance_name,
-            plant,
-            models_from_directives_map,
             lcm_buses,
             builder,
         )
@@ -1337,8 +1328,6 @@ def _MakeHardwareStationInterface(
     # Add drivers.
     _ApplyDriverConfigsInterface(
         driver_configs=scenario.model_drivers,
-        plant=plant,
-        models_from_directives=added_models,
         lcm_buses=lcm_buses,
         builder=builder,
     )
