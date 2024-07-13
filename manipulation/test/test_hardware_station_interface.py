@@ -1,5 +1,7 @@
 import unittest
 
+from pydrake.all import StartMeshcat
+
 from manipulation.station import LoadScenario, MakeHardwareStation, Scenario
 
 
@@ -19,7 +21,7 @@ directives:
     # Add schunk_left
     - add_model:
         name: wsg_left
-        file: package://drake_models/iiwa_description/urdf/iiwa14_no_collision.urdf
+        file: package://drake_models/wsg_50_description/sdf/schunk_wsg_50_with_tip.sdf
 
     - add_weld:
         parent: iiwa_left::iiwa_link_7
@@ -42,7 +44,7 @@ directives:
     # Add schunk_right
     - add_model:
         name: wsg_right
-        file: package://drake/manipulation/wsg_50_description/sdf/schunk_wsg_50_with_tip.sdf
+        file: package://drake_models/wsg_50_description/sdf/schunk_wsg_50_with_tip.sdf
 
     - add_weld:
         parent: iiwa_right::iiwa_link_7
@@ -88,6 +90,11 @@ model_drivers:
     def test_without_meshcat(self):
         scenario = self.get_scenario()
         station = MakeHardwareStation(scenario, hardware=True, meshcat=None)
+
+    def test_with_meshcat(self):
+        scenario = self.get_scenario()
+        meshcat = StartMeshcat()
+        station = MakeHardwareStation(scenario, hardware=True, meshcat=meshcat)
 
 
 if __name__ == "__main__":
