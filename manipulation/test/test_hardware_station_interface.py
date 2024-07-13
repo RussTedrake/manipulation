@@ -1,127 +1,93 @@
-import typing
 import unittest
-from functools import cache
 
-from pydrake.all import (
-    AddFrame,
-    AddModel,
-    AddWeld,
-    IiwaDriver,
-    ModelDirective,
-    MultibodyPlant,
-    RobotDiagram,
-    Rotation,
-    Transform,
-)
-
-from manipulation.directives_tree import DirectivesTree
-from manipulation.station import MakeHardwareStation, Scenario
+from manipulation.station import LoadScenario, MakeHardwareStation, Scenario
 
 
 class HardwareStationInterfaceTest(unittest.TestCase):
-    @cache
-    def get_flattened_directives(self) -> typing.List[ModelDirective]:
-        return [
-            ModelDirective(
-                add_model=AddModel(
-                    name="iiwa",
-                    file="package://drake_models/iiwa_description/urdf/iiwa14_no_collision.urdf",
-                )
-            ),
-            ModelDirective(
-                add_frame=AddFrame(
-                    name="iiwa_origin",
-                    X_PF=Transform(
-                        base_frame="world",
-                        translation=[0, 0.765, 0],
-                    ),
-                )
-            ),
-            ModelDirective(
-                add_weld=AddWeld(
-                    parent="iiwa_origin",
-                    child="iiwa::base",
-                )
-            ),
-            ModelDirective(
-                add_model=AddModel(
-                    name="wsg",
-                    file="package://drake_models/wsg_50_description/sdf/schunk_wsg_50_with_tip.sdf",
-                )
-            ),
-            ModelDirective(
-                add_frame=AddFrame(
-                    name="iiwa::wsg_attach",
-                    X_PF=Transform(
-                        base_frame="iiwa::iiwa_link_7",
-                        translation=[0, 0, 0.114],
-                        rotation=Rotation.Rpy(deg=[90.0, 0.0, 68.0]),
-                    ),
-                )
-            ),
-            ModelDirective(
-                add_weld=AddWeld(
-                    parent="iiwa::wsg_attach",
-                    child="wsg::body",
-                )
-            ),
-            ModelDirective(
-                add_model=AddModel(
-                    name="table",
-                    file="package://drake_models/manipulation_station/table_wide.sdf",
-                )
-            ),
-            ModelDirective(
-                add_frame=AddFrame(
-                    name="table_origin",
-                    X_PF=Transform(
-                        base_frame="world",
-                        translation=[0.4, 0.3825, 0.0],
-                        rotation=Rotation.Rpy(deg=[0.0, 0.0, 0.0]),
-                    ),
-                )
-            ),
-            ModelDirective(
-                add_weld=AddWeld(
-                    parent="table_origin",
-                    child="table::table_body",
-                )
-            ),
-        ]
+    def get_scenario(self) -> Scenario:
+        scenario_data = """
+directives:
+    # Add iiwa_left
+    - add_model:
+        name: iiwa_left
+        file: package://drake_models/iiwa_description/urdf/iiwa14_spheres_collision.urdf
 
-    def test_get_welded_descendants_and_directives(self):
-        directives = self.get_flattened_directives()
-        tree = DirectivesTree(directives)
+    - add_weld:
+        parent: world
+        child: iiwa_left::base
 
-        children, wsg_directives = tree.GetWeldedDescendantsAndDirectives(["iiwa"])
-        self.assertEqual(children, {"wsg"})
-        self.assertEqual(wsg_directives, directives[3:6])  # wsg-related directives
+    # Add schunk_left
+    - add_model:
+        name: wsg_left
+        file: package://drake_models/iiwa_description/urdf/iiwa14_no_collision.urdf
 
-    def test_get_weld_to_world_directives(self):
-        directives = self.get_flattened_directives()
-        tree = DirectivesTree(directives)
+    - add_weld:
+        parent: iiwa_left::iiwa_link_7
+        child: wsg_left::body
+        X_PC:
+            translation: [0, 0, 0.114]
+            rotation: !Rpy { deg: [90.0, 0.0, 68.0 ]}
 
-        iiwa_directives = tree.GetWeldToWorldDirectives(["iiwa"])
-        self.assertEqual(iiwa_directives, directives[:3])  # iiwa-related directives
+    # Add iiwa_right
+    - add_model:
+        name: iiwa_right
+        file: package://drake_models/iiwa_description/urdf/iiwa14_no_collision.urdf
 
-    def test_load_scenario(self):
-        scenario = Scenario()
-        scenario.directives = self.get_flattened_directives()
-        scenario.model_drivers = {
-            "iiwa": IiwaDriver(
-                control_mode="position_only",
-                hand_model_name="wsg",
-            )
-        }
-        station: RobotDiagram = MakeHardwareStation(scenario, hardware=False)
-        controller_plant: MultibodyPlant = station.GetSubsystemByName(
-            "iiwa_controller_plant_pointer_system"
-        ).get()
+    - add_weld:
+        parent: world
+        child: iiwa_right::base
+        X_PC:
+            translation: [0, 0.765, 0]
 
-        # Check that the controller plant contains "iiwa" and "wsg" but not "table".
-        self.assertTrue(controller_plant.HasModelInstanceNamed("iiwa"))
-        self.assertTrue(controller_plant.HasModelInstanceNamed("wsg"))
-        self.assertFalse(controller_plant.HasModelInstanceNamed("table"))
+    # Add schunk_right
+    - add_model:
+        name: wsg_right
+        file: package://drake/manipulation/wsg_50_description/sdf/schunk_wsg_50_with_tip.sdf
+
+    - add_weld:
+        parent: iiwa_right::iiwa_link_7
+        child: wsg_right::body
+        X_PC:
+            translation: [0, 0, 0.114]
+            rotation: !Rpy { deg: [90.0, 0.0, 68.0 ]}
+
+    # Add table
+    - add_model:
+        name: table
+        file: package://drake_models/manipulation_station/table_wide.sdf
+
+    - add_frame:
+        name: table_origin
+        X_PF:
+            base_frame: world
+            translation: [0.4, 0.3825, 0.0]
+            rotation: !Rpy { deg: [0., 0., 0.]}
+
+    - add_weld:
+        parent: table_origin
+        child: table::table_body
+
+lcm_buses:
+    left_lcm:
+        channel_suffix: _LEFT
+    right_lcm:
+        channel_suffix: _RIGHT
+
+model_drivers:
+    iiwa_left: !IiwaDriver
+        control_mode: position_only
+        hand_model_name: wsg_left
+        lcm_bus: left_lcm
+    iiwa_right: !IiwaDriver
+        control_mode: position_only
+        hand_model_name: wsg_right
+        lcm_bus: right_lcm
+"""
+        return LoadScenario(data=scenario_data)
+
+    def test_without_meshcat(self):
+        scenario = self.get_scenario()
+        station = MakeHardwareStation(scenario, hardware=True, meshcat=None)
 
 
 if __name__ == "__main__":
