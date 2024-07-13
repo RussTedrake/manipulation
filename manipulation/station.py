@@ -1244,6 +1244,47 @@ def _ApplyDriverConfigsInterface(
         )
 
 
+class ConcatenateVectors(LeafSystem):
+    """
+    Concatenates multiple input vectors into a single output vector.
+    """
+
+    def __init__(self, input_vector_sizes: typing.List[int]):
+        """
+        Args:
+            input_vector_sizes (List[int]): A list of input vector sizes. This
+                system creates an input port corresponding to each size.
+        """
+        super().__init__()
+
+        self.output_vector_size = sum(input_vector_sizes)
+
+        # One input port per input vector size.
+        for i, input_size in enumerate(input_vector_sizes):
+            self.DeclareVectorInputPort(
+                f"input_vector_{i + 1}",
+                input_size,
+            )
+
+        # Single output port.
+        self.DeclareVectorOutputPort(
+            "concatenated_vector",
+            self.output_vector_size,
+            self.Calc,
+        )
+
+    def Calc(self, context, output):
+        output_vector = np.zeros(self.output_vector_size)
+
+        start_index = 0
+        for i in range(self.num_input_ports()):
+            input_vector = self.get_input_port(i).Eval(context)
+            end_index = start_index + len(input_vector)
+            output_vector[start_index:end_index] = input_vector
+            start_index = end_index
+        output.SetFromVector(output_vector)
+
+
 def _WireDriverStatusReceiversToToPose(
     model_instance_names: typing.List[str],
     builder: DiagramBuilder,
@@ -1251,42 +1292,14 @@ def _WireDriverStatusReceiversToToPose(
     to_pose: MultibodyPositionToGeometryPose,
 ):
 
-    class _ConcatenatePositions(LeafSystem):
-        """
-        Concatenates the positions from multiple model instances into a single
-        position vector.
-        """
-
-        def __init__(self):
-            super().__init__()
-
-            self.num_total_positions = 0
-            for model_instance_name in model_instance_names:
-                model_instance_index = plant.GetModelInstanceByName(model_instance_name)
-                num_model_positions = plant.num_positions(model_instance_index)
-                self.num_total_positions += num_model_positions
-                self.DeclareVectorInputPort(
-                    f"{model_instance_name}.position_estimated",
-                    num_model_positions,
-                )
-            self.DeclareVectorOutputPort(
-                "concatenated_positions",
-                self.num_total_positions,
-                self.Calc,
-            )
-
-        def Calc(self, context, output):
-            output_vector = np.zeros(self.num_total_positions)
-
-            start_index = 0
-            for i in range(self.num_input_ports()):
-                input_vector = self.get_input_port(i).Eval(context)
-                end_index = start_index + len(input_vector)
-                output_vector[start_index:end_index] = input_vector
-                start_index = end_index
-            output.SetFromVector(output_vector)
-
-    concatenator = builder.AddSystem(_ConcatenatePositions())
+    # Create a ConcatenateVector system to concatenate positions for each model
+    # instance.
+    input_vector_sizes: typing.List[int] = []
+    for model_instance_name in model_instance_names:
+        model_instance_index = plant.GetModelInstanceByName(model_instance_name)
+        num_model_positions = plant.num_positions(model_instance_index)
+        input_vector_sizes.append(num_model_positions)
+    concatenator = builder.AddSystem(ConcatenateVectors(input_vector_sizes))
 
     # Wire the status receiver for each model driver to the concatenator.
     for i, model_instance_name in enumerate(model_instance_names):
