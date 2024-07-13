@@ -84,6 +84,8 @@ model_drivers:
         control_mode: position_only
         hand_model_name: wsg_right
         lcm_bus: right_lcm
+    wsg_left: !SchunkWsgDriver {}
+    wsg_right: !SchunkWsgDriver {}
 """
         return LoadScenario(data=scenario_data)
 
@@ -91,10 +93,16 @@ model_drivers:
         scenario = self.get_scenario()
         station = MakeHardwareStation(scenario, hardware=True, meshcat=None)
 
+        # Should not contain a SceneGraph.
+        self.assertFalse(station.HasSubsystemNamed("scene_graph"))
+
     def test_with_meshcat(self):
         scenario = self.get_scenario()
         meshcat = StartMeshcat()
         station = MakeHardwareStation(scenario, hardware=True, meshcat=meshcat)
+
+        # Should contain a SceneGraph.
+        self.assertTrue(station.HasSubsystemNamed("scene_graph"))
 
 
 if __name__ == "__main__":
