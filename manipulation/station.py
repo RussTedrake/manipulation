@@ -1251,8 +1251,6 @@ def _WireDriverStatusReceiversToToPose(
     to_pose: MultibodyPositionToGeometryPose,
 ):
 
-    # We define the class inside the function because the number of input ports
-    # depends on the number of model instances.
     class _ConcatenatePositions(LeafSystem):
         """
         Concatenates the positions from multiple model instances into a single
