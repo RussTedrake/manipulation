@@ -93,16 +93,18 @@ model_drivers:
         scenario = self.get_scenario()
         station = MakeHardwareStation(scenario, hardware=True, meshcat=None)
 
-        # Should not contain a SceneGraph.
+        # Should not contain SceneGraph and MeshcatVisualizer.
         self.assertFalse(station.HasSubsystemNamed("scene_graph"))
+        self.assertFalse(station.HasSubsystemNamed("meshcat_visualizer(visualizer)"))
 
     def test_with_meshcat(self):
         scenario = self.get_scenario()
         meshcat = StartMeshcat()
         station = MakeHardwareStation(scenario, hardware=True, meshcat=meshcat)
 
-        # Should contain a SceneGraph.
+        # Should contain SceneGraph and MeshcatVisualizer.
         self.assertTrue(station.HasSubsystemNamed("scene_graph"))
+        self.assertTrue(station.HasSubsystemNamed("meshcat_visualizer(visualizer)"))
 
 
 if __name__ == "__main__":

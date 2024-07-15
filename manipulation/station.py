@@ -43,6 +43,7 @@ from pydrake.all import (
     MakeMultibodyStateToWsgStateSystem,
     Meshcat,
     MeshcatPointCloudVisualizer,
+    MeshcatVisualizer,
     ModelDirective,
     ModelDirectives,
     ModelInstanceIndex,
@@ -1400,16 +1401,20 @@ def _MakeHardwareStationInterface(
             scene_graph.get_source_pose_port(plant.get_source_id()),
         )
 
-        config = VisualizationConfig()
-        config.publish_contacts = False
-        config.publish_inertia = False
-        ApplyVisualizationConfig(
-            config,
-            builder=builder,
-            plant=plant,
-            scene_graph=scene_graph,
-            meshcat=meshcat,
-        )
+        # config = VisualizationConfig()
+        # config.publish_contacts = False
+        # config.publish_inertia = False
+        # ApplyVisualizationConfig(
+        #     config,
+        #     builder=builder,
+        #     plant=plant,
+        #     scene_graph=scene_graph,
+        #     meshcat=meshcat,
+        # )
+
+        # Add MeshcatVisualizer (instead of ApplyVisualizationConfig()).
+        # https://github.com/RussTedrake/manipulation/pull/324#pullrequestreview-2176317315
+        MeshcatVisualizer.AddToBuilder(builder, scene_graph, meshcat)
 
     # Add LCM buses. (The simulator will handle polling the network for new
     # messages and dispatching them to the receivers, i.e., "pump" the bus.)
