@@ -95,7 +95,8 @@ model_drivers:
 
         # Should not contain SceneGraph and MeshcatVisualizer.
         self.assertFalse(station.HasSubsystemNamed("scene_graph"))
-        self.assertFalse(station.HasSubsystemNamed("meshcat_visualizer(visualizer)"))
+        self.assertFalse(station.HasSubsystemNamed("meshcat_visualizer(illustration)"))
+        self.assertFalse(station.HasSubsystemNamed("meshcat_visualizer(proximity)"))
 
     def test_with_meshcat(self):
         scenario = self.get_scenario()
@@ -104,7 +105,8 @@ model_drivers:
 
         # Should contain SceneGraph and MeshcatVisualizer.
         self.assertTrue(station.HasSubsystemNamed("scene_graph"))
-        self.assertTrue(station.HasSubsystemNamed("meshcat_visualizer(visualizer)"))
+        self.assertTrue(station.HasSubsystemNamed("meshcat_visualizer(illustration)"))
+        self.assertTrue(station.HasSubsystemNamed("meshcat_visualizer(proximity)"))
 
 
 if __name__ == "__main__":
