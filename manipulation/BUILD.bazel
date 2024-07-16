@@ -163,6 +163,14 @@ rt_py_test(
 )
 
 rt_py_test(
+    name = "test_hardware_station_interface",
+    srcs = ["test/test_hardware_station_interface.py"],
+    data = ["//manipulation:station"],
+    imports = [".."],
+    deps = ["manipulation"],
+)
+
+rt_py_test(
     name = "test_utils",
     srcs = ["test/test_utils.py"],
     imports = [".."],

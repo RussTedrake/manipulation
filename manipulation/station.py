@@ -49,6 +49,7 @@ from pydrake.all import (
     ModelInstanceInfo,
     MultibodyPlant,
     MultibodyPlantConfig,
+    MultibodyPositionToGeometryPose,
     Multiplexer,
     OutputPort,
     ParseIiwaControlMode,
@@ -1067,8 +1068,6 @@ def NegatedPort(
 def _ApplyDriverConfigInterface(
     driver_config,  # See Scenario.model_drivers for typing
     model_instance_name: str,
-    plant: MultibodyPlant,
-    models_from_directives_map: typing.Mapping[str, typing.List[ModelInstanceInfo]],
     lcm_buses: LcmBuses,
     builder: DiagramBuilder,
 ) -> None:
@@ -1111,6 +1110,7 @@ def _ApplyDriverConfigInterface(
         )
         # Receive IIWA status and populate the output ports.
         iiwa_status_receiver = builder.AddSystem(IiwaStatusReceiver())
+        iiwa_status_receiver.set_name(model_instance_name + ".status_receiver")
         iiwa_status_subscriber = builder.AddSystem(
             LcmSubscriberSystem.Make(
                 channel="IIWA_STATUS",
@@ -1204,6 +1204,7 @@ def _ApplyDriverConfigInterface(
 
         # Receive WSG status and populate the output ports.
         wsg_status_receiver = builder.AddSystem(SchunkWsgStatusReceiver())
+        wsg_status_receiver.set_name(model_instance_name + ".status_receiver")
         wsg_status_subscriber = builder.AddSystem(
             LcmSubscriberSystem.Make(
                 channel="SCHUNK_WSG_STATUS",
@@ -1231,23 +1232,98 @@ def _ApplyDriverConfigInterface(
 def _ApplyDriverConfigsInterface(
     *,
     driver_configs,  # See Scenario.model_drivers for typing
-    plant: MultibodyPlant,
-    models_from_directives: typing.Mapping[str, typing.List[ModelInstanceInfo]],
     lcm_buses: LcmBuses,
     builder: DiagramBuilder,
 ) -> None:
-    models_from_directives_map = dict(
-        [(info.model_name, info) for info in models_from_directives]
-    )
     for model_instance_name, driver_config in driver_configs.items():
         _ApplyDriverConfigInterface(
             driver_config,
             model_instance_name,
-            plant,
-            models_from_directives_map,
             lcm_buses,
             builder,
         )
+
+
+class ConcatenateVectors(LeafSystem):
+    """
+    Concatenates multiple input vectors into a single output vector.
+    """
+
+    def __init__(self, input_vector_sizes: typing.List[int]):
+        """
+        Args:
+            input_vector_sizes (List[int]): A list of input vector sizes. This
+                system creates an input port corresponding to each size.
+        """
+        super().__init__()
+
+        self.output_vector_size = sum(input_vector_sizes)
+
+        # One input port per input vector size.
+        for i, input_size in enumerate(input_vector_sizes):
+            self.DeclareVectorInputPort(
+                f"input_vector_{i + 1}",
+                input_size,
+            )
+
+        # Single output port.
+        self.DeclareVectorOutputPort(
+            "concatenated_vector",
+            self.output_vector_size,
+            self.Calc,
+        )
+
+    def Calc(self, context, output):
+        output_vector = np.zeros(self.output_vector_size)
+
+        start_index = 0
+        for i in range(self.num_input_ports()):
+            input_vector = self.get_input_port(i).Eval(context)
+            end_index = start_index + len(input_vector)
+            output_vector[start_index:end_index] = input_vector
+            start_index = end_index
+        output.SetFromVector(output_vector)
+
+
+def _WireDriverStatusReceiversToToPose(
+    model_instance_names: typing.List[str],
+    builder: DiagramBuilder,
+    plant: MultibodyPlant,
+    to_pose: MultibodyPositionToGeometryPose,
+):
+
+    # Create a ConcatenateVector system to concatenate positions for each model
+    # instance.
+    input_vector_sizes: typing.List[int] = []
+    for model_instance_name in model_instance_names:
+        model_instance_index = plant.GetModelInstanceByName(model_instance_name)
+        num_model_positions = plant.num_positions(model_instance_index)
+        input_vector_sizes.append(num_model_positions)
+    concatenator = builder.AddSystem(ConcatenateVectors(input_vector_sizes))
+
+    # Wire the status receiver for each model driver to the concatenator.
+    for i, model_instance_name in enumerate(model_instance_names):
+        status_receiver = builder.GetSubsystemByName(
+            f"{model_instance_name}.status_receiver"
+        )
+        if isinstance(status_receiver, IiwaStatusReceiver):
+            builder.Connect(
+                status_receiver.get_position_measured_output_port(),
+                concatenator.get_input_port(i),
+            )
+        elif isinstance(status_receiver, SchunkWsgStatusReceiver):
+            builder.Connect(
+                status_receiver.get_state_output_port(),
+                concatenator.get_input_port(i),
+            )
+        else:
+            raise ValueError(f"Unknown status subscriber: {status_receiver}")
+
+    # Wire the concatenator to the to_pose system.
+    builder.Connect(
+        concatenator.get_output_port(),
+        to_pose.get_input_port(),
+    )
 
 
 def _ApplyCameraLcmIdInterface(
@@ -1298,37 +1374,42 @@ def _MakeHardwareStationInterface(
 ) -> Diagram:
     builder = DiagramBuilder()
 
-    # Visualization
-    scene_graph = builder.AddNamedSystem("scene_graph", SceneGraph())
-    plant = MultibodyPlant(time_step=scenario.plant_config.time_step)
-    ApplyMultibodyPlantConfig(scenario.plant_config, plant)
-    plant.RegisterAsSourceForSceneGraph(scene_graph)
-    parser = Parser(plant)
-    for p in package_xmls:
-        parser.package_map().AddPackageXml(p)
-    ConfigureParser(parser)
+    # Visualize plant if Meshcat is provided.
+    if meshcat is not None:
+        scene_graph = builder.AddNamedSystem("scene_graph", SceneGraph())
+        plant = MultibodyPlant(time_step=scenario.plant_config.time_step)
+        ApplyMultibodyPlantConfig(scenario.plant_config, plant)
+        plant.RegisterAsSourceForSceneGraph(scene_graph)
+        parser = Parser(plant)
+        for p in package_xmls:
+            parser.package_map().AddPackageXml(p)
+        ConfigureParser(parser)
 
-    # Add model directives.
-    added_models = ProcessModelDirectives(
-        directives=ModelDirectives(directives=scenario.directives),
-        parser=parser,
-    )
+        # Add model directives.
+        added_models = ProcessModelDirectives(
+            directives=ModelDirectives(directives=scenario.directives),
+            parser=parser,
+        )
 
-    # Now the plant is complete.
-    plant.Finalize()
+        # Now the plant is complete.
+        plant.Finalize()
 
-    # to_pose = builder.AddSystem(MultibodyPositionToGeometryPose(plant))
-    # builder.Connect(
-    #     to_pose.get_output_port(),
-    #     scene_graph.get_source_pose_port(plant.get_source_id()),
-    # )
+        to_pose = builder.AddSystem(MultibodyPositionToGeometryPose(plant))
+        builder.Connect(
+            to_pose.get_output_port(),
+            scene_graph.get_source_pose_port(plant.get_source_id()),
+        )
 
-    # config = VisualizationConfig()
-    # config.publish_contacts = False
-    # config.publish_inertia = False
-    # ApplyVisualizationConfig(
-    #     config, builder=builder, plant=plant, meshcat=meshcat
-    # )
+        config = VisualizationConfig()
+        config.publish_contacts = False
+        config.publish_inertia = False
+        ApplyVisualizationConfig(
+            config,
+            builder=builder,
+            plant=plant,
+            scene_graph=scene_graph,
+            meshcat=meshcat,
+        )
 
     # Add LCM buses. (The simulator will handle polling the network for new
     # messages and dispatching them to the receivers, i.e., "pump" the bus.)
@@ -1337,11 +1418,17 @@ def _MakeHardwareStationInterface(
     # Add drivers.
     _ApplyDriverConfigsInterface(
         driver_configs=scenario.model_drivers,
-        plant=plant,
-        models_from_directives=added_models,
         lcm_buses=lcm_buses,
         builder=builder,
     )
+
+    if meshcat is not None:
+        _WireDriverStatusReceiversToToPose(
+            model_instance_names=scenario.model_drivers.keys(),
+            builder=builder,
+            plant=plant,
+            to_pose=to_pose,
+        )
 
     # Add camera ids
     for camera_name, camera_id in scenario.camera_ids.items():
