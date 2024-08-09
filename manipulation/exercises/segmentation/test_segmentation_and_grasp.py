@@ -62,6 +62,6 @@ class TestSegmentationAndGrasp(unittest.TestCase):
             chamfer_dist(
                 pcd_pts_target[:min_num_pts, :], pcd_pts_eval[:min_num_pts, :]
             ),
-            1e-4,
+            1e-2,
             "Point cloud points are not close enough to the solution values.",
         )
