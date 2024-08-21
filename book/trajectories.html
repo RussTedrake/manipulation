@@ -1075,8 +1075,8 @@ ik.AddPositionConstraint(
       convex approximations of more complex costs and constraints in the GCS convex
       relaxation, but then use nonlinear optimization during in the rounding step to
       handle the nonconvexity exactly once GCS selects the discrete path through the
-      graph to give a strong initial guess (citation coming soon)
-      <todo>cite David's IROS paper</todo>. This can be accomplished in Drake via the
+      graph to give a strong initial guess <elib>Wrangel24</elib>. This can be
+      accomplished in Drake via the
       <code>use_in_transcription</code> option of the <code>AddCost</code> and <code>AddConstraint</code> methods of
       GCS, and adding nonconvex constraints only to the <code>Transcription::kRestriction</code>. </p>
 
@@ -1573,6 +1573,13 @@ PhD thesis, Massachusetts Institute of Technology, May, <span class="year">2024<
 <span class="author">Tobia Marcucci and Mark Petersen and David von Wrangel and Russ Tedrake</span>, 
 <span class="title">"Motion planning around obstacles with convex optimization"</span>, 
 <span class="publisher">Science Robotics</span>, vol. 8, no. 84, <span class="year">2023</span>.
+
+</li><br>
+<li id=Wrangel24>
+<span class="author">David von Wrangel and Russ Tedrake</span>, 
+<span class="title">"Using Graphs of Convex Sets to Guide Nonconvex Trajectory Optimization"</span>, 
+<span class="publisher">Proceedings of the IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS)</span> , <span class="year">2024</span>.
+[&nbsp;<a href="http://groups.csail.mit.edu/robotics-center/public_papers/Wrangel24">link</a>&nbsp;]
 
 </li><br>
 <li id=Lozano-Perez90>
