@@ -855,13 +855,12 @@ ik.AddPositionConstraint(
 
   <section id="gcs"><h1>Motion Planning w/ Graphs of Convex Sets (GCS)</h1>
 
-    <p>Trajectory optimization techniques allow for rich specifications of
-    costs and constraints, including derivative constraints on continuous
-    curves, and can scale to high-dimensional configuration spaces, but they
-    are fundamentally based on local (gradient-based) optimization and suffer
-    from local mimima. Sampling-based planners reason more globally and provide
-    a notion of (probabilistic) <i>completeness</i>, but struggle to
-    accommodate derivative constraints on continuous curves and struggle in
+    <p>Trajectory optimization techniques allow for rich specifications of costs and
+    constraints, including derivative constraints on continuous curves, and can scale to
+    high-dimensional configuration spaces, but they are fundamentally based on local
+    (gradient-based) optimization and suffer from local mimima. Sampling-based planners
+    reason more globally and provide a notion of (probabilistic) completeness, but
+    struggle to accommodate derivative constraints on continuous curves and struggle in
     high dimensions. Is there any way to get the best of both worlds?</p>
 
     <p>My students and I have been working on new approach to motion planning
@@ -981,13 +980,13 @@ ik.AddPositionConstraint(
       they can connect continuous paths through multiple regions. This is the essence of
       our transcription. What this implies is that for each visit to a vertex in the
       GCS, then we want to pick <i>two points</i> in a C-space region, so that the path
-      lies in the region. So the convex sets in the GCS are not the C-space
-      regions themselves, they are the set with $2n$ variables for an $n$-dimensional
+      lies in the region. So the convex sets in the GCS are not the C-space regions
+      themselves, they are the set with $2n$ variables for an $n$-dimensional
       configuration space where the first $n$ and the last $n$ are both in the C-space
       region. In set notation, we'd say it's the Cartesian product of the set with
       itself. We form undirected edges between these sets iff the C-space regions
-      intersect, and we put a constraint on the edge saying that the second point one
-      set must be equal to the first point in the second set.</p>
+      intersect, and we put a constraint on each edge saying that the second point in
+      the first set must be equal to the first point in the second set.</p>
 
       <example><h1>GcsTrajOpt in a simple 2D configuration space</h1>
         
@@ -1043,19 +1042,43 @@ ik.AddPositionConstraint(
       You can find the <a
       href="https://drake.mit.edu/doxygen_cxx/classdrake_1_1planning_1_1trajectory__optimization_1_1_gcs_trajectory_optimization.html">implementation
       in Drake here</a>.</p>
-      
-      <p>Nonconvex trajectory optimization can, of course, consume richer costs
-      and constraints, but does not have the global optimization and
-      completeness elements that GCS can provide. (Of course, there are natural
-      nonconvex generalizations of GCS; we've focused first on the convex
-      optimization versions in order to make sure we deeply understand these
-      transcriptions.) We are constantly adding more costs and constraints into
-      the GCS Trajectory Optimization framework -- some seemingly nonconvex
-      constraints actually have an exact convex reformulation, others have nice
-      convex approximations. If you need something that's not supported, don't
-      be shy in <a
-      href="https://stackoverflow.com/questions/tagged/drake">asking about
-      it</a>.</p>
+
+      <example><h1>GcsTrajOpt in a simple 2D configuration space (cont.)</h1>
+        
+        <p>This is the result of running nearly the same minimum-time optimization as in
+        the example above, but this time we parameterize each segment with a fifth order
+        Bezier curve and a time scaling, and ask for continuity up to the fourth
+        derivative ("snap").</p>
+
+        <figure>
+        <img width="60%" src="figures/gcs_simple_2d_fifth_order_min_time.svg">
+        </figure>
+
+        <p>Inspection of the trajectory derivatives reveals that the velocities are
+        smooth and that they stay within the velocity bounds $[-1, 1]$ for the
+        <i>entire</i> trajectory; not just at sample points.</p>
+
+        <figure>
+          <img width="60%" src="figures/gcs_simple_2d_fifth_order_min_time_velocities.svg">
+        </figure>
+
+        <script>document.write(notebook_link('trajectories', notebook="gcs_simple_2d_cspace"))</script>
+        
+      </example>
+
+      <p>Nonconvex trajectory optimization can, of course, consume richer costs and
+      constraints, but does not have the global optimization and completeness elements
+      that GCS can provide.  We are constantly adding more costs and constraints into
+      the GCS Trajectory Optimization framework -- some seemingly nonconvex constraints
+      actually have an exact convex reformulation, others have nice convex
+      approximations. This leads to a natural merger of the two techniques: we can use
+      convex approximations of more complex costs and constraints in the GCS convex
+      relaxation, but then use nonlinear optimization during in the rounding step to
+      handle the nonconvexity exactly once GCS selects the discrete path through the
+      graph to give a strong initial guess (citation coming soon)
+      <todo>cite David's IROS paper</todo>. This can be accomplished in Drake via the
+      <code>use_in_transcription</code> option of the <code>AddCost</code> and <code>AddConstraint</code> methods of
+      GCS, and adding nonconvex constraints only to the <code>Transcription::kRestriction</code>. </p>
 
       <todo>Lots more examples</todo>
 
@@ -1174,6 +1197,18 @@ ik.AddPositionConstraint(
       computing a "minimum clique cover" of the "visibility graph"
       <elib>Werner23</elib> (<a href="https://drake.mit.edu/doxygen_cxx/namespacedrake_1_1planning.html#ace53f3f8045d8eb96867bcd6eda63ed0">implemented in Drake</a>).</p>
 
+      <example><h1>GcsTrajOpt in a simple 2D configuration space (cont.)</h1>
+        
+        <p>If we run the "minimum clique cover" algorithm with a coverage threshold of 96% of the configuration space on the simple 2D example, we obtain automatic decompositions like this:</p>
+
+        <figure>
+        <img width="60%" src="figures/gcs_simple_2d_clique_cover.svg">
+        </figure>
+
+        <script>document.write(notebook_link('trajectories', notebook="gcs_simple_2d_cspace"))</script>
+        
+      </example>
+
       <p>In practice, it seems reasonably tractable to try to compute a quite dense
       covering of the configuration space for 7-DOF manipulators, and perhaps even up to
       say 10 degrees of freedom. But for higher dimensions, I think that trying to cover
@@ -1181,9 +1216,9 @@ ik.AddPositionConstraint(
       prefer the idea of intializing the clique-cover algorithm with sample points that
       represent the "important" regions of your configuration space. Sometimes we do
       this by manual seeding (via calls to inverse kinematics), or alternatively, we can
-      do it by examing the solutions that come from teleop demonstrations, from another
-      planner (that can generate plans, but without the same guarantees), or even from a
-      reinforcement learning policy.</p>
+      do it by examining trajectories that come from teleop demonstrations, from
+      another planner (that can generate plans, but without the same guarantees), or
+      even from a reinforcement learning policy.</p>
 
       <example><h1>The IRIS Builder</h1>
 
