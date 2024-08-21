@@ -7,6 +7,9 @@
 This is the companion software for the textbook available at:
 https://manipulation.mit.edu/
 
+Online code documentation can be found
+[here](https://manipulation.mit.edu/python/index.html).
+
 For contributions, please see [developer instructions](Developers.md).
 
 To cite this software (or the corresponding textbook), please use:
