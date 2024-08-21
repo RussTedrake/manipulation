@@ -1126,13 +1126,20 @@ ik.AddPositionConstraint(
         <li><b>Using nonlinear programming (NP)</b>. In the IRIS-NP algorithm
         <elib>Petersen23a</elib> (<a
         href="https://drake.mit.edu/doxygen_cxx/group__geometry__optimization.html#ga3a51e0fec449a0abcf498f78a2a390a8">implemented
-        in Drake</a>), we replace the convex optimization for finding the
-        closest collision with a nonlinear optimization solver like SNOPT. We
-        randomly sample potential collisions in order to make the algorithm
-        probabilistically sound; in practice this algorithm is relatively fast
-        but does not <i>guarantee</i> that the region is completely collision
-        free.
+        in Drake</a>), we replace the convex optimization for finding the closest
+        collision with a nonlinear optimization solver like SNOPT. We randomly sample
+        potential collisions in order to make the algorithm probabilistically sound; in
+        practice this algorithm is relatively fast but does not <i>guarantee</i> that
+        the region is completely collision free. We've recently dramatically improve the
+        performance of this pipeline with <a
+        href="https://github.com/orgs/RobotLocomotion/projects/5/views/1?pane=issue&itemId=75484893">IRIS-NP2</a>,
+        introduced in <elib>Werner24</elib>, with creates bigger regions with less faces
+        orders of magnitude faster than the original IRIS-NP.
         </li>
+        <li><b>Using zero-order optimization (ZO)</b>. By replacing the nonlinear
+        optimization in IRIS-NP with a zeroth-order optimization (no gradients required;
+        it uses only samples), IRIS-ZO produces slightly smaller regions, but can be
+        trivially parallelized <elib>Werner24</elib>.</li>
         <li><b>Using algebraic kinematics + sums-of-squares optimization</b>.
         Leveraging the idea that the kinematics of most of our robots can be
         expressed using (rational) polynomials, we can use tools from
@@ -1579,7 +1586,7 @@ PhD thesis, Massachusetts Institute of Technology, May, <span class="year">2024<
 <span class="author">David von Wrangel and Russ Tedrake</span>, 
 <span class="title">"Using Graphs of Convex Sets to Guide Nonconvex Trajectory Optimization"</span>, 
 <span class="publisher">Proceedings of the IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS)</span> , <span class="year">2024</span>.
-[&nbsp;<a href="http://groups.csail.mit.edu/robotics-center/public_papers/Wrangel24">link</a>&nbsp;]
+[&nbsp;<a href="http://groups.csail.mit.edu/robotics-center/public_papers/Wrangel24.pdf">link</a>&nbsp;]
 
 </li><br>
 <li id=Lozano-Perez90>
@@ -1605,6 +1612,13 @@ PhD thesis, Massachusetts Institute of Technology, May, <span class="year">2024<
 <span class="author">Mark Petersen and Russ Tedrake</span>, 
 <span class="title">"Growing convex collision-free regions in configuration space using nonlinear programming"</span>, 
 <span class="publisher">arXiv preprint arXiv:2303.14737</span>, <span class="year">2023</span>.
+
+</li><br>
+<li id=Werner24>
+<span class="author">Peter Werner and Thomas Cohn and Rebecca H. Jiang and Tim Seyde and Max Simchowitz and Russ Tedrake and Daniela Rus</span>, 
+<span class="title">"Faster Algorithms for Growing Collision-Free Convex Polytopes in Robot Configuration Space"</span>, 
+<span class="publisher">Under review</span> , <span class="year">2024</span>.
+[&nbsp;<a href="http://groups.csail.mit.edu/robotics-center/public_papers/Werner24.pdf">link</a>&nbsp;]
 
 </li><br>
 <li id=Dai23>
