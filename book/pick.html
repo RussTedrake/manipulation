@@ -436,12 +436,11 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture videos a
         <img style="width:40%;margin-right:40px"
         src="figures/kinematic_frames_iiwa.png"/><img style="width:40%"
         src="figures/kinematic_frames_gripper.png"/>
-        <figcaption>Kinematic frames on the iiwa (left) and the WSG (right). For
-        each frame, the <span style="color:red">positive $x$ axis is in
-        red</span>, the <span style="color:green">positive $y$ axis is in
-        green</span>, and the <span style="color:blue">positive $z$ axis is in
-        blue</span>.  It's (hopefully) easy to remember: XYZ $\Leftrightarrow$
-        RGB.</figcaption>
+        <figcaption>Kinematic frames on the iiwa (left) and the WSG gripper (right). For
+        each frame, the <span style="color:red">positive $x$ axis is in red</span>, the
+        <span style="color:green">positive $y$ axis is in green</span>, and the <span
+        style="color:blue">positive $z$ axis is in blue</span>.  It's (hopefully) easy
+        to remember: XYZ $\Leftrightarrow$ RGB.</figcaption>
       </figure>
 
       <example><h1>Forward kinematics for the gripper frame</h1>
@@ -690,7 +689,7 @@ Velocity names: ['$world_base_link_wx', '$world_base_link_wy', '$world_base_link
     
     <p>The geometric Jacobian provides a linear relationship between
     generalized velocity and spatial velocity: \begin{equation}V^G =
-    J^G(q)v.\end{equation} Can this gives us what we need to produce changes in
+    J^G(q)v.\end{equation} Can this give us what we need to produce changes in
     gripper frame $G$? If I have a desired gripper frame velocity $V^{G_d}$,
     then how about commanding a joint velocity $v = \left[J^G(q)\right]^{-1}
     V^{G_d}$?</p>
@@ -909,23 +908,35 @@ Velocity names: ['$world_base_link_wx', '$world_base_link_wy', '$world_base_link
       RGB).</figcaption>
     </figure>
 
-    <p>Take a careful look at the gripper frame in the figure above, using the
-    colors to understand the axes.  Here is my thinking:  Given the size of the
-    hand and the object, I want the <i>desired</i> position (in meters) of the
-    object in the gripper frame, $${}^{G_{grasp}}p^O = \begin{bmatrix} 0 \\ 0.11
-    \\ 0 \end{bmatrix}, \qquad {}^{G_{pregrasp}}p^O = \begin{bmatrix} 0 \\ 0.2
-    \\ 0 \end{bmatrix}.$$  Recall that the logic behind a <i>pregrasp</i> pose
-    is to first move to safely above the object, if our only gripper motion that
-    is very close to the object is a straight translation from the pregrasp pose
-    to the grasp pose and back, then it allows us to mostly avoid having to
-    think about collisions (for now).  I want the orientation of my gripper to
-    be set so that the positive $z$ axis of the object aligns with the negative
-    $y$ axis of the gripper frame, and the positive $x$ axis of the object
-    aligns with the positive $z$ axis of the gripper.  We can accomplish that
-    with $${}^{G_{grasp}}R^O = \text{MakeXRotation}\left(\frac{\pi}{2}\right)
-    \text{MakeZRotation} \left(\frac{\pi}{2}\right).$$  I admit I had my right
-    hand in the air for that one!  Our pregrasp pose will have the same
-    orientation as our grasp pose.</p>
+    <p>Take a careful look at the gripper frame in the figure above, using the colors to
+    understand the axes.  Here is my thinking:  Given the size of the hand and the
+    object, I want the <i>desired</i> position (in meters) of the object in the gripper
+    frame, $${}^{G_{grasp}}p^O = \begin{bmatrix} 0 \\ 0.11 \\ 0 \end{bmatrix}, \qquad
+    {}^{G_{pregrasp}}p^O = \begin{bmatrix} 0 \\ 0.2 \\ 0 \end{bmatrix}.$$  Recall that
+    the logic behind a <i>pregrasp</i> pose is to first move to safely above the object,
+    if our only gripper motion that is very close to the object is a straight
+    translation from the pregrasp pose to the grasp pose and back, then it allows us to
+    mostly avoid having to think about collisions (for now).  I want the orientation of
+    my gripper to be set so that the positive $z$ axis of the object aligns with the
+    negative $y$ axis of the gripper frame, and the positive $x$ axis of the object
+    aligns with the positive $z$ axis of the gripper.  We can accomplish that with
+    \begin{gather*}{}^{G_{grasp}}R^O = \text{MakeXRotation}\left(\frac{\pi}{2}\right)
+    \text{MakeZRotation} \left(\frac{\pi}{2}\right).\end{gather*}  I admit I had my
+    right hand in the air for that one! We can step through this (by looking at the <a
+    href="#grasp_frames">figure above</a>). Put your right hand in the air in the
+    standard "right-hand-rule pose" (index finger forward, middle finger to the left,
+    thumb up); we'll call this frame $H$ (for hand) and we'll attach it to the object
+    frame, so ${}^OR^H = I.$ We want to understand the orientation of your hand in the
+    gripper frame, ${}^{G_{grasp}}R^H$. Working from right to left in the matrix
+    multiplications, we first rotate 90 degrees around the current $z$ axis (your thumb)
+    -- your index finger should be pointing to the left. Now we rotate 90 degrees about
+    the current $x$ axis (still forward), so your index finger is pointing up, your
+    middle finger is point towards you, and your thumb is pointing to the right. As
+    desired, the positive $z$ axis (your thumb) aligns with the negative $y$ axis, and
+    the positive $x$ axis (your index finger) aligns with the positive $z$ axis of the
+    gripper frame.</p>
+        
+    <p>Our pregrasp pose will have the same orientation as our grasp pose.</p>
 
     <example><h1>Computing grasp and pregrasp poses</h1>
     
@@ -971,8 +982,8 @@ Velocity names: ['$world_base_link_wx', '$world_base_link_wy', '$world_base_link
         <figcaption>Keyframes of the gripper.  The robot's base will be at the
         origin, so we're looking over the (invisible) robot's shoulder here. The
         hand starts in the "initial" pose near the center, moves to the
-        "prepick" to "pick" to "prepick" to "clearance" to "preplace" to "place"
-        and finally back to "preplace".</figcaption>
+        "prepick" to "pick" to "postpick" to "clearance" to "preplace" to "place"
+        and finally back to "postplace".</figcaption>
       </figure>
 
       <todo>timeline graphic here, from time zero, to pre-grasp, to grasp, to
@@ -1237,22 +1248,22 @@ Velocity names: ['$world_base_link_wx', '$world_base_link_wy', '$world_base_link
       a proportional controller that drives the robot to its nominal
       configuration.</p>
       
-      <p>Denote $P(q)$ as an orthonormal basis for the kernel of a Jacobian $J$.
-      Traditionally in robotics we implemented this using the pseudo-inverse: $P
-      = (I - J^+J)$, but many linear algebra packages now provide methods to
-      obtain one more directly.  Adding $Pv \approx PK(q_0 - q)$ as a secondary
-      objective can be accomplished with \begin{align}\min_{v_n} \quad &
-      \left|J^G(q)v_n - V^{G_d}\right|^2_2 + \epsilon \left|P(q)\left(v_n -
-      K(q_0 - q)\right)\right|^2_2, \\ \subjto \quad &
-      \text{constraints}.\nonumber\end{align} Note the scalar $\epsilon$ that
-      we've placed in front of the secondary objective.  There is something
-      important to understand here.  If we do not have any constraints, then we
-      can remove $\epsilon$ completely -- the secondary task will in no way
-      interfere with the primary task of tracking the spatial velocity. However,
-      if there are constraints, then these constraints can cause the two
-      objectives to clash (<a href="#competing_objectives">Exercise</a>).  So we pick $\epsilon \ll 1$ to give the primary
-      objective relatively more weight.  But don't make it too small, because
-      that might make the numerics bad for your solver.  I'd say $\epsilon ~=
+      <p>Denote $P(q)$ as a linear map from the generalized velocities into the
+      nullspace of $J(q)$. Traditionally in robotics we implemented this using the
+      pseudo-inverse: $P = (I - J^+J)$, but many linear algebra packages now provide
+      methods to obtain an orthonormal basis for the kernel of a Jacobian $J$ directly.
+      Adding $Pv \approx PK(q_0 - q)$ as a secondary objective can be accomplished with
+      \begin{align}\min_{v_n} \quad & \left|J^G(q)v_n - V^{G_d}\right|^2_2 + \epsilon
+      \left|P(q)\left(v_n - K(q_0 - q)\right)\right|^2_2, \\ \subjto \quad &
+      \text{constraints}.\nonumber\end{align} Note the scalar $\epsilon$ that we've
+      placed in front of the secondary objective.  There is something important to
+      understand here.  If we do not have any constraints, then we can remove $\epsilon$
+      completely -- the secondary task will in no way interfere with the primary task of
+      tracking the spatial velocity. However, if there are constraints, then these
+      constraints can cause the two objectives to clash (<a
+      href="#competing_objectives">Exercise</a>).  So we pick $\epsilon \ll 1$ to give
+      the primary objective relatively more weight.  But don't make it too small,
+      because that might make the numerics bad for your solver.  I'd say $\epsilon ~=
       0.01$ is just about right.</p>
 
       <p>There are more sophisticated methods if one wishes to establish a
