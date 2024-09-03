@@ -52,6 +52,13 @@ Then run
 bazel test //...
 ```
 
+If tests fail with
+```
+RuntimeError: error: ERROR: In vtkXOpenGLRenderWindow.cxx, line 459:
+vtkXOpenGLRenderWindow (0x584ba3abff20): bad X server connection. DISPLAY=:0. Aborting.
+```
+, try `unset DISPLAY` before running the tests.
+
 ## To update the pip wheels
 
 Update the version number in `pyproject.toml`, and the drake version, then from
