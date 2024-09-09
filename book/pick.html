@@ -344,7 +344,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture videos a
       lock" in <a
       href="https://robotacademy.net.au/lesson/singularity-in-3d-rotation-angle-sequences/">this
       video</a>. Similarly, the direction of the vector in the axis-angle
-      representation is not uniquely defined when the rotation angle is zero.
+      representation in not uniquely defined when the rotation angle is zero.
       These singularities become problematic when we start taking derivatives
       of rotations, for instance when we write the equations of motion. It is
       now well understood <elib>Stillwell08</elib> that it requires at least
@@ -1476,21 +1476,27 @@ Velocity names: ['$world_base_link_wx', '$world_base_link_wy', '$world_base_link
   <exercise id="jacobian_exploration"><h1>Exploring the Jacobian</h1>
       <p>Exercise 3.5 asked you to derive the translational Jacobian for the
       planar two-link manipulator. In this problem we will explore the
-      translational Jacobian in more detail, both in the context of a planar
-      two-link manipulator and in the context of a planar three-link
-      manipulator. For the planar three-link manipulator, the joint angles are
-      $(q_{0}, q_{1}, q_{2})$ and the planar end-effector position is described
-      by $(x, y)$. </p>
+      translational Jacobian in more detaill in the context of multi-link manipulators.</p>
 
       <ol type="a">
-          <li>For the planar two-link manipulator, the size of the planar
-          translational Jacobian is 2x2. What is the size of the planar
-          translational Jacobian of the planar three-link
-          manipulator?</li><br/>
-          <li>In considering the planar two-link and three-link manipulators,
-          how does the size of the translational Jacobian impact the type of
-          inverse that can be computed? (when can the inverse be computed
-          exactly? when can it not?)</li><br/>
+          <li>For the planar two-link manipulator, the size of the planar 
+          translational Jacobian is 2x2. Consider an N-link manipulator in which the 
+          joint angles are $(q_{0}, q_{1}, …, q_{N})$, and has an end-effector position 
+          described by (x, y, z). What is the size of the translational Jacobian?</li><br/>
+          <li>
+              <ol type="i">
+                  <li>In considering these multi-link manipulators, how does the size
+                      of the translational Jacobian impact the type of inverse that can
+                      be computed? (when can the inverse be computed exactly? when can 
+                      it not?)</li><br>
+                  <li>How is recovering joint velocities from end-effector velocities 
+                     impacted by size of the translational Jacobian? What happens when 
+                     the dimension of the configuration space (joint angles) is greater 
+                     than the dimension of the operational space (end-effector position)? 
+                     What about if the opposite were true, where the dimension of configuration
+                     space is less than the dimension of the operational space? What 
+                     happens when the dimensions are the same?</li><br>
+              </ol> </li><br/>
           <li>Below, for the planar two-link manipulator, we draw the unit
           circle of joint velocities in the $\dot{q_{1}}-\dot{q_{2}}$
           plane. This circle is then mapped through the translational Jacobian
