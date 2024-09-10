@@ -1476,21 +1476,32 @@ Velocity names: ['$world_base_link_wx', '$world_base_link_wy', '$world_base_link
   <exercise id="jacobian_exploration"><h1>Exploring the Jacobian</h1>
       <p>Exercise 3.5 asked you to derive the translational Jacobian for the
       planar two-link manipulator. In this problem we will explore the
-      translational Jacobian in more detail, both in the context of a planar
-      two-link manipulator and in the context of a planar three-link
-      manipulator. For the planar three-link manipulator, the joint angles are
-      $(q_{0}, q_{1}, q_{2})$ and the planar end-effector position is described
-      by $(x, y)$. </p>
+      translational Jacobian in more detaill in the context of multi-link manipulators.</p>
 
       <ol type="a">
-          <li>For the planar two-link manipulator, the size of the planar
-          translational Jacobian is 2x2. What is the size of the planar
-          translational Jacobian of the planar three-link
-          manipulator?</li><br/>
-          <li>In considering the planar two-link and three-link manipulators,
-          how does the size of the translational Jacobian impact the type of
-          inverse that can be computed? (when can the inverse be computed
-          exactly? when can it not?)</li><br/>
+          <li>For the planar two-link manipulator, the size of the planar 
+          translational Jacobian is 2x2. Consider an N-link manipulator in which the 
+          joint angles are $(q_{0}, q_{1}, ..., q_{N})$, and has an end-effector position 
+          described by (x, y, z). What is the size of the translational Jacobian?</li><br/>
+          <li>In considering these multi-link manipulators, we'll call the space of possible 
+          joint angles the <b>configuration space</b> and the space of possible end-effector 
+          positions the <b>operational space</b>.
+              <ol type="i">
+                  <li> If the shape of translational Jacobian is structured such that the 
+                  dimension of the configuration space is equal to the dimension of the 
+                  operational space, when can the inverse be computed? (give more than 
+                  "when the Jacobian is invertible"). If the inverse can be computed, how 
+                  many sets of joint velocities can be commanded to produce a desired end-effector 
+                  velocity?</li><br>
+                  <li>Consider if the dimension of the configuration space is greater than the
+                  dimension of the operational space. Would it be possible for there to be more
+                  than one set of joint velocities that can be commanded to produce a desired 
+                  end-effector velocity? If possible, when would this occur, and how many sets
+                  can be commanded? If not, explain why.</li><br>
+                  <li>Continuing from b.ii, is there ever an instance where there are no sets of 
+                  joint velocities that can be commanded to produce a desired end-effector velocity?
+                  Explain.</li><br>
+              </ol> </li><br/>
           <li>Below, for the planar two-link manipulator, we draw the unit
           circle of joint velocities in the $\dot{q_{1}}-\dot{q_{2}}$
           plane. This circle is then mapped through the translational Jacobian
