@@ -15,7 +15,7 @@ rt_ipynb_test(
         "@platforms//cpu:x86_64",
         "@platforms//os:linux",
     ],
-    tags = [“no-sandbox”], # for rendering, see drake#7004
+    tags = ["no-sandbox"], # for rendering, see drake#7004
     deps = [
         "//manipulation",
         "//manipulation:mustard_depth_camera_example",

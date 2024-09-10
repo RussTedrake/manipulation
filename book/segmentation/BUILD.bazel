@@ -22,7 +22,7 @@ rt_py_test(
     timeout = "moderate",
     args = ["--test"],
     imports = [".."],
-    tags = [“no-sandbox”], # for rendering, see drake#7004
+    tags = ["no-sandbox"], # for rendering, see drake#7004
     deps = [
       "//manipulation",
       "//manipulation:scenarios",

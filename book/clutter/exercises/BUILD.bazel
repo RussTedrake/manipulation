@@ -19,7 +19,7 @@ rt_ipynb_test(
 rt_ipynb_test(
     name = "normal_estimation_depth",
     srcs = ["normal_estimation_depth.ipynb"],
-    tags = [“no-sandbox”], # for rendering, see drake#7004
+    tags = ["no-sandbox"], # for rendering, see drake#7004
     deps = [
         "//manipulation",
         "//manipulation:meshcat_utils",
@@ -46,7 +46,7 @@ rt_ipynb_test(
     data = [
       "//manipulation/models",
     ],
-    tags = [“no-sandbox”], # for rendering, see drake#7004
+    tags = ["no-sandbox"], # for rendering, see drake#7004
     deps = [
         "//manipulation",
         "//manipulation:meshcat_utils",
