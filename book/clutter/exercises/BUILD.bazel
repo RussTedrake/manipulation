@@ -6,7 +6,6 @@
 
 load("@pip_deps//:requirements.bzl", "requirement")
 load("//book/htmlbook/tools/jupyter:defs.bzl", "rt_ipynb_test")
-load("//book/htmlbook/tools:test_tags.bzl", "vtk_test_tags")
 
 rt_ipynb_test(
     name = "static_equilibrium",
@@ -20,7 +19,7 @@ rt_ipynb_test(
 rt_ipynb_test(
     name = "normal_estimation_depth",
     srcs = ["normal_estimation_depth.ipynb"],
-    tags = vtk_test_tags(),
+    tags = [“no-sandbox”], # for rendering, see drake#7004
     deps = [
         "//manipulation",
         "//manipulation:meshcat_utils",
@@ -47,7 +46,7 @@ rt_ipynb_test(
     data = [
       "//manipulation/models",
     ],
-    tags = vtk_test_tags(),
+    tags = [“no-sandbox”], # for rendering, see drake#7004
     deps = [
         "//manipulation",
         "//manipulation:meshcat_utils",

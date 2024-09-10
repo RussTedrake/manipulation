@@ -6,7 +6,6 @@
 
 load("//book/htmlbook/tools/jupyter:defs.bzl", "rt_ipynb_test")
 load("//book/htmlbook/tools/python:defs.bzl", "rt_py_test")
-load("//book/htmlbook/tools:test_tags.bzl", "vtk_test_tags")
 
 # torchvision is trying to write to a temp directory.
 #rt_ipynb_test(
@@ -23,7 +22,7 @@ rt_py_test(
     timeout = "moderate",
     args = ["--test"],
     imports = [".."],
-    tags = vtk_test_tags(),
+    tags = [“no-sandbox”], # for rendering, see drake#7004
     deps = [
       "//manipulation",
       "//manipulation:scenarios",
