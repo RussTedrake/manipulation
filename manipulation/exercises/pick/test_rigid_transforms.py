@@ -69,7 +69,7 @@ class TestRigidTransforms(unittest.TestCase):
         test_X_OG, test_X_WG = f(X_WO)
 
         R_OG = RotationMatrix(np.array([[0, 0, 1], [0, -1, 0], [1, 0, 0]]).T)
-        p_OG = [0, 0.2, 0]
+        p_OG = [0, 0.02, 0]
         X_OG = RigidTransform(R_OG, p_OG)
         X_WG = X_WO.multiply(X_OG)
 
