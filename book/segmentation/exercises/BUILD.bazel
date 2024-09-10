@@ -5,6 +5,7 @@
 # Licensed under the BSD 3-Clause License. See LICENSE.TXT for details.
 
 load("//book/htmlbook/tools/jupyter:defs.bzl", "rt_ipynb_test")
+load("//book/htmlbook/tools:test_tags.bzl", "vtk_test_tags")
 
 rt_ipynb_test(
     name = "label_generation",
@@ -15,6 +16,7 @@ rt_ipynb_test(
         "@platforms//cpu:x86_64",
         "@platforms//os:linux",
     ],
+    tags = vtk_test_tags(),
     deps = [
         "//manipulation",
         "//manipulation:mustard_depth_camera_example",

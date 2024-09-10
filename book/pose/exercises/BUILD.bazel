@@ -6,6 +6,7 @@
 
 load("@pip_deps//:requirements.bzl", "requirement")
 load("//book/htmlbook/tools/jupyter:defs.bzl", "rt_ipynb_test")
+load("//book/htmlbook/tools:test_tags.bzl", "vtk_test_tags")
 
 rt_ipynb_test(
     name = "bunny_icp",
@@ -34,6 +35,7 @@ rt_ipynb_test(
     name = "pose_estimation_icp",
     srcs = ["pose_estimation_icp.ipynb"],
     timeout = "moderate",
+    tags = vtk_test_tags(),
     deps = [
         "//manipulation",
         "//manipulation:icp",
