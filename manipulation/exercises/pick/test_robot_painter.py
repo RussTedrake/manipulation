@@ -16,32 +16,26 @@ class TestRobotPainter(unittest.TestCase):
         """compose_circular_key_frames"""
         f = self.notebook_locals["compose_circular_key_frames"]
         X_WC = self.notebook_locals["X_WCenter"]
-        X_WG = self.notebook_locals["X_WG"]
         radius = self.notebook_locals["radius"]
         thetas = self.notebook_locals["thetas"]
         # carry out computation
-        output_frames = f(thetas, X_WC, X_WG)
+        output_frames = f(thetas, X_WC, radius)
 
         # test all key positions match radius
         for i, frame_i in enumerate(output_frames):
-            if i == 0:
-                # check if the first frame is the gripper's current frame
-                dist = np.linalg.norm(frame_i.translation() - X_WG.translation())
-                self.assertLessEqual(dist, 1e-6, "first key frame position incorrect!")
-            else:
-                # check if the radius is correct
-                pos_cur = frame_i.translation()
-                r_cur = np.linalg.norm(pos_cur - X_WC.translation())
-                self.assertLessEqual(
-                    abs(radius - r_cur),
-                    1e-6,
-                    "key frame positions incorrect!",
-                )
+            # check if the radius is correct
+            pos_cur = frame_i.translation()
+            r_cur = np.linalg.norm(pos_cur - X_WC.translation())
+            self.assertLessEqual(
+                abs(radius - r_cur),
+                1e-6,
+                "key frame positions incorrect!",
+            )
 
-                # check if +z of each frame points toward the center
-                z_cur = frame_i.rotation().matrix()[0:3, 2]
-                test_center = z_cur * radius + pos_cur
-                center_err = np.linalg.norm(test_center - X_WC.translation())
-                self.assertLessEqual(
-                    center_err, 1e-6, "key frame orientations incorrect!"
-                )
+            # check if +z of each frame points toward the center
+            z_cur = frame_i.rotation().matrix()[0:3, 2]
+            test_center = z_cur * radius + pos_cur
+            center_err = np.linalg.norm(test_center - X_WC.translation())
+            self.assertLessEqual(
+                center_err, 1e-6, "key frame orientations incorrect!"
+            )
