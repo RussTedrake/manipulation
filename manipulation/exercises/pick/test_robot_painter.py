@@ -36,6 +36,4 @@ class TestRobotPainter(unittest.TestCase):
             z_cur = frame_i.rotation().matrix()[0:3, 2]
             test_center = z_cur * radius + pos_cur
             center_err = np.linalg.norm(test_center - X_WC.translation())
-            self.assertLessEqual(
-                center_err, 1e-6, "key frame orientations incorrect!"
-            )
+            self.assertLessEqual(center_err, 1e-6, "key frame orientations incorrect!")
