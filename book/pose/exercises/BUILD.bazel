@@ -34,6 +34,7 @@ rt_ipynb_test(
     name = "pose_estimation_icp",
     srcs = ["pose_estimation_icp.ipynb"],
     timeout = "moderate",
+    tags = ["no-sandbox"], # for rendering, see drake#7004
     deps = [
         "//manipulation",
         "//manipulation:icp",
