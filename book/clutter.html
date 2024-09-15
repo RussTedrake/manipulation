@@ -304,7 +304,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture videos a
 
     <example><h1>Collision geometry inspector</h1>
     
-      <p>Drake's has a very useful <code>ModelVisualizer</code> tool that
+      <p>Drake has a very useful <code>ModelVisualizer</code> tool that
       publishes by the illustration and collision geometry roles to Meshcat
       (see, for example, the Drake <script>document.write(drake_tutorials_link(
         'authoring_multibody_simulation',
@@ -357,18 +357,17 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture videos a
     -- as Cartesian forces at one or more contact points. It's easy to
     underestimate this step!</p>
 
-    <p>First, let's appreciate the sheer number of cases that we have to get
-    right in the code; it's unfortunately extremely common for open-source
-    tools to have bugs in here. But I think this gui also makes it pretty
-    apparent that asking to summarize the forces between two bodies in deep
-    penetration with a single Cartesian force applied at a point is fraught
-    with peril. As you move the objects, you will find many discontinuities;
-    this is a common reason why you sometimes see rigid body simulations
-    "explode".  It might seem natural to try to use multiple contact points
-    instead of a single contact point to summarize the forces, and some
-    simulators do, but it is very hard to write an algorithm that only depends
-    on the current configurations of the geometry which selects contact points
-    consistently from one time step to the next.</p>
+    <p>First, let's appreciate the sheer number of cases that we have to get right in
+    the code; it's unfortunately extremely common for open-source tools to have bugs in
+    here. But I think the simple gui I've created below makes it pretty apparent that
+    asking to summarize the forces between two bodies in deep penetration with a single
+    Cartesian force applied at a point is fraught with peril. As you move the objects,
+    you will find many discontinuities; this is a common reason why you sometimes see
+    rigid body simulations "explode".  It might seem natural to try to use multiple
+    contact points instead of a single contact point to summarize the forces, and some
+    simulators do, but it is very hard to write an algorithm that only depends on the
+    current configurations of the geometry which selects contact points consistently
+    from one time step to the next.</p>
 
     <p>One of the innovations in Drake which makes it particularly good at simulating complex contact situations is that we have moved away from point contact models. When we enable <a href="https://drake.mit.edu/doxygen_cxx/group__hydroelastic__user__guide.html">hydroelastic contact in Drake</a>, the spatial forces between two penetrating bodies are computed by taking an integral over a "hydroelastic surface" which generalizes the notion of a contact patch <elib>Elandt19</elib>. As of this writing, you still have to "opt-in" to using hydroelastic in Drake (see <script>document.write(drake_tutorials_link(
       'hydroelastic_contact_basics',
@@ -443,7 +442,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture videos a
       </figure>
 
       <p>In order to achieve static equilibrium, we require that all of the
-      forces and torques on the brick be in balance. We have three forcesto
+      forces and torques on the brick be in balance. We have three forces to
       consider: $F_{g}, F_1,$ and $F_2$, named using shorthand for gravity,
       contact 1, and contact 2, respectively. The gravity vector is most
       naturally described in the world frame, applied to the body at the center
@@ -484,7 +483,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture videos a
     $q$, we have $$\phi(q) > 0 \Rightarrow f^{c_i} = 0.$$  Second, we demand
     that the normal force only resists penetration; bodies are never pulled
     into contact: $$f^{c_i}_{C_z} \ge 0.$$  In <i>rigid</i> contact models, we
-    solve for the smallest normal force enforces the non-penetration
+    solve for the smallest normal force that enforces the non-penetration
     constraint (this is known as the principle of least constraint).  In
     <i>soft</i> contact models, we define the force to be a function of the
     penetration depth and velocity.</p>  <todo>Citations</todo>
@@ -495,7 +494,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture videos a
     commonly used model of friction is Coulomb friction, which states that
     $$\sqrt{{f^{c_i}_{C_x}}^2 + {f^{c_i}_{C_y}}^2} \le \mu f^{c_i}_{C_z},$$ with $\mu$ a
     non-negative scalar <i>coefficient of friction</i>.  Typically we define
-    both a $\mu_{static}$, which is applied when the tangential velocity is
+    both $\mu_{static}$, which is applied when the tangential velocity is
     zero, and $\mu_{dynamic}$, applied when the tangential velocity is
     non-zero. In the Coulomb friction model, the tangential contact force is
     the force within this friction cone which produces maximum dissipation.
@@ -951,21 +950,19 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture videos a
       simple ideas for trying to find grasps candidates that have a low
       cost.</p>
 
-      <p>Following our discussion of "model-based" grasp selection above, once
-      we pick up an object -- or whatever happens to be between our fingers
-      when we squeeze -- then we will expect the contact forces between our
-      fingers to have to resist at least the <i>gravitational wrench</i> (the
-      spatial force due to gravity) of the object.  The closing force provided
-      by our gripper is in the gripper's $x$-axis, but if we want to be able to
-      pick up the object without it slipping from our hands, then we need
-      forces inside the friction cones of our contacts to be able to resist the
-      gravitational wrench.  Since we don't know what that wrench will be (and
-      are somewhat constrained by the geometry of our fingers), a reasonable
-      strategy is to look the colinear antipodal points on the surface of the
-      point cloud which also align with $x$-axis of the gripper. In a real
-      point cloud, we are unlikely to find perfect antipodal pairs, but finding
-      areas with normals pointing in nearly opposite directions is a good
-      strategy for grasping!</p>
+      <p>Following our discussion of "model-based" grasp selection above, once we pick
+      up an object -- or whatever happens to be between our fingers when we squeeze --
+      then we will expect the contact forces between our fingers to have to resist at
+      least the <i>gravitational wrench</i> (the spatial force due to gravity) of the
+      object.  The closing force provided by our gripper is in the gripper's $x$-axis,
+      but if we want to be able to pick up the object without it slipping from our
+      hands, then we need forces inside the friction cones of our contacts to be able to
+      resist the gravitational wrench.  Since we don't know what that wrench will be
+      (and are somewhat constrained by the geometry of our fingers), a reasonable
+      strategy is to look at the colinear antipodal points on the surface of the point
+      cloud which also align with $x$-axis of the gripper. In a real point cloud, we are
+      unlikely to find perfect antipodal pairs, but finding areas with normals pointing
+      in nearly opposite directions is a good strategy for grasping!</p>
 
       <example><h1>Scoring grasp candidates</h1>
 
@@ -1138,16 +1135,15 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture videos a
     <p>Most of us are used to writing code in a <a
     href="https://hackr.io/blog/procedural-programming">procedural
     programming</a>
-    paradigm; code executes from the top of the program through function calls,
-    branchs (like if/then statements), for/while loops, etc. It's tempting to
-    to to write our high-level robot programs like that, too.  For the clutter
-    task, I could write "while there is an object to pick up in the first bin,
-    pick it up and move it to the second bin; ...".  And that is certainly not
-    wrong! But to be a component in a robotics framework, this high-level
-    program must somehow communicate with the rest of the system at runtime,
-    including having interfaces to the low-level controllers that are running
-    at some regular frequency (say 100Hz or even 1kHz). So how do we author the
-    high-level behaviors (often called "task level") in a way that integrates
+    paradigm; code executes from the top of the program through function calls, branchs
+    (like if/then statements), for/while loops, etc. It's tempting to try to write our
+    high-level robot programs like that, too.  For the clutter task, I could write
+    "while there is an object to pick up in the first bin, pick it up and move it to the
+    second bin; ...".  And that is certainly not wrong! But to be a component in a
+    robotics framework, this high-level program must somehow communicate with the rest
+    of the system at runtime, including having interfaces to the low-level controllers
+    that are running at some regular frequency (say 100Hz or even 1kHz). So how do we
+    author the high-level behaviors (often called "task level") in a way that integrates
     seamlessly with the high-rate low-level controls?</p>
 
     <p>There are a few important programming paradigms for authoring the
@@ -1409,7 +1405,7 @@ output_ports:
             system? (Hint: what type of optimization problem is this?)</li>
             <li>Take a look at the Drake documentation for <a
             href="https://drake.mit.edu/doxygen_cxx/classdrake_1_1multibody_1_1_static_equilibrium_problem.html">StaticEquilbriumProblem</a>.
-            It lists the constraints that are used when it's solve for
+            It lists the constraints that are used when it solves for
             equilibrium. Which two of these can a free body diagram
             answer?</li>
         </ol>

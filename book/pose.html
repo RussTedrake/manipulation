@@ -362,7 +362,7 @@ output_ports:
 
     <subsection><h1>Surface normal estimation</h1>
     
-      <p>The simplest and most straight-forward algorithm for estimating the normals of a point cloud surface is to find the $k$ nearest neighbors, and fit a plane through those points using least-squares.  Let's denote the nominal point (about which we are estimating the normal) $p_0$, and it's $k$ nearest neighboard $p_i, i\in[1,k].$  Let us form the $k \times 3$ data matrix: $$X = [ p_1 - p_0, p_2 - p_0, ..., p_k - p_0 ].$$  Then the principal components of this data matrix are given by the <a href="https://en.wikipedia.org/wiki/Singular_value_decomposition">singular value decomposition</a> of $X$ (or the eigenvectors of $X^T X$); if $X = U\Sigma V^T$, then the columns of $V$ are the principal directions, with the last column (associated with the smallest singular value) representing the normal direction.  The length can be normalized to one; but keep in mind that the sign of this vector is ambiguous -- the $k$ nearest points don't give any information about what direction might be into the object or out of the object.  This is a case where knowing the original camera direction can help -- for example, PCL offers a method <code>flipNormalTowardsViewpoint</code> that post-processes the normals.</p>
+      <p>The simplest and most straight-forward algorithm for estimating the normals of a point cloud surface is to find the $k$ nearest neighbors, and fit a plane through those points using least-squares.  Let's denote the nominal point (about which we are estimating the normal) $p_0$, and its $k$ nearest neighboard $p_i, i\in[1,k].$  Let us form the $k \times 3$ data matrix: $$X = [ p_1 - p_0, p_2 - p_0, ..., p_k - p_0 ].$$  Then the principal components of this data matrix are given by the <a href="https://en.wikipedia.org/wiki/Singular_value_decomposition">singular value decomposition</a> of $X$ (or the eigenvectors of $X^T X$); if $X = U\Sigma V^T$, then the columns of $V$ are the principal directions, with the last column (associated with the smallest singular value) representing the normal direction.  The length can be normalized to one; but keep in mind that the sign of this vector is ambiguous -- the $k$ nearest points don't give any information about what direction might be into the object or out of the object.  This is a case where knowing the original camera direction can help -- for example, PCL offers a method <code>flipNormalTowardsViewpoint</code> that post-processes the normals.</p>
 
       <figure>
         <img src="http://www.pointclouds.org/assets/images/contents/documentation/features_normal.png" />
@@ -370,7 +370,7 @@ output_ports:
         <figcaption>Normal estimation using $k$ nearest neighbords (image linked from the <a href="http://docs.pointclouds.org/trunk/group__features.html"></a>PCL documentation</a>)</figcaption>
       </figure>
 
-      <todo>Add an example; or even support normals in the DepthImageToPointCloud.  Example could be as simple as grabbing one point from the mustard point cloud, and finding it's normal (with everything plotted in matplotlib).</todo>
+      <todo>Add an example; or even support normals in the DepthImageToPointCloud.  Example could be as simple as grabbing one point from the mustard point cloud, and finding its normal (with everything plotted in matplotlib).</todo>
 
       <p>What was interesting and surprising (to me) about this is not that the least-squares solution works.  What is surprising is that this operation is considered commonplace and cheap -- for every point in the point cloud, we find $k$ nearest neighbors and do the normal estimation... even for very large point clouds.  Making this performant typically requires data structures like the <a href="https://en.wikipedia.org/wiki/K-d_tree">k-d tree</a> to make the nearest neighbor queries efficient.</p>
 
@@ -572,7 +572,7 @@ output_ports:
     matrix with entries $[1, 1, \det(UV^T)]$ <elib>Myronenko09</elib>.  This may
     seem like magic, but replacing the singular values in SVD with ones gives
     the optimal projection back onto the orthonormal matrices, and the diagonal
-    matrix ensures that we do not get an improper rotation. There many
+    matrix ensures that we do not get an improper rotation. There are many
     derivations available in the literature, but many of them drop the
     determinant constraint instead of handling the improper rotation. See
     <elib>Haralick89</elib> (section 3) for one of my early favorites.</p>  
@@ -592,7 +592,7 @@ output_ports:
       world frame.  As expected, the algorithm perfectly recovers the ground
       truth transformation.</p>
 
-      <script>document.write(notebook_link('pose'))</script>
+      <script>document.write(notebook_link('pose', notebook="icp"))</script>
 
     </example>
 
@@ -1008,7 +1008,7 @@ output_ports:
         $$\min_\theta \sum_{j} \left\| \begin{bmatrix} \cos\theta & -\sin\theta
         \\ \sin\theta & \cos\theta \end{bmatrix} \left({}^Op^{m_{c_i}} -
         {}^Op^{\bar{m}}\right) - \left( p^{s_i} -
-        p^{\bar{s}}\right)\right\|^2.$$ We now have a complex, nonlinear
+        p^{\bar{s}}\right)\right\|^2.$$ We now have a complicated, nonlinear
         objective function.  Have we introduced local minima into the
         problem?</p>
 
@@ -1050,7 +1050,7 @@ output_ports:
         <p>There is an exceptionally nice trick for speeding up the computation
         in these nonlinear optimizations, but it does require us to go back to
         thinking about the minimum distance from a scene point to the model, as
-        opposed to the pairwise distance between points.  This, I think, it not
+        opposed to the pairwise distance between points.  This, I think, is not
         a big sacrifice now that we have stopped enumerating correspondences
         explicitly.  Let's slightly modify our objective above to be of the
         form $$\min \sum_{i} \left[ l\left( \min_j \| X^O \: {}^Op^{m_j} -

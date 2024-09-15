@@ -534,32 +534,31 @@ pose = plant.EvalBodyPoseInWorld(context, gripper)</pre></code>
   
     <p>Spatial velocities fit nicely into our spatial algebra:
     <ul>
-      <li>Velocities add when they are expressed in the same frame: \begin{gather}
-      {}^A\text{v}^B_F + {}^B\text{v}^C_F = {}^A\text{v}^C_F, \qquad {}^A\omega^B_F +
-      {}^B\omega^C_F = {}^A\omega^C_F,\end{gather} (especially for angular velocities,
-      this <a href="#angular_velocity_addition">deserves to be verified</a>) and have
-      the additive inverse, ${}^AV^C_F = - {}^CV^A_F,$.</li>
       <li>Rotations can be used to change between the "expressed-in"
       frames: \begin{equation} {}^A\text{v}^B_G = {}^GR^F {}^A\text{v}^B_F,
-      \qquad {}^A\omega^B_G = {}^GR^F {}^A\omega^B_F.\end{equation}
-        </li>
-        <li>Translational velocities compose across frames with:
-        \begin{equation}{}^A\text{v}^C_F = {}^A\text{v}^B_F + {}^B\text{v}^C_F
-        + {}^A\omega^B_F \times {}^Bp^C_F.\end{equation} 
+      \qquad {}^A\omega^B_G = {}^GR^F {}^A\omega^B_F.\end{equation}</li>
+      <li>Angular velocities add when they are expressed in the same frame:
+      \begin{gather} {}^A\omega^B_F + {}^B\omega^C_F = {}^A\omega^C_F,\end{gather} (this
+      <a href="#angular_velocity_addition">deserves to be verified</a>) and have the
+      additive inverse, ${}^A\omega^C_F = - {}^C\omega^A_F,$.</li>
+      <li>Composition of translational velocities is a bit more complicated:
+      \begin{equation}{}^A\text{v}^C_F = {}^A\text{v}^B_F + {}^B\text{v}^C_F +
+      {}^A\omega^B_F \times {}^Bp^C_F.\end{equation} 
       <details><summary>This can be derived in a few steps (click the triangle to
       expand)</summary><p>Differentiating $${}^Ap^C = {}^AX^B {}^Bp^C = {}^Ap^B +
       {}^AR^B {}^Bp^C,$$ yields \begin{align} {}^A\text{v}^C =& {}^A\text{v}^B +
       {}^A\dot{R}^B {}^Bp^C + {}^AR^B {}^B\text{v}^C \nonumber \\ =& {}^A\text{v}^B_A +
       {}^A\dot{R}^B {}^BR^A {}^Bp^C_A + {}^B\text{v}^C_A.\end{align} Allow me to write
-      $\dot{R}R^{-1}$ for ${}^A\dot{R}^B {}^BR^A$ (dropping the frames for a moment). It
-      turns out that $\dot{R}R^{-1}$, is always a skew-symmetric matrix.  To see this,
-      differentiate $RR^T = I$ to get $$\dot{R}R^T + R\dot{R}^T = 0 \Rightarrow
-      \dot{R}R^T = - R\dot{R}^T \Rightarrow \dot{R} R^T = - (\dot{R} R^T)^T,$$ which is
-      the definition of a skew-symmetric matrix. Any 3$\times$3 skew-symmetric matrix
-      can be parameterized by three numbers (for $\dot{R}R^T$ in particular, this is
-      exactly our angular velocity vector, $\omega$), and can be written as a cross
-      product, so $\dot{R}R^Tp = \omega \times p.$</p>  <p>Multiply the right and left
-      sides by ${}^FR^A$ to change the expressed-in frame, and we have our
+      $\dot{R}R^T = \dot{R}R^{-1}$ for ${}^A\dot{R}^B {}^BR^A$ (dropping the frames for
+      a moment). It turns out that $\dot{R}R^T$, is always a skew-symmetric matrix. To
+      see this, differentiate $RR^T = I$ to get $$\dot{R}R^T + R\dot{R}^T = 0
+      \Rightarrow \dot{R}R^T = - R\dot{R}^T \Rightarrow \dot{R} R^T = - (\dot{R}
+      R^T)^T,$$ which is the definition of a skew-symmetric matrix. Any 3$\times$3
+      skew-symmetric matrix can be parameterized by three numbers (for ${}^A\dot{R}^B
+      {}^BR^A$ in particular, this is exactly our angular velocity vector, ${}^A
+      \omega^B$), and can be written as a cross product, so ${}^A\dot{R}^B {}^BR^A
+      {}^Bp^C_A = {}^A \omega^B_A \times {}^B p^C_A.$</p>  <p>Multiply the right and
+      left sides by ${}^FR^A$ to change the expressed-in frame, and we have our
       result.</p></details></li>
       <li>This reveals that additive inverse for translational velocities is
       not obtained by switching the reference and measured-in frames; it is
