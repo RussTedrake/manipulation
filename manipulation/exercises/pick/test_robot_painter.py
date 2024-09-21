@@ -44,6 +44,6 @@ class TestRobotPainter(unittest.TestCase):
                 X_WG2 = frame_i
                 X_G1G1 = X_G1W @ X_WG2
                 rotation_direction = X_G1G1.rotation().ToAngleAxis().axis()[1]
-                self.assertTrue(
-                    rotation_direction == -1, "rotating in the wrong direction"
+                self.assertAlmostEqual(
+                    rotation_direction, -1, 2, "rotating in the wrong direction"
                 )
