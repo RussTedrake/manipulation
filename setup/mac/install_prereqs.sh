@@ -59,9 +59,6 @@ export HOMEBREW_NO_INSECURE_REDIRECT=1
 # Never automatically cleanup installed, upgraded, and/or reinstalled formulae.
 export HOMEBREW_NO_INSTALL_CLEANUP=1
 
-# Only list updates to installed formulae.
-export HOMEBREW_UPDATE_REPORT_ONLY_INSTALLED=1
-
 # brew update uses git(1), so HOMEBREW_CURL_RETRIES does not take effect.
 brew update || (sleep 30; brew update)
 
