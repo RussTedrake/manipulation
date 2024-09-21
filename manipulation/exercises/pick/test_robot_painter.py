@@ -18,8 +18,14 @@ class TestRobotPainter(unittest.TestCase):
         X_WC = self.notebook_locals["X_WCenter"]
         radius = self.notebook_locals["radius"]
         thetas = self.notebook_locals["thetas"]
+        num_key_frames = self.notebook_locals["num_key_frames"]
         # carry out computation
         output_frames = f(thetas, X_WC, radius)
+
+        # check number of key frames
+        self.assertEqual(
+            len(output_frames), num_key_frames, "wrong number of key frames"
+        )
 
         # test all key positions match radius
         for i, frame_i in enumerate(output_frames):
