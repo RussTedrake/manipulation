@@ -42,8 +42,8 @@ class TestRobotPainter(unittest.TestCase):
             if i > 0:
                 X_G1W = output_frames[i - 1].inverse()
                 X_WG2 = frame_i
-                X_G1G1 = X_G1W @ X_WG2
-                rotation_angle = X_G1G1.rotation().ToAngleAxis().angle()
+                X_G1G2 = X_G1W @ X_WG2
+                rotation_angle = X_G1G2.rotation().ToAngleAxis().angle()
                 self.assertAlmostEqual(
                     thetas[i] - thetas[i - 1],
                     rotation_angle,
@@ -51,7 +51,7 @@ class TestRobotPainter(unittest.TestCase):
                     "rotation angle incorrect",
                 )
 
-                rotation_direction = X_G1G1.rotation().ToAngleAxis().axis()[1]
+                rotation_direction = X_G1G2.rotation().ToAngleAxis().axis()[1]
                 self.assertAlmostEqual(
                     rotation_direction, -1, 2, "rotating in the wrong direction"
                 )
