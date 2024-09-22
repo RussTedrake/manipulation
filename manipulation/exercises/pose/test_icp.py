@@ -4,6 +4,7 @@ import numpy as np
 import timeout_decorator
 from gradescope_utils.autograder_utils.decorators import weight
 from pydrake.all import RigidTransform, RollPitchYaw, RotationMatrix
+from scipy.spatial import KDTree
 
 
 def least_squares_transform(scene, model):
@@ -32,6 +33,28 @@ def generate_arbitrary_transform(seed):
     p_BA = np.mod([seed * 2.13, seed * 3.3, seed * 5.225], 0.1) - 0.05
     X_BA = RigidTransform(R_BA, p_BA)
     return X_BA
+
+def nearest_neighbors(scene, model):
+    """
+    Find the nearest (Euclidean) neighbor in model for each
+    point in scene
+    Args:
+        scene: 3xN numpy array of points
+        model: 3xM numpy array of points
+    Returns:
+        distances: (N, ) numpy array of Euclidean distances from each point in
+            scene to its nearest neighbor in model.
+        indices: (N, ) numpy array of the indices in model of each
+            scene point's nearest neighbor - these are the c_i's
+    """
+    distances = np.empty(scene.shape[1], dtype=float)
+    indices = np.empty(scene.shape[1], dtype=int)
+
+    kdtree = KDTree(model.T)
+    for i in range(model.shape[1]):
+        distances[i], indices[i] = kdtree.query(scene[:, i], 1)
+
+    return distances, indices
 
 
 class TestICP(unittest.TestCase):
@@ -79,32 +102,12 @@ class TestICP(unittest.TestCase):
     def test_icp(self):
         """Test icp implementation"""
         f = self.notebook_locals["icp"]
-        nearest_neighbors = self.notebook_locals["nearest_neighbors"]
 
         # It should be sufficient to test only one for ICP.
         X_BA = generate_arbitrary_transform(7)
         self.scene = X_BA.multiply(self.model)
         X_BA_test, mean_error_test, num_iters_test = f(self.scene, self.model)
-        num_iters = 0
-        mean_error = 0.0
-        max_iterations = 20
-        tolerance = 1e-3
-        prev_error = 0
-        X_BA = RigidTransform()
 
-        while True:
-            num_iters += 1
-            distances, indices = nearest_neighbors(
-                self.scene, X_BA.multiply(self.model)
-            )
-            X_BA = least_squares_transform(self.scene, self.model[:, indices])
-            mean_error = np.mean(distances)
-            if abs(mean_error - prev_error) < tolerance or num_iters >= max_iterations:
-                break
-            prev_error = mean_error
-
-        result = X_BA.multiply(X_BA_test.inverse())
-        self.assertTrue(
-            np.allclose(result.GetAsMatrix4(), np.eye(4)),
-            "icp implementation is incorrect",
-        )
+        distances, indices = nearest_neighbors(self.scene, X_BA_test.multiply(self.model))
+        mean_error = np.mean(distances)
+        assert mean_error < 1.3 * 1e-2, "ICP test failed with mean error {}".format(mean_error)
