@@ -34,28 +34,6 @@ def generate_arbitrary_transform(seed):
     X_BA = RigidTransform(R_BA, p_BA)
     return X_BA
 
-def nearest_neighbors(scene, model):
-    """
-    Find the nearest (Euclidean) neighbor in model for each
-    point in scene
-    Args:
-        scene: 3xN numpy array of points
-        model: 3xM numpy array of points
-    Returns:
-        distances: (N, ) numpy array of Euclidean distances from each point in
-            scene to its nearest neighbor in model.
-        indices: (N, ) numpy array of the indices in model of each
-            scene point's nearest neighbor - these are the c_i's
-    """
-    distances = np.empty(scene.shape[1], dtype=float)
-    indices = np.empty(scene.shape[1], dtype=int)
-
-    kdtree = KDTree(model.T)
-    for i in range(model.shape[1]):
-        distances[i], indices[i] = kdtree.query(scene[:, i], 1)
-
-    return distances, indices
-
 
 class TestICP(unittest.TestCase):
     def __init__(self, test_name, notebook_locals):
@@ -102,6 +80,7 @@ class TestICP(unittest.TestCase):
     def test_icp(self):
         """Test icp implementation"""
         f = self.notebook_locals["icp"]
+        nearest_neighbors = self.notebook_locals["nearest_neighbors"]
 
         # It should be sufficient to test only one for ICP.
         X_BA = generate_arbitrary_transform(7)
