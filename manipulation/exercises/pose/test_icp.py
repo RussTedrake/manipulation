@@ -89,4 +89,4 @@ class TestICP(unittest.TestCase):
 
         distances, indices = nearest_neighbors(self.scene, X_BA_test.multiply(self.model))
         mean_error = np.mean(distances)
-        assert mean_error < 1.3 * 1e-2, "ICP test failed with mean error {}".format(mean_error)
+        assert mean_error < 1.3e-2, "ICP test failed with mean error {}".format(mean_error)
