@@ -1428,7 +1428,7 @@ output_ports:
         significance of this.</li>
        <li> Consider the general case where rotation is fixed with an equal number of scene and model points. 
         We only need to find the translational component. Solving this optimization problem,
-        what quantity do we find for each decision variable? 
+        what quantity do we find for each decision variable? Your solution should be correct even when the model and scene points cannot be perfectly aligned (e.g. noise).
         (HINT: We want to minimize the squared distance of all the transformed scene points compared to their corresponding model points.) </li>
       </ol>
     </exercise>
@@ -1526,7 +1526,7 @@ output_ports:
             r_{j}$) pairs. Next, compute the ICP error, the sum of the pairwise squared
             distances between each of these correspondences. </li>
             <li>Suppose that you are told that $\frac{1}{3}$ of the scene
-            points are outliers. Using the pairwise squared distances between each
+            points are outliers. Using the pairwise distances between each
             $b_{i}$ and $r_{j}$, which two scene points $r_{j}$ could you
             detect as the most likely outliers?</li>
             <li>Discarding the two proposed outlier scene points, compute the
