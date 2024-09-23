@@ -43,10 +43,10 @@ rt_ipynb_test(
 rt_ipynb_test(
     name = "grasp_candidate",
     srcs = ["grasp_candidate.ipynb"],
+    tags = ["no-sandbox"], # for rendering, see drake#7004
     data = [
       "//manipulation/models",
     ],
-    tags = ["no-sandbox"], # for rendering, see drake#7004
     deps = [
         "//manipulation",
         "//manipulation:meshcat_utils",
