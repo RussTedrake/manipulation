@@ -4,7 +4,6 @@ import numpy as np
 import timeout_decorator
 from gradescope_utils.autograder_utils.decorators import weight
 from pydrake.all import RigidTransform, RollPitchYaw, RotationMatrix
-from scipy.spatial import KDTree
 
 
 def least_squares_transform(scene, model):
