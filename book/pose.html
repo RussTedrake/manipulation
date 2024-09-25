@@ -1341,9 +1341,9 @@ output_ports:
 
       <ol type="a">
           <li>What is the minimum number of points that can uniquely
-      specify the pose of an object in 2D?  Provide a brief mathematical justification.</li> 
+      specify the pose of an object in 2D?  Provide a brief justification.</li> 
           <li>What is the minimum number of points that can uniquely
-      specify the pose of an object in 3D?  Provide a brief mathematical justification.</li>   
+      specify the pose of an object in 3D?  Provide a brief justification.</li>   
       </ol></p>
 
       (HINT: How might your answers change if point correspondences were unknown?)
@@ -1421,12 +1421,15 @@ output_ports:
       <ol type="a">
         <li> What are the decision variables in this optimization problem? Be
         specific. </li>
-        <li> How do the decision variables show up in the constraints?</li>
         <li>What is the value of the objective function for $p^O = (0,0)$? What
         about (3,10)? And (6,12)?</li>
-        <li>If you plotted the objective function and constraints as a function
+        <li>If you plotted the objective function as a function
         of your decision variables, what shape would it be? Explain the
         significance of this.</li>
+       <li> Consider the general case where rotation is fixed with an equal number of scene and model points. 
+        We only need to find the translational component. Solving this optimization problem,
+        what quantity do we find for each decision variable? Your solution should be correct even when the model and scene points cannot be perfectly aligned (e.g. noise).
+        (HINT: We want to minimize the squared distance of all the transformed scene points compared to their corresponding model points.) </li>
       </ol>
     </exercise>
 
@@ -1443,12 +1446,12 @@ output_ports:
       </figure>
 
         
-      <p>The model points and the scene points are given as:</p>
+      <p>The model points and the scene points in their corresponding frame are given as:</p>
 
-      $$p^{m_1}=\begin{pmatrix} 1 \\ 0 \end{pmatrix} \qquad
-      p^{m_2}=\begin{pmatrix} -1 \\ 0 \end{pmatrix} \qquad
-      p^{s_1}=\begin{pmatrix} 1 \\ 0 \end{pmatrix} \qquad
-      p^{s_2}=\begin{pmatrix} -1 \\ 0 \end{pmatrix}.$$
+      $$\prescript{W}{}{p^{m_1}}=\begin{pmatrix} 1 \\ 0 \end{pmatrix} \qquad
+      \prescript{W}{}{p^{m_2}}=\begin{pmatrix} -1 \\ 0 \end{pmatrix} \qquad
+      \prescript{O}{}{p^{s_1}}=\begin{pmatrix} 1 \\ 0 \end{pmatrix} \qquad
+      \prescript{O}{}{p^{s_2}}=\begin{pmatrix} -1 \\ 0 \end{pmatrix}.$$
 
       <p>The true correspondence is given by their numbering, but note that we
       don't know the true correspondence - ICP simply determines it based on
@@ -1457,7 +1460,7 @@ output_ports:
       write down the resulting optimization as:</p>
       $$\begin{aligned} \min_{p_x,p_y,a,b} \quad & \sum_i \bigg\|
       \begin{pmatrix} p_x \\ p_y \end{pmatrix} + \begin{pmatrix} a & -b \\ b &
-      a \end{pmatrix} p^{m_{c_i}} - p^{s_i} \bigg\|^2 \\ \text{s.t.} \quad &
+      a \end{pmatrix} \prescript{W}{}{p^{m_{c_i}}} - \prescript{O}{}{p^{s_i}} \bigg\|^2 \\ \text{s.t.} \quad &
       a^2 + b^2 = 1. \end{aligned}$$
 
       <ol type="a">
@@ -1472,8 +1475,8 @@ output_ports:
         <li> Remember that correspondence need not be one-to-one. In fact they
         are often not when computed based on nearest-neighbors. By constructing
         the data matrix $W$, show that when both scene points correspond to one
-        model point, ICP gets stuck and does not achieve zero-cost. (HINT: You
-        may assume that doing SVD on a zero matrix leads to identity matrices
+        model point, ICP gets stuck and does not achieve zero-cost. What happens on the next iteration of ICP?
+        (HINT: You may assume that doing SVD on a zero matrix leads to identity matrices
         for $U$ and $V$).</li>
       </ol>
     </exercise>
@@ -1520,7 +1523,7 @@ output_ports:
           scene. 
           <ol>
             <li>First, write down each of the correspondence, i.e the ($b_{i},
-            r_{j}$) pairs. Next, compute the ICP error, the sum of the pairwise
+            r_{j}$) pairs. Next, compute the ICP error, the sum of the pairwise squared
             distances between each of these correspondences. </li>
             <li>Suppose that you are told that $\frac{1}{3}$ of the scene
             points are outliers. Using the pairwise distances between each
@@ -1533,7 +1536,7 @@ output_ports:
           </li><br/><br/>
 
           <li>The optimization in ICP captures the distance between two sets of
-          points as the sum of pairwise Euclidean distances. As a thought
+          points as the sum of pairwise Euclidean squared distances. As a thought
           experiment: another possible distance metric (which isn't as
           optimization friendly) is the one-way Hausdorff distance. Stated
           simply, given that an adversary picks a point on one shape, the <a

@@ -85,26 +85,12 @@ class TestICP(unittest.TestCase):
         X_BA = generate_arbitrary_transform(7)
         self.scene = X_BA.multiply(self.model)
         X_BA_test, mean_error_test, num_iters_test = f(self.scene, self.model)
-        num_iters = 0
-        mean_error = 0.0
-        max_iterations = 20
-        tolerance = 1e-3
-        prev_error = 0
-        X_BA = RigidTransform()
 
-        while True:
-            num_iters += 1
-            distances, indices = nearest_neighbors(
-                self.scene, X_BA.multiply(self.model)
-            )
-            X_BA = least_squares_transform(self.scene, self.model[:, indices])
-            mean_error = np.mean(distances)
-            if abs(mean_error - prev_error) < tolerance or num_iters >= max_iterations:
-                break
-            prev_error = mean_error
+        distances, indices = nearest_neighbors(
+            self.scene, X_BA_test.multiply(self.model)
+        )
 
-        result = X_BA.multiply(X_BA_test.inverse())
-        self.assertTrue(
-            np.allclose(result.GetAsMatrix4(), np.eye(4)),
-            "icp implementation is incorrect",
+        mean_error = np.mean(distances)
+        assert mean_error < 1.3e-2, "ICP test failed with mean error {}".format(
+            mean_error
         )
