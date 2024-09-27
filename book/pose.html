@@ -1448,10 +1448,10 @@ output_ports:
         
       <p>The model points and the scene points in their corresponding frame are given as:</p>
 
-      $$\prescript{W}{}{p^{m_1}}=\begin{pmatrix} 1 \\ 0 \end{pmatrix} \qquad
-      \prescript{W}{}{p^{m_2}}=\begin{pmatrix} -1 \\ 0 \end{pmatrix} \qquad
-      \prescript{O}{}{p^{s_1}}=\begin{pmatrix} 1 \\ 0 \end{pmatrix} \qquad
-      \prescript{O}{}{p^{s_2}}=\begin{pmatrix} -1 \\ 0 \end{pmatrix}.$$
+      $${}^Wp^{m_1}=\begin{pmatrix} 1 \\ 0 \end{pmatrix} \qquad
+      {}^Wp^{m_2}=\begin{pmatrix} -1 \\ 0 \end{pmatrix} \qquad
+      {}^Op^{s_1}=\begin{pmatrix} 1 \\ 0 \end{pmatrix} \qquad
+      {}^Op^{s_2}=\begin{pmatrix} -1 \\ 0 \end{pmatrix}.$$
 
       <p>The true correspondence is given by their numbering, but note that we
       don't know the true correspondence - ICP simply determines it based on
@@ -1460,7 +1460,7 @@ output_ports:
       write down the resulting optimization as:</p>
       $$\begin{aligned} \min_{p_x,p_y,a,b} \quad & \sum_i \bigg\|
       \begin{pmatrix} p_x \\ p_y \end{pmatrix} + \begin{pmatrix} a & -b \\ b &
-      a \end{pmatrix} \prescript{W}{}{p^{m_{c_i}}} - \prescript{O}{}{p^{s_i}} \bigg\|^2 \\ \text{s.t.} \quad &
+      a \end{pmatrix} {}^Wp^{m_{c_i}} - {}^Op^{s_i} \bigg\|^2 \\ \text{s.t.} \quad &
       a^2 + b^2 = 1. \end{aligned}$$
 
       <ol type="a">
