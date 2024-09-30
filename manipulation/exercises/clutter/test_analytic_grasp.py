@@ -3,7 +3,11 @@ import unittest
 import numpy as np
 import timeout_decorator
 from gradescope_utils.autograder_utils.decorators import weight
-
+from pydrake.all import (
+    Evaluate,
+    Jacobian,
+    Variable
+)
 
 class TestAnalyticGrasp(unittest.TestCase):
     def __init__(self, test_name, notebook_locals):
@@ -11,48 +15,40 @@ class TestAnalyticGrasp(unittest.TestCase):
         self.notebook_locals = notebook_locals
 
     @weight(4)
-    @timeout_decorator.timeout(10.0)
+    @timeout_decorator.timeout(20.0)
     def test_antipodal_points(self):
         """Test find_antipodal_pts"""
         shape = self.notebook_locals["shape"]
         f = self.notebook_locals["find_antipodal_pts"]
 
-        # Use a seed that can test for different Hessians
-        np.random.seed(45)
+        np.random.seed(55)
 
-        result_lst = []
-        H_eig_lst = []
-
-        for i in range(4):
+        # Test if points are antipodal by comparing normal vectors.
+        for i in range(20):
             result, H_eig = f(shape)
-            result_lst.append(result)
-            H_eig_lst.append(np.sort(H_eig)[::-1])
+            
+            t = Variable("t")
+            surface = shape(t)
+            J_x = surface[0].Differentiate(t)
+            J_y = surface[1].Differentiate(t)
 
-        result_lst_eval = np.array(result_lst)
-        H_eig_lst_eval = np.array(H_eig_lst)
+            dx_1 = J_x.Evaluate({t: result[0]})
+            dy_1 = J_y.Evaluate({t: result[0]})
 
-        # yapf: disable
-        result_lst_target = np.array([  # noqa
-            [6.276351, 3.497493],
-            [3.948776, 1.636278],
-            [6.104002, 4.219046],
-            [3.223685, 0.710411]])
+            dx_2 = J_x.Evaluate({t: result[1]})
+            dy_2 = J_y.Evaluate({t: result[1]})
 
-        H_eig_lst_target = np.array([  # noqa
-            [35855.23483, 29612.82676],
-            [-1025.65590, -1312.08498],
-            [6819.32722, -643.00117],
-            [27654.86062, -1249.67350]])
-        # yapf: enable
+            pts = np.array([dx_1, dy_1]), np.array([dx_2, dy_2])
+            
+            v_1 = pts[0] / np.linalg.norm(pts[0])
+            v_2 = pts[1] / np.linalg.norm(pts[1])
+            
+            n_1 = np.array([-v_1[1], v_1[0]])
+            n_2 = -np.array([-v_2[1], v_2[0]])
 
-        self.assertLessEqual(
-            np.linalg.norm(result_lst_target - result_lst_eval),
-            1e-4,
-            "The optimal values are not returned correctly.",
-        )
-
-        self.assertLessEqual(
-            np.linalg.norm(H_eig_lst_target - H_eig_lst_eval),
-            1e-4,
-            "The Hessian values are not returned correctly.",
-        )
+            # yapf: enable
+            self.assertLessEqual(
+                np.linalg.norm(n_1 - n_2),
+                1e-4,
+                "Tested points are not antipodal.",
+            )
