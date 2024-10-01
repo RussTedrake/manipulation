@@ -18,8 +18,6 @@ class TestAnalyticGrasp(unittest.TestCase):
         shape = self.notebook_locals["shape"]
         f = self.notebook_locals["find_antipodal_pts"]
 
-        np.random.seed(55)
-
         # Test if points are antipodal by comparing normal vectors.
         for i in range(20):
             result, H_eig = f(shape)
