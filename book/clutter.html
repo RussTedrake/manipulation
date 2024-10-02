@@ -1415,6 +1415,9 @@ output_ports:
 
       <p>For this exercise, you will investigate a slightly different approach to normal vector estimation. In particular, we can exploit the spatial structure that is already in a depth image to avoid computing nearest neighbors. You will work exclusively in <script>document.write(notebook_link('clutter', notebook='normal_estimation_depth', link_text='this notebook'))</script>. You will be asked to complete the following steps:</p>
       <ol type="a">
+        <li> Analyze mathematically how the data matrix constructed from close
+        clusters of points in a depth image can be used to compute surface normals.
+        </li>
         <li> Implement a method to estimate normal vectors from a depth image,
         without computing nearest neighbors. </li>
         <li> Reason about a scenario where the depth image-based solution will
