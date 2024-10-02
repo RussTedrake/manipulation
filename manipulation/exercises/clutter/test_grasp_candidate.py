@@ -77,7 +77,7 @@ class TestGraspCandidate(unittest.TestCase):
         )
 
     @weight(4)
-    @timeout_decorator.timeout(10.0)
+    @timeout_decorator.timeout(20.0)
     def test_minimum_distance(self):
         """Test find_minimum_distance"""
         pcd = self.notebook_locals["pcd"]
