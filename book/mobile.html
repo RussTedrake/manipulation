@@ -142,11 +142,11 @@ discover (manipulate?) the world!</a></p>
     require explicit object models, that supports the types of queries we need
     for motion planning (for instance, fast collision detection and
     minimum-distance computations), which we can update efficiently from our
-    raw sensor data, and which scale well to large scenes. Raw, merged point
+    raw sensor data, and which scales well to large scenes. Raw, merged point
     clouds, for instance, are easy to update and don't require a model, but
     would not be ideal for fast planning queries.</p>
 
-    <p>Voxel grids are a geometry representation that meets (almost all of) the
+    <p>Voxel grids are a geometry representation that meets (almost all of)
     our desiderata -- we actually used them already in order to efficiently
     down-sample a point cloud. In this representation we discretize some finite
     volume of 3D space into a grid of fixed-size cubes; let's say 1 cm$^3.$ We
@@ -156,7 +156,7 @@ discover (manipulate?) the world!</a></p>
     geometry to be avoided. Many collision queries with voxel grids can be fast
     (and are easily parallelized). In particular the sphere-on-voxel collision
     query can be very fast, which is one of the reasons that you see a number
-    of collision geometries in the Drake models that are approximate with
+    of collision geometries in the Drake models that are approximated with
     densely packed spheres. <todo>Figure</todo> Updating a voxel grid with
     points clouds is also efficient. In order to scale voxel representations to
     have both fine resolution and to be able to represent very large scenes, we
@@ -337,7 +337,7 @@ discover (manipulate?) the world!</a></p>
 
   <p>When I've used the term "simulation" so far in these notes, I've been
   focusing mostly on the enabling technologies, like the physics engine and the
-  the rendering engine. In robotics today, there are only a handful of
+  rendering engine. In robotics today, there are only a handful of
   mainstream simulators which people are using, such as NVidia Isaac/Omniverse,
   MuJoCo, and Drake. (PyBullet was very popular but is no longer
   actively maintained.) But there is another crop of tools which call
@@ -363,7 +363,7 @@ discover (manipulate?) the world!</a></p>
 
   <p>Most of the ideas we've covered in this chapter so far can be considered
   relatively modest extensions to our existing manipulation toolbox. But there
-  are some important problem associated with navigating a mobile robot that
+  are some important problems associated with navigating a mobile robot that
   really don't come up in table-top manipulation.</p>
 
   <subsection><h1>Mapping (in addition to localization)</h1>
