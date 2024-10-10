@@ -33,5 +33,5 @@ MODULE.bazel
 book/python/
 manipulation-solutions
 
-book/clutter/exercises/table_top.sdf
-book/clutter/exercises/package.xml
+book/mobile/exercises/table_top.sdf
+book/mobile/exercises/package.xml
