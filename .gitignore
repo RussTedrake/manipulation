@@ -32,3 +32,6 @@ MODULE.bazel
 
 book/python/
 manipulation-solutions
+
+manipulation/exercises/clutter/table_top.sdf
+manipulation/exercises/clutter/package.xml
