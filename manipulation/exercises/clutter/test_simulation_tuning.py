@@ -54,8 +54,8 @@ class TestSimulationTuning(unittest.TestCase):
         block1_pos = block_poses[:7][4:]
         block2_pos = block_poses[7:][4:]
 
-        block1_pos_range = np.array([[0.01, 0.035], [-0.025, 0.025], [0.0475, 0.0675]])
-        block2_pos_range = np.array([[0.20, 0.23], [-0.025, 0.025], [0.0275, 0.05]])
+        block1_pos_range = np.array([[0.07, 0.09], [-0.0004, 0.000], [0.0475, 0.0675]])
+        block2_pos_range = np.array([[0.25, 0.30], [-0.0009, -0.0005], [0.0275, 0.05]])
 
         in_range_list1 = []
         in_range_list2 = []
