@@ -69,6 +69,7 @@ rt_ipynb_test(
     ],
     data = ["//book/data:iiwa_shelve_and_bins_science_robotics.yaml"],
     tags = ["requires-network"], # For gurobi
+    timeout = "long",
 )
 
 rt_ipynb_test(
