@@ -102,14 +102,13 @@ class DirectivesTree:
 
     def GetWeldedDescendantsAndDirectives(
         self, model_instance_names: typing.List[str]
-    ) -> typing.Tuple[typing.Set[str], typing.List[ModelDirective]]:
+    ) -> typing.Tuple[typing.Set[str], typing.Set[ModelDirective]]:
         """
         Returns:
             Set[str]: Names of proper descendant models of the input
                 `model_instance_names` in this directives tree.
-            List[ModelDirective]: The directives that need to be added to weld
-                the proper descendant models to the input model instances. The
-                directives list is in a valid topologically sorted order.
+            Set[ModelDirective]: The directives that need to be added to weld
+                the proper descendant models to the input model instances.
         """
 
         def _RecursiveCall(
@@ -158,18 +157,20 @@ class DirectivesTree:
             descendants.update(_descendants)
             directives.update(_directives)
 
-        return descendants, self.TopologicallySortDirectives(directives)
+        # Don't include the input model instances in the descendants set.
+        descendants.difference_update(model_instance_names)
 
-    def GetWeldToWorldDirectives(
+        return descendants, directives
+
+    def GetDirectivesFromRootToModels(
         self, model_instance_names: typing.List[str]
-    ) -> typing.List[ModelDirective]:
+    ) -> typing.Set[ModelDirective]:
         """
         Returns:
-            List[ModelDirective]: The directives that need to be added to
+            Set[ModelDirective]: The directives that need to be added to
                 weld all `model_instance_names` to the "world" frame. This is
                 the minimal set of directives necessary to support all
-                `model_instance_names` in a plant. The directives list is in a
-                valid topologically sorted order.
+                `model_instance_names` in a plant.
         """
 
         def _RecursiveCall(node: Node) -> typing.Set[ModelDirective]:
@@ -183,11 +184,10 @@ class DirectivesTree:
             """
             directives: typing.Set[ModelDirective] = set()
 
-            # Base case: if the node is one of the model instances, add its
-            # AddModel directive and return immediately.
+            # Base case: if the node is one of the model instances, add its AddModel
+            # directive.
             if node.type == "model" and node.name in model_instance_names:
                 directives.add(self.add_model_directives[node.name])
-                return directives
 
             for edge in self.edges.get(node, set()):
                 _directives = _RecursiveCall(edge.child)
@@ -203,7 +203,7 @@ class DirectivesTree:
             return directives
 
         world_node = Node("world", "frame")
-        return self.TopologicallySortDirectives(_RecursiveCall(world_node))
+        return _RecursiveCall(world_node)
 
     def TopologicallySortDirectives(
         self, directives: typing.Set[ModelDirective]
