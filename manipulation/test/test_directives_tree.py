@@ -104,6 +104,9 @@ class DirectivesTreeTest(unittest.TestCase):
         iiwa_directives = tree.GetWeldToWorldDirectives(["iiwa"])
         self.assertEqual(iiwa_directives, directives[:3])  # iiwa-related directives
 
+        iiwa_wsg_directives = tree.GetWeldToWorldDirectives(["iiwa", "wsg"])
+        self.assertEqual(iiwa_wsg_directives, directives[:6])
+
     def test_load_scenario(self):
         scenario = Scenario()
         scenario.directives = self.get_flattened_directives()
