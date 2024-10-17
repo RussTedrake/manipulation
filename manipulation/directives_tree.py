@@ -160,7 +160,7 @@ class DirectivesTree:
 
         return descendants, self.TopologicallySortDirectives(directives)
 
-    def GetWeldToWorldDirectives(
+    def GetDirectivesFromRootToModels(
         self, model_instance_names: typing.List[str]
     ) -> typing.List[ModelDirective]:
         """

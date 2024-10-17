@@ -394,7 +394,7 @@ def _PopulatePlantOrDiagram(
     ).directives
 
     tree = DirectivesTree(flattened_directives)
-    directives = tree.GetWeldToWorldDirectives(model_instance_names)
+    directives = tree.GetDirectivesFromRootToModels(model_instance_names)
     children_to_freeze = set()
 
     if add_frozen_child_instances:
