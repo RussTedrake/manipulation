@@ -183,11 +183,10 @@ class DirectivesTree:
             """
             directives: typing.Set[ModelDirective] = set()
 
-            # Base case: if the node is one of the model instances, add its
-            # AddModel directive and return immediately.
+            # Base case: if the node is one of the model instances, add its AddModel
+            # directive.
             if node.type == "model" and node.name in model_instance_names:
                 directives.add(self.add_model_directives[node.name])
-                return directives
 
             for edge in self.edges.get(node, set()):
                 _directives = _RecursiveCall(edge.child)
