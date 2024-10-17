@@ -401,10 +401,11 @@ def _PopulatePlantOrDiagram(
         children_to_freeze, additional_directives = (
             tree.GetWeldedDescendantsAndDirectives(model_instance_names)
         )
-        directives.extend(additional_directives)
+        directives.update(additional_directives)
 
+    sorted_directives = tree.TopologicallySortDirectives(directives)
     ProcessModelDirectives(
-        directives=ModelDirectives(directives=directives),
+        directives=ModelDirectives(directives=sorted_directives),
         parser=parser,
     )
 

@@ -102,14 +102,13 @@ class DirectivesTree:
 
     def GetWeldedDescendantsAndDirectives(
         self, model_instance_names: typing.List[str]
-    ) -> typing.Tuple[typing.Set[str], typing.List[ModelDirective]]:
+    ) -> typing.Tuple[typing.Set[str], typing.Set[ModelDirective]]:
         """
         Returns:
             Set[str]: Names of proper descendant models of the input
                 `model_instance_names` in this directives tree.
-            List[ModelDirective]: The directives that need to be added to weld
-                the proper descendant models to the input model instances. The
-                directives list is in a valid topologically sorted order.
+            Set[ModelDirective]: The directives that need to be added to weld
+                the proper descendant models to the input model instances.
         """
 
         def _RecursiveCall(
@@ -161,18 +160,17 @@ class DirectivesTree:
         # Don't include the input model instances in the descendants set.
         descendants.difference_update(model_instance_names)
 
-        return descendants, self.TopologicallySortDirectives(directives)
+        return descendants, directives
 
     def GetDirectivesFromRootToModels(
         self, model_instance_names: typing.List[str]
-    ) -> typing.List[ModelDirective]:
+    ) -> typing.Set[ModelDirective]:
         """
         Returns:
-            List[ModelDirective]: The directives that need to be added to
+            Set[ModelDirective]: The directives that need to be added to
                 weld all `model_instance_names` to the "world" frame. This is
                 the minimal set of directives necessary to support all
-                `model_instance_names` in a plant. The directives list is in a
-                valid topologically sorted order.
+                `model_instance_names` in a plant.
         """
 
         def _RecursiveCall(node: Node) -> typing.Set[ModelDirective]:
@@ -205,7 +203,7 @@ class DirectivesTree:
             return directives
 
         world_node = Node("world", "frame")
-        return self.TopologicallySortDirectives(_RecursiveCall(world_node))
+        return _RecursiveCall(world_node)
 
     def TopologicallySortDirectives(
         self, directives: typing.Set[ModelDirective]
