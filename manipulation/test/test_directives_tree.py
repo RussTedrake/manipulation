@@ -15,7 +15,7 @@ from pydrake.all import (
 )
 
 from manipulation.directives_tree import DirectivesTree
-from manipulation.station import MakeHardwareStation, Scenario
+from manipulation.station import MakeHardwareStation, MakeMultibodyPlant, Scenario
 
 
 class DirectivesTreeTest(unittest.TestCase):
@@ -115,6 +115,38 @@ class DirectivesTreeTest(unittest.TestCase):
             iiwa_wsg_directives
         )
         self.assertEqual(sorted_iiwa_wsg_directives, directives[:6])
+
+    def test_make_multibody_plant(self):
+        scenario = Scenario()
+        scenario.directives = self.get_flattened_directives()
+        scenario.model_drivers = {
+            "iiwa": IiwaDriver(
+                control_mode="position_only",
+                hand_model_name="wsg",
+            )
+        }
+
+        # Test with all model instances.
+        plant: MultibodyPlant = MakeMultibodyPlant(scenario)
+        self.assertTrue(plant.HasModelInstanceNamed("iiwa"))
+        self.assertTrue(plant.HasModelInstanceNamed("wsg"))
+        self.assertTrue(plant.HasModelInstanceNamed("table"))
+
+        # Test with only "iiwa" and "wsg".
+        plant: MultibodyPlant = MakeMultibodyPlant(
+            scenario, model_instance_names=["iiwa", "wsg"]
+        )
+        self.assertTrue(plant.HasModelInstanceNamed("iiwa"))
+        self.assertTrue(plant.HasModelInstanceNamed("wsg"))
+        self.assertFalse(plant.HasModelInstanceNamed("table"))
+
+        # Test with only "iiwa".
+        plant: MultibodyPlant = MakeMultibodyPlant(
+            scenario, model_instance_names=["iiwa"]
+        )
+        self.assertTrue(plant.HasModelInstanceNamed("iiwa"))
+        self.assertFalse(plant.HasModelInstanceNamed("wsg"))
+        self.assertFalse(plant.HasModelInstanceNamed("table"))
 
     def test_load_scenario(self):
         scenario = Scenario()
