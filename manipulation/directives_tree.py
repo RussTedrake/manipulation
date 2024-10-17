@@ -158,6 +158,9 @@ class DirectivesTree:
             descendants.update(_descendants)
             directives.update(_directives)
 
+        # Don't include the input model instances in the descendants set.
+        descendants.difference_update(model_instance_names)
+
         return descendants, self.TopologicallySortDirectives(directives)
 
     def GetDirectivesFromRootToModels(
