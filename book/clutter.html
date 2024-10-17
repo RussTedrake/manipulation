@@ -1449,7 +1449,6 @@ output_ports:
     </exercise>    
 
     <exercise id="behaviorTrees"><h1>Behavior Trees</h1>
-
       <p>Let's reintroduce the terminology of behavior trees. Behavior trees
       provide a structure for switching between different tasks in a way that
       is both modular and reactive. Behavior trees are a directed rooted tree
@@ -1459,18 +1458,24 @@ output_ports:
       condition may be "Is my hand empty?" which can be true (thus the
       condition succeeds) or can be false (the condition fails). <br/><br/>
 
-      We'll consider two categories of control flow nodes:
+      More specifically, each node is periodically checked. In turn it will
+      check its children, and report status as success, failure or running
+      depending on its childrens' statuses. There are different categories
+      of control flow nodes, but we'll consider two categories of control
+      flow nodes:
+
       <dl>
-        <dt>Sequence Node: ($\rightarrow$)</dt> <dd>Sequence nodes execute each
-        of the child behaviors one after another. The sequence <i>fails if any
-        of the children fail</i>. One way to think about this operator is that
+        <dt>Sequence Node: ($\rightarrow$)</dt> <dd>Sequence nodes execute
+        each of the child behaviors left to right. The sequence returns <i>failure 
+        if any of the children fail</i> and <i>running if any of the children are 
+        running</i>. One way to think about this operator is that
         a sequence node takes an "and" over all of the child behaviors.</dd>
         <dt>Fallback Node: (?)</dt> <dd>Fallback nodes also execute each of the
         child behaviors one after another. However, fallback <i>succeeds if any
         of the children succeed</i>. One way to think about this operator is
         that the fallback node takes an "or" over all of the children
         behaviors.</dd>
-</dl>
+      </dl>  
 
     The symbols are visualized below. Sequence nodes are represented as an
     arrow in a box, fallback nodes are represented as a question mark in a box,
