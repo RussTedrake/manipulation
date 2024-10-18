@@ -148,6 +148,16 @@ class DirectivesTreeTest(unittest.TestCase):
         self.assertFalse(plant.HasModelInstanceNamed("wsg"))
         self.assertFalse(plant.HasModelInstanceNamed("table"))
 
+        # Test with only "iiwa" and "add_frozen_child_instances=True"
+        plant: MultibodyPlant = MakeMultibodyPlant(
+            scenario,
+            model_instance_names=["iiwa"],
+            add_frozen_child_instances=True,
+        )
+        self.assertTrue(plant.HasModelInstanceNamed("iiwa"))
+        self.assertTrue(plant.HasModelInstanceNamed("wsg"))
+        self.assertFalse(plant.HasModelInstanceNamed("table"))
+
     def test_load_scenario(self):
         scenario = Scenario()
         scenario.directives = self.get_flattened_directives()
