@@ -381,6 +381,12 @@ def _PopulatePlantOrDiagram(
     parser_prefinalize_callback: typing.Callable[[Parser], None] = None,
 ) -> None:
     """See MakeMultibodyPlant and MakeRobotDiagram for details."""
+    if model_instance_names is None:
+        assert not add_frozen_child_instances, (
+            "add_frozen_child_instances cannot be used without specifying "
+            "model_instance_names."
+        )
+
     ApplyMultibodyPlantConfig(scenario.plant_config, plant)
     for p in package_xmls:
         parser.package_map().AddPackageXml(p)
@@ -393,18 +399,25 @@ def _PopulatePlantOrDiagram(
         ModelDirectives(directives=scenario.directives), parser.package_map()
     ).directives
 
-    tree = DirectivesTree(flattened_directives)
-    directives = tree.GetWeldToWorldDirectives(model_instance_names)
-    children_to_freeze = set()
+    if not model_instance_names is None:
+        tree = DirectivesTree(flattened_directives)
+        directives = tree.GetDirectivesFromRootToModels(model_instance_names)
+        children_to_freeze = set()
 
-    if add_frozen_child_instances:
-        children_to_freeze, additional_directives = (
-            tree.GetWeldedDescendantsAndDirectives(model_instance_names)
-        )
-        directives.extend(additional_directives)
+        if add_frozen_child_instances:
+            children_to_freeze, additional_directives = (
+                tree.GetWeldedDescendantsAndDirectives(model_instance_names)
+            )
+            directives.update(additional_directives)
+
+        sorted_directives = tree.TopologicallySortDirectives(directives)
+    else:
+        # Add all model instances.
+        sorted_directives = flattened_directives
+        children_to_freeze = set()
 
     ProcessModelDirectives(
-        directives=ModelDirectives(directives=directives),
+        directives=ModelDirectives(directives=sorted_directives),
         parser=parser,
     )
 
