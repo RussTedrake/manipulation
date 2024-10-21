@@ -619,7 +619,7 @@ pose = plant.EvalBodyPoseInWorld(context, gripper)</pre></code>
       generalized positions.  This works when we have only our iiwa in the
       model, and it is welded to the world frame, because all of the joints are
       revolute joints with a single degree of freedom each.  But we cannot
-      assume this in general; when floating-base rotations part of the
+      assume this in general; when floating-base rotations are part of the
       generalized position. As evidence, here is a simple example that loads
       exactly one rigid body into the
       <code>MultibodyPlant</code>, and then prints its
@@ -717,7 +717,7 @@ Velocity names: ['$world_base_link_wx', '$world_base_link_wy', '$world_base_link
       minimum-norm solution (the joint velocities that produce the desired
       spatial velocity which are closest to zero in the least-squares sense).
       When there is no exact solution, it returns the joint velocities that
-      produce an spatial velocity which is as close to the desired end-effector
+      produce a spatial velocity which is as close to the desired end-effector
       velocity as possible, again in the least-squares sense.  So good!</p>
 
       <example><h1>Our first end-effector "controller"</h1>
@@ -1112,7 +1112,7 @@ Velocity names: ['$world_base_link_wx', '$world_base_link_wy', '$world_base_link
     When the minimum singular value of the Jacobian gets small, that means that
     some values in the inverse get very large.  If you ask our controller to
     track a seemingly reasonable end-effector spatial velocity, then you might
-    have extremely large velocity commands that result.</p>
+    have extremely large velocity commands as a result.</p>
 
     <p>There are other important limitations, though, which are perhaps more
     subtle. The real robot has constraints, very real constraints on the joint
