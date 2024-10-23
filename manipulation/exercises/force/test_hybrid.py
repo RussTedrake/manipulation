@@ -10,7 +10,7 @@ class TestHybrid(unittest.TestCase):
         super().__init__(test_name)
         self.notebook_locals = notebook_locals
 
-    @weight(4)
+    @weight(2)
     @timeout_decorator.timeout(30.0)
     def test_antipodal_points(self):
         """Test compute_ctrl"""
