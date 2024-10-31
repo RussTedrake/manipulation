@@ -7,7 +7,7 @@
 load("//book/htmlbook/tools/jupyter:defs.bzl", "rt_ipynb_test")
 load("//book/htmlbook/tools/python:defs.bzl", "rt_py_test")
 
-# torchvision is trying to write to a temp directory.
+# TODO(russt): move clutter_maskrcnn_data to huggingface?
 #rt_ipynb_test(
 #    name = "segmentation_inference",
 #    srcs = ["segmentation_inference.ipynb"],
