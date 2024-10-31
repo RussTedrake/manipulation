@@ -29,7 +29,11 @@ rt_ipynb_test(
 rt_ipynb_test(
     name = "segmentation_and_grasp",
     srcs = ["segmentation_and_grasp.ipynb"],
-    data = ["//manipulation/models"],
+    data = [
+      "//manipulation/models",
+      "//book/data:prediction_0.npz",
+      "//book/data:prediction_1.npz",
+    ],
     tags = ["no-sandbox"], # for rendering, see drake#7004
     deps = [
         "//manipulation",
