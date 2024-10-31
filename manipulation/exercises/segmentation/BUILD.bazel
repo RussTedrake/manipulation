@@ -14,6 +14,7 @@ rt_py_library(
 
 rt_py_library(
     name = "test_segmentation_and_grasp",
+    data = ["//book/data:segmentation_and_grasp_soln.npz"],
     srcs = ["test_segmentation_and_grasp.py"],
     visibility = ["//visibility:public"],
 )
