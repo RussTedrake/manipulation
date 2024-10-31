@@ -9,11 +9,11 @@ from manipulation.utils import FindDataResource
 
 def chamfer_dist(pc_a, pc_b):
     """
-    pc_a of Size(N, 3)
-    pc_b of Size(M, 3)
+    pc_a of Size(3, N)
+    pc_b of Size(3, M)
     """
-    diff = np.linalg.norm(pc_a[:, None] - pc_b[None], axis=2) ** 2
-    dist = np.mean(np.min(diff, axis=0)) + np.mean(np.min(diff, axis=1))
+    diff = np.linalg.norm(pc_a[:, :, None] - pc_b[:, None, :], axis=0) ** 2
+    dist = np.mean(np.min(diff, axis=1)) + np.mean(np.min(diff, axis=0))
     return dist
 
 
@@ -40,13 +40,12 @@ class TestSegmentationAndGrasp(unittest.TestCase):
         )
         pcd_pts_eval = np.asarray(pcd_eval.xyzs()[:])
         pcd_colors_eval = np.asarray(pcd_eval.rgbs()[:])
-        pcd_pts_eval = pcd_pts_eval.T
-        num_points_eval = pcd_pts_eval.shape[0]
+        num_points_eval = pcd_pts_eval.shape[1]
 
         data_target = np.load(FindDataResource("segmentation_and_grasp_soln.npz"))
         pcd_pts_target = data_target["points"]
         data_target["colors"]
-        num_points_target = pcd_pts_target.shape[0]
+        num_points_target = pcd_pts_target.shape[1]
 
         # Allow some deviation in the number of points
         self.assertLessEqual(
@@ -60,7 +59,7 @@ class TestSegmentationAndGrasp(unittest.TestCase):
 
         self.assertLessEqual(
             chamfer_dist(
-                pcd_pts_target[:min_num_pts, :], pcd_pts_eval[:min_num_pts, :]
+                pcd_pts_target[:, :min_num_pts], pcd_pts_eval[:, :min_num_pts]
             ),
             1e-4,
             "Point cloud points are not close enough to the solution values.",
