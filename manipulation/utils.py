@@ -59,6 +59,10 @@ def FindDataResource(filename: str):
         os.makedirs(data)
     path = os.path.join(data, filename)
     if not os.path.exists(path):
+        if running_as_test:
+            raise FileNotFoundError(
+                f"{path} was not found locally; it is required for testing."
+            )  # because the urlretrieve defeats bazel's hermetic testing.
         print(f"{path} was not found locally; downloading it now...")
         urlretrieve(f"https://manipulation.csail.mit.edu/data/{filename}", path)
     return path
