@@ -371,7 +371,9 @@ def AddRgbdSensors(
                 # Add a system to convert the camera output into a point cloud
                 to_point_cloud = builder.AddSystem(
                     DepthImageToPointCloud(
-                        camera_info=rgbd.depth_camera_info(),
+                        camera_info=rgbd.default_depth_render_camera()
+                        .core()
+                        .intrinsics(),
                         fields=BaseField.kXYZs | BaseField.kRGBs,
                     )
                 )
