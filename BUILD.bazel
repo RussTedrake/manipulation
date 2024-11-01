@@ -8,7 +8,10 @@ load("//book/htmlbook/tools/html:defs.bzl", "rt_html_test")
 load("//book/htmlbook/tools/tidy:def.bzl", "html_tidy_test")
 
 exports_files(
-    ["LICENSE.TXT"],
+    [
+      "LICENSE.TXT",
+      "pyproject.toml",
+    ],
     visibility = ["//visibility:public"],
 )
 

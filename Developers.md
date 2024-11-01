@@ -59,6 +59,7 @@ the root directory, run:
 ```
 rm -rf dist/*
 poetry publish --build
+cd book && ./Deepnote.sh
 ```
 (Use `poetry config pypi-token.pypi <token>` once first)
 
