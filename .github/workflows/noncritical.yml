@@ -93,6 +93,6 @@ jobs:
           sed -i '/PYTHONNOUSERSITE/d' .bazelrc
         shell: bash
       - name: test
-        run: DRAKE_RESOURCE_ROOT=`python3 -c "from pathlib import Path; from pydrake.all import GetDrakePath; print(Path(GetDrakePath()).parent)"` ./book/htmlbook/workflows/ci/jammy/test_w_installed_deps
+        run: DRAKE_RESOURCE_ROOT=`python3 -c "from pathlib import Path; from pydrake.all import GetDrakePath; print(Path(GetDrakePath()).parent)"` MANIPULATION_DATA_DIR="`pwd`/book/data" ./book/htmlbook/workflows/ci/jammy/test_w_installed_deps
         shell: bash
 
