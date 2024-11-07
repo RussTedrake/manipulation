@@ -2,7 +2,7 @@
 name = "manipulation"
 # Use e.g. 2024.10.4.rc0 if I need to release a release candidate.
 # Use e.g. 2024.10.4.post1 if I need to rerelease on the same day.
-version = "2024.11.04.post1"
+version = "2024.11.07"
 description = "MIT 6.421 - Robotic Manipulation"
 authors = ["Russ Tedrake <russt@mit.edu>"]
 license = "BSD License"
