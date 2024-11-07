@@ -58,14 +58,14 @@ class TestVPG(unittest.TestCase):
         compute_advantages = self.notebook_locals["compute_advantages"]
         discount = 0.99
         gae_lambda = 1.0
-        max_episode_length = 2
+        max_episode_length = 3
         baselines = torch.FloatTensor([[1, 2, 3], [2, 1, 1]])
         rewards = torch.FloatTensor([[9, 8, 5], [6, 6, 6]])
         student_sol = compute_advantages(
             discount, gae_lambda, max_episode_length, baselines, rewards
         )
         reference_sol = torch.FloatTensor(
-            [[20.8205, 10.9500, 0.0000], [15.8206, 10.9400, 0.0000]]
+            [[20.8205, 10.9500, 2.9900], [15.8206, 10.9400, 5.9900]]
         )
 
         l1_error = l1_loss(input=student_sol[:, :-1], target=reference_sol[:, :-1])
