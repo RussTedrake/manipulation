@@ -11,7 +11,7 @@ class TestStochasticOptimization(unittest.TestCase):
         self.notebook_locals = notebook_locals
         self.gradient_descent = self.notebook_locals["gradient_descent"]
 
-    @weight(2)
+    @weight(1.5)
     @timeout_decorator.timeout(15.0)
     def test_exact_gradient(self):
         """Test exact gradient function"""
