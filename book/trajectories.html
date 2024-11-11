@@ -550,20 +550,18 @@ ik.AddPositionConstraint(
 
   <section><h1>Kinematic trajectory optimization</h1>
   
-    <p>Once you understand the optimization perspective of inverse kinematics,
-    then you are well on your way to understanding kinematic trajectory
-    optimization. Rather than solving multiple inverse kinematics problems
-    independently, the basic idea now is to solve for a sequence of joint
-    angles simultaneously in a single optimization. Even better, let us define
-    a parameterized joint trajectory, $q_\alpha(t)$, where $\alpha$ are
-    parameters. Then a simple extension to our inverse kinematics problem would
-    be to write something like \begin{align} \min_{\alpha,T} & \quad T, \\
-    \subjto &\quad X^{G_{start}} = f_{kin}(q_\alpha(0)),\\ & \quad X^{G_{goal}}
-    = f_{kin}(q_\alpha(T)), \\ & \quad \forall t , \quad
-    \left|\dot{q}_\alpha(t)\right| \le v_{max} \label{eq:vel_limits}.
-    \end{align} I read this as "find a trajectory, $q_\alpha(t)$ for $t \in
-    [0, T]$, that moves the gripper from the start to the goal in minimum
-    time".</p>
+    <p>Once you understand the optimization perspective of inverse kinematics, then you
+    are well on your way to understanding kinematic trajectory optimization. Rather than
+    solving multiple inverse kinematics problems independently, the basic idea now is to
+    solve for a sequence of joint angles simultaneously in a single optimization. Even
+    better, let us define a parameterized joint trajectory, $q_\alpha(t)$, where
+    $\alpha$ is a vector of parameters. Then a simple extension to our inverse
+    kinematics problem would be to write something like \begin{align} \min_{\alpha,T} &
+    \quad T, \\ \subjto &\quad X^{G_{start}} = f_{kin}(q_\alpha(0)),\\ & \quad
+    X^{G_{goal}} = f_{kin}(q_\alpha(T)), \\ & \quad \forall t , \quad
+    \left|\dot{q}_\alpha(t)\right| \le v_{max} \label{eq:vel_limits}. \end{align} I read
+    this as "find a trajectory, $q_\alpha(t)$ for $t \in [0, T]$, that moves the gripper
+    from the start to the goal in minimum time".</p>
     
     <p>The last equation, (\ref{eq:vel_limits}), represents velocity limits;
     this is the only way we are telling the optimizer that the robot cannot

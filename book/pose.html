@@ -283,15 +283,15 @@ output_ports:
     If we combine this with the basic information about the camera's intrinsic
     parameters (e.g. lens parameters, stored in the <a
     href="https://drake.mit.edu/doxygen_cxx/classdrake_1_1systems_1_1sensors_1_1_camera_info.html"><code>CameraInfo</code></a>
-    class in Drake) then we can transform this depth image representation
-    into a collection of 3D points, $s_i$.  I use $s$ here because they are
-    commonly referred to as the "scene points" in the algorithms we will present
-    below.  These points have a pose and (optionally) a color value or other
-    information attached; this is the <i>point cloud</i> representation.
-    By default, their pose is described in the camera frame, $^CX^{s_i}$, but
-    the <code>DepthImageToPointCloud</code> system in Drake also accepts $^PX^C$
-    to make it easy to transform them into another frame (such as the world
-    frame).</p>  
+    class in Drake) then we can transform this depth image representation into a
+    collection of 3D points, $s_i$.  I use $s$ here because they are commonly referred
+    to as the "scene points" in the algorithms we will present below.  These points are
+    expressed in some reference frame described by a rigid transform and (optionally) a
+    color value or other information attached; this is the <i>point cloud</i>
+    representation. In the <code>DepthImageToPointCloud</code> system in Drake, the
+    default frame is the camera frame, $^CX^{s_i}$, but the system also accepts $^PX^C$
+    on a (optional) input port to make it easy to transform them into another frame
+    (such as the world frame).</p>  
     
     <div>
       <script src="htmlbook/js-yaml.min.js"></script>
