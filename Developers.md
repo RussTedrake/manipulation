@@ -52,6 +52,16 @@ Then run
 bazel test //...
 ```
 
+## Updating dependencies
+
+Bazel currently uses requirements-bazel.txt, which we generate from poetry
+
+To generate it, run
+```
+poetry lock
+./book/htmlbook/PoetryExport.sh
+```
+
 ## To update the pip wheels
 
 Update the version number in `pyproject.toml`, and the drake version, then from
