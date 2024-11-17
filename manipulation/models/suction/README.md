@@ -6,6 +6,7 @@ and were covered by the Apache 2.0 license.
 
 The following modifications where made:
 - deleted reference to missing obj.mtl
+- added normals to the obj files using trimesh
 - removed erroneous commas in rgba value.
 - removed .urdf from robot names.
 - added hydro properties to tip.
