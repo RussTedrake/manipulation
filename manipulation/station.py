@@ -402,11 +402,13 @@ def _PopulatePlantOrDiagram(
     if not model_instance_names is None:
         tree = DirectivesTree(flattened_directives)
         directives = tree.GetDirectivesFromRootToModels(model_instance_names)
-        for model_instance_name in model_instance_names:
-            if model_instance_name not in directives:
-                # No connection from world frame to this model instance. Add it
-                # directly.
-                directives.add(tree.add_model_directives[model_instance_name])
+        if any([name not in directives for name in model_instance_names]):
+            # Missing connection from world frame to one of the model instances. Try to
+            # connect the floating cluster.
+            # NOTE: This doesn't work if there are multiple floating clusters.
+            directives = directives.union(
+                tree.GetDirectivesBetweenModels(model_instance_names)
+            )
 
         children_to_freeze = set()
 

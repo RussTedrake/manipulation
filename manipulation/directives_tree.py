@@ -205,6 +205,85 @@ class DirectivesTree:
         world_node = Node("world", "frame")
         return _RecursiveCall(world_node)
 
+    def GetDirectivesBetweenTwoModels(
+        self, model_instance_nameA: str, model_instance_nameB: str
+    ) -> typing.Set[ModelDirective]:
+        """
+        Returns:
+            Set[ModelDirective]: The directives that need to be added to
+                weld `model_instance_nameB` to `model_instance_nameA`. Empty if they
+                are not connected.
+        """
+
+        def _RecursiveCall(
+            node: Node,
+        ) -> typing.Tuple[bool, typing.Set[ModelDirective]]:
+            """
+            Args:
+                node (Node): The node to start this recursive call from.
+
+            Returns:
+                Tuple[bool, Set[ModelDirective]]: A tuple containing a boolean
+                    indicating whether `model_instance_nameB` was found, and the set of
+                    directives needed to reach it.
+            """
+            # Base case: if the node is model_instance_nameB.
+            if node.type == "model" and node.name == model_instance_nameB:
+                directives = {self.add_model_directives[node.name]}
+                return True, directives
+
+            for edge in self.edges.get(node, set()):
+                found, directives = _RecursiveCall(edge.child)
+                if found:
+                    # Include the edge directive and any directives from recursion.
+                    directives.add(edge.directive)
+                    return True, directives
+
+            return False, set()
+
+        # Create a Node object for model_instance_nameA.
+        start_node = Node(model_instance_nameA, "model")
+        found, directives = _RecursiveCall(start_node)
+        if found:
+            # Add the AddModel directive for model_instance_nameA.
+            directives.add(self.add_model_directives[model_instance_nameA])
+            return directives
+        else:
+            # Return an empty set if not connected.
+            return set()
+
+    def GetDirectivesBetweenModels(
+        self, model_instance_names: typing.List[str]
+    ) -> typing.Set[ModelDirective]:
+        """
+        Returns:
+            Set[ModelDirective]: The directives that need to be added to
+                weld all `model_instance_names` to each other if possible. Returns
+                the add_model directives if the models are not connected.
+        """
+        if len(model_instance_names) == 1:
+            return {self.add_model_directives[model_instance_names[0]]}
+
+        directives = set()
+        for i, model_name_a in enumerate(model_instance_names):
+            for model_name_b in model_instance_names[i + 1 :]:
+                # Try from A to B.
+                directives_a_to_b = self.GetDirectivesBetweenTwoModels(
+                    model_name_a, model_name_b
+                )
+                # Try from B to A.
+                directives_b_to_a = self.GetDirectivesBetweenTwoModels(
+                    model_name_b, model_name_a
+                )
+                pair_directives = directives_a_to_b.union(directives_b_to_a)
+                if not pair_directives:
+                    # Models are not connected; add their AddModel directives.
+                    directives.add(self.add_model_directives[model_name_a])
+                    directives.add(self.add_model_directives[model_name_b])
+                else:
+                    directives.update(pair_directives)
+        return directives
+
     def TopologicallySortDirectives(
         self, directives: typing.Set[ModelDirective]
     ) -> typing.List[ModelDirective]:

@@ -138,12 +138,16 @@ class DirectivesTreeTest(unittest.TestCase):
         )
         self.assertEqual(sorted_iiwa_wsg_directives, directives[:6])
 
-    def make_multibody_plant_tester(self, scenario: Scenario):
+    def make_multibody_plant_tester(self, scenario: Scenario, mobile_iiwa: bool):
+        num_wsg_positions = 2
+        num_iiwa_positions = 10 if mobile_iiwa else 7
+
         # Test with all model instances.
         plant: MultibodyPlant = MakeMultibodyPlant(scenario)
         self.assertTrue(plant.HasModelInstanceNamed("iiwa"))
         self.assertTrue(plant.HasModelInstanceNamed("wsg"))
         self.assertTrue(plant.HasModelInstanceNamed("table"))
+        self.assertEqual(plant.num_positions(), num_iiwa_positions + num_wsg_positions)
 
         # Test with only "iiwa" and "wsg".
         plant: MultibodyPlant = MakeMultibodyPlant(
@@ -152,6 +156,16 @@ class DirectivesTreeTest(unittest.TestCase):
         self.assertTrue(plant.HasModelInstanceNamed("iiwa"))
         self.assertTrue(plant.HasModelInstanceNamed("wsg"))
         self.assertFalse(plant.HasModelInstanceNamed("table"))
+        self.assertEqual(plant.num_positions(), num_iiwa_positions + num_wsg_positions)
+
+        # Test with only "iiwa" and "wsg" (reversed order).
+        plant: MultibodyPlant = MakeMultibodyPlant(
+            scenario, model_instance_names=["wsg", "iiwa"]
+        )
+        self.assertTrue(plant.HasModelInstanceNamed("iiwa"))
+        self.assertTrue(plant.HasModelInstanceNamed("wsg"))
+        self.assertFalse(plant.HasModelInstanceNamed("table"))
+        self.assertEqual(plant.num_positions(), num_iiwa_positions + num_wsg_positions)
 
         # Test with only "iiwa".
         plant: MultibodyPlant = MakeMultibodyPlant(
@@ -160,6 +174,7 @@ class DirectivesTreeTest(unittest.TestCase):
         self.assertTrue(plant.HasModelInstanceNamed("iiwa"))
         self.assertFalse(plant.HasModelInstanceNamed("wsg"))
         self.assertFalse(plant.HasModelInstanceNamed("table"))
+        self.assertEqual(plant.num_positions(), num_iiwa_positions)
 
         # Test with only "iiwa" and "add_frozen_child_instances=True"
         plant: MultibodyPlant = MakeMultibodyPlant(
@@ -170,6 +185,7 @@ class DirectivesTreeTest(unittest.TestCase):
         self.assertTrue(plant.HasModelInstanceNamed("iiwa"))
         self.assertTrue(plant.HasModelInstanceNamed("wsg"))
         self.assertFalse(plant.HasModelInstanceNamed("table"))
+        self.assertEqual(plant.num_positions(), num_iiwa_positions)
 
     def test_make_multibody_plant(self):
         scenario = Scenario()
@@ -181,14 +197,14 @@ class DirectivesTreeTest(unittest.TestCase):
             )
         }
 
-        self.make_multibody_plant_tester(scenario)
+        self.make_multibody_plant_tester(scenario, mobile_iiwa=False)
 
     def test_make_multibody_plant_mobile_iiwa(self):
         scenario = Scenario()
         scenario.directives = self.get_flattened_directives(mobile_iiwa=True)
         scenario.model_drivers = {"iiwa": InverseDynamicsDriver()}
 
-        self.make_multibody_plant_tester(scenario)
+        self.make_multibody_plant_tester(scenario, mobile_iiwa=True)
 
     def test_load_scenario(self):
         scenario = Scenario()
