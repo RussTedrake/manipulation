@@ -15,34 +15,20 @@ from pydrake.all import (
 )
 
 from manipulation.directives_tree import DirectivesTree
-from manipulation.station import MakeHardwareStation, MakeMultibodyPlant, Scenario
+from manipulation.station import (
+    InverseDynamicsDriver,
+    MakeHardwareStation,
+    MakeMultibodyPlant,
+    Scenario,
+)
 
 
 class DirectivesTreeTest(unittest.TestCase):
     @cache
-    def get_flattened_directives(self) -> typing.List[ModelDirective]:
-        return [
-            ModelDirective(
-                add_model=AddModel(
-                    name="iiwa",
-                    file="package://drake_models/iiwa_description/urdf/iiwa14_no_collision.urdf",
-                )
-            ),
-            ModelDirective(
-                add_frame=AddFrame(
-                    name="iiwa_origin",
-                    X_PF=Transform(
-                        base_frame="world",
-                        translation=[0, 0.765, 0],
-                    ),
-                )
-            ),
-            ModelDirective(
-                add_weld=AddWeld(
-                    parent="iiwa_origin",
-                    child="iiwa::base",
-                )
-            ),
+    def get_flattened_directives(
+        self, mobile_iiwa: bool = False
+    ) -> typing.List[ModelDirective]:
+        directives = [
             ModelDirective(
                 add_model=AddModel(
                     name="wsg",
@@ -89,6 +75,42 @@ class DirectivesTreeTest(unittest.TestCase):
             ),
         ]
 
+        if mobile_iiwa:
+            directives = [
+                ModelDirective(
+                    add_model=AddModel(
+                        name="iiwa",
+                        file="package://manipulation/mobile_iiwa14_primitive_collision.urdf",
+                    )
+                )
+            ] + directives
+        else:
+            directives = [
+                ModelDirective(
+                    add_model=AddModel(
+                        name="iiwa",
+                        file="package://drake_models/iiwa_description/urdf/iiwa14_no_collision.urdf",
+                    )
+                ),
+                ModelDirective(
+                    add_frame=AddFrame(
+                        name="iiwa_origin",
+                        X_PF=Transform(
+                            base_frame="world",
+                            translation=[0, 0.765, 0],
+                        ),
+                    )
+                ),
+                ModelDirective(
+                    add_weld=AddWeld(
+                        parent="iiwa_origin",
+                        child="iiwa::base",
+                    )
+                ),
+            ] + directives
+
+        return directives
+
     def test_get_welded_descendants_and_directives(self):
         directives = self.get_flattened_directives()
         tree = DirectivesTree(directives)
@@ -116,16 +138,7 @@ class DirectivesTreeTest(unittest.TestCase):
         )
         self.assertEqual(sorted_iiwa_wsg_directives, directives[:6])
 
-    def test_make_multibody_plant(self):
-        scenario = Scenario()
-        scenario.directives = self.get_flattened_directives()
-        scenario.model_drivers = {
-            "iiwa": IiwaDriver(
-                control_mode="position_only",
-                hand_model_name="wsg",
-            )
-        }
-
+    def make_multibody_plant_tester(self, scenario: Scenario):
         # Test with all model instances.
         plant: MultibodyPlant = MakeMultibodyPlant(scenario)
         self.assertTrue(plant.HasModelInstanceNamed("iiwa"))
@@ -157,6 +170,25 @@ class DirectivesTreeTest(unittest.TestCase):
         self.assertTrue(plant.HasModelInstanceNamed("iiwa"))
         self.assertTrue(plant.HasModelInstanceNamed("wsg"))
         self.assertFalse(plant.HasModelInstanceNamed("table"))
+
+    def test_make_multibody_plant(self):
+        scenario = Scenario()
+        scenario.directives = self.get_flattened_directives()
+        scenario.model_drivers = {
+            "iiwa": IiwaDriver(
+                control_mode="position_only",
+                hand_model_name="wsg",
+            )
+        }
+
+        self.make_multibody_plant_tester(scenario)
+
+    def test_make_multibody_plant_mobile_iiwa(self):
+        scenario = Scenario()
+        scenario.directives = self.get_flattened_directives(mobile_iiwa=True)
+        scenario.model_drivers = {"iiwa": InverseDynamicsDriver()}
+
+        self.make_multibody_plant_tester(scenario)
 
     def test_load_scenario(self):
         scenario = Scenario()
