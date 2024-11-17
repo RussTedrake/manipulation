@@ -402,6 +402,12 @@ def _PopulatePlantOrDiagram(
     if not model_instance_names is None:
         tree = DirectivesTree(flattened_directives)
         directives = tree.GetDirectivesFromRootToModels(model_instance_names)
+        for model_instance_name in model_instance_names:
+            if model_instance_name not in directives:
+                # No connection from world frame to this model instance. Add it
+                # directly.
+                directives.add(tree.add_model_directives[model_instance_name])
+
         children_to_freeze = set()
 
         if add_frozen_child_instances:
