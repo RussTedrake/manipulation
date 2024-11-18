@@ -206,7 +206,7 @@ class DirectivesTreeTest(unittest.TestCase):
 
         self.make_multibody_plant_tester(scenario, mobile_iiwa=True)
 
-    def test_load_scenario(self):
+    def test_load_scenario_iiwa_driver(self):
         scenario = Scenario()
         scenario.directives = self.get_flattened_directives()
         scenario.model_drivers = {
@@ -224,6 +224,23 @@ class DirectivesTreeTest(unittest.TestCase):
         self.assertTrue(controller_plant.HasModelInstanceNamed("iiwa"))
         self.assertTrue(controller_plant.HasModelInstanceNamed("wsg"))
         self.assertFalse(controller_plant.HasModelInstanceNamed("table"))
+        # Iiwa only driver => 7 positions.
+        self.assertEqual(controller_plant.num_positions(), 7)
+
+    def test_load_scenario_inverse_dynamics_driver(self):
+        scenario = Scenario()
+        scenario.directives = self.get_flattened_directives(mobile_iiwa=True)
+        scenario.model_drivers = {"iiwa+wsg": InverseDynamicsDriver()}
+        station: RobotDiagram = MakeHardwareStation(scenario, hardware=False)
+        controller = station.GetSubsystemByName("iiwa+wsg.controller")
+        controller_plant = controller.get_multibody_plant_for_control()
+
+        # Check that the controller plant contains "iiwa" and "wsg" but not "table".
+        self.assertTrue(controller_plant.HasModelInstanceNamed("iiwa"))
+        self.assertTrue(controller_plant.HasModelInstanceNamed("wsg"))
+        self.assertFalse(controller_plant.HasModelInstanceNamed("table"))
+        # Iiwa and wsg driver => 10+2=12 positions.
+        self.assertEqual(controller_plant.num_positions(), 12)
 
 
 if __name__ == "__main__":
