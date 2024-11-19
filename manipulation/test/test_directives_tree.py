@@ -126,13 +126,13 @@ class DirectivesTreeTest(unittest.TestCase):
         directives = self.get_flattened_directives()
         tree = DirectivesTree(directives)
 
-        iiwa_directives = tree.GetDirectivesFromRootToModels(["iiwa"])
+        iiwa_directives = tree.GetDirectivesFromModelsToRoot(["iiwa"])
         sorted_iiwa_directives = tree.TopologicallySortDirectives(iiwa_directives)
         self.assertEqual(
             sorted_iiwa_directives, directives[:3]
         )  # iiwa-related directives
 
-        iiwa_wsg_directives = tree.GetDirectivesFromRootToModels(["iiwa", "wsg"])
+        iiwa_wsg_directives = tree.GetDirectivesFromModelsToRoot(["iiwa", "wsg"])
         sorted_iiwa_wsg_directives = tree.TopologicallySortDirectives(
             iiwa_wsg_directives
         )
