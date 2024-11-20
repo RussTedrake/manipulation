@@ -506,7 +506,7 @@ def AddMultibodyTriad(frame, scene_graph, length=0.25, radius=0.01, opacity=1.0)
 
 
 def AddIiwaDifferentialIK(
-    builder: DiagramBuilder, plant: MultibodyPlant, frame: Frame = None
+    builder: DiagramBuilder, plant: MultibodyPlant, frame: Frame | None = None
 ) -> DifferentialInverseKinematicsIntegrator:
     warnings.warn(
         "Please use manipulation.systems.AddIiwaDifferentialIK instead.",

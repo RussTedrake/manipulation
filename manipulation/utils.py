@@ -149,7 +149,7 @@ def DrakeVersionGreaterThan(minimum_date: date):
             )
 
 
-def RenderDiagram(system: System, max_depth: int = None):
+def RenderDiagram(system: System, max_depth: int | None = None):
     """Use pydot to render the GraphViz diagram of the given system.
 
     Args:

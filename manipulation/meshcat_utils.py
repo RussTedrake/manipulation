@@ -364,7 +364,7 @@ def plot_mathematical_program(
     prog: MathematicalProgram,
     X: np.ndarray,
     Y: np.ndarray,
-    result: MathematicalProgramResult = None,
+    result: MathematicalProgramResult | None = None,
     point_size: float = 0.05,
 ):
     """Visualize a MathematicalProgram in Meshcat.

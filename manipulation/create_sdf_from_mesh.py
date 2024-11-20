@@ -20,7 +20,7 @@ from lxml import etree as ET
 def calc_mesh_com_and_inertia(
     mesh: trimesh.Trimesh,
     mass: float,
-    frame: np.ndarray = None,
+    frame: np.ndarray | None = None,
 ) -> Tuple[np.ndarray, np.ndarray]:
     """Calculates the mesh's center of mass and moment of inertia by assuming a uniform
     mass density.
