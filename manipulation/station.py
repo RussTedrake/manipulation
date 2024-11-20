@@ -64,7 +64,6 @@ from pydrake.all import (
     SchunkWsgDriver,
     SchunkWsgPositionController,
     SchunkWsgStatusReceiver,
-    ScopedName,
     SharedPointerSystem,
     SimIiwaDriver,
     SimulatorConfig,
@@ -401,7 +400,7 @@ def _PopulatePlantOrDiagram(
 
     if not model_instance_names is None:
         tree = DirectivesTree(flattened_directives)
-        directives = tree.GetDirectivesFromRootToModels(model_instance_names)
+        directives = tree.GetDirectivesFromModelsToRoot(model_instance_names)
         children_to_freeze = set()
 
         if add_frozen_child_instances:
@@ -684,37 +683,13 @@ def _ApplyDriverConfigSim(
             sim_plant.GetModelInstanceByName(n) for n in model_instance_names
         ]
 
-        controller_plant = MultibodyPlant(time_step=sim_plant.time_step())
-        parser = Parser(controller_plant)
-        for p in package_xmls:
-            parser.package_map().AddPackageXml(p)
-        ConfigureParser(parser)
-
-        # Make the plant for the iiwa controller to use.
-        controller_directives = []
-        for d in FlattenModelDirectives(
-            ModelDirectives(directives=scenario.directives), parser.package_map()
-        ).directives:
-            if d.add_model and (d.add_model.name in model_instance_names):
-                controller_directives.append(d)
-            if (
-                d.add_weld
-                and (
-                    ScopedName.Parse(d.add_weld.child).get_namespace()
-                    in model_instance_names
-                )
-                and (
-                    d.add_weld.parent == "world"
-                    or ScopedName.Parse(d.add_weld.parent).get_namespace()
-                    in model_instance_names
-                )
-            ):
-                controller_directives.append(d)
-        ProcessModelDirectives(
-            directives=ModelDirectives(directives=controller_directives),
-            parser=parser,
+        # Make the controller plant.
+        controller_plant = MakeMultibodyPlant(
+            scenario=scenario,
+            model_instance_names=model_instance_names,
+            add_frozen_child_instances=True,
+            package_xmls=package_xmls,
         )
-        controller_plant.Finalize()
 
         # Add the controller
 

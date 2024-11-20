@@ -49,8 +49,11 @@ class DirectivesTree:
         # Names of models added by `add_model` directives.
         self.model_names: typing.Set[str] = set()
 
-        # Mapping from parent nodes to the set of its outgoing edges.
-        self.edges: typing.Dict[Node, typing.Set[Edge]] = dict()
+        # Mapping from parent nodes to the set of its outgoing child edges.
+        self.child_edges: typing.Dict[Node, typing.Set[Edge]] = dict()
+
+        # Mapping from child nodes to its incoming parent edge.
+        self.parent_edge: typing.Dict[Node, Edge] = dict()
 
         # Read node names.
         for d in self.flattened_directives:
@@ -95,10 +98,22 @@ class DirectivesTree:
         parent = self._MakeNode(parent_name)
         child = self._MakeNode(child_name)
         edge = Edge(parent, child, directive)
-        if parent not in self.edges:
-            self.edges[parent] = {edge}
+
+        # Add child edge.
+        if parent not in self.child_edges:
+            self.child_edges[parent] = {edge}
         else:
-            self.edges[parent].add(edge)
+            self.child_edges[parent].add(edge)
+
+        # Add parent edge.
+        if child in self.parent_edge:
+            edge = self.parent_edge[child]
+            raise ValueError(
+                f"Child {child} already has a parent {edge.parent} with directive "
+                f"{edge.directive}. Directives must form a tree where each node "
+                "has at most one parent."
+            )
+        self.parent_edge[child] = edge
 
     def GetWeldedDescendantsAndDirectives(
         self, model_instance_names: typing.List[str]
@@ -127,7 +142,7 @@ class DirectivesTree:
             descendants: typing.Set[str] = set()
             directives: typing.Set[ModelDirective] = set()
 
-            for edge in self.edges.get(node, set()):
+            for edge in self.child_edges.get(node, set()):
                 _descendants, _directives = _RecursiveCall(edge.child)
 
                 # If the child is a model instance, add its AddModel directive,
@@ -162,48 +177,35 @@ class DirectivesTree:
 
         return descendants, directives
 
-    def GetDirectivesFromRootToModels(
+    def GetDirectivesFromModelsToRoot(
         self, model_instance_names: typing.List[str]
     ) -> typing.Set[ModelDirective]:
         """
+        Recursively traverses the tree from `model_instance_names` to the root
+        nodes of the tree (which may or may not be "world").
+
         Returns:
             Set[ModelDirective]: The directives that need to be added to
-                weld all `model_instance_names` to the "world" frame. This is
-                the minimal set of directives necessary to support all
-                `model_instance_names` in a plant.
+                weld all `model_instance_names`. This is the minimal set of
+                directives necessary to support all `model_instance_names` in
+                a plant.
         """
+        directives: typing.Set[ModelDirective] = set()
+        for model_instance_name in model_instance_names:
+            # Add input model_instance's add_model directive.
+            assert model_instance_name in self.add_model_directives
+            node = Node(model_instance_name, "model")
+            directives.add(self.add_model_directives[node.name])
 
-        def _RecursiveCall(node: Node) -> typing.Set[ModelDirective]:
-            """
-            Args:
-                node (Node): The node to start this recursive call from.
+            # Loop until we reach the root node.
+            while node in self.parent_edge:
+                edge = self.parent_edge[node]
+                directives.add(edge.directive)
+                node = edge.parent
+                if node.type == "model":
+                    directives.add(self.add_model_directives[node.name])
 
-            Returns:
-                Set[ModelDirective]: The directives that need to be added to
-                    weld all `model_instance_names` to the "world" frame.
-            """
-            directives: typing.Set[ModelDirective] = set()
-
-            # Base case: if the node is one of the model instances, add its AddModel
-            # directive.
-            if node.type == "model" and node.name in model_instance_names:
-                directives.add(self.add_model_directives[node.name])
-
-            for edge in self.edges.get(node, set()):
-                _directives = _RecursiveCall(edge.child)
-
-                # If the child node has non-zero directives, add the edge
-                # directive that leads to the child node.
-                if len(_directives) > 0:
-                    directives.add(edge.directive)
-
-                    # Add the recursion results.
-                    directives.update(_directives)
-
-            return directives
-
-        world_node = Node("world", "frame")
-        return _RecursiveCall(world_node)
+        return directives
 
     def TopologicallySortDirectives(
         self, directives: typing.Set[ModelDirective]
