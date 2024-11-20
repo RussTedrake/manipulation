@@ -78,7 +78,7 @@ class MultibodyPositionToBodyPose(LeafSystem):
 
 
 def AddIiwaDifferentialIK(
-    builder: DiagramBuilder, plant: MultibodyPlant, frame: Frame = None
+    builder: DiagramBuilder, plant: MultibodyPlant, frame: Frame | None = None
 ) -> DifferentialInverseKinematicsIntegrator:
     """Adds a DifferentialInverseKinematicsIntegrator system to the builder with default parameters suitable for use with the standard 7-link iiwa models or the 3-link planar iiwa models.
 
