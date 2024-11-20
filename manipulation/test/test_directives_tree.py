@@ -28,7 +28,43 @@ class DirectivesTreeTest(unittest.TestCase):
     def get_flattened_directives(
         self, mobile_iiwa: bool = False
     ) -> typing.List[ModelDirective]:
-        directives = [
+        if mobile_iiwa:
+            # Add mobile iiwa.
+            directives = [
+                ModelDirective(
+                    add_model=AddModel(
+                        name="iiwa",
+                        file="package://manipulation/mobile_iiwa14_primitive_collision.urdf",
+                    )
+                ),
+            ]
+        else:
+            # Add iiwa and weld it to the world frame.
+            directives = [
+                ModelDirective(
+                    add_model=AddModel(
+                        name="iiwa",
+                        file="package://drake_models/iiwa_description/urdf/iiwa14_no_collision.urdf",
+                    )
+                ),
+                ModelDirective(
+                    add_frame=AddFrame(
+                        name="iiwa_origin",
+                        X_PF=Transform(
+                            base_frame="world",
+                            translation=[0, 0.765, 0],
+                        ),
+                    )
+                ),
+                ModelDirective(
+                    add_weld=AddWeld(
+                        parent="iiwa_origin",
+                        child="iiwa::base",
+                    )
+                ),
+            ]
+        # Add and weld wsg + table.
+        directives += [
             ModelDirective(
                 add_model=AddModel(
                     name="wsg",
@@ -74,41 +110,6 @@ class DirectivesTreeTest(unittest.TestCase):
                 )
             ),
         ]
-
-        if mobile_iiwa:
-            directives = [
-                ModelDirective(
-                    add_model=AddModel(
-                        name="iiwa",
-                        file="package://manipulation/mobile_iiwa14_primitive_collision.urdf",
-                    )
-                )
-            ] + directives
-        else:
-            directives = [
-                ModelDirective(
-                    add_model=AddModel(
-                        name="iiwa",
-                        file="package://drake_models/iiwa_description/urdf/iiwa14_no_collision.urdf",
-                    )
-                ),
-                ModelDirective(
-                    add_frame=AddFrame(
-                        name="iiwa_origin",
-                        X_PF=Transform(
-                            base_frame="world",
-                            translation=[0, 0.765, 0],
-                        ),
-                    )
-                ),
-                ModelDirective(
-                    add_weld=AddWeld(
-                        parent="iiwa_origin",
-                        child="iiwa::base",
-                    )
-                ),
-            ] + directives
-
         return directives
 
     def test_get_welded_descendants_and_directives(self):
@@ -187,7 +188,7 @@ class DirectivesTreeTest(unittest.TestCase):
         self.assertFalse(plant.HasModelInstanceNamed("table"))
         self.assertEqual(plant.num_positions(), num_iiwa_positions)
 
-    def test_make_multibody_plant(self):
+    def test_make_multibody_plant_welded_iiwa(self):
         scenario = Scenario()
         scenario.directives = self.get_flattened_directives()
         scenario.model_drivers = {
