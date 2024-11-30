@@ -860,7 +860,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture videos a
 
     </subsection>
 
-    <subsection><h1>Cartesian stiffness control</h1>
+    <subsection><h1>Cartesian stiffness and operational space control</h1>
 
       <p>A better analogy for the control we were doing with the point finger
       example is to write a controller so that the robot acts like a simple
@@ -891,7 +891,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture videos a
       \begin{equation} M_E(q) \ddot{p}^E + C_E(q,\dot{q})\dot{q} = f^{B_E}_g(q)
       + f^{B_E}_u + f^{B_E}_{ext} \label{eq:cartesian_dynamics},\end{equation}
       where $$M_E(q) = (J M^{-1} J^T)^{-1}, \qquad C_E(q,\dot{q}) = M_E \left(J
-      M^{-1} C+ \dot{J} \right), \qquad f^{B_E}_g(q) = M_E J M^{-1} \tau_g.$$
+      M^{-1} C - \dot{J} \right), \qquad f^{B_E}_g(q) = M_E J M^{-1} \tau_g.$$
       Now if we simply apply a controller analogous to what we used in joint
       space, e.g.: $$f^{B_E}_u = -f^{B_E}_g(q) + K_p(p^{E_d} - p^E) +
       K_d(\dot{p}^{E_d} - \dot{p}^E),$$ then we can achieve the desired
