@@ -135,7 +135,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture videos a
         <script type="text/javascript">
         var system = { "name": "PidController", 
           "input_ports" : ["estimated_state", "desired_state"],
-          "output_ports" : ["generalized_force"]
+          "output_ports" : ["actuation"]
           };
         document.write(system_html(system, "https://drake.mit.edu/doxygen_cxx/classdrake_1_1systems_1_1controllers_1_1_pid_controller.html"));
         </script> 
@@ -143,15 +143,15 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture videos a
         <script type="text/javascript">
           var system = { "name": "InverseDynamicsController", 
             "input_ports" : ["estimated_state", "desired_state", '<span style="color:gray">desired_acceleration</span>'],
-            "output_ports" : ["generalized_force"]
-            };
+            "output_ports" : ["actuation", "generalized_force"]
+          };
           document.write(system_html(system, "https://drake.mit.edu/doxygen_cxx/classdrake_1_1systems_1_1controllers_1_1_inverse_dynamics_controller.html"));
         </script>
       </div><div style="padding: 10px;">
         <script type="text/javascript">
           var system = { "name": "SpatialForceController", 
             "input_ports" : ["estimated_state", "desired_spatial_force"],
-            "output_ports" : ["generalized_force"]
+            "output_ports" : ["actuation"]
             };
           document.write(system_html(system));
         </script>
@@ -159,7 +159,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture videos a
         <script type="text/javascript">
           var system = { "name": "JointStiffnessController", 
             "input_ports" : ["estimated_state", "desired_state"],
-            "output_ports" : ["generalized_force"]
+            "output_ports" : ["actuation"]
             };
           document.write(system_html(system, "https://github.com/RobotLocomotion/drake/pull/18272"));
         </script>
@@ -167,7 +167,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture videos a
         <script type="text/javascript">
           var system = { "name": "SpatialStiffnessController", 
             "input_ports" : ["estimated_state", "desired_pose", "desired_spatial_velocity", "secondary_task"],
-            "output_ports" : ["generalized_force"]
+            "output_ports" : ["actuation"]
             };
           document.write(system_html(system));
         </script>
@@ -330,7 +330,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture videos a
         <script type="text/javascript">
         var force_control = { "name": "ForceControl", 
           "input_ports" : ["estimated_state", "desired_contact_force", '<span style="color:gray">measured_accelerations</span>', '<span style="color:gray">measured_contact_force</span>'],
-          "output_ports" : ["generalized_force"]
+          "output_ports" : ["actuation"]
           };
         document.write(system_html(force_control));
         </script>
@@ -752,7 +752,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture videos a
         <script type="text/javascript">
         var inverse_dynamics = { "name": "InverseDynamics", 
           "input_ports" : ["estimated_state", "desired_acceleration"],
-          "output_ports" : ["actuation_input"]
+          "output_ports" : ["generalized_force"]
           };
         document.write(system_html(inverse_dynamics, "https://drake.mit.edu/doxygen_cxx/classdrake_1_1systems_1_1controllers_1_1_inverse_dynamics.html"));
         </script>
@@ -778,7 +778,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture videos a
         <script type="text/javascript">
         var inverse_dynamics = { "name": "InverseDynamicsController", 
           "input_ports" : ["estimated_state", "desired_state", "desired_acceleration"],
-          "output_ports" : ["actuation_input"]
+          "output_ports" : ["actuation", "generalized_force"]
           };
         document.write(system_html(inverse_dynamics, "https://drake.mit.edu/doxygen_cxx/classdrake_1_1systems_1_1controllers_1_1_inverse_dynamics_controller.html"));
         </script>
