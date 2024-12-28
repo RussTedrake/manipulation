@@ -2,8 +2,9 @@
 
 set -e
 
-docker pull robotlocomotion/drake:jammy
+docker pull robotlocomotion/drake:noble
 docker build -f setup/docker/Dockerfile -t russtedrake/manipulation:latest .
+# Note: This could require `docker login`
 docker push russtedrake/manipulation:latest
 docker build -f setup/docker/Dockerfile -t russtedrake/manipulation:$(git rev-parse --short HEAD) .
 docker push russtedrake/manipulation:$(git rev-parse --short HEAD)

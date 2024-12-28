@@ -45,8 +45,8 @@ apt-get update -qq || (sleep 15; apt-get update -qq)
 apt-get install -o APT::Acquire::Retries=4 -o Dpkg::Use-Pty=0 -qy \
   --no-install-recommends lsb-release
 
-if [[ "$(lsb_release -cs)" != 'jammy' ]]; then
-  echo 'ERROR: This script requires Ubuntu 22.04 (Jammy)' >&2
+if [[ "$(lsb_release -cs)" != 'noble' ]]; then
+  echo 'ERROR: This script requires Ubuntu 24.04 (Noble)' >&2
   exit 2
 fi
 
@@ -55,22 +55,43 @@ apt-get install -o APT::Acquire::Retries=4 -o Dpkg::Use-Pty=0 -qy \
 
 apt-get update -qq || (sleep 15; apt-get update -qq)
 
+# Keep this up to date with Drake's
+# setup/ubuntu/binary_distribution/packages-noble.txt, except that we choose to
+# not install most of the system `python3-*` packages. The second batch are new
+# requirements from this repo.
 apt-get install -o APT::Acquire::Retries=4 -o Dpkg::Use-Pty=0 -qy \
   --no-install-recommends $(cat <<EOF
-g++
+default-jre
+jupyter-notebook
+libblas-dev
+libegl1
+libeigen3-dev
+libgfortran5
+libglib2.0-0
+libglx0
+libgomp1
+libjchart2d-java
+liblapack3
+libmumps-seq-5.6
+libopengl0
+libquadmath0
+libpython3.12
+libspdlog-dev
+libx11-6
+ocl-icd-libopencl1
+python3
+zlib1g
+
 graphviz
 jupyter-nbconvert
-jupyter-notebook
-libegl1
 locales
-python3
 python3-pip
 tidy
 wget
 unzip
-zlib1g-dev
 EOF
 )
+
 
 locale-gen en_US.UTF-8
 
