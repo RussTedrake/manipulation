@@ -1,7 +1,7 @@
 ## Requirements management with Poetry
 
 ```
-pip3 install poetry
+pip3 install poetry poetry-plugin-export
 poetry install --with=dev,docs
 ```
 (in a virtual environment) to install the requirements.
