@@ -573,27 +573,27 @@ class _MultiplexState(LeafSystem):
         output.SetFromVector(np.concatenate((positions, velocities)))
 
 
-class _DemultiplexInput(LeafSystem):
+class _DemultiplexActuation(LeafSystem):
     def __init__(self, plant: MultibodyPlant, model_instance_names: typing.List[str]):
         LeafSystem.__init__(self)
         total_inputs = 0
+        self._plant = plant
         for name in model_instance_names:
-            num_actuators = plant.num_actuators(plant.GetModelInstanceByName(name))
+            model_instance_index = plant.GetModelInstanceByName(name)
+            num_actuators = plant.num_actuators(model_instance_index)
             self.DeclareVectorOutputPort(
                 name + ".input",
                 num_actuators,
-                partial(
-                    self.CalcOutput,
-                    size=num_actuators,
-                    start_index=total_inputs,
-                ),
+                partial(self.CalcOutput, model_instance_index=model_instance_index),
             )
             total_inputs += num_actuators
         self.DeclareVectorInputPort("combined_input", total_inputs)
 
-    def CalcOutput(self, context, output, size, start_index):
+    def CalcOutput(self, context, output, model_instance_index):
         input = self.get_input_port().Eval(context)
-        output.SetFromVector(input[start_index : start_index + size])
+        output.SetFromVector(
+            self._plant.GetActuationFromArray(model_instance_index, input)
+        )
 
 
 # TODO(russt): Use the c++ version pending https://github.com/RobotLocomotion/drake/issues/20055
@@ -729,7 +729,7 @@ def _ApplyDriverConfigSim(
                 controller.get_input_port_estimated_state(),
             )
             builder.Connect(
-                controller.get_output_port(),
+                controller.get_output_port_control(),
                 sim_plant.get_actuation_input_port(model_instances[0]),
             )
             builder.ExportOutput(
@@ -742,7 +742,7 @@ def _ApplyDriverConfigSim(
             )
             combined_state.set_name(model_instance_name + ".combined_state")
             combined_input = builder.AddSystem(
-                _DemultiplexInput(sim_plant, model_instance_names)
+                _DemultiplexActuation(sim_plant, model_instance_names)
             )
             combined_input.set_name(model_instance_name + ".combined_input")
             for index, model_instance in enumerate(model_instances):
@@ -759,7 +759,7 @@ def _ApplyDriverConfigSim(
                 controller.get_input_port_estimated_state(),
             )
             builder.Connect(
-                controller.get_output_port(), combined_input.get_input_port()
+                controller.get_output_port_control(), combined_input.get_input_port()
             )
             builder.ExportOutput(
                 combined_state.get_output_port(),

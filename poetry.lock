@@ -786,16 +786,16 @@ files = [
 
 [[package]]
 name = "drake"
-version = "1.36.0"
+version = "0.0.20241230"
 description = "Model-based design and verification for robotics"
 optional = false
 python-versions = ">=3.10"
 files = [
-    {file = "drake-1.36.0-cp310-cp310-manylinux_2_35_x86_64.whl", hash = "sha256:b889b8963e96c4c90c360e857d7dbe5b08088de6183a3079fd0cc308c860ca08"},
-    {file = "drake-1.36.0-cp311-cp311-macosx_14_0_arm64.whl", hash = "sha256:a516dad8623a82d232de5eb97042cf86fea141558f56c866f1e1e54414e0e277"},
-    {file = "drake-1.36.0-cp311-cp311-manylinux_2_35_x86_64.whl", hash = "sha256:467195c112f5dd54bd4178a262ff84a5e446a7903cd0d3cbd63726cf6312d6ad"},
-    {file = "drake-1.36.0-cp312-cp312-macosx_14_0_arm64.whl", hash = "sha256:dc7795f66f9265e283c995432586213034c16b608fa84e5ff41544f1c29f2fc0"},
-    {file = "drake-1.36.0-cp312-cp312-manylinux_2_35_x86_64.whl", hash = "sha256:a161ef1ed6727cb2816817d1d8d1cfdfb013821d7e09a0de269391f5b85f86df"},
+    {file = "drake-0.0.20241230-cp310-cp310-manylinux_2_35_x86_64.whl", hash = "sha512:5f0b27e11664aecd44568a40d864a9bd8cf230ba683acba2cb7cb849734acbe087e3cfd326249f5d2fe2c8cb655edaf795da7a402a30876d4b3a0f54af1a56e7"},
+    {file = "drake-0.0.20241230-cp311-cp311-macosx_14_0_arm64.whl", hash = "sha512:ad39b298a3b1ba46ad2bd6057517f49fa54b7262672bd0509d0a00413b78b5a32ba3788c1ac963843e652a7a9080047d082742c196db61ceb4d77dc13c85c2ad"},
+    {file = "drake-0.0.20241230-cp311-cp311-manylinux_2_35_x86_64.whl", hash = "sha512:384b4988b1bbb11fc1f164476fd890d6c8ca99dee4b5b1d172fbb8a2ac1dffb749d28a9f2df84aaa072832c361ac19039a2cf6d05241c7fb7d55c7174b5a6910"},
+    {file = "drake-0.0.20241230-cp312-cp312-macosx_14_0_arm64.whl", hash = "sha512:b23e49986ecefda836a14bee499ff55b350b98c38703390f27b0ec1dd42869ce6dcdc9f903b6dac6849ff6fb43b874552e99df3edce7e86b37c9a6fceac0f8c8"},
+    {file = "drake-0.0.20241230-cp312-cp312-manylinux_2_35_x86_64.whl", hash = "sha512:8ae5c1183422cc6a18f2229a09b6613c36c6fda32decb009b3e364eb2d1627e53577815ae6dcc46e41ef2874ba58d06112534e09271e41ab90402aa036a08e2b"},
 ]
 
 [package.dependencies]
@@ -803,6 +803,11 @@ matplotlib = "*"
 numpy = "*"
 pydot = "*"
 PyYAML = "*"
+
+[package.source]
+type = "legacy"
+url = "https://drake-packages.csail.mit.edu/whl/nightly"
+reference = "drake-nightly"
 
 [[package]]
 name = "dulwich"
@@ -4890,4 +4895,4 @@ type = ["pytest-mypy"]
 [metadata]
 lock-version = "2.0"
 python-versions = "<4.0,>=3.10"
-content-hash = "658ce2d40282c36649692b823b8d6a34112fa3825320978e339404a648341bda"
+content-hash = "600aadd2a85b3152e3d1056119a83d9bf4c5009954f78a751f3dfa05cfc81363"
