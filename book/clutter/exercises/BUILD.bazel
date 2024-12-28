@@ -57,14 +57,3 @@ rt_ipynb_test(
         requirement("scipy"),
     ],
 )
-
-rt_ipynb_test(
-    name = "simulation_tuning",
-    srcs = ["simulation_tuning.ipynb"],
-    timeout = "moderate",
-    deps = [
-        "//manipulation",
-        "//manipulation/exercises:grader",
-        "//manipulation/exercises/clutter:test_simulation_tuning",
-    ],
-)
