@@ -10,5 +10,6 @@ This package contains code to support the [Robotic Manipulation](http://manipula
    systems
    meshcat_utils
    utils
+   make_drake_compatible_model
 ```
 
