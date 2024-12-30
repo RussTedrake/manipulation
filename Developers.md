@@ -58,8 +58,7 @@ Bazel currently uses requirements-bazel.txt, which we generate from poetry
 
 To generate it, run
 ```
-poetry lock
-./book/htmlbook/PoetryExport.sh
+poetry lock && ./book/htmlbook/PoetryExport.sh
 ```
 
 ## To update the pip wheels
@@ -68,8 +67,7 @@ Update the version number in `pyproject.toml`, and the drake version, then from
 the root directory, run:
 ```
 rm -rf dist/*
-poetry publish --build
-cd book && ./Deepnote.sh
+poetry publish --build && cd book && ./Deepnote.sh
 ```
 (Use `poetry config pypi-token.pypi <token>` once first)
 
@@ -102,13 +100,20 @@ rm -rf book/python && sphinx-build -M html manipulation /tmp/manip_doc && cp -r 
 Note that the website will only install the dependencies in the `docs` group, so
 `poetry install --only docs` must obtain all of the relevant dependencies.
 
-## Tips for developers
 
-These are things that I often add to my preamble of the notebook (ever since vs code broke my pythonpath importing)
+
+## To debug a notebook with a local build of Drake
+
+There are several approaches, but perhaps easiest is to just add a few lines at the top of the notebook:
 ```
-%load_ext autoreload
-%autoreload 2
 import sys
-sys.path.append('/home/russt/drake-install/lib/python3.6/site-packages')
-sys.path.append('/home/russt/manipulation')
+import os
+
+python_version = f"python{sys.version_info.major}.{sys.version_info.minor}"
+drake_path = os.path.expanduser(f"~/drake-install/lib/{python_version}/site-packages")
+if drake_path not in sys.path:
+    sys.path.insert(0, drake_path)
+
+import pydrake
+print(f"Using pydrake from: {pydrake.__file__}")
 ```
