@@ -75,13 +75,16 @@ vhacdx = ">=0.0.5"
 [tool.poetry.group.docs]
 optional = true
 
-# Must include all dependencies required to build the docs with sphinx + autodoc.
+# Must include all dependencies required to build the docs with sphinx +
+# autodoc, and repeat the dependencies from main, because my sphinx script uses
+# `poetry install --only docs`
 [tool.poetry.group.docs.dependencies]
 #drake = { version = ">=0.0.20240615", source = "drake-nightly" }
 drake = ">=1.32.0"
 ipython = ">=7.8.0"
-sphinx = ">=7.2.6"
 myst-parser = ">=2.0.0"
+pymeshlab = ">=2023.0"
+sphinx = ">=7.2.6"
 sphinx_rtd_theme = ">=2.0.0"
 
 [tool.poetry.group.dev.dependencies]

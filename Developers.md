@@ -99,7 +99,8 @@ From the root directory, run
 ```
 rm -rf book/python && sphinx-build -M html manipulation /tmp/manip_doc && cp -r /tmp/manip_doc/html book/python
 ```
-
+Note that the website will only install the dependencies in the `docs` group, so
+`poetry install --only docs` must obtain all of the relevant dependencies.
 
 ## Tips for developers
 
