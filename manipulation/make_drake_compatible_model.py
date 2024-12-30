@@ -74,8 +74,8 @@ def _convert_urdf(input_filename, output_filename, package_map):
         )
         if scale_match != uniform_scale:
             print(
-                f"Replaced scale '{scale_match}' with uniform scale "
-                f"'{uniform_scale}' in URDF content."
+                f"WARNING: Replaced scale '{scale_match}' with uniform scale "
+                f"'{uniform_scale}' in URDF content. This has CHANGED the geometry."
             )
 
     with open(output_filename, "w") as file:
