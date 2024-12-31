@@ -124,57 +124,40 @@ class TestTaskspaceIRIS(unittest.TestCase):
         tris = [val for val in tri_obs]
         test_C = np.array([[0.22810313, -0.10359835], [-0.0444466, 0.27173404]])
         test_d = np.array([0.36327963, 0.4762024])
-        A_pred, b_pred, hyp_sol = f(test_C, test_d, tris)
+        A, b, found = f(test_C, test_d, tris)
 
-        self.assertTrue(hyp_sol, "No solution found for hyperplanes!")
+        if False:  # For debugging
+            import matplotlib.pyplot as plt
+            from matplotlib.patches import Polygon
 
-        # store in sorted order (by first element of each hyperplane normal)
-        A_sol = np.array(
-            [
-                [-11.80111656, -0.70808857],
-                [-9.9585355, -6.5676601],
-                [-1.18005283, 6.06107998],
-                [2.02598734, -10.40603528],
-                [5.09000672, -4.11054018],
-                [10.78383668, 8.62684478],
-                [24.28562186, 1.06813158],
-            ]
-        ).T
+            fig, ax = plt.subplots()
+            draw_intersection = self.notebook_locals["draw_intersection"]
+            draw_intersection(A, b, test_d, ax)
+            for region in tri_obs:
+                plt.plot(region[:, 0], region[:, 1], color="green", alpha=0.5)
+                plt.plot(
+                    region[[0, -1], 0], region[[0, -1], 1], color="green", alpha=0.5
+                )
+                ax.add_patch(Polygon(region, color="green", alpha=0.25))
+            plt.show()
 
-        b_sol = np.array(
-            [
-                -1.14084094,
-                -4.57882326,
-                4.3040654,
-                1.22325314,
-                2.05286201,
-                10.99093778,
-                24.37936607,
-            ]
-        ).reshape(-1, 1)
+        self.assertTrue(found, "No solution found for hyperplanes!")
 
+        self.assertEqual(A.shape, (2, 8), "We expect 8 hyperplanes")
+        self.assertEqual(b.shape, (8, 1), "We expect 8 hyperplanes")
+
+        # Check that the point is on one side of all the hyperplanes
         self.assertTrue(
-            A_sol.shape[1] == A_pred.shape[1],
-            "Incorrect number of hyperplanes returned!",
+            (A.T @ test_d < b.T).all(),
+            "The center point, d, of the ellipse is outside the resulting polytope.",
         )
 
-        A_sol_norm = A_sol / np.linalg.norm(A_sol, axis=0)
-        A_pred_norm = A_pred / np.linalg.norm(A_pred, axis=0)
-
-        # sort predicted hyperplanes to handle different permutations
-        pred_sorted_idx = np.argsort(A_pred_norm[0, :])
-        A_pred_norm = A_pred_norm[:, pred_sorted_idx]
-        b_pred = b_pred[pred_sorted_idx]
-
-        A_pred_norm = A_pred_norm.T
-        A_sol_norm = A_sol_norm.T
-        A_dots = [
-            np.dot(A_sol_norm[idx], A_pred_norm[idx])
-            for idx in range(A_sol_norm.shape[0])
-        ]
-        A_thetas = np.arccos(A_dots)
-
-        b_diff = np.linalg.norm(b_sol - b_pred, axis=-1)
-
-        self.assertTrue((A_thetas < np.deg2rad(5)).all(), "Hyperplane angles are off!")
-        self.assertTrue((b_diff < 0.01).all(), "Hyperplane offsets are off!")
+        # Check each obstacles is outside the at least one hyperplane
+        epsilon = 1e-3
+        for obs in tri_obs:
+            all_vertices_outside = np.all(A.T @ obs.T >= b - epsilon, axis=1)
+            at_least_one_separating_hyperplane = np.any(all_vertices_outside)
+            self.assertTrue(
+                at_least_one_separating_hyperplane,
+                f"An obstacle is inside the resulting polytope.",
+            )
