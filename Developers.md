@@ -6,18 +6,6 @@ poetry install --with=dev,docs
 ```
 (in a virtual environment) to install the requirements.
 
-## Bazel currently uses requirements-bazel.txt, which we generate from poetry
-
-If the poetry dependencies change in `pyproject.toml`, then run
-```
-poetry lock
-./book/htmlbook/PoetryExport.sh
-```
-to synchronize the requirements-bazel.txt file.
-
-Hopefully [direct poetry
-support](https://github.com/bazelbuild/rules_python/issues/340) in bazel will land soon, or I can use [rules_python_poetry](https://github.com/AndrewGuenther/rules_python_poetry) directly; but it looks like it will still require poetry to fix [their issue](# https://github.com/python-poetry/poetry-plugin-export/issues/176).
-
 ## Please install the pre-commit hooks
 
 ```

@@ -46,8 +46,8 @@ priority = "explicit"
 [tool.poetry.dependencies]
 python = "<4.0,>=3.10"
 cloudpickle = "2.2.1"  # needs to be pinned for stored files to remain compatible.
-#drake = { version = ">=0.0.20240615", source = "drake-nightly" }
-drake = ">=1.32.0"
+drake = { version = ">=0.0.20241229", source = "drake-nightly" }
+#drake = ">=1.32.0"
 gradescope-utils = ">=0.4.0"
 ipywidgets = ">=8"
 # Note: matplotlib gets additional handling in PoetryExport.sh for bazel. 
@@ -79,8 +79,9 @@ optional = true
 # autodoc, and repeat the dependencies from main, because my sphinx script uses
 # `poetry install --only docs`
 [tool.poetry.group.docs.dependencies]
-#drake = { version = ">=0.0.20240615", source = "drake-nightly" }
-drake = ">=1.32.0"
+# TODO(russt): why do I have to list drake here again? I've forgotten...
+drake = { version = ">=0.0.20241229", source = "drake-nightly" }
+#drake = ">=1.32.0"
 ipython = ">=7.8.0"
 myst-parser = ">=2.0.0"
 pymeshlab = ">=2023.0"
