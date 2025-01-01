@@ -72,6 +72,8 @@ from pydrake.all import (
     ZeroForceDriver,
     position_enabled,
     torque_enabled,
+    ContactVisualizer,
+    ContactVisualizerParams,
 )
 from pydrake.common.yaml import yaml_load_typed
 
@@ -996,6 +998,16 @@ def MakeHardwareStation(
 
     # Add visualization.
     if meshcat:
+        contact_viz = ContactVisualizer.AddToBuilder(
+            builder,
+            sim_plant,
+            meshcat,
+            ContactVisualizerParams(
+                publish_period=1.0 / 256.0,
+                newtons_per_meter=2e1,
+                newton_meters_per_meter=1e-1,
+            ),
+        )
         ApplyVisualizationConfig(
             scenario.visualization, builder, meshcat=meshcat, lcm_buses=lcm_buses
         )
@@ -1008,6 +1020,10 @@ def MakeHardwareStation(
     builder.ExportInput(
         sim_plant.get_applied_spatial_force_input_port(),
         "applied_spatial_force",
+    )
+    builder.ExportOutput(
+        sim_plant.get_contact_results_output_port(),
+        "contact_states",
     )
     # Export any actuation (non-empty) input ports that are not already
     # connected (e.g. by a driver).
