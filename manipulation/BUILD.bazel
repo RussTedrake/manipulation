@@ -105,7 +105,7 @@ rt_py_library(
     srcs = ["icp.py"],
     imports = [".."],
     deps = [
-      requirement("scipy"),
+      requirement("scipy"), # TODO(russt): remove this dep?
     ],
     visibility = ["//visibility:public"],
 )

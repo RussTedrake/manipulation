@@ -145,6 +145,7 @@ jobs:
         # Force bazel to use user pip instead of re-downloading everything to 
         # be hermetic:
         run: |
+          pip install -U manipulation[all] --extra-index-url https://drake-packages.csail.mit.edu/whl/nightly/
           truncate -s0 requirements.txt 
           sed -i '/PYTHONNOUSERSITE/d' .bazelrc
         shell: bash
@@ -153,9 +154,9 @@ jobs:
         shell: bash
   jammy-pip:
     # This should emulate a student's experience if they are doing the psets
-    # via pip install manipulation.
+    # via pip install manipulation[all].
     #
-    # TODO(russt): Revisit the pip3 install -r requirements.txt below. Maybe I
+    # TODO(russt): Revisit the pip install -r requirements.txt below. Maybe I
     # need to separate out testing requirements from notebook requirements.
     name: pip on jammy
     runs-on: ubuntu-22.04
@@ -166,7 +167,7 @@ jobs:
         run: |
           apt-get update -o APT::Acquire::Retries=4 -qq
           apt-get install -o APT::Acquire::Retries=4 -o Dpkg::Use-Pty=0 -qy --no-install-recommends python3-pip git xvfb
-          pip3 install manipulation --extra-index-url https://drake-packages.csail.mit.edu/whl/nightly/
+          pip install manipulation --extra-index-url https://drake-packages.csail.mit.edu/whl/nightly/
         shell: bash
       - name: checkout
         uses: actions/checkout@v2
@@ -179,7 +180,7 @@ jobs:
         # installed drake.
         run: |
           ./setup/ubuntu/22.04/install_prereqs.sh
-          pip3 install -r requirements.txt  # poetry does not publish dependency groups https://github.com/python-poetry/poetry/issues/6727
+          pip install manipulation[all] --extra-index-url https://drake-packages.csail.mit.edu/whl/nightly/
           truncate -s0 requirements.txt
           sed -i '/PYTHONNOUSERSITE/d' .bazelrc
         shell: bash
