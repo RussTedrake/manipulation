@@ -45,63 +45,74 @@ priority = "explicit"
 
 [tool.poetry.dependencies]
 python = "<4.0,>=3.10"
-cloudpickle = "2.2.1"  # needs to be pinned for stored files to remain compatible.
+beautifulsoup4 = { version=">=4.6.3", optional=true }
+cloudpickle = { version="2.2.1", optional=true} # needs to be pinned for stored files to remain compatible.
 drake = { version = ">=0.0.20241229", source = "drake-nightly" }
 #drake = ">=1.32.0"
-gradescope-utils = ">=0.4.0"
-ipywidgets = ">=8"
+gradescope-utils = { version=">=0.4.0", optional=true}
+gymnasium = { version=">0.26", optional=true }
+ipython = ">=7.8.0" # TODO: make this optional?
+ipywidgets = { version=">=8", optional=true }
 # Note: matplotlib gets additional handling in PoetryExport.sh for bazel. 
+lxml = ">=4.9.2" # seems to be needed on python 3.11
+lxml-html-clean = ">=0.1.0"
 matplotlib = ">=3.7.0" # old versions don't build in XCode
-mpld3  = ">=0.5.6"
-nevergrad = ">=0.4.3"  # TODO: avoid expensive bayesian optimization dep
-numpy = "<2.0.0"  # https://stackoverflow.com/questions/78533824/local-installation-of-drake-on-macos-sonoma
-psutil = ">=5.9.*"
-#pymcubes = ">=0.0.9"
-pymeshlab = ">=2023.0"
-pyzmq = [ 
-  {platform="darwin", version=">=25.0.0"}, # needed for python 3.11?
-  {platform="linux", version=">=24.0.0"},   # <25.0.0 is currently needed for deepnote 
+mpld3  = { version=">=0.5.6", optional=false } # TODO: make this optional
+mysql-connector-python = { version=">=8.0.23", optional=true }
+nbconvert = [ 
+  {platform="darwin", version="7.0.0"},
+  {platform="linux", version="6.4.0"},
 ]
-scipy = ">=1.10.0"  # From github dependabot
-stable-baselines3 = ">=2.0.0"
-timeout-decorator = ">=0.4.1"
-torch = ">=2.0.1 <2.4.0" # 2.4.0 doesn't support +cpu yet; needed for bazel on linux
-torchvision = ">=0.10.1"
-tqdm = ">=4"
-trimesh = {extras = ["recommend"], version = ">=4.0.0 <4.2.0"}
-vhacdx = ">=0.0.5"
+nevergrad = { version=">=0.4.3", optional=true }  # TODO: avoid expensive bayesian optimization dep
+numpy = "<2.0.0"  # https://stackoverflow.com/questions/78533824/local-installation-of-drake-on-macos-sonoma
+psutil = { version=">=5.9.*", optional=true }
+#pymcubes = ">=0.0.9"
+pymeshlab = { version=">=2023.0", optional=true }
+pyvirtualdisplay = { version=">=3.0", optional=false } # TODO: remove this.
+pyzmq = [ 
+  {platform="darwin", version=">=25.0.0", optional=true}, # needed for python 3.11?
+  {platform="linux", version=">=24.0.0", optional=true},   # <25.0.0 is currently needed for deepnote; this is pinned in htmlbook/Init.ipynb 
+]
+requests = { version=">=2.25.1", optional=true }
+scipy = { version=">=1.10.0", optional=true }
+stable-baselines3 = { version=">=2.0.0", optional=true }
+timeout-decorator = { version=">=0.4.1", optional=true }
+torch = { version=">=2.0.1 <2.4.0", optional=true } # 2.4.0 doesn't support +cpu yet; needed for bazel on linux. additional logic in PoetryExport.sh.
+torchvision = { version=">=0.10.1", optional=true }
+tqdm = { version=">=4", optional=true }
+trimesh = {extras = ["recommend"], version = ">=4.0.0 <4.2.0", optional=true }
+vhacdx = { version=">=0.0.5", optional=true }
 #wandb = ">=0.14.0"
+
+[tool.poetry.extras]
+torch = ["torch", "torchvision"]
+rl = ["stable_baselines3", "gymnasium"]
+mesh = ["trimesh", "vhacdx", "pymeshlab"]
+grader = ["gradescope-utils", "timeout-decorator", "nbconvert", "nbformat"]
+# All should have all of the optional dependencies.
+all = ["cloudpickle", "gradescope-utils", "gymnasium", "ipywidgets", "nevergrad", "psutil", "pymeshlab", "pyzmq", "scipy", "stable_baselines3", "timeout-decorator", "torch", "torchvision", "tqdm", "trimesh", "vhacdx"]
+test = ["all", "beautifulsoup4", "mysql-connector-python", "requests"]
 
 [tool.poetry.group.docs]
 optional = true
 
 # Must include all dependencies required to build the docs with sphinx +
-# autodoc, and repeat the dependencies from main, because my sphinx script uses
-# `poetry install --only docs`
+# autodoc, even if it repeats some dependencies from main, because my sphinx
+# script uses `poetry install --only docs`. This include any requirements
+# needed to import for a file that sphinx autodoc is trying to index.
 [tool.poetry.group.docs.dependencies]
-# TODO(russt): why do I have to list drake here again? I've forgotten...
 drake = { version = ">=0.0.20241229", source = "drake-nightly" }
 #drake = ">=1.32.0"
-ipython = ">=7.8.0"
 myst-parser = ">=2.0.0"
 pymeshlab = ">=2023.0"
 sphinx = ">=7.2.6"
 sphinx_rtd_theme = ">=2.0.0"
 
 [tool.poetry.group.dev.dependencies]
-beautifulsoup4 = ">=4.6.3"
+# These should not appear as requirements in any BUILD.bazel (except htmlbook)
 black = { version = ">=23.*", extras = ["jupyter"] }
-lxml = ">=4.9.2" # seems to be needed on python 3.11
-lxml-html-clean = ">=0.1.0"
-mysql-connector-python = ">=8.0.23"
-nbconvert = [ 
-  {platform="darwin", version="7.0.0"},
-  {platform="linux", version="6.4.0"},
-]
-requests = ">=2.25.1"
 pre-commit = "^3.4.0"
 poetry-pre-commit-plugin = "^0.1.2"
-pyvirtualdisplay = ">=3.0"
 
 [tool.black]
 include = '\.ipynb?$|\.pyi?$'
