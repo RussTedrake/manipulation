@@ -1,12 +1,13 @@
 import argparse
 import os
 import re
+import xml.etree.ElementTree as ET
 
 import pymeshlab
 from pydrake.all import PackageMap
 
 
-def _convert_mesh(input_filename, output_filename, overwrite=False):
+def _convert_mesh(input_filename, output_filename, scale, overwrite):
     if not overwrite and os.path.exists(output_filename):
         print(f"Note: {output_filename} already exists. Skipping conversion.")
         return
@@ -17,66 +18,75 @@ def _convert_mesh(input_filename, output_filename, overwrite=False):
     # Load the mesh file
     ms.load_new_mesh(input_filename)
 
-    # Save the mesh as an OBJ file
+    if scale is not None:
+        scale = [float(s) for s in scale]
+        assert len(scale) == 3, "Scale must be a 3-element array."
+
+        # First apply absolute value scaling
+        ms.apply_filter(
+            "compute_matrix_from_translation_rotation_scale",
+            scalex=scale[0],
+            scaley=scale[1],
+            scalez=scale[2],
+            freeze=True,
+        )
+
+    # Save the mesh
     ms.save_current_mesh(
         output_filename, save_face_color=False, save_vertex_color=False
     )
     print(f"Converted {input_filename} to {output_filename}")
 
 
-def _convert_urdf(input_filename, output_filename, package_map):
+def _convert_urdf(input_filename, output_filename, package_map, overwrite):
     with open(input_filename, "r") as file:
         urdf_content = file.read()
 
     # Remove XML comments to avoid matching filenames inside them
     urdf_content_no_comments = re.sub(r"<!--.*?-->", "", urdf_content, flags=re.DOTALL)
 
-    # Regex pattern to find resource names with .stl or .dae extensions
+    # Regex pattern to find entire XML nodes with .stl or .dae extensions in the filename attribute
     resource_pattern = re.compile(
-        r'filename=["\']([^"\']+\.(stl|dae))["\']', re.IGNORECASE
+        r'<(\w+)\s+[^>]*filename=["\']([^"\']+\.(stl|dae))["\'][^>]*>', re.IGNORECASE
     )
 
     # Find all matches in the URDF content without comments
-    matches = resource_pattern.findall(urdf_content_no_comments)
+    matches = resource_pattern.finditer(urdf_content_no_comments)
 
     modified_urdf_content = urdf_content
 
-    for match, extension in matches:
-        input_mesh_path = package_map.ResolveUrl(match)
-        output_obj_path = input_mesh_path.rsplit(".", 1)[0] + ".obj"
+    for match in matches:
+        node_text = match.group(0)
+        node = ET.fromstring(node_text)
+        filename = node.attrib["filename"]
+        scale = node.attrib.get("scale")
+        if scale:
+            scale_suffix = "_scaled_" + scale.replace("-", "n").replace(" ", "_")
+            scale = scale.split()
+        else:
+            scale = None
+            scale_suffix = ""
 
-        _convert_mesh(input_mesh_path, output_obj_path)
+        input_mesh_path = package_map.ResolveUrl(filename)
+        output_obj_path = input_mesh_path.rsplit(".", 1)[0] + scale_suffix + ".obj"
+        obj_filename = filename.rsplit(".", 1)[0] + scale_suffix + ".obj"
 
-        obj_filename = match.rsplit(".", 1)[0] + ".obj"
-        modified_urdf_content = modified_urdf_content.replace(match, obj_filename)
-
-    # Regex pattern to find scale attributes
-    scale_pattern = re.compile(
-        r'scale=["\']([-+]?[0-9]*\.?[0-9]+(?:[eE][-+]?[0-9]+)? [-+]?[0-9]*\.?[0-9]+(?:[eE][-+]?[0-9]+)? [-+]?[0-9]*\.?[0-9]+(?:[eE][-+]?[0-9]+)?)["\']'
-    )
-
-    # Until https://github.com/RobotLocomotion/drake/issues/22046 is resolved, I
-    # need to just brute-force a uniform scale.
-
-    # Find all scale attributes in the URDF content
-    scale_matches = scale_pattern.findall(urdf_content_no_comments)
-
-    for scale_match in scale_matches:
-        # Split the scale values, convert them to float, and invert the sign on any negative values
-        scale_values = [abs(float(value)) for value in scale_match.split()]
-        # Calculate the average scale value
-        average_scale = sum(scale_values) / len(scale_values)
-        # Create a uniform scale string
-        uniform_scale = f"{average_scale} {average_scale} {average_scale}"
-        # Replace the original scale attribute with the uniform scale
-        modified_urdf_content = modified_urdf_content.replace(
-            f'scale="{scale_match}"', f'scale="{uniform_scale}"'
+        _convert_mesh(
+            input_mesh_path, output_obj_path, scale=scale, overwrite=overwrite
         )
-        if scale_match != uniform_scale:
-            print(
-                f"WARNING: Replaced scale '{scale_match}' with uniform scale "
-                f"'{uniform_scale}' in URDF content. This has CHANGED the geometry."
-            )
+
+        # Update the node's filename attribute
+        node.attrib["filename"] = obj_filename
+
+        # If scale is not None, update the scale attribute
+        if scale:
+            node.attrib["scale"] = "1 1 1"
+
+        # Convert the node back to a string
+        node_string = ET.tostring(node, encoding="unicode")
+
+        # Replace the original match with the updated node string
+        modified_urdf_content = modified_urdf_content.replace(node_text, node_string)
 
     with open(output_filename, "w") as file:
         file.write(modified_urdf_content)
@@ -130,7 +140,7 @@ def MakeDrakeCompatibleModel(
     ):
         _convert_mesh(input_filename, output_filename, overwrite)
     elif input_filename.lower().endswith(".urdf"):
-        _convert_urdf(input_filename, output_filename, package_map)
+        _convert_urdf(input_filename, output_filename, package_map, overwrite=overwrite)
     else:
         print(
             f"Warning: The file extension of '{input_filename}' is not "
@@ -175,4 +185,5 @@ if __name__ == "__main__":
         output_filename=args.output_filename,
         populate_package_map_from_env=args.populate_package_map_from_env,
         populate_package_map_from_folder=args.populate_package_map_from_folder,
+        overwrite=args.overwrite,
     )
