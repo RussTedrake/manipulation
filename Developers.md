@@ -51,13 +51,18 @@ poetry lock && ./book/htmlbook/PoetryExport.sh
 
 ## To update the pip wheels
 
-Update the version number in `pyproject.toml`, and the drake version, then from
+If you make a change to the dependencies or manipulation library directory, you
+will need to update the pip wheels.
+- First PR the code changes, and mark the PR with the `requires new pip wheels` label.
+- Once the PR is merged update the version number in `pyproject.toml`, then from
 the root directory, run:
 ```
 rm -rf dist/*
 poetry publish --build && cd book && ./Deepnote.sh
 ```
-(Use `poetry config pypi-token.pypi <token>` once first)
+- Finally, PR the updated pyproject.toml (without the `requires new pip wheels` label).
+
+Note: use `poetry config pypi-token.pypi <token>` once to set up your pypi token.
 
 # To update the Docker image (and pip wheels)
 
