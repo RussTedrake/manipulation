@@ -154,7 +154,7 @@ jobs:
         shell: bash
   jammy-pip-core:
     # This tests the core functionality of pip install manipulation.
-    name: pip on jammy
+    name: pip core on jammy
     runs-on: ubuntu-22.04
     if: ${{ !contains(github.event.pull_request.labels.*.name, 'requires new pip wheels') }}
     container: ubuntu:22.04
@@ -191,7 +191,7 @@ jobs:
   jammy-pip-extra:
     # This should emulate a student's experience if they are doing the psets
     # via pip install manipulation[all].
-    name: pip on jammy
+    name: pip extra on jammy
     runs-on: ubuntu-22.04
     if: ${{ !contains(github.event.pull_request.labels.*.name, 'requires new pip wheels') }}
     container: ubuntu:22.04
