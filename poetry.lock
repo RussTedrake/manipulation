@@ -786,16 +786,16 @@ files = [
 
 [[package]]
 name = "drake"
-version = "0.0.20250103"
+version = "0.0.20250104"
 description = "Model-based design and verification for robotics"
 optional = false
 python-versions = ">=3.10"
 files = [
-    {file = "drake-0.0.20250103-cp310-cp310-manylinux_2_35_x86_64.whl", hash = "sha512:a376b0edc59cd52537467eeec341fbf41f4fcf1d06665f2196da18973ac4e557c737d49d4f16ef4d2553bf28e679b0ce42ee866c94c246ee363036bc5e7abafc"},
-    {file = "drake-0.0.20250103-cp311-cp311-macosx_14_0_arm64.whl", hash = "sha512:f985a15c063384a020cb29654cf255dd4ca2a69f16e3fbffe796dc0f9d9d9b9f8fbeb2e172cb3991b3e0dc0042c58bff0dd0001338092c5b81ae486f657c8ef7"},
-    {file = "drake-0.0.20250103-cp311-cp311-manylinux_2_35_x86_64.whl", hash = "sha512:4d543d069b6d4d494a3ab1eb786df20e7b7289a29e7fdf98ad1d577084a433f7b48b478394fc52936fedc490d9cbfb281985c95b028f18ec86024514c2f2d110"},
-    {file = "drake-0.0.20250103-cp312-cp312-macosx_14_0_arm64.whl", hash = "sha512:3290d493cecbc79e6c64ab6b9246ba416ccc282a47dba495e6a1e5ccf6ad0578b7f77d874c008bf3f18b6f32c58ead79ae96ff57e689a1935e27dc9d7946e5ff"},
-    {file = "drake-0.0.20250103-cp312-cp312-manylinux_2_35_x86_64.whl", hash = "sha512:ca5a8090bdc414292746b10860a4c2e5555147b44098fd3c37a140b89c7d0a57ec79d78d7e22187891ab11421ac7cebc9453371b84f52940c7f3112304f773e5"},
+    {file = "drake-0.0.20250104-cp310-cp310-manylinux_2_35_x86_64.whl", hash = "sha512:bbbce0764403104034eed1cf13567715a11322acdaa55baf29a3c044c39922fec71c5400cd4167c0db1d09055f77ca867745de7f29c5aa26005a7fb05e0142b3"},
+    {file = "drake-0.0.20250104-cp311-cp311-macosx_14_0_arm64.whl", hash = "sha512:dff53e56f8fa478e55ebd9208ecec6d24ccc1a2cdca195c17ee54424df47f1ad01b3503880c41ffdd10beb9e162653db94fc44b15afc7c05371b487a1a580591"},
+    {file = "drake-0.0.20250104-cp311-cp311-manylinux_2_35_x86_64.whl", hash = "sha512:905691ff80ff4040ac9642989222bd151cf6e4e5982a719f6a13d76e2bf5bb5ab9bd251766324a9f91b7f0e61f6aeb885226ee63aa5e23f2bf85f522ef4cc9a7"},
+    {file = "drake-0.0.20250104-cp312-cp312-macosx_14_0_arm64.whl", hash = "sha512:97b936f17945fc1b0d4d8031c3aa5be6118a574fbd9eccd6f6d03ebc951cf49ab87d44275cfe0ad9c3e2b54fde06f97c6706daab1dfda0d94a9c2d2d3f1778fb"},
+    {file = "drake-0.0.20250104-cp312-cp312-manylinux_2_35_x86_64.whl", hash = "sha512:ebf2a249d7afc660f008d0b8fc6e42aceb6408e222ff5d0d91ae2f1d004bf952b0a630f28c2311bc614773a44c2888c868adc5686279c76cfd410a6a8d601a66"},
 ]
 
 [package.dependencies]
@@ -1157,13 +1157,13 @@ toy-text = ["pygame (>=2.1.3)", "pygame (>=2.1.3)"]
 
 [[package]]
 name = "identify"
-version = "2.6.4"
+version = "2.6.5"
 description = "File identification library for Python"
 optional = false
 python-versions = ">=3.9"
 files = [
-    {file = "identify-2.6.4-py2.py3-none-any.whl", hash = "sha256:993b0f01b97e0568c179bb9196391ff391bfb88a99099dbf5ce392b68f42d0af"},
-    {file = "identify-2.6.4.tar.gz", hash = "sha256:285a7d27e397652e8cafe537a6cc97dd470a970f48fb2e9d979aa38eae5513ac"},
+    {file = "identify-2.6.5-py2.py3-none-any.whl", hash = "sha256:14181a47091eb75b337af4c23078c9d09225cd4c48929f521f3bf16b09d02566"},
+    {file = "identify-2.6.5.tar.gz", hash = "sha256:c10b33f250e5bba374fae86fb57f3adcebf1161bce7cdf92031915fd480c13bc"},
 ]
 
 [package.extras]

@@ -21,7 +21,7 @@ include = [
     "manipulation/**/*.urdf",
     "manipulation/**/*.xml",
     "manipulation/**/*.yaml",
-    "manipulation/**/*.obj"
+    "manipulation/**/*.obj",
 ]
 exclude = [
     "*.egg-info/**",
@@ -31,7 +31,8 @@ exclude = [
     "bazel-*",
     "book/**",
     "solutions/**",
-    "figures/**"
+    "figures/**",
+    "manipulation/_static/**",
 ]
 
 [build-system]
