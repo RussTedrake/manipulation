@@ -153,7 +153,8 @@ jobs:
         run: EXCLUDE_TESTS="//book/htmlbook/..." ./book/htmlbook/workflows/ci/jammy/test
         shell: bash
   jammy-pip-core:
-    # This tests the core functionality of pip install manipulation.
+    # This should emulate a student's experience if they are doing the psets
+    # via pip install manipulation[] (or just pip install manipulation).
     name: pip core on jammy
     runs-on: ubuntu-22.04
     if: ${{ !contains(github.event.pull_request.labels.*.name, 'requires new pip wheels') }}
