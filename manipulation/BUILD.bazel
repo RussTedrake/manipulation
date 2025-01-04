@@ -36,6 +36,7 @@ rt_py_library(
     imports = [".."],
     visibility = ["//visibility:public"],
     deps = [
+      requirement("lxml"),
       requirement("pymeshlab"),
     ],
 )
