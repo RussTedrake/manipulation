@@ -5,11 +5,19 @@ import tempfile
 import unittest
 from pathlib import Path
 
-import trimesh
+try:
+    import trimesh
 
-from manipulation.create_sdf_from_mesh import create_sdf_from_mesh
+    from manipulation.create_sdf_from_mesh import create_sdf_from_mesh
+
+    trimesh_available = True
+except ImportError:
+    trimesh_available = False
+    print("trimesh not found.")
+    print("Consider 'pip install trimesh'.")
 
 
+@unittest.skipIf(not trimesh_available, "Requires trimesh dependency.")
 class CreateSDFFromMeshTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):

@@ -1,11 +1,30 @@
 import unittest
 
-import gymnasium as gym
-import stable_baselines3.common.env_checker
+try:
+    import gymnasium as gym
 
-import manipulation.envs.box_flipup  # no-member
+    import manipulation.envs.box_flipup  # no-member
+
+    gym_available = True
+except ImportError:
+    gym_available = False
+    print("gymnasium not found.")
+    print("Consider 'pip install gymnasium'.")
+
+try:
+    import stable_baselines3.common.env_checker
+
+    stable_baselines_available = True
+except ImportError:
+    stable_baselines_available = False
+    print("stable_baselines3 not found.")
+    print("Consider 'pip install stable_baselines3'.")
 
 
+@unittest.skipIf(not gym_available, "Requires gymnasium dependency.")
+@unittest.skipIf(
+    not stable_baselines_available, "Requires stable_baselines3 dependency."
+)
 class DrakeGymTest(unittest.TestCase):
     """
     Test that a DrakeGymEnv satisfies the OpenAI Gym Env specifications as to

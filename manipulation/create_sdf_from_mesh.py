@@ -13,8 +13,14 @@ from pathlib import Path
 from typing import List, Tuple, Union
 
 import numpy as np
-import trimesh
 from lxml import etree as ET
+
+try:
+    import trimesh
+except ImportError:
+    print("trimesh not found.")
+    print("Consider 'pip install trimesh'.")
+    exit(code=1)
 
 
 def calc_mesh_com_and_inertia(
