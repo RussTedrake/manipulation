@@ -4900,10 +4900,10 @@ all = ["cloudpickle", "gradescope-utils", "gymnasium", "ipywidgets", "nevergrad"
 grader = ["gradescope-utils", "nbconvert", "nbconvert", "timeout-decorator"]
 mesh = ["pymeshlab", "trimesh", "vhacdx"]
 rl = ["gymnasium", "stable-baselines3"]
-test = ["beautifulsoup4", "mysql-connector-python", "requests"]
+test = ["beautifulsoup4", "cloudpickle", "gradescope-utils", "gymnasium", "ipywidgets", "mysql-connector-python", "nevergrad", "psutil", "pymeshlab", "pyzmq", "pyzmq", "requests", "scipy", "stable-baselines3", "timeout-decorator", "torch", "torchvision", "tqdm", "trimesh", "vhacdx"]
 torch = ["torch", "torchvision"]
 
 [metadata]
 lock-version = "2.0"
 python-versions = "<4.0,>=3.10"
-content-hash = "dc04dff9613420f3892a3354fa7ec85d817183f03b40967a5fe703eb9689d567"
+content-hash = "341d0e04b559818e7802f328886cdffd0af88e6bebb500c6cb75b17cb0dc3494"
