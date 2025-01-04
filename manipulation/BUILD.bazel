@@ -173,6 +173,14 @@ rt_py_test(
 )
 
 rt_py_test(
+    name = "test_inverse_dynamics_driver",
+    srcs = ["test/test_inverse_dynamics_driver.py"],
+    data = ["//manipulation:station"],
+    imports = [".."],
+    deps = ["manipulation"],
+)
+
+rt_py_test(
     name = "test_hardware_station_interface",
     srcs = ["test/test_hardware_station_interface.py"],
     data = ["//manipulation:station"],
