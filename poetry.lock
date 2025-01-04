@@ -2241,7 +2241,7 @@ files = [
 name = "mysql-connector-python"
 version = "9.1.0"
 description = "A self-contained Python driver for communicating with MySQL servers, using an API that is compliant with the Python Database API Specification v2.0 (PEP 249)."
-optional = true
+optional = false
 python-versions = ">=3.9"
 files = [
     {file = "mysql-connector-python-9.1.0.tar.gz", hash = "sha256:346261a2aeb743a39cf66ba8bde5e45931d313b76ce0946a69a6d1187ec7d279"},
@@ -4900,10 +4900,9 @@ all = ["cloudpickle", "gradescope-utils", "gymnasium", "ipywidgets", "nevergrad"
 grader = ["gradescope-utils", "nbconvert", "nbconvert", "timeout-decorator"]
 mesh = ["pymeshlab", "trimesh", "vhacdx"]
 rl = ["gymnasium", "stable-baselines3"]
-test = ["beautifulsoup4", "cloudpickle", "gradescope-utils", "gymnasium", "ipywidgets", "mysql-connector-python", "nevergrad", "psutil", "pymeshlab", "pyzmq", "pyzmq", "requests", "scipy", "stable-baselines3", "timeout-decorator", "torch", "torchvision", "tqdm", "trimesh", "vhacdx"]
 torch = ["torch", "torchvision"]
 
 [metadata]
 lock-version = "2.0"
 python-versions = "<4.0,>=3.10"
-content-hash = "341d0e04b559818e7802f328886cdffd0af88e6bebb500c6cb75b17cb0dc3494"
+content-hash = "2f3aeede0c0309650971d455ecc2619ba88e65bfdd659e10a97a688d711d62ad"
