@@ -738,11 +738,11 @@ def _ApplyDriverConfigSim(
             )
         else:
             combined_state = builder.AddSystem(
-                _MultiplexState(sim_plant, model_instance_names)
+                _MultiplexState(controller_plant, model_instance_names)
             )
             combined_state.set_name(model_instance_name + ".combined_state")
             combined_input = builder.AddSystem(
-                _DemultiplexActuation(sim_plant, model_instance_names)
+                _DemultiplexActuation(controller_plant, model_instance_names)
             )
             combined_input.set_name(model_instance_name + ".combined_input")
             for index, model_instance in enumerate(model_instances):
