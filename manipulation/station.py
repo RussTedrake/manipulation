@@ -888,7 +888,7 @@ def MakeHardwareStation(
     parser_preload_callback: typing.Callable[[Parser], None] | None = None,
     parser_prefinalize_callback: typing.Callable[[Parser], None] | None = None,
     prebuild_callback: typing.Callable[[DiagramBuilder], None] | None = None,
-) -> Diagram:
+) -> RobotDiagram:
     """Make a diagram encapsulating a simulation of (or the communications
     interface to/from) a physical robot, including sensors and controllers.
 
