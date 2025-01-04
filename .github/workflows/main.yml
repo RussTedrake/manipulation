@@ -137,7 +137,7 @@ jobs:
     container: russtedrake/manipulation:latest
     steps:
       - name: checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       - name: submodule checkout
         run:  ./setup/submodule_checkout
         shell: bash
@@ -155,9 +155,6 @@ jobs:
   jammy-pip:
     # This should emulate a student's experience if they are doing the psets
     # via pip install manipulation[all].
-    #
-    # TODO(russt): Revisit the pip install -r requirements.txt below. Maybe I
-    # need to separate out testing requirements from notebook requirements.
     name: pip on jammy
     runs-on: ubuntu-22.04
     if: ${{ !contains(github.event.pull_request.labels.*.name, 'requires new pip wheels') }}

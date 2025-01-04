@@ -46,15 +46,14 @@ priority = "explicit"
 [tool.poetry.dependencies]
 python = "<4.0,>=3.10"
 cloudpickle = { version="2.2.1", optional=true} # needs to be pinned for stored files to remain compatible.
-drake = { version = ">=0.0.20241229 < 1.0", source = "drake-nightly" }
+drake = { version = ">=0.0.20241229 <1.0", source = "drake-nightly" }
 #drake = ">=1.32.0"
 gradescope-utils = { version=">=0.4.0", optional=true}
 gymnasium = { version=">0.26", optional=true }
 ipython = ">=7.8.0" # TODO: make this optional?
-ipywidgets = { version=">=8", optional=true }
+ipywidgets = { version=">=8", optional=true } 
+lxml = {version = ">=4.9.2", extras = ["html_clean"] }
 # Note: matplotlib gets additional handling in PoetryExport.sh for bazel. 
-lxml = ">=4.9.2" # seems to be needed on python 3.11
-lxml-html-clean = ">=0.1.0"
 matplotlib = ">=3.7.0" # old versions don't build in XCode
 mpld3  = { version=">=0.5.6", optional=false } # TODO: make this optional
 nbconvert = [ 
@@ -92,12 +91,12 @@ all = ["cloudpickle", "gradescope-utils", "gymnasium", "ipywidgets", "nevergrad"
 [tool.poetry.group.docs]
 optional = true
 
+[tool.poetry.group.docs.dependencies]
 # Must include all dependencies required to build the docs with sphinx +
 # autodoc, even if it repeats some dependencies from main, because my sphinx
 # script uses `poetry install --only docs`. This include any requirements
 # needed to import for a file that sphinx autodoc is trying to index.
-[tool.poetry.group.docs.dependencies]
-drake = { version = ">=0.0.20241229 < 1.0", source = "drake-nightly" }
+drake = { version = ">=0.0.20241229 <1.0", source = "drake-nightly" }
 #drake = ">=1.32.0"
 myst-parser = ">=2.0.0"
 pymeshlab = ">=2023.0"
