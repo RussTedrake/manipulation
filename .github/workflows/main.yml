@@ -145,7 +145,7 @@ jobs:
         # Force bazel to use user pip instead of re-downloading everything to 
         # be hermetic:
         run: |
-          pip install -U manipulation[all] --extra-index-url https://drake-packages.csail.mit.edu/whl/nightly/
+          pip install -U manipulation[test] --extra-index-url https://drake-packages.csail.mit.edu/whl/nightly/
           truncate -s0 requirements.txt 
           sed -i '/PYTHONNOUSERSITE/d' .bazelrc
         shell: bash
@@ -167,7 +167,6 @@ jobs:
         run: |
           apt-get update -o APT::Acquire::Retries=4 -qq
           apt-get install -o APT::Acquire::Retries=4 -o Dpkg::Use-Pty=0 -qy --no-install-recommends python3-pip git xvfb
-          pip install manipulation --extra-index-url https://drake-packages.csail.mit.edu/whl/nightly/
         shell: bash
       - name: checkout
         uses: actions/checkout@v2
@@ -180,7 +179,7 @@ jobs:
         # installed drake.
         run: |
           ./setup/ubuntu/22.04/install_prereqs.sh
-          pip install manipulation[all] --extra-index-url https://drake-packages.csail.mit.edu/whl/nightly/
+          pip install manipulation[test] --extra-index-url https://drake-packages.csail.mit.edu/whl/nightly/
           truncate -s0 requirements.txt
           sed -i '/PYTHONNOUSERSITE/d' .bazelrc
         shell: bash

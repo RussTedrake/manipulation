@@ -2,7 +2,7 @@
 name = "manipulation"
 # Use e.g. 2024.10.4.rc0 if I need to release a release candidate.
 # Use e.g. 2024.10.4.post1 if I need to rerelease on the same day.
-version = "2024.12.30post1"
+version = "2025.1.3post2"
 description = "MIT 6.421 - Robotic Manipulation"
 authors = ["Russ Tedrake <russt@mit.edu>"]
 license = "BSD License"
@@ -47,7 +47,7 @@ priority = "explicit"
 python = "<4.0,>=3.10"
 beautifulsoup4 = { version=">=4.6.3", optional=true }
 cloudpickle = { version="2.2.1", optional=true} # needs to be pinned for stored files to remain compatible.
-drake = { version = ">=0.0.20241229", source = "drake-nightly" }
+drake = { version = ">=0.0.20241229 < 1.0", source = "drake-nightly" }
 #drake = ">=1.32.0"
 gradescope-utils = { version=">=0.4.0", optional=true}
 gymnasium = { version=">0.26", optional=true }
@@ -89,9 +89,10 @@ torch = ["torch", "torchvision"]
 rl = ["stable_baselines3", "gymnasium"]
 mesh = ["trimesh", "vhacdx", "pymeshlab"]
 grader = ["gradescope-utils", "timeout-decorator", "nbconvert", "nbformat"]
-# All should have all of the optional dependencies.
+# 'all' should have all of the optional dependencies required to run bazel in this repo.
 all = ["cloudpickle", "gradescope-utils", "gymnasium", "ipywidgets", "nevergrad", "psutil", "pymeshlab", "pyzmq", "scipy", "stable_baselines3", "timeout-decorator", "torch", "torchvision", "tqdm", "trimesh", "vhacdx"]
-test = ["all", "beautifulsoup4", "mysql-connector-python", "requests"]
+# 'test' needs all + requirements for bazel in htmlbook
+test = ["cloudpickle", "gradescope-utils", "gymnasium", "ipywidgets", "nevergrad", "psutil", "pymeshlab", "pyzmq", "scipy", "stable_baselines3", "timeout-decorator", "torch", "torchvision", "tqdm", "trimesh", "vhacdx", "beautifulsoup4", "mysql-connector-python", "requests"]
 
 [tool.poetry.group.docs]
 optional = true
@@ -101,7 +102,7 @@ optional = true
 # script uses `poetry install --only docs`. This include any requirements
 # needed to import for a file that sphinx autodoc is trying to index.
 [tool.poetry.group.docs.dependencies]
-drake = { version = ">=0.0.20241229", source = "drake-nightly" }
+drake = { version = ">=0.0.20241229 < 1.0", source = "drake-nightly" }
 #drake = ">=1.32.0"
 myst-parser = ">=2.0.0"
 pymeshlab = ">=2023.0"
