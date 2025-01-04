@@ -544,8 +544,10 @@ def MakeRobotDiagram(
 class _MultiplexState(LeafSystem):
     def __init__(self, plant: MultibodyPlant, model_instance_names: typing.List[str]):
         LeafSystem.__init__(self)
-        total_states = 0
-        for name in model_instance_names:
+        self._total_states = 0
+        self._model_instance_names = model_instance_names
+        self._plant = plant
+        for name in self._model_instance_names:
             model_instance = plant.GetModelInstanceByName(name)
             num_states = plant.num_multibody_states(model_instance)
             # The logic below assumes num_positions == num_velocities (though
@@ -554,22 +556,29 @@ class _MultiplexState(LeafSystem):
                 model_instance
             )
             self.DeclareVectorInputPort(name + ".state", num_states)
-            total_states += num_states
+            self._total_states += num_states
         self.DeclareVectorOutputPort(
             "combined_state",
-            total_states,
+            self._total_states,
             self.CalcOutput,
         )
 
     def CalcOutput(self, context, output):
         # The order should should be [q, q, ..., v, v, ...].
-        positions = np.array([])
-        velocities = np.array([])
-        for i in range(self.num_input_ports()):
+        positions = np.zeros((self._total_states // 2,))
+        velocities = np.zeros((self._total_states // 2,))
+        for i, model_instance_name in enumerate(self._model_instance_names):
+            model_instance_index = self._plant.GetModelInstanceByName(
+                model_instance_name
+            )
             state = self.get_input_port(i).Eval(context)
             num_q = len(state) // 2
-            positions = np.append(positions, state[:num_q])
-            velocities = np.append(velocities, state[num_q:])
+            self._plant.SetPositionsInArray(
+                model_instance_index, state[:num_q], positions
+            )
+            self._plant.SetVelocitiesInArray(
+                model_instance_index, state[num_q:], velocities
+            )
         output.SetFromVector(np.concatenate((positions, velocities)))
 
 
