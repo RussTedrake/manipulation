@@ -4,10 +4,19 @@ import unittest
 
 from pydrake.multibody.parsing import PackageMap
 
-from manipulation.make_drake_compatible_model import MakeDrakeCompatibleModel
 from manipulation.utils import FindResource
 
+try:
+    from manipulation.make_drake_compatible_model import MakeDrakeCompatibleModel
 
+    pymeshlab_available = True
+except ImportError:
+    pymeshlab_available = False
+    print("pymeshlab not found.")
+    print("Consider 'pip install pymeshlab'.")
+
+
+@unittest.skipIf(not pymeshlab_available, "Requires pymeshlab dependency.")
 class TestMakeDrakeCompatibleModel(unittest.TestCase):
     def test_urdf(self):
         original_filename = FindResource("test/models/test.urdf")
