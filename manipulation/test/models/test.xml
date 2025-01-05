@@ -1,0 +1,16 @@
+<mujoco model="test">
+  <include file="test_include.xml"/>
+  <asset>
+    <mesh name="test_stl" file="cube.stl"/>
+    <mesh name="test_dae" file="cube.dae"/>
+    <mesh name="test_obj" file="cube.obj"/>
+    <mesh name="test_obj_scaled" file="cube.obj" scale="1.2 2.3 3.4"/>
+  </asset>
+  <worldbody>
+    <geom type="mesh" mesh="test_stl"/>
+    <geom type="mesh" mesh="test_stl_scaled"/>
+    <geom type="mesh" mesh="test_dae"/>
+    <geom type="mesh" mesh="test_obj"/>
+    <geom type="mesh" mesh="test_obj_scaled"/>
+  </worldbody>
+</mujoco>

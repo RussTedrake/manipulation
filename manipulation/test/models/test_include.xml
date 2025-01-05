@@ -1,0 +1,5 @@
+<mujoco model="test">
+  <asset>
+    <mesh name="test_stl_scaled" file="cube.stl" scale="-1 1 1"/>
+  </asset>
+</mujoco>

@@ -11,7 +11,7 @@ from IPython.display import SVG, display
 from pydrake.all import GetDrakePath
 from pydrake.common import GetDrakePath
 from pydrake.geometry import RenderLabel
-from pydrake.multibody.parsing import Parser
+from pydrake.multibody.parsing import PackageMap, Parser
 from pydrake.systems.framework import System
 from pydrake.systems.sensors import ImageLabel16I
 
@@ -71,10 +71,15 @@ def FindDataResource(filename: str):
     return path
 
 
+def ConfigurePackageMap(package_map: PackageMap):
+    """Add the `manipulation` module packages to the given PackageMap."""
+    package_xml = os.path.join(os.path.dirname(__file__), "models/package.xml")
+    package_map.AddPackageXml(filename=package_xml)
+
+
 def ConfigureParser(parser: Parser):
     """Add the `manipulation` module packages to the given Parser."""
-    package_xml = os.path.join(os.path.dirname(__file__), "models/package.xml")
-    parser.package_map().AddPackageXml(filename=package_xml)
+    ConfigurePackageMap(parser.package_map())
 
 
 def colorize_labels(image: ImageLabel16I):

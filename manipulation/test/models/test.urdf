@@ -1,0 +1,25 @@
+<?xml version="0.0" ?>
+<robot name="test">
+  <link name="body">
+    <visual>
+      <geometry>
+        <mesh filename="cube.stl"/>
+      </geometry>
+    </visual>
+    <visual>
+      <geometry>
+        <mesh filename="cube.dae"/>
+      </geometry>
+    </visual>
+    <visual>
+      <geometry>
+        <mesh filename="cube.obj"/>
+      </geometry>
+    </visual>
+    <visual>
+      <geometry>
+        <mesh filename="package://manipulation_test_models/cube.obj" scale="-1 1 1"/>
+      </geometry>
+    </visual>
+  </link>
+</robot>

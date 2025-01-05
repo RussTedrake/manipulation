@@ -2,22 +2,36 @@ import argparse
 import os
 import re
 import warnings
+from typing import List, Optional
 
 import pymeshlab
 from lxml import etree
 from pydrake.all import PackageMap
 
 
-def _convert_mesh(input_filename, output_filename, scale, overwrite):
-    if not overwrite and os.path.exists(output_filename):
-        print(f"Note: {output_filename} already exists. Skipping conversion.")
-        return
+def _convert_mesh(
+    url: str, path: str, scale: Optional[List[float]] = None, overwrite: bool = False
+) -> str:
+    if scale:
+        scale_str = "_scaled_" + "_".join(
+            [str(int(s) if s.is_integer() else s).replace("-", "n") for s in scale]
+        )
+    else:
+        scale_str = ""
+    suffix = "_from_" + path.rsplit(".", 1)[1] + scale_str + ".obj"
+
+    output_url = url.rsplit(".", 1)[0] + suffix
+    output_path = path.rsplit(".", 1)[0] + suffix
+
+    if not overwrite and os.path.exists(output_path):
+        print(f"Note: {output_path} already exists. Skipping conversion.")
+        return output_url, output_path
 
     # Create a new PyMeshLab mesh set
     ms = pymeshlab.MeshSet()
 
     # Load the mesh file
-    ms.load_new_mesh(input_filename)
+    ms.load_new_mesh(path)
 
     if scale is not None:
         scale = [float(s) for s in scale]
@@ -33,10 +47,9 @@ def _convert_mesh(input_filename, output_filename, scale, overwrite):
         )
 
     # Save the mesh
-    ms.save_current_mesh(
-        output_filename, save_face_color=False, save_vertex_color=False
-    )
-    print(f"Converted {input_filename} to {output_filename}")
+    ms.save_current_mesh(output_path, save_face_color=False, save_vertex_color=False)
+    print(f"Converted {path} to {output_path}")
+    return output_url, output_path
 
 
 def _convert_urdf(input_filename, output_filename, package_map, overwrite):
@@ -48,7 +61,8 @@ def _convert_urdf(input_filename, output_filename, package_map, overwrite):
 
     # Regex pattern to find entire XML nodes with .stl or .dae extensions in the filename attribute
     resource_pattern = re.compile(
-        r'<(\w+)\s+[^>]*filename=["\']([^"\']+\.(stl|dae))["\'][^>]*>', re.IGNORECASE
+        r'<(\w+)\s+[^>]*filename=["\']([^"\']+\.(stl|dae|obj))["\'][^>]*>',
+        re.IGNORECASE,
     )
 
     # Find all matches in the URDF content without comments
@@ -59,37 +73,35 @@ def _convert_urdf(input_filename, output_filename, package_map, overwrite):
     for match in matches:
         node_text = match.group(0)
         node = etree.fromstring(node_text)
-        filename = node.attrib["filename"]
+        mesh_url = node.attrib["filename"]
         scale = node.attrib.get("scale")
         if scale:
-            scale_suffix = "_scaled_" + scale.replace("-", "n").replace(" ", "_")
-            scale = scale.split()
-        else:
-            scale = None
-            scale_suffix = ""
+            scale = [float(s) for s in scale.split()]
+            if len(set(scale)) == 1:
+                # Uniform scaling is supported natively by Drake.
+                scale = None
+        if mesh_url.lower().endswith(".obj") and scale is None:
+            # Don't need to convert .obj files with no scale or uniform scale.
+            continue
 
-        if mesh_filename.lower().startswith("package://"):
-            input_mesh_path = package_map.ResolveUrl(mesh_filename)
+        if mesh_url.lower().startswith("package://"):
+            mesh_path = package_map.ResolveUrl(mesh_url)
         else:
-            input_mesh_path = os.path.join(
-                os.path.dirname(input_filename), mesh_filename
-            )
-        output_obj_path = input_mesh_path.rsplit(".", 1)[0] + scale_suffix + ".obj"
-        obj_filename = filename.rsplit(".", 1)[0] + scale_suffix + ".obj"
+            mesh_path = os.path.join(os.path.dirname(input_filename), mesh_url)
 
-        _convert_mesh(
-            input_mesh_path, output_obj_path, scale=scale, overwrite=overwrite
+        output_mesh_url, output_mesh_path = _convert_mesh(
+            url=mesh_url, path=mesh_path, scale=scale, overwrite=overwrite
         )
 
         # Update the node's filename attribute
-        node.attrib["filename"] = obj_filename
+        node.attrib["filename"] = output_mesh_url
 
         # If scale is not None, update the scale attribute
         if scale:
             node.attrib["scale"] = "1 1 1"
 
         # Convert the node back to a string
-        node_string = ET.tostring(node, encoding="unicode")
+        node_string = etree.tostring(node, encoding="unicode")
 
         # Replace the original match with the updated node string
         modified_urdf_content = modified_urdf_content.replace(node_text, node_string)
@@ -168,49 +180,37 @@ def _convert_mjcf(input_filename, output_filename, package_map, overwrite):
     # Find all <mesh> elements recursively using xpath
     mesh_elements = root.findall(".//mesh")
     for mesh_element in mesh_elements:
-        mesh_filename = mesh_element.attrib["file"]
+        mesh_url = mesh_element.attrib["file"]
         if "class" in mesh_element.attrib:
             warnings.warn("Defaults are not being parsed yet.", UserWarning)
-        if mesh_filename is None:
+        if mesh_url is None:
             raise ValueError("A 'file' attribute must be specified for mesh elements.")
         scale = mesh_element.attrib.get("scale")
-
-        has_uniform_scale = True
         if scale:
-            scale_suffix = "_scaled_" + scale.replace("-", "n").replace(" ", "_")
-            scale = scale.split()
-            has_uniform_scale = len(set(float(s) for s in scale)) == 1
-        else:
-            scale = None
-            scale_suffix = ""
-
-        if mesh_filename.lower().endswith(".obj") and has_uniform_scale:
+            scale = [float(s) for s in scale.split()]
+            if len(set(scale)) == 1:
+                # Uniform scaling is supported natively by Drake.
+                scale = None
+        if mesh_url.lower().endswith(".obj") and scale is None:
+            # Don't need to convert .obj files with no scale or uniform scale.
             continue
 
-        if mesh_filename.lower().startswith("package://"):
-            input_mesh_path = package_map.ResolveUrl(mesh_filename)
-        else:
-            input_mesh_path = os.path.join(
-                os.path.dirname(input_filename), mesh_filename
-            )
+        mesh_path = os.path.join(os.path.dirname(input_filename), mesh_url)
 
-        if not os.path.exists(input_mesh_path):
+        if not os.path.exists(mesh_path):
             if has_meshdir or has_assetdir:
                 warnings.warn(
-                    f"The file {input_mesh_path} does not exist in the expected location. This may be due to the fact that meshdir and assetdir are not being parsed yet.",
+                    f"The file {mesh_path} does not exist in the expected location. This may be due to the fact that meshdir and assetdir are not being parsed yet.",
                     UserWarning,
                 )
-            raise FileNotFoundError(f"The file {input_mesh_path} does not exist.")
+            raise FileNotFoundError(f"The file {mesh_path} does not exist.")
 
-        output_obj_path = input_mesh_path.rsplit(".", 1)[0] + scale_suffix + ".obj"
-        obj_filename = mesh_filename.rsplit(".", 1)[0] + scale_suffix + ".obj"
-
-        _convert_mesh(
-            input_mesh_path, output_obj_path, scale=scale, overwrite=overwrite
+        output_mesh_url, output_mesh_path = _convert_mesh(
+            url=mesh_url, path=mesh_path, scale=scale, overwrite=overwrite
         )
 
         # Update the node's filename attribute
-        mesh_element.attrib["filename"] = obj_filename
+        mesh_element.attrib["file"] = output_mesh_url
 
         # If scale is not None, update the scale attribute
         if scale:
@@ -223,11 +223,11 @@ def _convert_mjcf(input_filename, output_filename, package_map, overwrite):
 def MakeDrakeCompatibleModel(
     input_filename: str,
     output_filename: str,
-    populate_package_map_from_env: str = None,
-    populate_package_map_from_folder: str = None,
+    package_map: PackageMap = None,
     overwrite: bool = False,
 ) -> None:
-    """Converts a model file to be compatible with the Drake multibody parsers.
+    """Converts a model file (currently .urdf or .xml)to be compatible with the
+    Drake multibody parsers.
 
     - Converts any .stl files to obj
       https://github.com/RobotLocomotion/drake/issues/19408
@@ -236,32 +236,22 @@ def MakeDrakeCompatibleModel(
     - Zaps any non-uniform scale attributes
       https://github.com/RobotLocomotion/drake/issues/22046
 
-    Any new files will be created alongside the original files (e.g. .obj files will be created next to the existing .stl files); existing files will not be overwritten by default.
+    Any new files will be created alongside the original files (e.g. .obj files
+    will be created next to the existing .stl files); all new files will get a
+    descriptive suffix, and existing files will not be overwritten by default.
 
     Args:
         input_filename (str): The path to the input file to be converted.
         output_filename (str): The path where the converted file will be saved.
             Using the same string as input_filename is allowed.
-        populate_package_map_from_env (str, optional): Environment variable to
-            populate the package map from. Defaults to None.
-        populate_package_map_from_folder (str, optional): Folder path to
-            populate the package map from. Defaults to None.
+        package_map (PackageMap, optional): The package map to use. Defaults to None.
         overwrite (bool, optional): Whether to overwrite existing files. Defaults
             to False.
     """
-    package_map = PackageMap()
+    if package_map is None:
+        package_map = PackageMap()
 
-    if populate_package_map_from_env:
-        package_map.PopulateFromEnvironment(populate_package_map_from_env)
-
-    if populate_package_map_from_folder:
-        package_map.PopulateFromFolder(populate_package_map_from_folder)
-
-    if input_filename.lower().endswith(".stl") or input_filename.lower().endswith(
-        ".dae"
-    ):
-        _convert_mesh(input_filename, output_filename, overwrite)
-    elif input_filename.lower().endswith(".urdf"):
+    if input_filename.lower().endswith(".urdf"):
         _convert_urdf(input_filename, output_filename, package_map, overwrite=overwrite)
     elif input_filename.lower().endswith(".sdf"):
         _convert_sdf(input_filename, output_filename, package_map, overwrite=overwrite)
@@ -306,10 +296,17 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
+    package_map = PackageMap()
+
+    if args.populate_package_map_from_env:
+        package_map.PopulateFromEnvironment(args.populate_package_map_from_env)
+
+    if args.populate_package_map_from_folder:
+        package_map.PopulateFromFolder(args.populate_package_map_from_folder)
+
     MakeDrakeCompatibleModel(
         input_filename=args.input_filename,
         output_filename=args.output_filename,
-        populate_package_map_from_env=args.populate_package_map_from_env,
-        populate_package_map_from_folder=args.populate_package_map_from_folder,
+        package_map=package_map,
         overwrite=args.overwrite,
     )

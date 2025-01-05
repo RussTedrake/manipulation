@@ -163,3 +163,6 @@ ignore-init-module-imports = true
 remove-all-unused-imports = true
 remove-duplicate-keys = true
 remove-unused-variables = true
+
+[tool.pyright]
+include = ["manipulation"]

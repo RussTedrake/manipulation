@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <package>
-  <name>manipulation</name>
+  <name>manipulation_test_models</name>
   <version>1.0.0</version>
   <description>
     This package contains miscellaneous models authored by Russ for the manipulation class.
