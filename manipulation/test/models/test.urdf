@@ -18,6 +18,11 @@
     </visual>
     <visual>
       <geometry>
+        <mesh filename="file://replace_me_in_test_with_absolute_path/cube.obj" scale="1 2 3"/>
+      </geometry>
+    </visual>
+    <visual>
+      <geometry>
         <mesh filename="package://manipulation_test_models/cube.obj" scale="-1 1 1"/>
       </geometry>
     </visual>

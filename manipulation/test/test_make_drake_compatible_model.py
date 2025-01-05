@@ -10,8 +10,16 @@ from manipulation.utils import FindResource
 
 class TestMakeDrakeCompatibleModel(unittest.TestCase):
     def test_urdf(self):
-        input_filename = FindResource("test/models/test.urdf")
-        output_filename = tempfile.mktemp()
+        original_filename = FindResource("test/models/test.urdf")
+        input_filename = original_filename.replace(".urdf", "_modified.urdf")
+        with open(original_filename, "r") as file:
+            original_content = file.read()
+        modified_content = original_content.replace(
+            "replace_me_in_test_with_absolute_path", os.path.dirname(input_filename)
+        )
+        with open(input_filename, "w") as file:
+            file.write(modified_content)
+        output_filename = tempfile.mktemp(suffix=".urdf")
         package_map = PackageMap()
         package_map.AddPackageXml(filename=FindResource("test/models/package.xml"))
         MakeDrakeCompatibleModel(
@@ -26,6 +34,10 @@ class TestMakeDrakeCompatibleModel(unittest.TestCase):
         self.assertIn('filename="cube_from_dae.obj"', output_content)
         self.assertIn('filename="cube.obj"', output_content)
         self.assertIn(
+            f'filename="file://{os.path.dirname(input_filename)}/cube_from_obj_scaled_1_2_3.obj"',
+            output_content,
+        )
+        self.assertIn(
             'filename="package://manipulation_test_models/cube_from_obj_scaled_n1_1_1.obj"',
             output_content,
         )
@@ -38,7 +50,7 @@ class TestMakeDrakeCompatibleModel(unittest.TestCase):
 
     def test_mjcf(self):
         input_filename = FindResource("test/models/test.xml")
-        output_filename = tempfile.mktemp()
+        output_filename = tempfile.mktemp(suffix=".xml")
         package_map = PackageMap()
         package_map.AddPackageXml(filename=FindResource("test/models/package.xml"))
         MakeDrakeCompatibleModel(

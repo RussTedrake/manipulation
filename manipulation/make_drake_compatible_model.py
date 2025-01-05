@@ -84,7 +84,9 @@ def _convert_urdf(input_filename, output_filename, package_map, overwrite):
             # Don't need to convert .obj files with no scale or uniform scale.
             continue
 
-        if mesh_url.lower().startswith("package://"):
+        if mesh_url.lower().startswith("package://") or mesh_url.lower().startswith(
+            "file://"
+        ):
             mesh_path = package_map.ResolveUrl(mesh_url)
         else:
             mesh_path = os.path.join(os.path.dirname(input_filename), mesh_url)
