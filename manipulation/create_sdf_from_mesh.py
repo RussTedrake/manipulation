@@ -23,7 +23,7 @@ except ImportError:
     exit(code=1)
 
 
-def calc_mesh_com_and_inertia(
+def _calc_mesh_com_and_inertia(
     mesh: trimesh.Trimesh,
     mass: float,
     frame: np.ndarray | None = None,
@@ -60,7 +60,7 @@ def calc_mesh_com_and_inertia(
     return mesh.center_mass, moment_of_inertia
 
 
-def perform_convex_decomposition(
+def _perform_convex_decomposition(
     mesh: trimesh.Trimesh,
     mesh_name: str,
     mesh_dir: Path,
@@ -192,7 +192,7 @@ def create_sdf_from_mesh(
     pose_item.text = "0 0 0 0 0 0"
 
     # Compute and add the physical properties
-    com, inertia = calc_mesh_com_and_inertia(mesh=mesh, mass=mass)
+    com, inertia = _calc_mesh_com_and_inertia(mesh=mesh, mass=mass)
     inertial_item = ET.SubElement(link_item, "inertial")
     mass_item = ET.SubElement(inertial_item, "mass")
     mass_item.text = str(mass)
@@ -215,7 +215,7 @@ def create_sdf_from_mesh(
     scale_item.text = f"{scale} {scale} {scale}"
 
     # Compute the VHACD convex decomposition and use it as the collision geometry
-    mesh_piece_paths = perform_convex_decomposition(
+    mesh_piece_paths = _perform_convex_decomposition(
         mesh=mesh,
         mesh_name=mesh_name,
         mesh_dir=dir_path,
