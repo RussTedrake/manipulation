@@ -118,10 +118,16 @@ optional = true
 # needed to import for a file that sphinx autodoc is trying to index.
 drake = { version = ">=0.0.20241229 <1.0", source = "drake-nightly" }
 #drake = ">=1.32.0"
+ipython = ">=7.8.0"
+lxml = {version = ">=4.9.2", extras = ["html_clean"] }
+mpld3  = { version=">=0.5.6", optional=false }
 myst-parser = ">=2.0.0"
 pymeshlab = ">=2023.0"
+pyvirtualdisplay = { version=">=3.0", optional=false }
 sphinx = ">=7.2.6"
 sphinx_rtd_theme = ">=2.0.0"
+trimesh = {extras = ["recommend"], version = ">=4.0.0 <4.2.0", optional=true }
+vhacdx = { version=">=0.0.5", optional=true }
 
 [tool.poetry.group.dev.dependencies]
 # These should not appear as requirements in any BUILD.bazel (except htmlbook)
