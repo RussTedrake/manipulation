@@ -15,6 +15,10 @@ print "<br/>done.</p>";
 print "<p>building documentation...<br/>";
 chdir "..";
 
+# When I've had dependencies get "stuck" on the server, I've had to update them
+# manually with e.g. `sudo -u www-data /var/www/manipulation/venv/bin/pip
+# install drake==0.0.20250110 --extra-index-url
+# https://drake-packages.csail.mit.edu/whl/nightly/`
 my $status = system('/bin/bash', '-c', '
     source venv/bin/activate &&
     poetry install --only docs &&
