@@ -10,6 +10,7 @@ This package contains code to support the [Robotic Manipulation](http://manipula
    systems
    meshcat_utils
    utils
+   create_sdf_from_mesh
    make_drake_compatible_model
 ```
 
