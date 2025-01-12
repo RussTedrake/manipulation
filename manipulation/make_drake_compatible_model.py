@@ -218,6 +218,25 @@ def _convert_mjcf(input_filename, output_filename, package_map, overwrite):
         if scale:
             mesh_element.attrib["scale"] = "1 1 1"
 
+    geoms_with_type_plane = root.findall(".//geom[@type='plane']")
+    for geom in geoms_with_type_plane:
+        parent = geom.getparent()
+        while parent is not None:
+            if parent.tag == "worldbody":
+                break
+            elif parent.tag == "body":
+                # Then the plane would have been parsed as a dynamic collision element in Drake. Replace it with a large box.
+                geom.attrib["size"] = "1000 1000 1"
+                if "pos" in geom.attrib:
+                    pos = [float(value) for value in geom.attrib["pos"].split()]
+                else:
+                    pos = [0, 0, 0]
+                pos[2] -= 1
+                geom.attrib["pos"] = " ".join([str(value) for value in pos])
+                geom.attrib["type"] = "box"
+                break
+            parent = parent.getparent()
+
     tree.write(output_filename, pretty_print=True)
     print(f"Converted MJCF file '{input_filename}' to '{output_filename}'.")
 
@@ -237,6 +256,9 @@ def MakeDrakeCompatibleModel(
       https://github.com/RobotLocomotion/drake/issues/19109
     - Zaps any non-uniform scale attributes
       https://github.com/RobotLocomotion/drake/issues/22046
+    - Converts dynamic half-space collision geometries to (very) large boxes
+      https://github.com/RobotLocomotion/drake/issues/19263
+      (this is so far implemented only for mujoco .xml models)
 
     Any new files will be created alongside the original files (e.g. .obj files
     will be created next to the existing .stl files); all new files will get a
