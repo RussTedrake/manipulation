@@ -175,9 +175,21 @@ def _convert_mjcf(input_filename, output_filename, package_map, overwrite):
     tree = _process_includes(input_filename)
     root = tree.getroot()
 
-    # TODO(russt): Parse defaults, meshdir, and assetdir.
-    has_meshdir = root.find(".//meshdir") is not None
-    has_assetdir = root.find(".//assetdir") is not None
+    # TODO(russt): Parse defaults.
+    compiler_elements = root.findall(".//compiler")
+    strippath = False
+    meshdir = None
+    for compiler_element in compiler_elements:
+        if "strippath" in compiler_element.attrib:
+            # Convert XML string "true"/"false" to Python bool
+            strippath = compiler_element.attrib["strippath"].lower() == "true"
+        if "assetdir" in compiler_element.attrib:
+            meshdir = compiler_element.attrib["assetdir"]
+            compiler_element.attrib["assetdir"]
+        if "meshdir" in compiler_element.attrib:
+            meshdir = compiler_element.attrib["meshdir"]
+        if "texturedir" in compiler_element.attrib:
+            compiler_element.attrib["texturedir"]
 
     # Find all <mesh> elements recursively using xpath
     mesh_elements = root.findall(".//mesh")
@@ -197,10 +209,26 @@ def _convert_mjcf(input_filename, output_filename, package_map, overwrite):
             # Don't need to convert .obj files with no scale or uniform scale.
             continue
 
-        mesh_path = os.path.join(os.path.dirname(input_filename), mesh_url)
+        # Get absolute path to mesh file according to MJCF rules
+        if strippath:
+            # Remove all path information, keeping only filename
+            mesh_url = os.path.basename(mesh_url)
+
+        # Check if mesh_url is already an absolute path
+        if os.path.isabs(mesh_url):
+            mesh_path = mesh_url
+        # Check if meshdir is an absolute path
+        elif meshdir is not None and os.path.isabs(meshdir):
+            mesh_path = os.path.join(meshdir, mesh_url)
+        # Use path relative to MJCF file
+        else:
+            base_path = os.path.dirname(input_filename)
+            if meshdir is not None:
+                base_path = os.path.join(base_path, meshdir)
+            mesh_path = os.path.join(base_path, mesh_url)
 
         if not os.path.exists(mesh_path):
-            if has_meshdir or has_assetdir:
+            if meshdir is not None:
                 warnings.warn(
                     f"The file {mesh_path} does not exist in the expected location. This may be due to the fact that meshdir and assetdir are not being parsed yet.",
                     UserWarning,

@@ -90,6 +90,23 @@ class TestMakeDrakeCompatibleModel(unittest.TestCase):
         # Clean up the temp file
         os.remove(output_filename)
 
+    def test_mjcf_meshdir(self):
+        input_filename = FindResource("test/models/test_meshdir.xml")
+        output_filename = tempfile.mktemp(suffix=".xml")
+        package_map = PackageMap()
+        package_map.AddPackageXml(filename=FindResource("test/models/package.xml"))
+        MakeDrakeCompatibleModel(
+            input_filename=input_filename,
+            output_filename=output_filename,
+            package_map=package_map,
+        )
+        self.assertTrue(os.path.exists(output_filename))
+        with open(output_filename, "r") as f:
+            output_content = f.read()
+        self.assertIn('file="cube_from_stl.obj"', output_content)
+        # Clean up the temp file
+        os.remove(output_filename)
+
 
 if __name__ == "__main__":
     unittest.main()
