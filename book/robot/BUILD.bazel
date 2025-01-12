@@ -11,6 +11,7 @@ rt_ipynb_test(
     srcs = ["inspector.ipynb"],
     deps = [
       "//manipulation",
+      "//manipulation:make_drake_compatible_model",
     ],
 )
 
