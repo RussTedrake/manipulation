@@ -2,6 +2,7 @@ import os
 import tempfile
 import unittest
 
+from lxml import etree
 from pydrake.multibody.parsing import PackageMap
 
 from manipulation.utils import FindResource
@@ -75,6 +76,17 @@ class TestMakeDrakeCompatibleModel(unittest.TestCase):
         self.assertIn('file="cube_from_dae.obj"', output_content)
         self.assertIn('file="cube.obj"', output_content)
         self.assertIn('file="cube_from_obj_scaled_1.2_2.3_3.4.obj"', output_content)
+
+        root = etree.parse(output_filename)
+        planes_to_box = root.findall(".//body[@name='floor']/geom")
+        self.assertEqual(len(planes_to_box), 2)
+        for geom in planes_to_box:
+            self.assertEqual(geom.attrib["size"], "1000 1000 1")
+            self.assertEqual(geom.attrib["type"], "box")
+            if geom.attrib["name"] == "wo_pos":
+                self.assertEqual(geom.attrib["pos"], "0 0 -1")
+            elif geom.attrib["name"] == "w_pos":
+                self.assertEqual(geom.attrib["pos"], "1.0 2.0 2.0")
         # Clean up the temp file
         os.remove(output_filename)
 

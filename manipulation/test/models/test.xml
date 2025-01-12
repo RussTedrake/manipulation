@@ -12,5 +12,9 @@
     <geom type="mesh" mesh="test_dae"/>
     <geom type="mesh" mesh="test_obj"/>
     <geom type="mesh" mesh="test_obj_scaled"/>
+    <body name="floor" pos="0 0 0">
+      <geom name="wo_pos" size="0 0 .25" type="plane"/>
+      <geom name="w_pos" size="0 0 .25" pos="1 2 3" type="plane"/>
+    </body>
   </worldbody>
 </mujoco>
