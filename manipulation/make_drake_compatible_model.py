@@ -1,4 +1,5 @@
 import argparse
+import copy
 import os
 import re
 import warnings
@@ -171,12 +172,42 @@ def _process_includes(filename, processed_files=None):
     return tree
 
 
+def _apply_defaults(element, defaults_dict, class_name_override=None):
+    """Apply default attributes from a defaults class to an element.
+
+    Args:
+        element: The XML element to apply defaults to
+        defaults_dict: Dictionary mapping (class_name, element_type) to default elements
+    """
+    if "class" in element.attrib:
+        class_name = (
+            element.attrib["class"]
+            if class_name_override is None
+            else class_name_override
+        )
+        # Try to find defaults for this specific element type and class
+        key = (class_name, element.tag)
+        if key in defaults_dict:
+            for attr, value in defaults_dict[key].attrib.items():
+                # Special case: only one rotation specification allowed
+                rotation_attrs = {"quat", "axisangle", "xyaxes", "zaxis", "euler"}
+                if attr in rotation_attrs:
+                    # Check if element already has any rotation attributes
+                    has_rotation = any(
+                        rot_attr in element.attrib for rot_attr in rotation_attrs
+                    )
+                    if has_rotation:
+                        continue
+                if attr != "class":
+                    if attr not in element.attrib:
+                        element.attrib[attr] = value
+
+
 def _convert_mjcf(input_filename, output_filename, package_map, overwrite):
     # Process includes first to build complete DOM
     tree = _process_includes(input_filename)
     root = tree.getroot()
 
-    # TODO(russt): Parse defaults.
     compiler_elements = root.findall(".//compiler")
     strippath = False
     meshdir = None
@@ -192,12 +223,54 @@ def _convert_mjcf(input_filename, output_filename, package_map, overwrite):
         if "texturedir" in compiler_element.attrib:
             compiler_element.attrib["texturedir"]
 
+    # Dictionary to store default classes, initialize with empty "main" class
+    # Initialize defaults with empty dictionary
+    defaults = {}
+
+    # Process all default elements recursively
+    def process_defaults(element, parent_class="main"):
+        """Process default elements recursively.
+
+        Args:
+            element: The default element to process
+            parent_class: The parent class name for inheritance
+        """
+        # Get class name, default to parent_class if not specified
+        class_name = element.get("class", parent_class)
+
+        # Process this default element's children (which define defaults for specific types)
+        for child in element:
+            if child.tag != "default":  # Only process non-default children
+                # Create key from class name and element type
+                key = (class_name, child.tag)
+
+                # If parent class has defaults for this type, inherit them
+                parent_key = (parent_class, child.tag)
+                if parent_key in defaults:
+                    defaults[key] = copy.deepcopy(defaults[parent_key])
+                else:
+                    # Create new default element
+                    defaults[key] = etree.Element(child.tag)
+
+                # Update with new attributes
+                for attr, value in child.attrib.items():
+                    if attr != "class":
+                        defaults[key].attrib[attr] = value
+
+        # Process nested default elements recursively
+        for child in element.findall("default"):
+            process_defaults(child, class_name)
+
+    # Find and process all top-level default elements
+    for default_element in root.findall("default"):
+        process_defaults(default_element)
+
     # Find all <mesh> elements recursively using xpath
-    mesh_elements = root.findall(".//mesh")
+    mesh_elements = root.findall(".//asset/mesh")
     for mesh_element in mesh_elements:
+        _apply_defaults(mesh_element, defaults)
+
         mesh_url = mesh_element.attrib["file"]
-        if "class" in mesh_element.attrib:
-            warnings.warn("Defaults are not being parsed yet.", UserWarning)
         if mesh_url is None:
             raise ValueError("A 'file' attribute must be specified for mesh elements.")
         scale = mesh_element.attrib.get("scale")

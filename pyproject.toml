@@ -49,7 +49,7 @@ priority = "explicit"
 [tool.poetry.dependencies]
 python = "<4.0,>=3.10"
 cloudpickle = { version="2.2.1", optional=true} # needs to be pinned for stored files to remain compatible.
-drake = { version = ">=0.0.20241229 <1.0", source = "drake-nightly" }
+drake = { version = ">=0.0.20250111 <1.0", source = "drake-nightly" }
 #drake = ">=1.32.0"
 gradescope-utils = { version=">=0.4.0", optional=true}
 gymnasium = { version=">0.26", optional=true }
@@ -116,7 +116,7 @@ optional = true
 # autodoc, even if it repeats some dependencies from main, because my sphinx
 # script uses `poetry install --only docs`. This include any requirements
 # needed to import for a file that sphinx autodoc is trying to index.
-drake = { version = ">=0.0.20241229 <1.0", source = "drake-nightly" }
+drake = { version = ">=0.0.20250111 <1.0", source = "drake-nightly" }
 #drake = ">=1.32.0"
 ipython = ">=7.8.0"
 lxml = {version = ">=4.9.2", extras = ["html_clean"] }

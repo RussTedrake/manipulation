@@ -1,0 +1,13 @@
+<mujoco model="test">
+  <default>
+    <default class="scaled">
+      <mesh scale="0.001 0.002 0.003"/>
+    </default>
+  </default>
+  <asset>
+    <mesh name="test_stl" file="cube.stl" class="scaled"/>
+  </asset>
+  <worldbody>
+    <geom type="mesh" mesh="test_stl"/>
+  </worldbody>
+</mujoco>
