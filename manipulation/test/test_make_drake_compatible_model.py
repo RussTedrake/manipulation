@@ -108,12 +108,33 @@ class TestMakeDrakeCompatibleModel(unittest.TestCase):
         # Clean up the temp file
         os.remove(output_filename)
 
+    def test_mjcf_defaults(self):
+        input_filename = FindResource("test/models/test_defaults.xml")
+        output_filename = tempfile.mktemp(suffix=".xml")
+        package_map = PackageMap()
+        package_map.AddPackageXml(filename=FindResource("test/models/package.xml"))
+        MakeDrakeCompatibleModel(
+            input_filename=input_filename,
+            output_filename=output_filename,
+            package_map=package_map,
+        )
+        self.assertTrue(os.path.exists(output_filename))
+        with open(output_filename, "r") as f:
+            output_content = f.read()
+        self.assertIn(
+            'file="cube_from_stl_scaled_0.001_0.002_0.003.obj"', output_content
+        )
+        # Clean up the temp file
+        os.remove(output_filename)
+
     @unittest.skip(
         "I need to make it so that this test can run on CI without downloading the entire mujoco_menagerie package every time."
     )
     def test_mujoco_menagerie(self):
         """Test all files in the mujoco_menagerie package."""
-        # os.environ["TEST_TMPDIR"] = "/tmp/test_tmpdir"  # This lets me only download once, but it is not hermetic.
+        os.environ["XDG_CACHE_HOME"] = (
+            "/tmp/parser_cache"  # This lets me only download once, but it is not hermetic.
+        )
         package_map = PackageMap()
         AddMujocoMenagerie(package_map)
         menagerie = package_map.GetPath("mujoco_menagerie")
@@ -139,7 +160,8 @@ class TestMakeDrakeCompatibleModel(unittest.TestCase):
                         except Exception as e:
                             # Known type/message pairs that we expect to encounter
                             known_exceptions = [
-                                (KeyError, r".*'file'.*", "Need to parse defaults"),
+                                # No more known exceptions (yeah!)... but the format is:
+                                # (KeyError, r".*'file'.*", "Need to parse defaults"),
                             ]
                             known_failure = False
                             for exc_type, msg_pattern, note in known_exceptions:
