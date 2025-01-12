@@ -24,7 +24,8 @@ def _convert_mesh(
     output_path = path.rsplit(".", 1)[0] + suffix
 
     if not overwrite and os.path.exists(output_path):
-        print(f"Note: {output_path} already exists. Skipping conversion.")
+        # This was a bit too noisy:
+        # print(f"Note: {output_path} already exists. Skipping conversion.")
         return output_url, output_path
 
     # Create a new PyMeshLab mesh set

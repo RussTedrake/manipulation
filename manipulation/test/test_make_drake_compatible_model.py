@@ -1,11 +1,12 @@
 import os
+import re
 import tempfile
 import unittest
 
 from lxml import etree
 from pydrake.multibody.parsing import PackageMap
 
-from manipulation.utils import FindResource
+from manipulation.utils import AddMujocoMenagerie, FindResource
 
 try:
     from manipulation.make_drake_compatible_model import MakeDrakeCompatibleModel
@@ -106,6 +107,52 @@ class TestMakeDrakeCompatibleModel(unittest.TestCase):
         self.assertIn('file="cube_from_stl.obj"', output_content)
         # Clean up the temp file
         os.remove(output_filename)
+
+    @unittest.skip(
+        "I need to make it so that this test can run on CI without downloading the entire mujoco_menagerie package every time."
+    )
+    def test_mujoco_menagerie(self):
+        """Test all files in the mujoco_menagerie package."""
+        # os.environ["TEST_TMPDIR"] = "/tmp/test_tmpdir"  # This lets me only download once, but it is not hermetic.
+        package_map = PackageMap()
+        AddMujocoMenagerie(package_map)
+        menagerie = package_map.GetPath("mujoco_menagerie")
+        # Find all XML files recursively under the menagerie path
+        results = ""
+        for root, dirs, files in os.walk(menagerie):
+            for file in files:
+                if file.endswith(".drake.xml"):
+                    continue
+                if file.endswith(".xml"):
+                    with self.subTest(file=file):
+                        original_file = os.path.join(root, file)
+                        drake_compatible_file = original_file.replace(
+                            ".xml", ".drake.xml"
+                        )
+                        try:
+                            MakeDrakeCompatibleModel(
+                                original_file, drake_compatible_file
+                            )
+                            results += (
+                                f"PASS: {os.path.relpath(root, menagerie)}/{file}\n"
+                            )
+                        except Exception as e:
+                            # Known type/message pairs that we expect to encounter
+                            known_exceptions = [
+                                (KeyError, r".*'file'.*", "Need to parse defaults"),
+                            ]
+                            known_failure = False
+                            for exc_type, msg_pattern, note in known_exceptions:
+                                if isinstance(e, exc_type) and re.match(
+                                    msg_pattern, str(e)
+                                ):
+                                    rel_path = os.path.relpath(root, menagerie)
+                                    results += f"FAIL: {os.path.join(rel_path, file)}: {note}\n"
+                                    known_failure = True
+                                    break
+                            if not known_failure:
+                                raise  # Re-raise if not a known exception
+        print(results)
 
 
 if __name__ == "__main__":
