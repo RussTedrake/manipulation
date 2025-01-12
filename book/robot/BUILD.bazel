@@ -25,6 +25,15 @@ rt_ipynb_test(
 )
 
 rt_ipynb_test(
+    name = "gymnasium_robotics",
+    srcs = ["gymnasium_robotics.ipynb"],
+    deps = [
+      "//manipulation",
+      "//manipulation:make_drake_compatible_model",
+    ],
+)
+
+rt_ipynb_test(
     name = "simulation",
     srcs = ["simulation.ipynb"],
     deps = ["//manipulation"],

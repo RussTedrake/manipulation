@@ -292,6 +292,14 @@ def _convert_mjcf(input_filename: str, output_filename: str, overwrite: bool) ->
             texturedir = compiler_element.attrib["texturedir"]
             del compiler_element.attrib["texturedir"]
 
+    # Truncate all rgba attributes to [0, 1]. See Drake#22445.
+    elements_with_rgba = root.findall(".//*[@rgba]")
+    for element in elements_with_rgba:
+        rgba = element.attrib["rgba"]
+        rgba = [float(value) for value in rgba.split()]
+        rgba = [min(max(value, 0), 1) for value in rgba]
+        element.attrib["rgba"] = " ".join([str(value) for value in rgba])
+
     defaults = {}
 
     # Process all default elements recursively
