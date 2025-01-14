@@ -174,9 +174,7 @@ class Scenario:
         accuracy=1.0e-2,
     )
 
-    plant_config: MultibodyPlantConfig = MultibodyPlantConfig(
-        discrete_contact_approximation="sap"
-    )
+    plant_config: MultibodyPlantConfig = MultibodyPlantConfig()
 
     directives: typing.List[ModelDirective] = dc.field(default_factory=list)
 
