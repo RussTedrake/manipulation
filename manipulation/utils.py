@@ -8,11 +8,18 @@ import numpy as np
 import pydot
 from IPython import get_ipython
 from IPython.display import SVG, display
-from pydrake.all import GetDrakePath
+from pydrake.all import (
+    ApplyLcmBusConfig,
+    ApplyVisualizationConfig,
+    DrakeLcmParams,
+    GetDrakePath,
+    Meshcat,
+    VisualizationConfig,
+)
 from pydrake.common import GetDrakePath
 from pydrake.geometry import RenderLabel
 from pydrake.multibody.parsing import PackageMap, Parser
-from pydrake.systems.framework import System
+from pydrake.systems.framework import DiagramBuilder, System
 from pydrake.systems.sensors import ImageLabel16I
 
 # Use a global variable here because some calls to IPython will actually cause
@@ -98,6 +105,16 @@ def AddMujocoMenagerie(package_map: PackageMap):
             strip_prefix="mujoco_menagerie-469893211c41d5da9c314f5ab58059fa17c8e360/",
         ),
     )
+
+
+def ApplyDefaultVisualization(builder: DiagramBuilder, meshcat: Meshcat):
+    """Follows Drake's ApplyDefaultVisualization, but disables LCM (drake
+    visualizer) by default."""
+    config = VisualizationConfig()
+    lcm_buses = ApplyLcmBusConfig(
+        {"default": DrakeLcmParams(lcm_url="memq://null")}, builder
+    )
+    ApplyVisualizationConfig(config, builder, lcm_buses=lcm_buses, meshcat=meshcat)
 
 
 def colorize_labels(image: ImageLabel16I):
