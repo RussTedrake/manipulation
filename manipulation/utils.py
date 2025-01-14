@@ -130,9 +130,25 @@ def colorize_labels(image: ImageLabel16I):
     return color_image
 
 
+def GetDrakeVersion() -> str:
+    """Returns a string representing the Drake version, if availableor "source"."""
+    drake_version_txt = (
+        Path(GetDrakePath()).parent.parent / "doc" / "drake" / "VERSION.TXT"
+    )
+    if drake_version_txt.is_file():
+        with open(drake_version_txt, "r") as f:
+            drake_version = f.read()
+        drake_version = drake_version.split()[0]
+    else:
+        drake_version = "source"
+    return drake_version
+
+
 def DrakeVersionGreaterThan(minimum_date: date):
     """Check that the Drake version is at least `minimum_data`."""
-    drake_version_txt = Path(GetDrakePath()).parent / "doc" / "drake" / "VERSION.TXT"
+    drake_version_txt = (
+        Path(GetDrakePath()).parent.parent / "doc" / "drake" / "VERSION.TXT"
+    )
     version_dates = {
         "1.13.0": date(year=2023, month=2, day=14),
         "1.14.0": date(year=2023, month=3, day=15),
