@@ -7,7 +7,6 @@ from pydrake.all import (
     ContactVisualizer,
     ContactVisualizerParams,
     DiagramBuilder,
-    DiscreteContactApproximation,
     EventStatus,
     FixedOffsetFrame,
     InverseDynamicsController,
@@ -142,7 +141,6 @@ class RewardSystem(LeafSystem):
 def make_box_flipup(generator, observations="state", meshcat=None, time_limit=10):
     builder = DiagramBuilder()
     plant, scene_graph = AddMultibodyPlantSceneGraph(builder, time_step=0.001)
-    plant.set_discrete_contact_approximation(DiscreteContactApproximation.kSap)
     # TODO(russt): randomize parameters.
     box = AddPlanarBinAndSimpleBox(plant)
     finger = AddPointFinger(plant)

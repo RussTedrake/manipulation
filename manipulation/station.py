@@ -175,7 +175,7 @@ class Scenario:
     )
 
     plant_config: MultibodyPlantConfig = MultibodyPlantConfig(
-        discrete_contact_approximation="sap"
+        discrete_contact_approximation="lagged"
     )
 
     directives: typing.List[ModelDirective] = dc.field(default_factory=list)
