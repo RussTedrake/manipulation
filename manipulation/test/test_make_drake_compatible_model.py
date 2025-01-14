@@ -9,7 +9,10 @@ from pydrake.multibody.parsing import PackageMap
 from manipulation.utils import AddMujocoMenagerie, FindResource
 
 try:
-    from manipulation.make_drake_compatible_model import MakeDrakeCompatibleModel
+    from manipulation.make_drake_compatible_model import (
+        MakeDrakeCompatibleModel,
+        _convert_mesh,
+    )
 
     pymeshlab_available = True
 except ImportError:
@@ -20,6 +23,14 @@ except ImportError:
 
 @unittest.skipIf(not pymeshlab_available, "Requires pymeshlab dependency.")
 class TestMakeDrakeCompatibleModel(unittest.TestCase):
+    def test_obj_no_textures(self):
+        input_url = FindResource("test/models/cube.obj")
+        output_url, output_path = _convert_mesh(
+            url=input_url, path=input_url, overwrite=True
+        )
+        self.assertTrue(os.path.exists(output_path))
+        self.assertFalse(os.path.exists(output_path + ".mtl"))
+
     def test_urdf(self):
         original_filename = FindResource("test/models/test.urdf")
         input_filename = original_filename.replace(".urdf", "_modified.urdf")
@@ -132,9 +143,8 @@ class TestMakeDrakeCompatibleModel(unittest.TestCase):
     )
     def test_mujoco_menagerie(self):
         """Test all files in the mujoco_menagerie package."""
-        os.environ["XDG_CACHE_HOME"] = (
-            "/tmp/parser_cache"  # This lets me only download once, but it is not hermetic.
-        )
+        # This lets me only download once, but it is not hermetic.
+        os.environ["TEST_TMPDIR"] = "/tmp/parser_cache"
         package_map = PackageMap()
         AddMujocoMenagerie(package_map)
         menagerie = package_map.GetPath("mujoco_menagerie")
@@ -158,6 +168,7 @@ class TestMakeDrakeCompatibleModel(unittest.TestCase):
                                 f"PASS: {os.path.relpath(root, menagerie)}/{file}\n"
                             )
                         except Exception as e:
+                            rel_path = os.path.relpath(root, menagerie)
                             # Known type/message pairs that we expect to encounter
                             known_exceptions = [
                                 # No more known exceptions (yeah!)... but the format is:
@@ -168,11 +179,11 @@ class TestMakeDrakeCompatibleModel(unittest.TestCase):
                                 if isinstance(e, exc_type) and re.match(
                                     msg_pattern, str(e)
                                 ):
-                                    rel_path = os.path.relpath(root, menagerie)
                                     results += f"FAIL: {os.path.join(rel_path, file)}: {note}\n"
                                     known_failure = True
                                     break
                             if not known_failure:
+                                results += f"FAIL: {os.path.join(rel_path, file)}: Unregistered exception\n"
                                 raise  # Re-raise if not a known exception
         print(results)
 
