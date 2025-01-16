@@ -2,8 +2,7 @@ import argparse
 import copy
 import os
 import re
-import warnings
-from typing import List, Optional
+from typing import List, Tuple
 
 import pymeshlab
 from lxml import etree
@@ -11,8 +10,24 @@ from pydrake.all import PackageMap
 
 
 def _convert_mesh(
-    url: str, path: str, scale: Optional[List[float]] = None, overwrite: bool = False
-) -> str:
+    url: str,
+    path: str,
+    scale: List[float] | None = None,
+    texture_path: str | None = None,
+    overwrite: bool = False,
+) -> Tuple[str, str]:
+    """Convert a mesh file to be compatible with Drake.
+
+    Args:
+        url: The URL of the mesh file.
+        path: The path to the mesh file.
+        scale: The (optional)scale to apply to the mesh.
+        texture_path: The (optional) path to the texture file to apply to the mesh.
+        overwrite: Whether to overwrite existing files.
+
+    Returns:
+        A tuple containing the URL and path of the converted mesh file.
+    """
     if scale:
         scale_str = "_scaled_" + "_".join(
             [str(int(s) if s.is_integer() else s).replace("-", "n") for s in scale]
@@ -35,9 +50,18 @@ def _convert_mesh(
     # Load the mesh file
     ms.load_new_mesh(path)
 
+    if texture_path is not None:
+        if not os.path.exists(texture_path):
+            raise FileNotFoundError(f"Texture file not found: {texture_path}")
+
+        # Apply the texture to the mesh
+        print(f"Applying texture {texture_path} to mesh {path}")
+        ms.set_texture_per_mesh(textname=texture_path)
+
     if scale is not None:
         scale = [float(s) for s in scale]
-        assert len(scale) == 3, "Scale must be a 3-element array."
+        if len(scale) != 3:
+            raise ValueError("Scale must be a 3-element array.")
 
         # First apply absolute value scaling
         ms.apply_filter(
@@ -47,6 +71,8 @@ def _convert_mesh(
             scalez=scale[2],
             freeze=True,
         )
+        if any(s < 0 for s in scale):
+            ms.apply_filter("meshing_invert_face_orientation")
 
     # Save the mesh
     ms.save_current_mesh(output_path, save_face_color=False, save_vertex_color=False)
@@ -54,7 +80,17 @@ def _convert_mesh(
     return output_url, output_path
 
 
-def _convert_urdf(input_filename, output_filename, package_map, overwrite):
+def _convert_urdf(
+    input_filename: str, output_filename: str, package_map: PackageMap, overwrite: bool
+) -> None:
+    """Convert an URDF file to be compatible with Drake.
+
+    Args:
+        input_filename: The path to the input URDF file.
+        output_filename: The path where the converted URDF file will be saved.
+        package_map: The PackageMap to use.
+        overwrite: Whether to overwrite existing files.
+    """
     with open(input_filename, "r") as file:
         urdf_content = file.read()
 
@@ -116,11 +152,15 @@ def _convert_urdf(input_filename, output_filename, package_map, overwrite):
     print(f"Converted URDF file '{input_filename}' to '{output_filename}'.")
 
 
-def _convert_sdf(input_filename, output_filename, package_map, overwrite):
+def _convert_sdf(
+    input_filename: str, output_filename: str, package_map: PackageMap, overwrite: bool
+) -> None:
     raise NotImplementedError("SDF format is not supported yet, but it will be soon.")
 
 
-def _process_includes(filename, processed_files=None):
+def _process_includes(
+    filename: str, processed_files: set[str] | None = None
+) -> etree.ElementTree:
     """Process include tags recursively and return complete DOM tree.
 
     Args:
@@ -141,7 +181,7 @@ def _process_includes(filename, processed_files=None):
     processed_files.add(filename)
 
     # Parse the main file
-    tree = etree.parse(filename)
+    tree = etree.parse(filename, parser=etree.XMLParser(remove_comments=True))
     root = tree.getroot()
 
     # Find all include elements
@@ -172,14 +212,32 @@ def _process_includes(filename, processed_files=None):
     return tree
 
 
-def _apply_defaults(element, defaults_dict, class_name_override=None):
+def _apply_defaults(
+    element: etree.Element,
+    defaults_dict: dict[tuple[str, str], etree.Element],
+    class_name_override: str | None = None,
+) -> etree.Element:
     """Apply default attributes from a defaults class to an element.
 
     Args:
         element: The XML element to apply defaults to
         defaults_dict: Dictionary mapping (class_name, element_type) to default elements
+        class_name_override: If not None, this will override the class name for the element.
+    Returns:
+        The element with defaults applied.
     """
-    if "class" in element.attrib:
+    # If class_name_override not already set, check parent elements for childclass
+    if class_name_override is None:
+        parent = element.getparent()
+        while parent is not None:
+            if "childclass" in parent.attrib:
+                class_name_override = parent.attrib["childclass"]
+                break
+            parent = parent.getparent()
+    if class_name_override or "class" in element.attrib:
+        element = copy.deepcopy(
+            element
+        )  # make a copy so we don't write the applied default back to the exported model
         class_name = (
             element.attrib["class"]
             if class_name_override is None
@@ -201,9 +259,18 @@ def _apply_defaults(element, defaults_dict, class_name_override=None):
                 if attr != "class":
                     if attr not in element.attrib:
                         element.attrib[attr] = value
+    return element
 
 
-def _convert_mjcf(input_filename, output_filename, package_map, overwrite):
+def _convert_mjcf(input_filename: str, output_filename: str, overwrite: bool) -> None:
+    """Convert an MJCF file to be compatible with Drake.
+
+    Args:
+        input_filename: The path to the input MJCF file.
+        output_filename: The path where the converted MJCF file will be saved.
+        package_map: The PackageMap to use.
+        overwrite: Whether to overwrite existing files.
+    """
     # Process includes first to build complete DOM
     tree = _process_includes(input_filename)
     root = tree.getroot()
@@ -211,20 +278,19 @@ def _convert_mjcf(input_filename, output_filename, package_map, overwrite):
     compiler_elements = root.findall(".//compiler")
     strippath = False
     meshdir = None
+    texturedir = None
     for compiler_element in compiler_elements:
         if "strippath" in compiler_element.attrib:
             # Convert XML string "true"/"false" to Python bool
             strippath = compiler_element.attrib["strippath"].lower() == "true"
         if "assetdir" in compiler_element.attrib:
             meshdir = compiler_element.attrib["assetdir"]
-            compiler_element.attrib["assetdir"]
+            texturedir = meshdir
         if "meshdir" in compiler_element.attrib:
             meshdir = compiler_element.attrib["meshdir"]
         if "texturedir" in compiler_element.attrib:
-            compiler_element.attrib["texturedir"]
+            texturedir = compiler_element.attrib["texturedir"]
 
-    # Dictionary to store default classes, initialize with empty "main" class
-    # Initialize defaults with empty dictionary
     defaults = {}
 
     # Process all default elements recursively
@@ -250,7 +316,12 @@ def _convert_mjcf(input_filename, output_filename, package_map, overwrite):
                     defaults[key] = copy.deepcopy(defaults[parent_key])
                 else:
                     # Create new default element
-                    defaults[key] = etree.Element(child.tag)
+                    try:
+                        defaults[key] = etree.Element(child.tag)
+                    except:
+                        raise RuntimeError(
+                            f"Failed to create default element for {key}"
+                        )
 
                 # Update with new attributes
                 for attr, value in child.attrib.items():
@@ -265,23 +336,88 @@ def _convert_mjcf(input_filename, output_filename, package_map, overwrite):
     for default_element in root.findall("default"):
         process_defaults(default_element)
 
+    # Parse all textures
+    texture_paths = {}
+    texture_elements = root.findall(".//asset/texture")
+    for texture_element in texture_elements:
+        if "file" in texture_element.attrib:
+            texture_url = texture_element.attrib["file"]
+            if "name" in texture_element.attrib:
+                texture_name = texture_element.attrib["name"]
+            else:
+                texture_name = os.path.splitext(os.path.basename(texture_url))[0]
+            if strippath:
+                # Remove all path information, keeping only filename
+                texture_url = os.path.basename(texture_url)
+
+            # Check if texture_url is already an absolute path
+            if os.path.isabs(texture_url):
+                texture_path = texture_url
+            # Check if texturedir is an absolute path
+            elif texturedir is not None and os.path.isabs(texturedir):
+                texture_path = os.path.join(texturedir, texture_url)
+            # Use path relative to MJCF file
+            else:
+                base_path = os.path.dirname(input_filename)
+                if texturedir is not None:
+                    base_path = os.path.join(base_path, texturedir)
+                texture_path = os.path.join(base_path, texture_url)
+
+            if not os.path.exists(texture_path):
+                raise FileNotFoundError(f"The file {texture_path} does not exist.")
+
+            texture_paths[texture_name] = texture_path
+
+    # Parse all materials that reference textures
+    material_paths = {}
+    for material_element in root.findall(".//asset/material"):
+        if "name" not in material_element.attrib:
+            raise AssertionError("Material element must have a 'name' attribute")
+        if "texture" in material_element.attrib:
+            texture_name = material_element.attrib["texture"]
+            if texture_name in texture_paths:
+                material_paths[material_element.attrib["name"]] = texture_paths[
+                    texture_name
+                ]
+
+    mesh_to_material = {}
+    # Loop through geoms to find the mesh => material mappings
+    for geom_element in root.findall(".//geom"):
+        geom_element_w_defaults = _apply_defaults(geom_element, defaults)
+        if (
+            "material" in geom_element_w_defaults.attrib
+            and geom_element_w_defaults.attrib["material"] in material_paths
+            and "mesh" in geom_element_w_defaults.attrib
+        ):
+            mesh_name = geom_element_w_defaults.attrib["mesh"]
+            material_name = geom_element_w_defaults.attrib["material"]
+            if (
+                mesh_name in mesh_to_material
+                and mesh_to_material[mesh_name] != material_name
+            ):
+                raise AssertionError(
+                    f"Mesh {mesh_name} was already associated with {mesh_to_material[mesh_name]}. We don't handle multiple materials assigned to the same mesh yet."
+                )
+            mesh_to_material[mesh_name] = material_name
+
     # Find all <mesh> elements recursively using xpath
     mesh_elements = root.findall(".//asset/mesh")
     for mesh_element in mesh_elements:
-        _apply_defaults(mesh_element, defaults)
+        mesh_element_w_defaults = _apply_defaults(mesh_element, defaults)
 
-        mesh_url = mesh_element.attrib["file"]
+        mesh_url = mesh_element_w_defaults.attrib["file"]
         if mesh_url is None:
             raise ValueError("A 'file' attribute must be specified for mesh elements.")
-        scale = mesh_element.attrib.get("scale")
+        if "name" in mesh_element_w_defaults.attrib:
+            mesh_name = mesh_element_w_defaults.attrib["name"]
+        else:
+            mesh_name = os.path.splitext(os.path.basename(mesh_url))[0]
+        scale = mesh_element_w_defaults.attrib.get("scale")
         if scale:
             scale = [float(s) for s in scale.split()]
             if len(set(scale)) == 1:
                 # Uniform scaling is supported natively by Drake.
                 scale = None
-        if mesh_url.lower().endswith(".obj") and scale is None:
-            # Don't need to convert .obj files with no scale or uniform scale.
-            continue
 
         # Get absolute path to mesh file according to MJCF rules
         if strippath:
@@ -302,15 +438,22 @@ def _convert_mjcf(input_filename, output_filename, package_map, overwrite):
             mesh_path = os.path.join(base_path, mesh_url)
 
         if not os.path.exists(mesh_path):
-            if meshdir is not None:
-                warnings.warn(
-                    f"The file {mesh_path} does not exist in the expected location. This may be due to the fact that meshdir and assetdir are not being parsed yet.",
-                    UserWarning,
-                )
             raise FileNotFoundError(f"The file {mesh_path} does not exist.")
 
+        texture_path = None
+        if mesh_name in mesh_to_material:
+            texture_path = material_paths[mesh_to_material[mesh_name]]
+
+        if mesh_url.lower().endswith(".obj") and scale is None and texture_path is None:
+            # Don't need to convert .obj files with no scale or uniform scale.
+            continue
+
         output_mesh_url, output_mesh_path = _convert_mesh(
-            url=mesh_url, path=mesh_path, scale=scale, overwrite=overwrite
+            url=mesh_url,
+            path=mesh_path,
+            scale=scale,
+            texture_path=texture_path,
+            overwrite=overwrite,
         )
 
         # Update the node's filename attribute
@@ -346,7 +489,7 @@ def _convert_mjcf(input_filename, output_filename, package_map, overwrite):
 def MakeDrakeCompatibleModel(
     input_filename: str,
     output_filename: str,
-    package_map: PackageMap = None,
+    package_map: PackageMap = PackageMap(),
     overwrite: bool = False,
 ) -> None:
     """Converts a model file (currently .urdf or .xml)to be compatible with the
@@ -361,6 +504,7 @@ def MakeDrakeCompatibleModel(
     - Converts dynamic half-space collision geometries to (very) large boxes
       https://github.com/RobotLocomotion/drake/issues/19263
       (this is so far implemented only for mujoco .xml models)
+    - Applies textures specified in mujoco .xml directly to the mesh .obj files.
 
     Any new files will be created alongside the original files (e.g. .obj files
     will be created next to the existing .stl files); all new files will get a
@@ -374,15 +518,12 @@ def MakeDrakeCompatibleModel(
         overwrite (bool, optional): Whether to overwrite existing files. Defaults
             to False.
     """
-    if package_map is None:
-        package_map = PackageMap()
-
     if input_filename.lower().endswith(".urdf"):
         _convert_urdf(input_filename, output_filename, package_map, overwrite=overwrite)
     elif input_filename.lower().endswith(".sdf"):
         _convert_sdf(input_filename, output_filename, package_map, overwrite=overwrite)
     elif input_filename.lower().endswith(".xml"):
-        _convert_mjcf(input_filename, output_filename, package_map, overwrite=overwrite)
+        _convert_mjcf(input_filename, output_filename, overwrite=overwrite)
     else:
         print(
             f"Warning: The file extension of '{input_filename}' is not "
