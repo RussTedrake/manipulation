@@ -786,16 +786,16 @@ files = [
 
 [[package]]
 name = "drake"
-version = "0.0.20250112"
+version = "0.0.20250116"
 description = "Model-based design and verification for robotics"
 optional = false
 python-versions = ">=3.10"
 files = [
-    {file = "drake-0.0.20250112-cp310-cp310-manylinux_2_35_x86_64.whl", hash = "sha512:2c3af72ea4daf788d02b928e0e500bd8b8294a11af87477667cb404bd44615df1b7f8ec8c82440fd252c9ff55554a06981b818ee07bdbe346caec3926937019a"},
-    {file = "drake-0.0.20250112-cp311-cp311-macosx_14_0_arm64.whl", hash = "sha512:aa0f479c80613c94635537e0af891fb708afd542359d7cd3b0b859febd139115c0e2f8f81016f7d1030d45f60d3f5ddfa88d3e554bc7f992081833be1baa44bb"},
-    {file = "drake-0.0.20250112-cp311-cp311-manylinux_2_35_x86_64.whl", hash = "sha512:54a382c3693ea3a8239f2d93b00cd40ec20d284ddca882a4bf9a7a6819d10272c6975194e924403c0a882472b5f2caaec0d5faf46a9a282cbb6cb6b64d20a2d3"},
-    {file = "drake-0.0.20250112-cp312-cp312-macosx_14_0_arm64.whl", hash = "sha512:a80a98d4851e56d4b1200e4f8987345204495e97ade04031376c7fc291237b12e5966f04f1e92f5df3da592398c7e620fe69fbf2cba504169705b07df11562f6"},
-    {file = "drake-0.0.20250112-cp312-cp312-manylinux_2_35_x86_64.whl", hash = "sha512:0f0e2038cf76ca8784f608ba2d00e5a56661d357c26739526c7b64909b1790acd6b8a3f54bdad8c20e6ba2d5a0854765463a67e6820112320e57f1adca0d6812"},
+    {file = "drake-0.0.20250116-cp310-cp310-manylinux_2_35_x86_64.whl", hash = "sha512:90afec35d2f5797cdcf8806412aad6553c9a30ebd508471476a80c989f4636413a5588cb4c2aada0fbb1c8c8989fc5735c5947fcf953e7c03bd4d86dcdcd9f50"},
+    {file = "drake-0.0.20250116-cp311-cp311-macosx_14_0_arm64.whl", hash = "sha512:1682490bfd977cc411f1cbcde7cbbd84e1d641a3ccb720af6c5aadb8e63364474b5067ad5c726abac2e15387ce4b11beb30ec5c41d69258ddcfa3abd9c51344b"},
+    {file = "drake-0.0.20250116-cp311-cp311-manylinux_2_35_x86_64.whl", hash = "sha512:8c56995f4b9e5237b74a89f2b087c07e668d4829902d698ce4bb70be993f9690fc860c9be553febdaf0cf285cdce6154fd7437a7c17c016c55c01269c45da560"},
+    {file = "drake-0.0.20250116-cp312-cp312-macosx_14_0_arm64.whl", hash = "sha512:dd8f43c883d3980114bdd10bac3117040b62dd07f8103643abb448b61bc663baf91b52877d860de0161241f041465642802a09d0a9a8df83c5633d9b8e25c223"},
+    {file = "drake-0.0.20250116-cp312-cp312-manylinux_2_35_x86_64.whl", hash = "sha512:1b7d76bc0d496dd120806be2d71e3699f92445a5ab7e4b574c5bdc52fe80976244b52bd41275defeae9242be5d29141d66d7f8f4e42771508dee0e22a61e0cde"},
 ]
 
 [package.dependencies]
@@ -2115,13 +2115,13 @@ tbb = "==2021.*"
 
 [[package]]
 name = "more-itertools"
-version = "10.5.0"
+version = "10.6.0"
 description = "More routines for operating on iterables, beyond itertools"
 optional = false
-python-versions = ">=3.8"
+python-versions = ">=3.9"
 files = [
-    {file = "more-itertools-10.5.0.tar.gz", hash = "sha256:5482bfef7849c25dc3c6dd53a6173ae4795da2a41a80faea6700d9f5846c5da6"},
-    {file = "more_itertools-10.5.0-py3-none-any.whl", hash = "sha256:037b0d3203ce90cca8ab1defbbdac29d5f993fc20131f3664dc8d6acfa872aef"},
+    {file = "more-itertools-10.6.0.tar.gz", hash = "sha256:2cd7fad1009c31cc9fb6a035108509e6547547a7a738374f10bd49a09eb3ee3b"},
+    {file = "more_itertools-10.6.0-py3-none-any.whl", hash = "sha256:6eb054cb4b6db1473f6e15fcc676a08e4732548acd47c708f0e179c2c7c01e89"},
 ]
 
 [[package]]
@@ -4593,13 +4593,13 @@ tutorials = ["matplotlib", "pandas", "tabulate", "torch"]
 
 [[package]]
 name = "trove-classifiers"
-version = "2025.1.10.15"
+version = "2025.1.15.22"
 description = "Canonical source for classifiers on PyPI (pypi.org)."
 optional = false
 python-versions = "*"
 files = [
-    {file = "trove_classifiers-2025.1.10.15-py3-none-any.whl", hash = "sha256:9824eb16f7df1b1cc1c217c52ce56c76869d6263da2067f8eadc45122a731cfc"},
-    {file = "trove_classifiers-2025.1.10.15.tar.gz", hash = "sha256:be2c7d25e46cd39d5c7151acd389584df3919f61890f5f163c8ee2090ff71e7f"},
+    {file = "trove_classifiers-2025.1.15.22-py3-none-any.whl", hash = "sha256:5f19c789d4f17f501d36c94dbbf969fb3e8c2784d008e6f5164dd2c3d6a2b07c"},
+    {file = "trove_classifiers-2025.1.15.22.tar.gz", hash = "sha256:90af74358d3a01b3532bc7b3c88d8c6a094c2fd50a563d13d9576179326d7ed9"},
 ]
 
 [[package]]
@@ -4755,13 +4755,13 @@ test = ["pytest"]
 
 [[package]]
 name = "virtualenv"
-version = "20.28.1"
+version = "20.29.0"
 description = "Virtual Python Environment builder"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "virtualenv-20.28.1-py3-none-any.whl", hash = "sha256:412773c85d4dab0409b83ec36f7a6499e72eaf08c80e81e9576bca61831c71cb"},
-    {file = "virtualenv-20.28.1.tar.gz", hash = "sha256:5d34ab240fdb5d21549b76f9e8ff3af28252f5499fb6d6f031adac4e5a8c5329"},
+    {file = "virtualenv-20.29.0-py3-none-any.whl", hash = "sha256:c12311863497992dc4b8644f8ea82d3b35bb7ef8ee82e6630d76d0197c39baf9"},
+    {file = "virtualenv-20.29.0.tar.gz", hash = "sha256:6345e1ff19d4b1296954cee076baaf58ff2a12a84a338c62b02eda39f20aa982"},
 ]
 
 [package.dependencies]
@@ -4920,4 +4920,4 @@ torch = ["torch", "torchvision"]
 [metadata]
 lock-version = "2.0"
 python-versions = "<4.0,>=3.10"
-content-hash = "1750e8e00798308cfeb70d1c92814b4b5d094420afe9e6dab3578aa59d4902a5"
+content-hash = "9f792ef5af40fc81b83730bbbbd71d2e661698b9d6d2139116c187d55e30a062"

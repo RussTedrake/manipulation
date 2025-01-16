@@ -115,8 +115,8 @@ def _convert_urdf(
         scale = node.attrib.get("scale")
         if scale:
             scale = [float(s) for s in scale.split()]
-            if len(set(scale)) == 1:
-                # Uniform scaling is supported natively by Drake.
+            if len(set(scale)) == 1 and all(s > 0 for s in scale):
+                # Uniform positive scaling is supported natively by Drake.
                 scale = None
         if mesh_url.lower().endswith(".obj") and scale is None:
             # Don't need to convert .obj files with no scale or uniform scale.
@@ -290,6 +290,7 @@ def _convert_mjcf(input_filename: str, output_filename: str, overwrite: bool) ->
             meshdir = compiler_element.attrib["meshdir"]
         if "texturedir" in compiler_element.attrib:
             texturedir = compiler_element.attrib["texturedir"]
+            del compiler_element.attrib["texturedir"]
 
     defaults = {}
 
@@ -367,6 +368,7 @@ def _convert_mjcf(input_filename: str, output_filename: str, overwrite: bool) ->
                 raise FileNotFoundError(f"The file {texture_path} does not exist.")
 
             texture_paths[texture_name] = texture_path
+            texture_element.getparent().remove(texture_element)
 
     # Parse all materials that reference textures
     material_paths = {}
@@ -412,11 +414,14 @@ def _convert_mjcf(input_filename: str, output_filename: str, overwrite: bool) ->
             mesh_name = mesh_element_w_defaults.attrib["name"]
         else:
             mesh_name = os.path.splitext(os.path.basename(mesh_url))[0]
+            mesh_element_w_defaults.attrib["name"] = mesh_name
+            mesh_element.attrib["name"] = mesh_name
+
         scale = mesh_element_w_defaults.attrib.get("scale")
         if scale:
             scale = [float(s) for s in scale.split()]
-            if len(set(scale)) == 1:
-                # Uniform scaling is supported natively by Drake.
+            if len(set(scale)) == 1 and all(s > 0 for s in scale):
+                # Uniform positive scaling is supported natively by Drake.
                 scale = None
 
         # Get absolute path to mesh file according to MJCF rules
@@ -483,7 +488,7 @@ def _convert_mjcf(input_filename: str, output_filename: str, overwrite: bool) ->
             parent = parent.getparent()
 
     tree.write(output_filename, pretty_print=True)
-    print(f"Converted MJCF file '{input_filename}' to '{output_filename}'.")
+    print(f"Converted MJCF file {input_filename} to {output_filename}")
 
 
 def MakeDrakeCompatibleModel(
