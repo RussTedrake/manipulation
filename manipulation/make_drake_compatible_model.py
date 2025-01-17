@@ -262,7 +262,12 @@ def _apply_defaults(
     return element
 
 
-def _convert_mjcf(input_filename: str, output_filename: str, overwrite: bool) -> None:
+def _convert_mjcf(
+    input_filename: str,
+    output_filename: str,
+    overwrite: bool,
+    remap_geometry_groups: dict[int, int] = {},
+) -> None:
     """Convert an MJCF file to be compatible with Drake.
 
     Args:
@@ -495,6 +500,15 @@ def _convert_mjcf(input_filename: str, output_filename: str, overwrite: bool) ->
                 break
             parent = parent.getparent()
 
+    # Remap geometry groups
+    if remap_geometry_groups:
+        geoms = root.findall(".//geom")
+        for geom in geoms:
+            if "group" in geom.attrib:
+                group = int(geom.attrib["group"])
+                if group in remap_geometry_groups:
+                    geom.attrib["group"] = str(remap_geometry_groups[group])
+
     tree.write(output_filename, pretty_print=True)
     print(f"Converted MJCF file {input_filename} to {output_filename}")
 
@@ -504,6 +518,7 @@ def MakeDrakeCompatibleModel(
     output_filename: str,
     package_map: PackageMap = PackageMap(),
     overwrite: bool = False,
+    remap_mujoco_geometry_groups: dict[int, int] = {},
 ) -> None:
     """Converts a model file (currently .urdf or .xml)to be compatible with the
     Drake multibody parsers.
@@ -534,13 +549,23 @@ def MakeDrakeCompatibleModel(
         package_map (PackageMap, optional): The package map to use. Defaults to None.
         overwrite (bool, optional): Whether to overwrite existing files. Defaults
             to False.
+        remap_mujoco_geometry_groups (dict[int, int], optional): Drake's mujoco
+            parser registers visual geometry for geometry groups < 3 (the
+            mujoco default), which is a common, but not universal, convention.
+            This argument allows you to remap (substituting the value for the
+            key).
     """
     if input_filename.lower().endswith(".urdf"):
         _convert_urdf(input_filename, output_filename, package_map, overwrite=overwrite)
     elif input_filename.lower().endswith(".sdf"):
         _convert_sdf(input_filename, output_filename, package_map, overwrite=overwrite)
     elif input_filename.lower().endswith(".xml"):
-        _convert_mjcf(input_filename, output_filename, overwrite=overwrite)
+        _convert_mjcf(
+            input_filename,
+            output_filename,
+            overwrite=overwrite,
+            remap_geometry_groups=remap_mujoco_geometry_groups,
+        )
     else:
         print(
             f"Warning: The file extension of '{input_filename}' is not "

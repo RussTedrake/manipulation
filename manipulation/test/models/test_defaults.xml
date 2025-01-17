@@ -3,6 +3,7 @@
     <default class="scaled">
       <mesh scale="0.001 0.002 0.003"/>
     </default>
+    <geom group="0"/>
   </default>
   <asset>
     <mesh name="test_stl" file="cube.stl" class="scaled"/>
