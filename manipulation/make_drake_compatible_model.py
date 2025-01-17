@@ -508,15 +508,19 @@ def MakeDrakeCompatibleModel(
     """Converts a model file (currently .urdf or .xml)to be compatible with the
     Drake multibody parsers.
 
+    For all models:
     - Converts any .stl files to obj
       https://github.com/RobotLocomotion/drake/issues/19408
     - Converts any .dae files to obj
       https://github.com/RobotLocomotion/drake/issues/19109
-    - Zaps any non-uniform scale attributes
+    - Resizes meshes to work around any non-uniform scale attributes
       https://github.com/RobotLocomotion/drake/issues/22046
+
+    In addition, for MuJoCo .xml models:
     - Converts dynamic half-space collision geometries to (very) large boxes
       https://github.com/RobotLocomotion/drake/issues/19263
-      (this is so far implemented only for mujoco .xml models)
+    - Truncates all rgba attributes to [0, 1].
+      https://github.com/RobotLocomotion/drake/issues/22445
     - Applies textures specified in mujoco .xml directly to the mesh .obj files.
 
     Any new files will be created alongside the original files (e.g. .obj files
