@@ -128,6 +128,7 @@ class TestMakeDrakeCompatibleModel(unittest.TestCase):
             input_filename=input_filename,
             output_filename=output_filename,
             package_map=package_map,
+            remap_mujoco_geometry_groups={0: 3},
         )
         self.assertTrue(os.path.exists(output_filename))
         with open(output_filename, "r") as f:
@@ -135,6 +136,7 @@ class TestMakeDrakeCompatibleModel(unittest.TestCase):
         self.assertIn(
             'file="cube_from_stl_scaled_0.001_0.002_0.003.obj"', output_content
         )
+        self.assertIn('group="3"', output_content)
         # Clean up the temp file
         os.remove(output_filename)
 
