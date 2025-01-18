@@ -38,7 +38,8 @@ rt_py_library(
     deps = [
       requirement("drake"),
       requirement("lxml"),
-      requirement("pymeshlab"),
+      requirement("pycollada"),
+      requirement("trimesh"),
     ],
 )
 

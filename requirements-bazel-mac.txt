@@ -1,3 +1,5 @@
+--extra-index-url https://drake-packages.csail.mit.edu/whl/nightly
+
 asttokens==3.0.0 ; python_version >= "3.10" and python_version < "4.0"
 attrs==24.3.0 ; python_version >= "3.10" and python_version < "4.0" and (sys_platform == "darwin" or sys_platform == "linux")
 autoprop==4.1.0 ; python_version >= "3.10" and python_version < "4.0"
@@ -24,7 +26,7 @@ cython==3.0.11 ; python_version >= "3.10" and python_version < "4.0"
 decorator==5.1.1 ; python_version >= "3.10" and python_version < "4.0"
 defusedxml==0.7.1 ; python_version >= "3.10" and python_version < "4.0" and (sys_platform == "darwin" or sys_platform == "linux")
 distlib==0.3.9 ; python_version >= "3.10" and python_version < "4.0"
-drake==1.37.0 ; python_version >= "3.10" and python_version < "4.0"
+drake==0.0.20250118 ; python_version >= "3.10" and python_version < "4.0"
 dulwich==0.21.7 ; python_version >= "3.10" and python_version < "4.0"
 exceptiongroup==1.2.2 ; python_version >= "3.10" and python_version < "3.11"
 executing==2.1.0 ; python_version >= "3.10" and python_version < "4.0"
@@ -108,11 +110,11 @@ prompt-toolkit==3.0.48 ; python_version >= "3.10" and python_version < "4.0"
 psutil==6.1.1 ; python_version >= "3.10" and python_version < "4.0"
 ptyprocess==0.7.0 ; python_version >= "3.10" and python_version < "4.0"
 pure-eval==0.2.3 ; python_version >= "3.10" and python_version < "4.0"
+pycollada==0.8 ; python_version >= "3.10" and python_version < "4.0"
 pycparser==2.22 ; python_version >= "3.10" and python_version < "4.0" and (sys_platform == "darwin" or sys_platform == "linux") and (implementation_name == "pypy" or sys_platform == "darwin" or platform_python_implementation != "PyPy")
 pydot==3.0.4 ; python_version >= "3.10" and python_version < "4.0"
 pyglet==1.5.31 ; python_version >= "3.10" and python_version < "4.0"
 pygments==2.19.1 ; python_version >= "3.10" and python_version < "4.0"
-pymeshlab==2023.12.post2 ; python_version >= "3.10" and python_version < "4.0"
 pyparsing==3.2.1 ; python_version >= "3.10" and python_version < "4.0"
 pyproject-hooks==1.2.0 ; python_version >= "3.10" and python_version < "4.0"
 python-dateutil==2.9.0.post0 ; python_version >= "3.10" and python_version < "4.0"
@@ -122,7 +124,7 @@ pyvirtualdisplay==3.0 ; python_version >= "3.10" and python_version < "4.0"
 pyyaml==6.0.2 ; python_version >= "3.10" and python_version < "4.0"
 pyzmq==26.2.0 ; python_version >= "3.10" and python_version < "4.0" and (sys_platform == "darwin" or sys_platform == "linux")
 rapidfuzz==3.11.0 ; python_version >= "3.10" and python_version < "4.0"
-referencing==0.35.1 ; python_version >= "3.10" and python_version < "4.0" and (sys_platform == "darwin" or sys_platform == "linux")
+referencing==0.36.1 ; python_version >= "3.10" and python_version < "4.0" and (sys_platform == "darwin" or sys_platform == "linux")
 requests-toolbelt==1.0.0 ; python_version >= "3.10" and python_version < "4.0"
 requests==2.32.3 ; python_version >= "3.10" and python_version < "4.0"
 rich==13.9.4 ; python_version >= "3.10" and python_version < "4.0"
@@ -161,7 +163,7 @@ tzdata==2024.2 ; python_version >= "3.10" and python_version < "4.0"
 urllib3==2.3.0 ; python_version >= "3.10" and python_version < "4.0"
 vecrec==0.3.1 ; python_version >= "3.10" and python_version < "4.0"
 vhacdx==0.0.8.post1 ; python_version >= "3.10" and python_version < "4.0"
-virtualenv==20.29.0 ; python_version >= "3.10" and python_version < "4.0"
+virtualenv==20.29.1 ; python_version >= "3.10" and python_version < "4.0"
 wcwidth==0.2.13 ; python_version >= "3.10" and python_version < "4.0"
 webencodings==0.5.1 ; python_version >= "3.10" and python_version < "4.0" and (sys_platform == "darwin" or sys_platform == "linux")
 widgetsnbextension==4.0.13 ; python_version >= "3.10" and python_version < "4.0"

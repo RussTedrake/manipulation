@@ -786,16 +786,16 @@ files = [
 
 [[package]]
 name = "drake"
-version = "1.37.0"
+version = "0.0.20250118"
 description = "Model-based design and verification for robotics"
 optional = false
 python-versions = ">=3.10"
 files = [
-    {file = "drake-1.37.0-cp310-cp310-manylinux_2_35_x86_64.whl", hash = "sha256:4c5b8a792a0dcba6e1f211388e56a82120b41ebbe16367642b29f0c423b79149"},
-    {file = "drake-1.37.0-cp311-cp311-macosx_14_0_arm64.whl", hash = "sha256:48d246bc40f385bc038d2a9e190766457f44326e70df99a391d95cc28114e6e3"},
-    {file = "drake-1.37.0-cp311-cp311-manylinux_2_35_x86_64.whl", hash = "sha256:4a2c06741d1aabe4ff94763a359b0d1ccd16f9822df372ecc5f83973dbb7e37a"},
-    {file = "drake-1.37.0-cp312-cp312-macosx_14_0_arm64.whl", hash = "sha256:b88d45d7747cd75b5cc549258f72c3b1abb09ca8fd955c422946cb507276a0a4"},
-    {file = "drake-1.37.0-cp312-cp312-manylinux_2_35_x86_64.whl", hash = "sha256:e1682978fc12fe71bd8083ba7d360be70e20efa243bd036af737d422c57c486d"},
+    {file = "drake-0.0.20250118-cp310-cp310-manylinux_2_35_x86_64.whl", hash = "sha512:187ee48602e76a55169c3c498131ab874468905a948cb0689b8036ffa70b26fb1fec825b506af5a4060ce12b80d089023e9ffd92702a502192357cfa21fc0385"},
+    {file = "drake-0.0.20250118-cp311-cp311-macosx_14_0_arm64.whl", hash = "sha512:993c3ca587db8a07a87dae971c3c768ec3c20345b33b666c482f36c0094abd5c00095d89dddafafbcc4000684d8486e46617d9d7792c9215970e60c3da4a276f"},
+    {file = "drake-0.0.20250118-cp311-cp311-manylinux_2_35_x86_64.whl", hash = "sha512:188a17d170c2985e3e11aaf16edd42b9319eb11b79e4bdb4118517826abaaabb86c638c370c351f226a52ea6cbb1d1d6d85ea814b3c02b7b8ea14ff89257f543"},
+    {file = "drake-0.0.20250118-cp312-cp312-macosx_14_0_arm64.whl", hash = "sha512:8357c9cc15f6a0cb0f12d87af1d2774a604459134b5dc2110a07de96b96eb6c4a9123b485e9c91c1086e5f29e0a2750ab599976ca2fbee6252ff24073fa1f69a"},
+    {file = "drake-0.0.20250118-cp312-cp312-manylinux_2_35_x86_64.whl", hash = "sha512:e2fcdb0b740714f5e831947bc9e61cf4478eb100899e173472f759e821cb70621f989703af94656b8bfc93cd72690e3e42f7deb9c665ed23ea3598040df34613"},
 ]
 
 [package.dependencies]
@@ -803,6 +803,11 @@ matplotlib = "*"
 numpy = "*"
 pydot = "*"
 PyYAML = "*"
+
+[package.source]
+type = "legacy"
+url = "https://drake-packages.csail.mit.edu/whl/nightly"
+reference = "drake-nightly"
 
 [[package]]
 name = "dulwich"
@@ -3120,6 +3125,24 @@ files = [
 tests = ["pytest"]
 
 [[package]]
+name = "pycollada"
+version = "0.8"
+description = "python library for reading and writing collada documents"
+optional = true
+python-versions = "*"
+files = [
+    {file = "pycollada-0.8.tar.gz", hash = "sha256:f3a3759cc4cec1d59e932aad74399dbcf541d18862aad903c770040da42af20e"},
+]
+
+[package.dependencies]
+numpy = "*"
+python-dateutil = ">=2.2"
+
+[package.extras]
+prettyprint = ["lxml"]
+validation = ["lxml"]
+
+[[package]]
 name = "pycparser"
 version = "2.22"
 description = "C parser in Python"
@@ -3173,36 +3196,6 @@ files = [
 
 [package.extras]
 windows-terminal = ["colorama (>=0.4.6)"]
-
-[[package]]
-name = "pymeshlab"
-version = "2023.12.post2"
-description = "A Python interface to MeshLab"
-optional = false
-python-versions = "*"
-files = [
-    {file = "pymeshlab-2023.12.post2-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:e24b26a44c935c63b208aed93dcb7204c12c9089bcbf475e0564dc68e9a9a759"},
-    {file = "pymeshlab-2023.12.post2-cp310-cp310-macosx_11_0_x86_64.whl", hash = "sha256:3ea522f44b7e49cef89104de67a457551153e76382c3176e0d8faa8c3aee525c"},
-    {file = "pymeshlab-2023.12.post2-cp310-cp310-manylinux_2_31_x86_64.whl", hash = "sha256:ef626f86a0b890f1147b838129f3a1e8083f639e9b559bf8305220b243cacab0"},
-    {file = "pymeshlab-2023.12.post2-cp310-cp310-win_amd64.whl", hash = "sha256:f901b96ff01bf8e07f05ee0769dada37fa9715ef4847c23a2cd4ba5cc0a43f72"},
-    {file = "pymeshlab-2023.12.post2-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:6f0ca88cbea6d356244e4c93f0e4eff30bb71e35f4dcac591ffbbb26520160f2"},
-    {file = "pymeshlab-2023.12.post2-cp311-cp311-macosx_11_0_x86_64.whl", hash = "sha256:0068a451cf1fe9a2109eec87c1adbd4555a22e8d64d3521dc572b7f9c9b5e89c"},
-    {file = "pymeshlab-2023.12.post2-cp311-cp311-manylinux_2_31_x86_64.whl", hash = "sha256:49012717642015f77464dcb903e3ef863244395f1aedb00996120323fc656031"},
-    {file = "pymeshlab-2023.12.post2-cp311-cp311-win_amd64.whl", hash = "sha256:4d2ff5d9879abb33609a9b9920e3fa14cdbb2adcf5864c0ad1d07859ec71d95f"},
-    {file = "pymeshlab-2023.12.post2-cp312-cp312-macosx_11_0_arm64.whl", hash = "sha256:0a4510428d58defd11e4f5ebc82e934b36425defc11c9d630c1c3f82111c0d5a"},
-    {file = "pymeshlab-2023.12.post2-cp312-cp312-macosx_11_0_x86_64.whl", hash = "sha256:bcf0fc697f5eadb3d4376b09abd2911763fee76fec21e995773be59d179e3aa5"},
-    {file = "pymeshlab-2023.12.post2-cp312-cp312-manylinux_2_31_x86_64.whl", hash = "sha256:d3e296bb8cfe067e84e4c900d8604f292aedaa3fa653df599ffac3ce96cb20fb"},
-    {file = "pymeshlab-2023.12.post2-cp312-cp312-win_amd64.whl", hash = "sha256:d0dec5bd334bca1414e3e961200c4762061129100bfd6c0ca2ed059d5019fd79"},
-    {file = "pymeshlab-2023.12.post2-cp38-cp38-macosx_11_0_x86_64.whl", hash = "sha256:9b47c9141a4d6f710ff84fce8efc7275d2d044e144c7badfa20b7e460d4786ad"},
-    {file = "pymeshlab-2023.12.post2-cp38-cp38-manylinux_2_31_x86_64.whl", hash = "sha256:008de416990b1bf3ec3b52028c60a2dc39e6e10b75c4c7056abbdcf84c4b9e41"},
-    {file = "pymeshlab-2023.12.post2-cp38-cp38-win_amd64.whl", hash = "sha256:a4f13db8280e73395f1c04e8489410e5180ffd8413917983b7f7a0827594a3fb"},
-    {file = "pymeshlab-2023.12.post2-cp39-cp39-macosx_11_0_x86_64.whl", hash = "sha256:d6eaed5d70e01e745388558c2b28790a38af0e816852a3921ddcbd220d5738f9"},
-    {file = "pymeshlab-2023.12.post2-cp39-cp39-manylinux_2_31_x86_64.whl", hash = "sha256:c1fb6ea441f32f9f90bb838b75288e0a66291b98a87efc580e31febc14ad48d6"},
-    {file = "pymeshlab-2023.12.post2-cp39-cp39-win_amd64.whl", hash = "sha256:5da70549e75b1240c175e86f2fda04f2f8400442bbe69abfb9cec8df450fc17f"},
-]
-
-[package.dependencies]
-numpy = "*"
 
 [[package]]
 name = "pyparsing"
@@ -3600,18 +3593,19 @@ all = ["numpy"]
 
 [[package]]
 name = "referencing"
-version = "0.35.1"
+version = "0.36.1"
 description = "JSON Referencing + Python"
 optional = false
-python-versions = ">=3.8"
+python-versions = ">=3.9"
 files = [
-    {file = "referencing-0.35.1-py3-none-any.whl", hash = "sha256:eda6d3234d62814d1c64e305c1331c9a3a6132da475ab6382eaa997b21ee75de"},
-    {file = "referencing-0.35.1.tar.gz", hash = "sha256:25b42124a6c8b632a425174f24087783efb348a6f1e0008e63cd4466fedf703c"},
+    {file = "referencing-0.36.1-py3-none-any.whl", hash = "sha256:363d9c65f080d0d70bc41c721dce3c7f3e77fc09f269cd5c8813da18069a6794"},
+    {file = "referencing-0.36.1.tar.gz", hash = "sha256:ca2e6492769e3602957e9b831b94211599d2aade9477f5d44110d2530cf9aade"},
 ]
 
 [package.dependencies]
 attrs = ">=22.2.0"
 rpds-py = ">=0.7.0"
+typing-extensions = {version = ">=4.4.0", markers = "python_version < \"3.13\""}
 
 [[package]]
 name = "requests"
@@ -4750,13 +4744,13 @@ test = ["pytest"]
 
 [[package]]
 name = "virtualenv"
-version = "20.29.0"
+version = "20.29.1"
 description = "Virtual Python Environment builder"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "virtualenv-20.29.0-py3-none-any.whl", hash = "sha256:c12311863497992dc4b8644f8ea82d3b35bb7ef8ee82e6630d76d0197c39baf9"},
-    {file = "virtualenv-20.29.0.tar.gz", hash = "sha256:6345e1ff19d4b1296954cee076baaf58ff2a12a84a338c62b02eda39f20aa982"},
+    {file = "virtualenv-20.29.1-py3-none-any.whl", hash = "sha256:4e4cb403c0b0da39e13b46b1b2476e505cb0046b25f242bee80f62bf990b2779"},
+    {file = "virtualenv-20.29.1.tar.gz", hash = "sha256:b8b8970138d32fb606192cb97f6cd4bb644fa486be9308fb9b63f81091b5dc35"},
 ]
 
 [package.dependencies]
@@ -4906,13 +4900,13 @@ test = ["big-O", "importlib-resources", "jaraco.functools", "jaraco.itertools", 
 type = ["pytest-mypy"]
 
 [extras]
-all = ["cloudpickle", "gradescope-utils", "gymnasium", "ipywidgets", "nevergrad", "psutil", "pymeshlab", "pyzmq", "pyzmq", "scipy", "stable-baselines3", "timeout-decorator", "torch", "torchvision", "tqdm", "trimesh", "vhacdx"]
+all = ["cloudpickle", "gradescope-utils", "gymnasium", "ipywidgets", "nevergrad", "psutil", "pycollada", "pyzmq", "pyzmq", "scipy", "stable-baselines3", "timeout-decorator", "torch", "torchvision", "tqdm", "trimesh", "vhacdx"]
 grader = ["gradescope-utils", "nbconvert", "nbconvert", "timeout-decorator"]
-mesh = ["pymeshlab", "trimesh", "vhacdx"]
+mesh = ["pycollada", "trimesh", "vhacdx"]
 rl = ["gymnasium", "stable-baselines3"]
 torch = ["torch", "torchvision"]
 
 [metadata]
 lock-version = "2.0"
 python-versions = "<4.0,>=3.10"
-content-hash = "42ed687f390b5fe9a760b9213183bb99c9e719b9725b4a607d44308e30782746"
+content-hash = "7c1ab5a8373c52f90f87eb9744dbb28750e8310d8ee25676ccf4e9053ae94706"
