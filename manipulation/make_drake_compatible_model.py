@@ -15,7 +15,7 @@ def _convert_mesh(
     url: str,
     path: str,
     scale: List[float] | None = None,
-    texture_path: str | None = None,
+    material: trimesh.visual.material.Material | None = None,
     overwrite: bool = False,
 ) -> Tuple[str, str]:
     """Convert a mesh file to be compatible with Drake using Trimesh.
@@ -48,44 +48,44 @@ def _convert_mesh(
         return output_url, output_path
 
     # Load the mesh
-    mesh = trimesh.load(path)
+    mesh_or_scene = trimesh.load(path)
+    if isinstance(mesh_or_scene, trimesh.Scene):
+        meshes = [mesh for mesh in mesh_or_scene.geometry.values()]
+    else:
+        meshes = [mesh_or_scene]
 
-    # Apply scaling if specified
-    if scale is not None:
-        scale = [float(s) for s in scale]
-        if len(scale) != 3:
-            raise ValueError("Scale must be a 3-element array.")
+    for mesh in meshes:
+        # Apply scaling if specified
+        if scale is not None:
+            scale = [float(s) for s in scale]
+            if len(scale) != 3:
+                raise ValueError("Scale must be a 3-element array.")
 
-        scale_matrix = np.eye(4)
-        scale_matrix[:3, :3] = np.diag(scale)
-        mesh.apply_transform(scale_matrix)
+            scale_matrix = np.eye(4)
+            scale_matrix[:3, :3] = np.diag(scale)
+            mesh.apply_transform(scale_matrix)
 
-    # If texture_path is provided, use that texture
-    if texture_path is not None:
-        if not os.path.exists(texture_path):
-            raise FileNotFoundError(f"Texture file not found: {texture_path}")
-        image = Image.open(texture_path)
+        if material is not None:
+            # For STL files, we need to ensure UV coordinates exist
+            if not hasattr(mesh.visual, "uv"):
+                # Generate simple planar UV coordinates based on normalized vertex positions
+                vertices = mesh.vertices - mesh.vertices.min(axis=0)
+                vertices = vertices / vertices.max(axis=0)
+                uv = vertices[:, [0, 1]]  # Use X and Y coordinates for UV mapping
 
-        # For STL files, we need to ensure UV coordinates exist
-        if isinstance(mesh, trimesh.Trimesh) and not hasattr(mesh.visual, "uv"):
-            # Generate simple planar UV coordinates based on normalized vertex positions
-            vertices = mesh.vertices - mesh.vertices.min(axis=0)
-            vertices = vertices / vertices.max(axis=0)
-            uv = vertices[:, [0, 1]]  # Use X and Y coordinates for UV mapping
-
-            mesh.visual = trimesh.visual.TextureVisuals(uv=uv, image=image)
-
-        material = trimesh.visual.material.SimpleMaterial(image=image)
-        mesh.visual.material = material
+                mesh.visual = trimesh.visual.TextureVisuals(uv=uv, material=material)
+            else:
+                mesh.visual.material = material
 
     # Export as OBJ with specified material filename
-    mesh.export(output_path, include_texture=True, mtl_name=mtl_name)
+    mesh_or_scene.export(output_path, include_texture=True, mtl_name=mtl_name)
 
     # If we specified a texture_path, clean up the generated texture and update MTL
-    if texture_path is not None:
+    if material is not None and material.image is not None:
+        image_path = material.image.filename
         # Remove the generated texture if it exists
         generated_texture = os.path.join(os.path.dirname(output_path), "material_0.png")
-        if os.path.exists(generated_texture) and generated_texture != texture_path:
+        if os.path.exists(generated_texture) and generated_texture != image_path:
             os.remove(generated_texture)
 
         # Update the MTL file to point to our texture
@@ -94,7 +94,7 @@ def _convert_mesh(
             with open(mtl_path, "r") as f:
                 mtl_content = f.read()
             mtl_content = mtl_content.replace(
-                "material_0.png", os.path.basename(texture_path)
+                "material_0.png", os.path.basename(image_path)
             )
             with open(mtl_path, "w") as f:
                 f.write(mtl_content)
@@ -407,16 +407,39 @@ def _convert_mjcf(
             texture_element.getparent().remove(texture_element)
 
     # Parse all materials that reference textures
-    material_paths = {}
+    materials = {}
     for material_element in root.findall(".//asset/material"):
         if "name" not in material_element.attrib:
             raise AssertionError("Material element must have a 'name' attribute")
+        # Create a SimpleMaterial with the specified properties
+        props = {  # default values from the MujoCo XML documentation.
+            "diffuse": [255, 255, 255, 255],
+            "ambient": [255, 255, 255, 255],
+            "specular": [0.5, 0.5, 0.5],
+            "glossiness": 0.5,
+        }
+        if "rgba" in material_element.attrib:
+            props["diffuse"] = [
+                255 * float(value) for value in material_element.attrib["rgba"].split()
+            ]
+            props["ambient"] = props["diffuse"]  # Match ambient to diffuse
+        if "specular" in material_element.attrib:
+            props["specular"] = [float(material_element.attrib["specular"])] * 3
+        if "shininess" in material_element.attrib:
+            props["glossiness"] = float(material_element.attrib["shininess"])
+        # Note: emission, metallic, and roughness aren't directly supported by
+        # SimpleMaterial so we'll skip those properties
         if "texture" in material_element.attrib:
             texture_name = material_element.attrib["texture"]
             if texture_name in texture_paths:
-                material_paths[material_element.attrib["name"]] = texture_paths[
-                    texture_name
-                ]
+                texture_path = texture_paths[texture_name]
+                if not os.path.exists(texture_path):
+                    raise FileNotFoundError(f"Texture file not found: {texture_path}")
+                image = Image.open(texture_path)
+                props["image"] = image
+        materials[material_element.attrib["name"]] = (
+            trimesh.visual.material.SimpleMaterial(**props)
+        )
 
     mesh_to_material = {}
     # Loop through geoms to find the mesh => material mappings
@@ -424,7 +447,7 @@ def _convert_mjcf(
         geom_element_w_defaults = _apply_defaults(geom_element, defaults)
         if (
             "material" in geom_element_w_defaults.attrib
-            and geom_element_w_defaults.attrib["material"] in material_paths
+            and geom_element_w_defaults.attrib["material"] in materials
             and "mesh" in geom_element_w_defaults.attrib
         ):
             mesh_name = geom_element_w_defaults.attrib["mesh"]
@@ -481,11 +504,11 @@ def _convert_mjcf(
         if not os.path.exists(mesh_path):
             raise FileNotFoundError(f"The file {mesh_path} does not exist.")
 
-        texture_path = None
+        material = None
         if mesh_name in mesh_to_material:
-            texture_path = material_paths[mesh_to_material[mesh_name]]
+            material = materials[mesh_to_material[mesh_name]]
 
-        if mesh_url.lower().endswith(".obj") and scale is None and texture_path is None:
+        if mesh_url.lower().endswith(".obj") and scale is None and material is None:
             # Don't need to convert .obj files with no scale or uniform scale.
             continue
 
@@ -493,7 +516,7 @@ def _convert_mjcf(
             url=mesh_url,
             path=mesh_path,
             scale=scale,
-            texture_path=texture_path,
+            material=material,
             overwrite=overwrite,
         )
 
@@ -561,7 +584,7 @@ def MakeDrakeCompatibleModel(
       https://github.com/RobotLocomotion/drake/issues/19263
     - Truncates all rgba attributes to [0, 1].
       https://github.com/RobotLocomotion/drake/issues/22445
-    - Applies textures specified in mujoco .xml directly to the mesh .obj files.
+    - Applies materials specified in mujoco .xml directly to the mesh .obj files.
 
     Any new files will be created alongside the original files (e.g. .obj files
     will be created next to the existing .stl files); all new files will get a
