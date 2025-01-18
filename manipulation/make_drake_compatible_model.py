@@ -2,19 +2,20 @@ import argparse
 import copy
 import os
 import re
-from typing import List, Tuple
+from typing import Tuple
 
 import numpy as np
 import trimesh
 from lxml import etree
 from PIL import Image  # For image loading
-from pydrake.all import PackageMap
+from pydrake.all import PackageMap, Quaternion, RigidTransform
 
 
 def _convert_mesh(
     url: str,
     path: str,
-    scale: List[float] | None = None,
+    scale: np.ndarray | None = None,
+    X_GM: np.ndarray = np.eye(4),
     material: trimesh.visual.material.Material | None = None,
     overwrite: bool = False,
 ) -> Tuple[str, str]:
@@ -24,19 +25,47 @@ def _convert_mesh(
         url: The URL of the mesh file.
         path: The path to the mesh file.
         scale: The (optional) scale to apply to the mesh.
+        X_GM: The (optional) transform from the geometry frame to the mesh frame.
         texture_path: The (optional) path to the texture file to apply to the mesh.
         overwrite: Whether to overwrite existing files.
 
     Returns:
         A tuple containing the URL and path of the converted mesh file.
     """
-    if scale:
+    # Create a compact matrix string for filename
+    if scale is not None:
         scale_str = "_scaled_" + "_".join(
             [str(int(s) if s.is_integer() else s).replace("-", "n") for s in scale]
         )
     else:
         scale_str = ""
-    suffix = "_from_" + path.rsplit(".", 1)[1] + scale_str + ".obj"
+    if not np.allclose(X_GM, np.eye(4)):
+        R = X_GM[:3, :3]
+        p = X_GM[:3, 3]
+
+        # Check if rotation is around a single axis
+        rot_str = ""
+        if np.allclose(R, np.eye(3)):
+            pass
+        elif np.allclose(R, np.array([[1, 0, 0], [0, -1, 0], [0, 0, -1]])):
+            rot_str = "_Rx180"
+        elif np.allclose(R, np.array([[-1, 0, 0], [0, 1, 0], [0, 0, -1]])):
+            rot_str = "_Ry180"
+        elif np.allclose(R, np.array([[-1, 0, 0], [0, -1, 0], [0, 0, 1]])):
+            rot_str = "_Rz180"
+        else:
+            # Use a hash of the rotation matrix for other cases
+            rot_str = f"_R{hash(R.tobytes()) % 1000:03d}"
+
+        # Add translation if non-zero
+        trans_str = ""
+        if not np.allclose(p, 0):
+            trans_str = f"_T{hash(p.tobytes()) % 1000:03d}"
+    else:
+        rot_str = ""
+        trans_str = ""
+    X_GM_str = scale_str + rot_str + trans_str
+    suffix = "_from_" + path.rsplit(".", 1)[1] + X_GM_str + ".obj"
 
     output_url = url.rsplit(".", 1)[0] + suffix
     output_path = path.rsplit(".", 1)[0] + suffix
@@ -56,14 +85,13 @@ def _convert_mesh(
 
     for mesh in meshes:
         # Apply scaling if specified
-        if scale is not None:
-            scale = [float(s) for s in scale]
-            if len(scale) != 3:
-                raise ValueError("Scale must be a 3-element array.")
-
-            scale_matrix = np.eye(4)
-            scale_matrix[:3, :3] = np.diag(scale)
-            mesh.apply_transform(scale_matrix)
+        if not np.allclose(X_GM, np.eye(4)) or scale is not None:
+            if scale is not None:
+                if len(scale) != 3:
+                    raise ValueError("Scale must be a 3-element array.")
+                scale.append(1)
+                X_GM = np.diag(scale) @ X_GM
+            mesh.apply_transform(X_GM)
 
         if material is not None:
             # For STL files, we need to ensure UV coordinates exist
@@ -141,6 +169,8 @@ def _convert_urdf(
             if len(set(scale)) == 1 and all(s > 0 for s in scale):
                 # Uniform positive scaling is supported natively by Drake.
                 scale = None
+            else:
+                node.attrib["scale"] = "1 1 1"
         if mesh_url.lower().endswith(".obj") and scale is None:
             # Don't need to convert .obj files with no scale or uniform scale.
             continue
@@ -158,10 +188,6 @@ def _convert_urdf(
 
         # Update the node's filename attribute
         node.attrib["filename"] = output_mesh_url
-
-        # If scale is not None, update the scale attribute
-        if scale:
-            node.attrib["scale"] = "1 1 1"
 
         # Convert the node back to a string
         node_string = etree.tostring(node, encoding="unicode")
@@ -476,12 +502,36 @@ def _convert_mjcf(
             mesh_element_w_defaults.attrib["name"] = mesh_name
             mesh_element.attrib["name"] = mesh_name
 
+        X_MG = RigidTransform()
+        if "refpos" in mesh_element_w_defaults.attrib:
+            refpos = [
+                float(value)
+                for value in mesh_element_w_defaults.attrib["refpos"].split()
+            ]
+            X_MG.set_translation(-refpos)
+            mesh_element.attrib["refpos"] = "0 0 0"
+        if "refquat" in mesh_element_w_defaults.attrib:
+            refquat = np.array(
+                [
+                    float(value)
+                    for value in mesh_element_w_defaults.attrib["refquat"].split()
+                ]
+            )
+            refquat = refquat / np.linalg.norm(refquat)
+            X_MG.set_rotation(
+                Quaternion(refquat[0], refquat[1], refquat[2], refquat[3])
+            )
+            mesh_element.attrib["refquat"] = "1 0 0 0"
+        X_GM = X_MG.inverse().GetAsMatrix4()
+
         scale = mesh_element_w_defaults.attrib.get("scale")
         if scale:
             scale = [float(s) for s in scale.split()]
             if len(set(scale)) == 1 and all(s > 0 for s in scale):
                 # Uniform positive scaling is supported natively by Drake.
                 scale = None
+            else:
+                mesh_element.attrib["scale"] = "1 1 1"
 
         # Get absolute path to mesh file according to MJCF rules
         if strippath:
@@ -516,16 +566,13 @@ def _convert_mjcf(
             url=mesh_url,
             path=mesh_path,
             scale=scale,
+            X_GM=X_GM,
             material=material,
             overwrite=overwrite,
         )
 
         # Update the node's filename attribute
         mesh_element.attrib["file"] = output_mesh_url
-
-        # If scale is not None, update the scale attribute
-        if scale:
-            mesh_element.attrib["scale"] = "1 1 1"
 
     geoms_with_type_plane = root.findall(".//geom[@type='plane']")
     for geom in geoms_with_type_plane:
@@ -584,6 +631,8 @@ def MakeDrakeCompatibleModel(
       https://github.com/RobotLocomotion/drake/issues/19263
     - Truncates all rgba attributes to [0, 1].
       https://github.com/RobotLocomotion/drake/issues/22445
+    - Applies refpos and refquat attributes to the mesh .obj files.
+      https://github.com/RobotLocomotion/drake/issues/22488
     - Applies materials specified in mujoco .xml directly to the mesh .obj files.
 
     Any new files will be created alongside the original files (e.g. .obj files
