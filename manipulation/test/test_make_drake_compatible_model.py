@@ -14,14 +14,14 @@ try:
         _convert_mesh,
     )
 
-    pymeshlab_available = True
+    trimesh_available = True
 except ImportError:
-    pymeshlab_available = False
-    print("pymeshlab not found.")
-    print("Consider 'pip install pymeshlab'.")
+    trimesh_available = False
+    print("trimesh not found.")
+    print("Consider 'pip install trimesh'.")
 
 
-@unittest.skipIf(not pymeshlab_available, "Requires pymeshlab dependency.")
+@unittest.skipIf(not trimesh_available, "Requires trimesh dependency.")
 class TestMakeDrakeCompatibleModel(unittest.TestCase):
     def test_obj_no_textures(self):
         input_url = FindResource("test/models/cube.obj")

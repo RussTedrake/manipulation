@@ -49,8 +49,8 @@ priority = "explicit"
 [tool.poetry.dependencies]
 python = "<4.0,>=3.10"
 cloudpickle = { version="2.2.1", optional=true} # needs to be pinned for stored files to remain compatible.
-#drake = { version = ">=0.0.20250116 <1.0", source = "drake-nightly" }
-drake = ">=1.37.0"
+drake = { version = ">=0.0.20250118 <1.0", source = "drake-nightly" }
+#drake = ">=1.37.0"
 gradescope-utils = { version=">=0.4.0", optional=true}
 gymnasium = { version=">0.26", optional=true }
 ipython = ">=7.8.0" # TODO: make this optional?
@@ -66,8 +66,8 @@ nbconvert = [
 nevergrad = { version=">=0.4.3", optional=true } # TODO: avoid expensive bayesian optimization dep
 numpy = "<2.0.0"  # https://stackoverflow.com/questions/78533824/local-installation-of-drake-on-macos-sonoma
 psutil = { version=">=5.9.*", optional=true }
+pycollada = { version=">=0.8", optional=true }
 #pymcubes = ">=0.0.9"
-pymeshlab = { version=">=2023.0", optional=true }
 pyvirtualdisplay = { version=">=3.0", optional=false } # TODO: remove this.
 pyzmq = [ 
   {platform="darwin", version=">=25.0.0", optional=true}, # needed for python 3.11?
@@ -86,7 +86,7 @@ vhacdx = { version=">=0.0.5", optional=true }
 [tool.poetry.extras]
 torch = ["torch", "torchvision"]
 rl = ["stable_baselines3", "gymnasium"]
-mesh = ["trimesh", "vhacdx", "pymeshlab"]
+mesh = ["pycollada", "trimesh", "vhacdx"]
 grader = ["gradescope-utils", "timeout-decorator", "nbconvert", "nbformat"]
 # 'all' should have all of the optional dependencies required to run bazel in this repo.
 all = [
@@ -96,7 +96,7 @@ all = [
   "ipywidgets",
   "nevergrad",
   "psutil",
-  "pymeshlab",
+  "pycollada",
   "pyzmq",
   "scipy",
   "stable_baselines3",
@@ -116,13 +116,12 @@ optional = true
 # autodoc, even if it repeats some dependencies from main, because my sphinx
 # script uses `poetry install --only docs`. This include any requirements
 # needed to import for a file that sphinx autodoc is trying to index.
-#drake = { version = ">=0.0.20250116 <1.0", source = "drake-nightly" }
-drake = ">=1.37.0"
+drake = { version = ">=0.0.20250118 <1.0", source = "drake-nightly" }
+#drake = ">=1.37.0"
 ipython = ">=7.8.0"
 lxml = {version = ">=4.9.2", extras = ["html_clean"] }
 mpld3  = { version=">=0.5.6", optional=false }
 myst-parser = ">=2.0.0"
-pymeshlab = ">=2023.0"
 pyvirtualdisplay = { version=">=3.0", optional=false }
 sphinx = ">=7.2.6"
 sphinx_rtd_theme = ">=2.0.0"

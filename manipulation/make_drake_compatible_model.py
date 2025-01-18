@@ -4,8 +4,10 @@ import os
 import re
 from typing import List, Tuple
 
-import pymeshlab
+import numpy as np
+import trimesh
 from lxml import etree
+from PIL import Image  # For image loading
 from pydrake.all import PackageMap
 
 
@@ -16,12 +18,12 @@ def _convert_mesh(
     texture_path: str | None = None,
     overwrite: bool = False,
 ) -> Tuple[str, str]:
-    """Convert a mesh file to be compatible with Drake.
+    """Convert a mesh file to be compatible with Drake using Trimesh.
 
     Args:
         url: The URL of the mesh file.
         path: The path to the mesh file.
-        scale: The (optional)scale to apply to the mesh.
+        scale: The (optional) scale to apply to the mesh.
         texture_path: The (optional) path to the texture file to apply to the mesh.
         overwrite: Whether to overwrite existing files.
 
@@ -39,43 +41,64 @@ def _convert_mesh(
     output_url = url.rsplit(".", 1)[0] + suffix
     output_path = path.rsplit(".", 1)[0] + suffix
 
+    # Generate base name for material
+    mtl_name = os.path.splitext(os.path.basename(output_path))[0] + ".mtl"
+
     if not overwrite and os.path.exists(output_path):
-        # This was a bit too noisy:
-        # print(f"Note: {output_path} already exists. Skipping conversion.")
         return output_url, output_path
 
-    # Create a new PyMeshLab mesh set
-    ms = pymeshlab.MeshSet()
+    # Load the mesh
+    mesh = trimesh.load(path)
 
-    # Load the mesh file
-    ms.load_new_mesh(path)
-
-    if texture_path is not None:
-        if not os.path.exists(texture_path):
-            raise FileNotFoundError(f"Texture file not found: {texture_path}")
-
-        # Apply the texture to the mesh
-        print(f"Applying texture {texture_path} to mesh {path}")
-        ms.set_texture_per_mesh(textname=texture_path)
-
+    # Apply scaling if specified
     if scale is not None:
         scale = [float(s) for s in scale]
         if len(scale) != 3:
             raise ValueError("Scale must be a 3-element array.")
 
-        # First apply absolute value scaling
-        ms.apply_filter(
-            "compute_matrix_from_translation_rotation_scale",
-            scalex=scale[0],
-            scaley=scale[1],
-            scalez=scale[2],
-            freeze=True,
-        )
-        if any(s < 0 for s in scale):
-            ms.apply_filter("meshing_invert_face_orientation")
+        scale_matrix = np.eye(4)
+        scale_matrix[:3, :3] = np.diag(scale)
+        mesh.apply_transform(scale_matrix)
 
-    # Save the mesh
-    ms.save_current_mesh(output_path, save_face_color=False, save_vertex_color=False)
+    # If texture_path is provided, use that texture
+    if texture_path is not None:
+        if not os.path.exists(texture_path):
+            raise FileNotFoundError(f"Texture file not found: {texture_path}")
+        image = Image.open(texture_path)
+
+        # For STL files, we need to ensure UV coordinates exist
+        if isinstance(mesh, trimesh.Trimesh) and not hasattr(mesh.visual, "uv"):
+            # Generate simple planar UV coordinates based on normalized vertex positions
+            vertices = mesh.vertices - mesh.vertices.min(axis=0)
+            vertices = vertices / vertices.max(axis=0)
+            uv = vertices[:, [0, 1]]  # Use X and Y coordinates for UV mapping
+
+            mesh.visual = trimesh.visual.TextureVisuals(uv=uv, image=image)
+
+        material = trimesh.visual.material.SimpleMaterial(image=image)
+        mesh.visual.material = material
+
+    # Export as OBJ with specified material filename
+    mesh.export(output_path, include_texture=True, mtl_name=mtl_name)
+
+    # If we specified a texture_path, clean up the generated texture and update MTL
+    if texture_path is not None:
+        # Remove the generated texture if it exists
+        generated_texture = os.path.join(os.path.dirname(output_path), "material_0.png")
+        if os.path.exists(generated_texture) and generated_texture != texture_path:
+            os.remove(generated_texture)
+
+        # Update the MTL file to point to our texture
+        mtl_path = os.path.join(os.path.dirname(output_path), mtl_name)
+        if os.path.exists(mtl_path):
+            with open(mtl_path, "r") as f:
+                mtl_content = f.read()
+            mtl_content = mtl_content.replace(
+                "material_0.png", os.path.basename(texture_path)
+            )
+            with open(mtl_path, "w") as f:
+                f.write(mtl_content)
+
     print(f"Converted {path} to {output_path}")
     return output_url, output_path
 
@@ -227,7 +250,7 @@ def _apply_defaults(
         The element with defaults applied.
     """
     # If class_name_override not already set, check parent elements for childclass
-    if class_name_override is None:
+    if class_name_override is None and "class" not in element.attrib:
         parent = element.getparent()
         while parent is not None:
             if "childclass" in parent.attrib:
