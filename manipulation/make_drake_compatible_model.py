@@ -524,6 +524,7 @@ def MakeDrakeCompatibleModel(
     Drake multibody parsers.
 
     For all models:
+
     - Converts any .stl files to obj
       https://github.com/RobotLocomotion/drake/issues/19408
     - Converts any .dae files to obj
@@ -532,6 +533,7 @@ def MakeDrakeCompatibleModel(
       https://github.com/RobotLocomotion/drake/issues/22046
 
     In addition, for MuJoCo .xml models:
+
     - Converts dynamic half-space collision geometries to (very) large boxes
       https://github.com/RobotLocomotion/drake/issues/19263
     - Truncates all rgba attributes to [0, 1].
