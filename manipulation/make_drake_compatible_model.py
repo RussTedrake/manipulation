@@ -2,6 +2,7 @@ import argparse
 import copy
 import os
 import re
+import warnings
 from typing import Tuple
 
 import numpy as np
@@ -325,6 +326,15 @@ def _convert_mjcf(
         package_map: The PackageMap to use.
         overwrite: Whether to overwrite existing files.
     """
+    # Check if output path matches input path
+    if os.path.dirname(os.path.abspath(output_filename)) != os.path.dirname(
+        os.path.abspath(input_filename)
+    ):
+        warnings.warn(
+            f"Output path {os.path.dirname(output_filename)} differs from input path {os.path.dirname(input_filename)}. "
+            "This may cause issues with relative paths in the MJCF file."
+        )
+
     # Process includes first to build complete DOM
     tree = _process_includes(input_filename)
     root = tree.getroot()
