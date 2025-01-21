@@ -115,7 +115,8 @@ optional = true
 # Must include all dependencies required to build the docs with sphinx +
 # autodoc, even if it repeats some dependencies from main, because my sphinx
 # script uses `poetry install --only docs`. This include any requirements
-# needed to import for a file that sphinx autodoc is trying to index.
+# needed to import for a file that sphinx autodoc is trying to index. None of
+# these should be marked as optional.
 drake = { version = ">=0.0.20250118 <1.0", source = "drake-nightly" }
 #drake = ">=1.37.0"
 ipython = ">=7.8.0"
@@ -125,8 +126,8 @@ myst-parser = ">=2.0.0"
 pyvirtualdisplay = { version=">=3.0", optional=false }
 sphinx = ">=7.2.6"
 sphinx_rtd_theme = ">=2.0.0"
-trimesh = {extras = ["recommend"], version = ">=4.0.0 <4.2.0", optional=true }
-vhacdx = { version=">=0.0.5", optional=true }
+trimesh = {extras = ["recommend"], version = ">=4.0.0 <4.2.0", optional=false }
+vhacdx = { version=">=0.0.5", optional=false }
 
 [tool.poetry.group.dev.dependencies]
 # These should not appear as requirements in any BUILD.bazel (except htmlbook)
