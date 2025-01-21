@@ -64,7 +64,7 @@ nbconvert = [
   {platform="linux", version="6.4.0"},
 ]
 nevergrad = { version=">=0.4.3", optional=true } # TODO: avoid expensive bayesian optimization dep
-numpy = "<2.0.0"  # https://stackoverflow.com/questions/78533824/local-installation-of-drake-on-macos-sonoma
+numpy = "^2.0.0"
 psutil = { version=">=5.9.*", optional=true }
 pycollada = { version=">=0.8", optional=true }
 #pymcubes = ">=0.0.9"
