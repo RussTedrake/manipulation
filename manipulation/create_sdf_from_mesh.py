@@ -411,6 +411,9 @@ if __name__ == "__main__":
         choices=["auto", "voxel", "sampling"],
         help="CoACD preprocess mode.",
     )
+    coacd_group.add_argument(
+        "--pca", action="store_true", help="Enable PCA pre-processing."
+    )
 
     # VHACD arguments.
     vhacd_group.add_argument(
@@ -516,17 +519,21 @@ if __name__ == "__main__":
         sys.exit(1)
 
     # Separate VHACD and CoACD parameters.
-    vhacd_params = {
-        "resolution": args.vhacd_resolution,
-        "maxConvexHulls": args.maxConvexHulls,
-        "minimumVolumePercentErrorAllowed": args.minimumVolumePercentErrorAllowed,
-        "maxRecursionDepth": args.maxRecursionDepth,
-        "shrinkWrap": not args.no_shrinkWrap,
-        "fillMode": args.fillMode,
-        "maxNumVerticesPerCH": args.maxNumVerticesPerCH,
-        "asyncACD": not args.no_asyncACD,
-        "minEdgeLength": args.minEdgeLength,
-    }
+    vhacd_params = (
+        {
+            "resolution": args.vhacd_resolution,
+            "maxConvexHulls": args.maxConvexHulls,
+            "minimumVolumePercentErrorAllowed": args.minimumVolumePercentErrorAllowed,
+            "maxRecursionDepth": args.maxRecursionDepth,
+            "shrinkWrap": not args.no_shrinkWrap,
+            "fillMode": args.fillMode,
+            "maxNumVerticesPerCH": args.maxNumVerticesPerCH,
+            "asyncACD": not args.no_asyncACD,
+            "minEdgeLength": args.minEdgeLength,
+        }
+        if not args.use_coacd
+        else None
+    )
     coacd_params = {}
     for param in [
         "threshold",
