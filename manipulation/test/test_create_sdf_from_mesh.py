@@ -66,6 +66,7 @@ class CreateSDFFromMeshTest(unittest.TestCase):
             f"An incorrect number of mesh pieces were created ({num_mesh_pieces} pieces)",
         )
 
+    @unittest.skipIf(not coacd_available, "Requires coacd dependency.")
     def test_create_sdf_from_mesh_with_coacd_params(self):
         create_sdf_from_mesh(
             mesh_path=Path(self._mesh_path),
@@ -77,6 +78,7 @@ class CreateSDFFromMeshTest(unittest.TestCase):
             mu_dynamic=1.0,
             mu_static=None,
             preview_with_trimesh=False,
+            use_coacd=True,
             coacd_kwargs={
                 "threshold": 0.1,
                 "resolution": 1000,

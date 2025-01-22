@@ -66,8 +66,8 @@ def _perform_convex_decomposition(
     mesh_dir: Path,
     preview_with_trimesh: bool,
     use_coacd: bool = False,
-    coacd_kwargs: dict = None,
-    vhacd_kwargs: dict = None,
+    coacd_kwargs: dict | None = None,
+    vhacd_kwargs: dict | None = None,
 ) -> List[Path]:
     """Given a mesh, performs a convex decomposition of it with either VHACD or CoACD.
     The resulting convex parts are saved in a subfolder named `<mesh_filename>_parts`.
@@ -81,8 +81,8 @@ def _perform_convex_decomposition(
         preview_with_trimesh (bool): Whether to open (and block on) a window to preview
         the decomposition.
         use_coacd (bool): Whether to use CoACD instead of VHACD for decomposition.
-        coacd_kwargs (dict, optional): The CoACD-specific parameters.
-        vhacd_kwargs (dict, optional): The VHACD-specific parameters.
+        coacd_kwargs (dict | None): The CoACD-specific parameters.
+        vhacd_kwargs (dict | None): The VHACD-specific parameters.
 
     Returns:
         List[Path]: The paths of the convex pieces.
@@ -162,9 +162,9 @@ def create_sdf_from_mesh(
     mu_dynamic: Union[float, None],
     mu_static: Union[float, None],
     preview_with_trimesh: bool,
-    use_coacd: bool,
-    coacd_kwargs: dict,
-    vhacd_kwargs: dict,
+    use_coacd: bool = False,
+    coacd_kwargs: dict | None = None,
+    vhacd_kwargs: dict | None = None,
 ) -> None:
     """Given a mesh, creates an SDFormat file in the same directory that:
     - Uses the mesh as its visual geometry
@@ -195,9 +195,14 @@ def create_sdf_from_mesh(
         preview_with_trimesh (bool): Whether to open (and block on) a window to preview
         the decomposition.
         use_coacd (bool): Whether to use CoACD instead of VHACD for convex decomposition.
-        coacd_kwargs (dict): The CoACD-specific parameters.
-        vhacd_kwargs (dict): The VHACD-specific parameters.
+        coacd_kwargs (dict | None): The CoACD-specific parameters.
+        vhacd_kwargs (dict | None): The VHACD-specific parameters.
     """
+    if (use_coacd and vhacd_kwargs is not None) or (
+        not use_coacd and coacd_kwargs is not None
+    ):
+        raise ValueError("Cannot use both CoACD and VHACD.")
+
     # Construct SDF path
     dir_path = mesh_path.parent
     mesh_name = mesh_path.stem
