@@ -79,7 +79,7 @@ timeout-decorator = { version=">=0.4.1", optional=true }
 torch = { version=">=2.0.1 <2.4.0", optional=true } # 2.4.0 doesn't support +cpu yet; needed for bazel on linux. additional logic in PoetryExport.sh.
 torchvision = { version=">=0.10.1", optional=true }
 tqdm = { version=">=4", optional=true }
-trimesh = {extras = ["recommend"], version = ">=4.4.4", optional=true }
+trimesh = { version = ">=4.4.4", optional=true }
 vhacdx = { version=">=0.0.5", optional=true }
 #wandb = ">=0.14.0"
 
@@ -126,7 +126,7 @@ myst-parser = ">=2.0.0"
 pyvirtualdisplay = { version=">=3.0", optional=false }
 sphinx = ">=7.2.6"
 sphinx_rtd_theme = ">=2.0.0"
-trimesh = {extras = ["recommend"], version = ">=4.4.4", optional=false }
+trimesh = { version = ">=4.4.4", optional=false }
 vhacdx = { version=">=0.0.5", optional=false }
 
 [tool.poetry.group.dev.dependencies]
