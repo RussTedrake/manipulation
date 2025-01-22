@@ -490,6 +490,23 @@ constrained-solution-tracking = ["moarchiving"]
 plotting = ["matplotlib"]
 
 [[package]]
+name = "coacd"
+version = "1.0.5"
+description = "Approximate Convex Decomposition for 3D Meshes with Collision-Aware Concavity and Tree Search"
+optional = true
+python-versions = ">=3.6"
+files = [
+    {file = "coacd-1.0.5-cp36-abi3-macosx_10_14_x86_64.whl", hash = "sha256:92503b7cb1d6a28eb8d609532567773de22e6190b8aa1ceeb4ce4fa697dc1760"},
+    {file = "coacd-1.0.5-cp36-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:70439f5170dfb8b249615650c13203c65459d34b2524fca8ef6658992b12355c"},
+    {file = "coacd-1.0.5-cp36-abi3-musllinux_1_1_x86_64.whl", hash = "sha256:1248548f76115098dd034425050c4ddc9ccdcde16b745d7ca012efc6774587cd"},
+    {file = "coacd-1.0.5-cp36-abi3-win_amd64.whl", hash = "sha256:544451ad5509c5324db2e14a599ae6cf9e0588d3f0e737a2a7b550236f9f0a5f"},
+    {file = "coacd-1.0.5-cp38-abi3-macosx_10_14_universal2.whl", hash = "sha256:3df979a8d7e2b0ac18c15c137ead462e042e8f6828e87eb451027914ddca5201"},
+]
+
+[package.dependencies]
+numpy = "*"
+
+[[package]]
 name = "colorama"
 version = "0.4.6"
 description = "Cross-platform colored terminal text."
@@ -4899,13 +4916,13 @@ test = ["big-O", "importlib-resources", "jaraco.functools", "jaraco.itertools", 
 type = ["pytest-mypy"]
 
 [extras]
-all = ["cloudpickle", "gradescope-utils", "gymnasium", "ipywidgets", "nevergrad", "psutil", "pycollada", "pyzmq", "pyzmq", "scipy", "stable-baselines3", "timeout-decorator", "torch", "torchvision", "tqdm", "trimesh", "vhacdx"]
+all = ["cloudpickle", "coacd", "gradescope-utils", "gymnasium", "ipywidgets", "nevergrad", "psutil", "pycollada", "pyzmq", "pyzmq", "scipy", "stable-baselines3", "timeout-decorator", "torch", "torchvision", "tqdm", "trimesh", "vhacdx"]
 grader = ["gradescope-utils", "nbconvert", "nbconvert", "timeout-decorator"]
-mesh = ["pycollada", "trimesh", "vhacdx"]
+mesh = ["coacd", "pycollada", "trimesh", "vhacdx"]
 rl = ["gymnasium", "stable-baselines3"]
 torch = ["torch", "torchvision"]
 
 [metadata]
 lock-version = "2.0"
 python-versions = "<4.0,>=3.10"
-content-hash = "16783194e7192792f1e7e9eddd9bd7e07f11a324bc4f79c4a89440b4d44fe95b"
+content-hash = "7c911436431913bb12187ccfd10d426b2dde85dbf3856d49bde0f9dd91ec1e7f"

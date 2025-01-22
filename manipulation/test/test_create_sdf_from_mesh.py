@@ -17,6 +17,16 @@ except ImportError:
     print("Consider 'pip install trimesh'.")
 
 
+try:
+    import coacd  # noqa: F401
+
+    coacd_available = True
+except ImportError:
+    coacd_available = False
+    print("coacd not found.")
+    print("Consider 'pip install coacd'.")
+
+
 @unittest.skipIf(not trimesh_available, "Requires trimesh dependency.")
 class CreateSDFFromMeshTest(unittest.TestCase):
     @classmethod
@@ -45,6 +55,32 @@ class CreateSDFFromMeshTest(unittest.TestCase):
         self.assertTrue(
             os.path.exists(self._mesh_path.replace("obj", "sdf")),
             "SDFormat file does not exist",
+        )
+        mesh_pieces_dir = self._mesh_path.replace(".obj", "_parts")
+        self.assertTrue(
+            os.path.exists(mesh_pieces_dir), "Mesh pieces dir does not exist"
+        )
+        num_mesh_pieces = len(fnmatch.filter(os.listdir(mesh_pieces_dir), "*.*"))
+        self.assertTrue(
+            num_mesh_pieces == 1,
+            f"An incorrect number of mesh pieces were created ({num_mesh_pieces} pieces)",
+        )
+
+    def test_create_sdf_from_mesh_with_coacd_params(self):
+        create_sdf_from_mesh(
+            mesh_path=Path(self._mesh_path),
+            mass=1.0,
+            scale=1.5,
+            is_compliant=True,
+            hydroelastic_modulus=1e8,
+            hunt_crossley_dissipation=None,
+            mu_dynamic=1.0,
+            mu_static=None,
+            preview_with_trimesh=False,
+            coacd_kwargs={
+                "threshold": 0.1,
+                "resolution": 1000,
+            },
         )
         mesh_pieces_dir = self._mesh_path.replace(".obj", "_parts")
         self.assertTrue(
