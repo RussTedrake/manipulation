@@ -26,6 +26,15 @@ except ImportError:
     print("coacd not found.")
     print("Consider 'pip install coacd'.")
 
+try:
+    import vhacdx  # noqa: F401
+
+    vhacdx_available = True
+except ImportError:
+    vhacdx_available = False
+    print("vhacdx not found.")
+    print("Consider 'pip install vhacdx'.")
+
 
 @unittest.skipIf(not trimesh_available, "Requires trimesh dependency.")
 class CreateSDFFromMeshTest(unittest.TestCase):
@@ -40,6 +49,7 @@ class CreateSDFFromMeshTest(unittest.TestCase):
     def tearDownClass(cls):
         shutil.rmtree(cls._tmp_dir)
 
+    @unittest.skipIf(not vhacdx_available, "Requires vhacdx dependency.")
     def test_create_sdf_from_mesh(self):
         create_sdf_from_mesh(
             mesh_path=Path(self._mesh_path),

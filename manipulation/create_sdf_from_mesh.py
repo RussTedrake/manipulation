@@ -119,6 +119,13 @@ def _perform_convex_decomposition(
                 piece = trimesh.Trimesh(vertices, faces)
                 convex_pieces.append(piece)
         else:
+            try:
+                import vhacdx  # noqa: F401
+            except ImportError:
+                print("vhacdx not found.")
+                print("Consider 'pip install vhacdx'.")
+                exit(code=1)
+
             vhacd_settings = vhacd_kwargs or {}
             convex_pieces = mesh.convex_decomposition(**vhacd_settings)
             if not isinstance(convex_pieces, list):
