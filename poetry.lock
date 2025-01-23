@@ -710,16 +710,16 @@ files = [
 
 [[package]]
 name = "drake"
-version = "0.0.20250122"
+version = "0.0.20250123"
 description = "Model-based design and verification for robotics"
 optional = false
 python-versions = ">=3.10"
 files = [
-    {file = "drake-0.0.20250122-cp310-cp310-manylinux_2_35_x86_64.whl", hash = "sha512:f9482b4dd27edd9875e06aa0dd49e8b58bc87c9e3bf6b8a2d4f9e322097045397418087fe17bb3eb57dda0a88abecdce092c3bcff43494909151f177f6321d15"},
-    {file = "drake-0.0.20250122-cp311-cp311-macosx_14_0_arm64.whl", hash = "sha512:9620896f51cf44f8a7e845acf90f90616078559af1bffe7317334239c015d9f467cbda5b506017744c3059e646742013993c73e4f41811b25a75391e0f102f19"},
-    {file = "drake-0.0.20250122-cp311-cp311-manylinux_2_35_x86_64.whl", hash = "sha512:f1700659dff779dd59f73960b708b03bf91ff0d7731a7b33f3fd28d52f9dff0616d7227c3025f5e0471cdaa8b0f3a65c055bc2a42a37c4ff77fcecb52fa1a5a9"},
-    {file = "drake-0.0.20250122-cp312-cp312-macosx_14_0_arm64.whl", hash = "sha512:590c0d8881b1c6399e8434881978f93b5cbed0b58c06fc8ddae686ea6a9fbeddfde8c87a8216bb165b8bdf7d3065c27717cd18f75edd4b0a0d962fc7e0a09f76"},
-    {file = "drake-0.0.20250122-cp312-cp312-manylinux_2_35_x86_64.whl", hash = "sha512:659a9d04f0b3059f73f827fe94540cf583606f3a6740c2ee88b0793529e15ec3e79213c9aa1d54185bc0bbcae215b11da19370b36e59e65d0985f622cff52c5d"},
+    {file = "drake-0.0.20250123-cp310-cp310-manylinux_2_35_x86_64.whl", hash = "sha512:311c6045efa1d2ab05e6980ac83923a51196c6222bd72896216c6ee0b7d415bc5be58915a4f3b0ca2e4150c185746008a3f9b65304a4fd65727041a84fbffbe7"},
+    {file = "drake-0.0.20250123-cp311-cp311-macosx_14_0_arm64.whl", hash = "sha512:92416b6a667dd9e820169128ebde175ac2930d0288af3f3e1994ce7f661ba1dc9a59de4c0d5e6308d1ea9acec2ca5a9379399f0ad05117ba41d68a05aedca47c"},
+    {file = "drake-0.0.20250123-cp311-cp311-manylinux_2_35_x86_64.whl", hash = "sha512:d23410becc2dca7964f5322dde296786f6b227fe1b7609d6da45ea467985d08f446e421be74bcaede92cbcc6bb3c315cafbebc65270f40efd1a7abf8a689e335"},
+    {file = "drake-0.0.20250123-cp312-cp312-macosx_14_0_arm64.whl", hash = "sha512:ad83162bc89fd72995da6a93afef564fc1f79c9196262bba3e2c57adc1a9d75d8c9f7ab34d9b84c71605de4116735a31b6ddc3474913bb5ba714f4a1e42bbbd7"},
+    {file = "drake-0.0.20250123-cp312-cp312-manylinux_2_35_x86_64.whl", hash = "sha512:72490f44165f8560a9aeae20ed67198075340f0f04092cfbdb9968fe0f8e999e007b78ebd47871f33414a220757b630c6bca176e78c0d99512894405e7d03d03"},
 ]
 
 [package.dependencies]
@@ -4514,4 +4514,4 @@ torch = ["torch", "torchvision"]
 [metadata]
 lock-version = "2.0"
 python-versions = "<4.0,>=3.10"
-content-hash = "a2e600a520abb09c7b904e78e860ed6c8ea57540f76548cf1235dc63510bad91"
+content-hash = "ad8108d671e07f99f334340dbd17521ae71054d23d2735ad01b7dbe6e9625f69"
