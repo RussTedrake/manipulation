@@ -82,11 +82,12 @@ tqdm = { version=">=4", optional=true }
 trimesh = { version = ">=4.4.4", optional=true }
 vhacdx = { version=">=0.0.5", optional=true }
 #wandb = ">=0.14.0"
+coacd = { version="^1.0.5", optional=true }
 
 [tool.poetry.extras]
 torch = ["torch", "torchvision"]
 rl = ["stable_baselines3", "gymnasium"]
-mesh = ["pycollada", "trimesh", "vhacdx"]
+mesh = ["pycollada", "trimesh", "vhacdx", "coacd"]
 grader = ["gradescope-utils", "timeout-decorator", "nbconvert", "nbformat"]
 # 'all' should have all of the optional dependencies required to run bazel in this repo.
 all = [
@@ -105,7 +106,8 @@ all = [
   "torchvision",
   "tqdm",
   "trimesh",
-  "vhacdx"
+  "vhacdx",
+  "coacd"
 ]
 
 [tool.poetry.group.docs]

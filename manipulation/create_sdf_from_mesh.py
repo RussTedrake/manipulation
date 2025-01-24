@@ -65,13 +65,12 @@ def _perform_convex_decomposition(
     mesh_name: str,
     mesh_dir: Path,
     preview_with_trimesh: bool,
-    **kwargs,
+    use_coacd: bool = False,
+    coacd_kwargs: dict | None = None,
+    vhacd_kwargs: dict | None = None,
 ) -> List[Path]:
-    """Given a mesh, performs a convex decomposition of it with VHACD. The resulting
-    convex parts are saved in a subfolder named `<mesh_filename>_parts`.
-
-    NOTE: The current implementation requires trimesh>=4.0.0. See
-    https://github.com/mikedh/trimesh/issues/2045.
+    """Given a mesh, performs a convex decomposition of it with either VHACD or CoACD.
+    The resulting convex parts are saved in a subfolder named `<mesh_filename>_parts`.
 
     Args:
         mesh (trimesh.Trimesh): The mesh to decompose.
@@ -81,7 +80,9 @@ def _perform_convex_decomposition(
         used for creating the mesh parts directory.
         preview_with_trimesh (bool): Whether to open (and block on) a window to preview
         the decomposition.
-        **kwargs: The convex decomposition arguments that are passed to VHACD.
+        use_coacd (bool): Whether to use CoACD instead of VHACD for decomposition.
+        coacd_kwargs (dict | None): The CoACD-specific parameters.
+        vhacd_kwargs (dict | None): The VHACD-specific parameters.
 
     Returns:
         List[Path]: The paths of the convex pieces.
@@ -98,15 +99,40 @@ def _perform_convex_decomposition(
 
     logging.info(
         "Performing convex decomposition. This might take a couple of minutes for "
-        + "complicated meshes. If this runs too long, try decreasing --resolution."
+        + "complicated meshes and fine resolution settings."
     )
     try:
-        convex_pieces = mesh.convex_decomposition(**kwargs)
+        if use_coacd:
+            try:
+                import coacd
+            except ImportError:
+                print("coacd not found.")
+                print("Consider 'pip install coacd'.")
+                exit(code=1)
+
+            coacd.set_log_level("error")
+            coacd_mesh = coacd.Mesh(mesh.vertices, mesh.faces)
+            coacd_result = coacd.run_coacd(coacd_mesh, **(coacd_kwargs or {}))
+            # Convert CoACD result to trimesh objects.
+            convex_pieces = []
+            for vertices, faces in coacd_result:
+                piece = trimesh.Trimesh(vertices, faces)
+                convex_pieces.append(piece)
+        else:
+            try:
+                import vhacdx  # noqa: F401
+            except ImportError:
+                print("vhacdx not found.")
+                print("Consider 'pip install vhacdx'.")
+                exit(code=1)
+
+            vhacd_settings = vhacd_kwargs or {}
+            convex_pieces = mesh.convex_decomposition(**vhacd_settings)
+            if not isinstance(convex_pieces, list):
+                convex_pieces = [convex_pieces]
     except Exception as e:
         logging.error(f"Problem performing decomposition: {e}")
         exit(1)
-    if not isinstance(convex_pieces, list):
-        convex_pieces = [convex_pieces]
 
     if preview_with_trimesh:
         # Display the convex decomposition, giving each a random colors
@@ -143,7 +169,9 @@ def create_sdf_from_mesh(
     mu_dynamic: Union[float, None],
     mu_static: Union[float, None],
     preview_with_trimesh: bool,
-    **kwargs,
+    use_coacd: bool = False,
+    coacd_kwargs: dict | None = None,
+    vhacd_kwargs: dict | None = None,
 ) -> None:
     """Given a mesh, creates an SDFormat file in the same directory that:
     - Uses the mesh as its visual geometry
@@ -173,8 +201,15 @@ def create_sdf_from_mesh(
         mu_static (Union[float, None]): The coefficient of static friction.
         preview_with_trimesh (bool): Whether to open (and block on) a window to preview
         the decomposition.
-        **kwargs: The VHACD arguments.
+        use_coacd (bool): Whether to use CoACD instead of VHACD for convex decomposition.
+        coacd_kwargs (dict | None): The CoACD-specific parameters.
+        vhacd_kwargs (dict | None): The VHACD-specific parameters.
     """
+    if (use_coacd and vhacd_kwargs is not None) or (
+        not use_coacd and coacd_kwargs is not None
+    ):
+        raise ValueError("Cannot use both CoACD and VHACD.")
+
     # Construct SDF path
     dir_path = mesh_path.parent
     mesh_name = mesh_path.stem
@@ -220,7 +255,9 @@ def create_sdf_from_mesh(
         mesh_name=mesh_name,
         mesh_dir=dir_path,
         preview_with_trimesh=preview_with_trimesh,
-        **kwargs,
+        use_coacd=use_coacd,
+        coacd_kwargs=coacd_kwargs,
+        vhacd_kwargs=vhacd_kwargs,
     )
     for i, mesh_piece_path in enumerate(mesh_piece_paths):
         mesh_piece_path = mesh_piece_path.relative_to(dir_path)
@@ -321,61 +358,6 @@ if __name__ == "__main__":
         help="The coefficient of static friction.",
     )
     parser.add_argument(
-        "--resolution",
-        type=int,
-        default=10000000,
-        help="VHACD voxel resolution.",
-    )
-    parser.add_argument(
-        "--maxConvexHulls",
-        type=int,
-        default=64,
-        help="VHACD maximum number of convex hulls/ mesh pieces.",
-    )
-    parser.add_argument(
-        "--minimumVolumePercentErrorAllowed",
-        type=float,
-        default=1.0,
-        help="VHACD minimum allowed volume percentage error.",
-    )
-    parser.add_argument(
-        "--maxRecursionDepth",
-        type=int,
-        default=10,
-        help="VHACD maximum recursion depth.",
-    )
-    parser.add_argument(
-        "--no_shrinkWrap",
-        action="store_true",
-        help="Whether or not to shrinkwrap the voxel positions to the source mesh on "
-        + "output.",
-    )
-    parser.add_argument(
-        "--fillMode",
-        type=str,
-        default="flood",
-        choices=["flood", "raycast", "surface"],
-        help="VHACD maximum recursion depth.",
-    )
-    parser.add_argument(
-        "--maxNumVerticesPerCH",
-        type=int,
-        default=64,
-        help="VHACD maximum number of triangles per convex hull.",
-    )
-    parser.add_argument(
-        "--no_asyncACD",
-        action="store_true",
-        help="Whether or not to run VHACD asynchronously, taking advantage of "
-        + "additional cores.",
-    )
-    parser.add_argument(
-        "--minEdgeLength",
-        type=int,
-        default=2,
-        help="VHACD minimum voxel patch edge length.",
-    )
-    parser.add_argument(
         "--preview",
         action="store_true",
         help="Whether to preview the decomposition.",
@@ -386,6 +368,115 @@ if __name__ == "__main__":
         default="INFO",
         choices=["CRITICAL", "ERROR", "WARNING", "INFO", "DEBUG"],
         help="Log level.",
+    )
+
+    # Create argument groups for VHACD and CoACD.
+    vhacd_group = parser.add_argument_group("VHACD parameters")
+    coacd_group = parser.add_argument_group("CoACD parameters")
+
+    parser.add_argument(
+        "--use_coacd",
+        action="store_true",
+        help="Use CoACD instead of VHACD for convex decomposition.",
+    )
+
+    # CoACD arguments.
+    coacd_group.add_argument(
+        "--threshold",
+        type=float,
+        help="CoACD threshold parameter for determining concavity.",
+    )
+    coacd_group.add_argument(
+        "--preprocess_resolution",
+        type=int,
+        help="Resolution used in preprocessing step.",
+    )
+    coacd_group.add_argument(
+        "--coacd_resolution",
+        type=int,
+        help="Main resolution parameter for decomposition.",
+    )
+    coacd_group.add_argument(
+        "--mcts_nodes",
+        type=int,
+        help="Number of nodes for Monte Carlo Tree Search.",
+    )
+    coacd_group.add_argument(
+        "--mcts_iterations",
+        type=int,
+        help="Number of iterations for Monte Carlo Tree Search.",
+    )
+    coacd_group.add_argument(
+        "--mcts_max_depth",
+        type=int,
+        help="Maximum depth for Monte Carlo Tree Search.",
+    )
+    coacd_group.add_argument(
+        "--preprocess_mode",
+        type=str,
+        default="auto",
+        choices=["auto", "voxel", "sampling"],
+        help="CoACD preprocess mode.",
+    )
+    coacd_group.add_argument(
+        "--pca", action="store_true", help="Enable PCA pre-processing."
+    )
+
+    # VHACD arguments.
+    vhacd_group.add_argument(
+        "--vhacd_resolution",
+        type=int,
+        default=10000000,
+        help="VHACD voxel resolution.",
+    )
+    vhacd_group.add_argument(
+        "--maxConvexHulls",
+        type=int,
+        default=64,
+        help="VHACD maximum number of convex hulls/ mesh pieces.",
+    )
+    vhacd_group.add_argument(
+        "--minimumVolumePercentErrorAllowed",
+        type=float,
+        default=1.0,
+        help="VHACD minimum allowed volume percentage error.",
+    )
+    vhacd_group.add_argument(
+        "--maxRecursionDepth",
+        type=int,
+        default=10,
+        help="VHACD maximum recursion depth.",
+    )
+    vhacd_group.add_argument(
+        "--no_shrinkWrap",
+        action="store_true",
+        help="Whether or not to shrinkwrap the voxel positions to the source mesh on "
+        + "output.",
+    )
+    vhacd_group.add_argument(
+        "--fillMode",
+        type=str,
+        default="flood",
+        choices=["flood", "raycast", "surface"],
+        help="VHACD maximum recursion depth.",
+    )
+    vhacd_group.add_argument(
+        "--maxNumVerticesPerCH",
+        type=int,
+        default=64,
+        help="VHACD maximum number of triangles per convex hull.",
+    )
+    vhacd_group.add_argument(
+        "--no_asyncACD",
+        action="store_true",
+        help="Whether or not to run VHACD asynchronously, taking advantage of "
+        + "additional cores.",
+    )
+    vhacd_group.add_argument(
+        "--minEdgeLength",
+        type=int,
+        default=2,
+        help="VHACD minimum voxel patch edge length.",
     )
 
     args = parser.parse_args()
@@ -434,6 +525,37 @@ if __name__ == "__main__":
         )
         sys.exit(1)
 
+    # Separate VHACD and CoACD parameters.
+    vhacd_params = (
+        {
+            "resolution": args.vhacd_resolution,
+            "maxConvexHulls": args.maxConvexHulls,
+            "minimumVolumePercentErrorAllowed": args.minimumVolumePercentErrorAllowed,
+            "maxRecursionDepth": args.maxRecursionDepth,
+            "shrinkWrap": not args.no_shrinkWrap,
+            "fillMode": args.fillMode,
+            "maxNumVerticesPerCH": args.maxNumVerticesPerCH,
+            "asyncACD": not args.no_asyncACD,
+            "minEdgeLength": args.minEdgeLength,
+        }
+        if not args.use_coacd
+        else None
+    )
+    coacd_params = {}
+    for param in [
+        "threshold",
+        "preprocess_resolution",
+        "coacd_resolution",
+        "mcts_nodes",
+        "mcts_iterations",
+        "mcts_max_depth",
+        "preprocess_mode",
+    ]:
+        value = getattr(args, param)
+        if value is not None:
+            key = "resolution" if param == "coacd_resolution" else param
+            coacd_params[key] = value
+
     create_sdf_from_mesh(
         mesh_path=mesh_path,
         mass=mass,
@@ -444,13 +566,7 @@ if __name__ == "__main__":
         mu_dynamic=mu_dynamic,
         mu_static=mu_static,
         preview_with_trimesh=args.preview,
-        resolution=args.resolution,
-        maxConvexHulls=args.maxConvexHulls,
-        minimumVolumePercentErrorAllowed=args.minimumVolumePercentErrorAllowed,
-        maxRecursionDepth=args.maxRecursionDepth,
-        shrinkWrap=not args.no_shrinkWrap,
-        fillMode=args.fillMode,
-        maxNumVerticesPerCH=args.maxNumVerticesPerCH,
-        asyncACD=not args.no_asyncACD,
-        minEdgeLength=args.minEdgeLength,
+        use_coacd=args.use_coacd,
+        coacd_kwargs=coacd_params,
+        vhacd_kwargs=vhacd_params,
     )
