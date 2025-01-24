@@ -1,36 +1,58 @@
-#!/usr/bin/perl
+#!/usr/bin/env python3
 
-use strict;
-use warnings;
+import os
+import subprocess
 
-use CGI;
-my $r = new CGI;
+try:
+    # Do all work first
+    git_output = subprocess.run(
+        ["git", "fetch", "origin"], capture_output=True, text=True, check=True
+    ).stdout
 
-print $r->header();
-print "<p>pulling repo...<br/>";
-system 'git fetch origin && git reset --hard origin/master';
-system 'git submodule update --init --recursive';
-print "<br/>done.</p>";
+    git_output += subprocess.run(
+        ["git", "reset", "--hard", "origin/master"],
+        capture_output=True,
+        text=True,
+        check=True,
+    ).stdout
 
-print "<p>building documentation...<br/>";
-chdir "..";
+    git_output += subprocess.run(
+        ["git", "submodule", "update", "--init", "--recursive"],
+        capture_output=True,
+        text=True,
+        check=True,
+    ).stdout
 
-# When I've had dependencies get "stuck" on the server, I've had to update them
-# manually with e.g. `sudo -u www-data /var/www/manipulation/venv/bin/pip
-# install drake==0.0.20250110 --extra-index-url
-# https://drake-packages.csail.mit.edu/whl/nightly/`
-my $status = system('/bin/bash', '-c', '
-    source venv/bin/activate &&
-    poetry install --only docs &&
-    sphinx-build -M html manipulation /tmp/manip_doc &&
-    rm -rf book/python &&
-    cp -r /tmp/manip_doc/html book/python
-');
+    os.chdir("..")
 
-if ($status == 0) {
-    print "<br/>done.</p>";
-} else {
-    print "<br/>Error occurred: $status</p>";
-}
+    # Start the build process in background
+    with open("/tmp/manipulation_build_docs.log", "w") as log_file:
+        subprocess.Popen(
+            [
+                "/bin/bash",
+                "-c",
+                "source venv/bin/activate && "
+                "poetry install --only docs && "
+                "sphinx-build -M html manipulation /tmp/manip_doc && "
+                "rm -rf book/python && "
+                "cp -r /tmp/manip_doc/html book/python",
+            ],
+            stdout=log_file,
+            stderr=subprocess.STDOUT,
+            start_new_session=True,
+        )
 
-print $r->end_html;
+    print("Content-Type: text/html\n")
+    print("<html><body>")
+    print("<p>pulling repo...</p>")
+    print(f"<pre>{git_output}</pre>")
+    print("<p>done.</p>")
+    print("<p>Documentation build started in the background.</p>")
+    print("<p>Check /tmp/manipulation_build_docs.log for progress.</p>")
+    print("</body></html>")
+
+except Exception as e:
+    print("Content-Type: text/html\n")
+    print("<html><body>")
+    print(f"<p>Error: {str(e)}</p>")
+    print("</body></html>")
