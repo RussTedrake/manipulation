@@ -22,8 +22,8 @@ chdir "..";
 my $status = system('/bin/bash', '-c', '
     source venv/bin/activate &&
     poetry install --only docs &&
-    rm -rf book/python &&
     sphinx-build -M html manipulation /tmp/manip_doc &&
+    rm -rf book/python &&
     cp -r /tmp/manip_doc/html book/python
 ');
 
