@@ -73,7 +73,9 @@ pyzmq = [
   {platform="darwin", version=">=25.0.0", optional=true}, # needed for python 3.11?
   {platform="linux", version=">=24.0.0", optional=true}, # <25.0.0 is currently needed for deepnote; this is pinned in htmlbook/Init.ipynb 
 ]
+scene-synthesizer = { version=">=1.13.2", optional=true }
 scipy = { version=">=1.10.0", optional=true }
+setuptools = { version="<71.0.0", optional=true } # https://github.com/pypa/setuptools/issues/4487
 stable-baselines3 = { version=">=2.0.0", optional=true }
 timeout-decorator = { version=">=0.4.1", optional=true }
 torch = { version=">=2.0.1 <2.4.0", optional=true } # 2.4.0 doesn't support +cpu yet; needed for bazel on linux. additional logic in PoetryExport.sh.
@@ -99,6 +101,7 @@ all = [
   "psutil",
   "pycollada",
   "pyzmq",
+  "scene-synthesizer",
   "scipy",
   "stable_baselines3",
   "timeout-decorator",

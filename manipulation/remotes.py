@@ -1,5 +1,7 @@
 from pydrake.multibody.parsing import PackageMap
 
+from manipulation.make_drake_compatible_model import MakeDrakeCompatibleModel
+
 
 def AddMujocoMenagerie(package_map: PackageMap) -> str:
     """Add the remote `mujoco_menagerie` package to the given PackageMap.
@@ -55,6 +57,24 @@ def AddGymnasiumRobotics(package_map: PackageMap) -> str:
     return package_name
 
 
+def AddRby1Remote(package_map: PackageMap):
+    package_name = "rby1"
+    package_map.AddRemote(
+        package_name=package_name,
+        params=PackageMap.RemoteParams(
+            urls=[
+                f"https://github.com/RainbowRobotics/rby1-sdk/archive/refs/tags/v0.3.0.tar.gz"
+            ],
+            sha256=("f1cbebccc24ad2cb3d966a4816adc8394572949e2b41809b9dc1c6756e501f48"),
+            strip_prefix="rby1-sdk-0.3.0/models/rby1a/",
+        ),
+    )
+    model_path = package_map.ResolveUrl("package://rby1/urdf/model.urdf")
+    drake_model_path = model_path.replace(".urdf", ".drake.urdf")
+    MakeDrakeCompatibleModel(model_path, drake_model_path)
+    return package_name
+
+
 def PrefetchAllRemotePackages():
     """Prefetch all remote packages in the given PackageMap.
     This is useful for CI, where the remote packages are downloaded as part of
@@ -70,3 +90,4 @@ def PrefetchAllRemotePackages():
     fetch(AddMujocoMenagerie(package_map))
     fetch(AddSpotRemote(package_map))
     fetch(AddGymnasiumRobotics(package_map))
+    fetch(AddRby1Remote(package_map))
