@@ -36,6 +36,7 @@ rt_ipynb_test(
 
 rt_ipynb_test(
     name = "qdot_vs_v",
+    data = ["@drake_models"],
     srcs = ["qdot_vs_v.ipynb"],
     deps = [
       requirement("drake"),

@@ -6,7 +6,8 @@ import unittest
 from lxml import etree
 from pydrake.multibody.parsing import PackageMap
 
-from manipulation.utils import AddMujocoMenagerie, FindResource
+from manipulation.remotes import AddMujocoMenagerie
+from manipulation.utils import FindResource
 
 try:
     from manipulation.make_drake_compatible_model import (
@@ -140,13 +141,8 @@ class TestMakeDrakeCompatibleModel(unittest.TestCase):
         # Clean up the temp file
         os.remove(output_filename)
 
-    @unittest.skip(
-        "I need to make it so that this test can run on CI without downloading the entire mujoco_menagerie package every time."
-    )
     def test_mujoco_menagerie(self):
         """Test all files in the mujoco_menagerie package."""
-        # This lets me only download once, but it is not hermetic.
-        os.environ["TEST_TMPDIR"] = "/tmp/parser_cache"
         package_map = PackageMap()
         AddMujocoMenagerie(package_map)
         menagerie = package_map.GetPath("mujoco_menagerie")
@@ -156,7 +152,7 @@ class TestMakeDrakeCompatibleModel(unittest.TestCase):
             for file in files:
                 if file.endswith(".drake.xml"):
                     continue
-                if file.endswith(".xml"):
+                if file.endswith("scene.xml"):
                     with self.subTest(file=file):
                         original_file = os.path.join(root, file)
                         drake_compatible_file = original_file.replace(

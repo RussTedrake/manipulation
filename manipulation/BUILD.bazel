@@ -5,13 +5,16 @@
 # Licensed under the BSD 3-Clause License. See LICENSE.TXT for details.
 
 load("@pip_deps//:requirements.bzl", "requirement")
-load("//book/htmlbook/tools/python:defs.bzl", "rt_py_library", "rt_py_test")
+load("//book/htmlbook/tools/python:defs.bzl", "rt_py_library", "rt_py_test", "rt_py_binary")
 
 rt_py_library(
     name = "manipulation",
     srcs = [
         "__init__.py",
         "utils.py",
+    ],
+    data = [
+      "@drake_models",
     ],
     imports = [".."],
     visibility = ["//visibility:public"],
@@ -63,6 +66,23 @@ rt_py_library(
     srcs = ["scenarios.py"],
     imports = [".."],
     visibility = ["//visibility:public"],
+)
+
+rt_py_library(
+    name = "remotes",
+    srcs = ["remotes.py"],
+    imports = [".."],
+    deps = [
+      requirement("drake"),
+    ],
+    visibility = ["//visibility:public"],
+)
+
+rt_py_binary(
+    name = "prefetch_remotes",
+    tags = ["requires-network", "no-sandbox"], 
+    srcs = ["prefetch_remotes.py"],
+    deps = ["remotes"],
 )
 
 rt_py_library(
@@ -152,12 +172,15 @@ rt_py_test(
     name = "test_make_drake_compatible_model",
     srcs = ["test/test_make_drake_compatible_model.py"],
     imports = [".."],
+    tags = ["requires-network", "no-sandbox"],
+    timeout = "moderate",  # TODO(russt): consider moving the menagerie work to the prefetch_remotes
     data = [
       "//manipulation/test/models:models",
     ],
     deps = [
       "manipulation",
       "//manipulation:make_drake_compatible_model",
+      "//manipulation:remotes",
     ],
 )
 
