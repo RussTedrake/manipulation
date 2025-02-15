@@ -51,11 +51,6 @@ def FindResource(filename: str):
     return os.path.join(os.path.dirname(__file__), filename)
 
 
-def LoadDataResource(filename: str):
-    warn("`LoadDataResource` is deprecated. Use `FindDataResource` instead.")
-    FindDataResource(filename)
-
-
 def FindDataResource(filename: str):
     """
     Returns the absolute path to the given filename relative to the book data
@@ -90,21 +85,9 @@ def ConfigureParser(parser: Parser):
 
 
 def AddMujocoMenagerie(package_map: PackageMap):
-    """Add the remote `mujoco_menagerie` package to the given PackageMap.
-    https://github.com/google-deepmind/mujoco_menagerie"""
-    package_map.AddRemote(
-        package_name="mujoco_menagerie",
-        params=PackageMap.RemoteParams(
-            # This repository doesn't have up-to-date tags/releases; the scary
-            # hash in the url is the most recent commit sha at the time of my
-            # writing.
-            urls=[
-                f"https://github.com/google-deepmind/mujoco_menagerie/archive/469893211c41d5da9c314f5ab58059fa17c8e360.tar.gz"
-            ],
-            sha256=("1cfe0ebde2c6dd80405977e0b3a6f72e1b062d8a79f9f0437ebebe463c9c85f7"),
-            strip_prefix="mujoco_menagerie-469893211c41d5da9c314f5ab58059fa17c8e360/",
-        ),
-    )
+    assert (
+        False
+    ), "`manipulation.utils.AddMujocoMenagerie` is has moved. Use `manipulation.remotes.AddMujocoMenagerie` instead."
 
 
 def ApplyDefaultVisualization(builder: DiagramBuilder, meshcat: Meshcat):

@@ -63,7 +63,9 @@ jobs:
         run:  ./setup/submodule_checkout
         shell: bash
       - name: post-checkout setup
-        run: ./book/htmlbook/workflows/ci/jammy/setup
+        run: |
+          ./book/htmlbook/workflows/ci/jammy/setup
+          bazel run //manipulation:prefetch_remotes
         shell: bash
 #      - name: Check disk space
 #        run: |
@@ -85,7 +87,9 @@ jobs:
         run:  ./setup/submodule_checkout
         shell: zsh -efuo pipefail {0}
       - name: setup
-        run: ./book/htmlbook/workflows/ci/sonoma/setup
+        run: |
+          ./book/htmlbook/workflows/ci/sonoma/setup
+          bazel run //manipulation:prefetch_remotes
         shell: zsh -efuo pipefail {0}
       - name: test
         run: ./book/htmlbook/workflows/ci/sonoma/test
@@ -148,6 +152,7 @@ jobs:
           pip install -U manipulation[all] --extra-index-url https://drake-packages.csail.mit.edu/whl/nightly/
           truncate -s0 requirements.txt 
           sed -i '/PYTHONNOUSERSITE/d' .bazelrc
+          bazel run //manipulation:prefetch_remotes
         shell: bash
       - name: test
         run: EXCLUDE_TESTS="//book/htmlbook/..." ./book/htmlbook/workflows/ci/jammy/test
@@ -179,6 +184,7 @@ jobs:
           pip install manipulation --extra-index-url https://drake-packages.csail.mit.edu/whl/nightly/
           truncate -s0 requirements.txt
           sed -i '/PYTHONNOUSERSITE/d' .bazelrc
+          bazel run //manipulation:prefetch_remotes
         shell: bash
       - name: test
         run: |
@@ -216,6 +222,7 @@ jobs:
           pip install manipulation[all] --extra-index-url https://drake-packages.csail.mit.edu/whl/nightly/
           truncate -s0 requirements.txt
           sed -i '/PYTHONNOUSERSITE/d' .bazelrc
+          bazel run //manipulation:prefetch_remotes
         shell: bash
       - name: test
         run: |

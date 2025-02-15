@@ -26,15 +26,16 @@ rt_ipynb_test(
     ],
 )
 
-
-# TODO(russt): Pre-download the model
-#rt_ipynb_test(
-#    name = "spot",
-#    srcs = ["spot.ipynb"],
-#    deps = [
-#      "//manipulation",
-#    ],
-#)
+rt_ipynb_test(
+    name = "spot",
+    srcs = ["spot.ipynb"],
+    tags = ["requires-network", "no-sandbox"],
+    deps = [
+      "//manipulation",
+      "//manipulation:remotes",
+      "//manipulation:station",
+    ],
+)
 
 rt_ipynb_test(
     name = "pr2",
