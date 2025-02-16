@@ -41,6 +41,8 @@ rt_py_library(
     deps = [
       requirement("drake"),
       requirement("lxml"),
+    ],
+    optional_deps = [
       requirement("pycollada"),
       requirement("trimesh"),
     ],
@@ -151,6 +153,8 @@ rt_py_test(
     deps = [
       "manipulation",
       requirement("lxml"),
+    ],
+    optional_deps = [
       requirement("trimesh"),
       requirement("vhacdx"),
     ],
@@ -165,6 +169,8 @@ rt_py_test(
       "//manipulation/envs:box_flipup",
       "manipulation",
       "scenarios",
+    ],
+    optional_deps = [
       requirement("stable-baselines3"),
     ],
 )

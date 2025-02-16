@@ -193,7 +193,8 @@ jobs:
           "from pathlib import Path; from pydrake.all import GetDrakePath; \
           print(Path(GetDrakePath()).parent)"` \
           MANIPULATION_DATA_DIR="`pwd`/book/data" \
-          ./book/htmlbook/workflows/ci/jammy/test_w_installed_deps
+          BAZEL_TEST_FLAGS="--define=use_dependencies=none" \
+          ./book/htmlbook/workflows/ci/jammy/test
         shell: bash
   jammy-pip-extra:
     # This should emulate a student's experience if they are doing the psets
@@ -231,5 +232,6 @@ jobs:
           "from pathlib import Path; from pydrake.all import GetDrakePath; \
           print(Path(GetDrakePath()).parent)"` \
           MANIPULATION_DATA_DIR="`pwd`/book/data" \
-          ./book/htmlbook/workflows/ci/jammy/test_w_installed_deps
+          BAZEL_TEST_FLAGS="--define=use_dependencies=none" \
+          ./book/htmlbook/workflows/ci/jammy/test
         shell: bash
