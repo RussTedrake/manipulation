@@ -73,6 +73,7 @@ rt_py_library(
     srcs = ["remotes.py"],
     imports = [".."],
     deps = [
+      "make_drake_compatible_model",
       requirement("drake"),
     ],
     visibility = ["//visibility:public"],
