@@ -6,7 +6,6 @@ import unittest
 from lxml import etree
 from pydrake.multibody.parsing import PackageMap
 
-from manipulation.remotes import AddMujocoMenagerie
 from manipulation.utils import FindResource
 
 try:
@@ -14,6 +13,7 @@ try:
         MakeDrakeCompatibleModel,
         _convert_mesh,
     )
+    from manipulation.remotes import AddMujocoMenagerie
 
     trimesh_available = True
 except ImportError:
