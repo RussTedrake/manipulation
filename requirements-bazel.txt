@@ -1,5 +1,5 @@
+--find-links https://download.pytorch.org/whl/torch_stable.html
 --extra-index-url https://drake-packages.csail.mit.edu/whl/nightly
-
 anyio==4.8.0 ; python_version >= "3.10" and python_version < "4.0"
 asttokens==3.0.0 ; python_version >= "3.10" and python_version < "4.0"
 attrs==25.1.0 ; python_version >= "3.10" and python_version < "4.0"
@@ -112,6 +112,7 @@ parso==0.8.4 ; python_version >= "3.10" and python_version < "4.0"
 pathspec==0.12.1 ; python_version >= "3.10" and python_version < "4.0"
 pexpect==4.9.0 ; python_version >= "3.10" and python_version < "4.0"
 pillow==11.1.0 ; python_version >= "3.10" and python_version < "4.0"
+pip-requirements-parser==32.0.1 ; python_version >= "3.10" and python_version < "4.0"
 pkginfo==1.12.0 ; python_version >= "3.10" and python_version < "4.0"
 platformdirs==4.3.6 ; python_version >= "3.10" and python_version < "4.0"
 pre-commit==3.8.0 ; python_version >= "3.10" and python_version < "4.0"
@@ -161,12 +162,10 @@ tinycss2==1.4.0 ; python_version >= "3.10" and python_version < "4.0" and sys_pl
 tokenize-rt==6.1.0 ; python_version >= "3.10" and python_version < "4.0"
 tomli==2.2.1 ; python_version >= "3.10" and python_version < "3.11"
 tomlkit==0.13.2 ; python_version >= "3.10" and python_version < "4.0"
---find-links https://download.pytorch.org/whl/torch_stable.html
-torch==2.3.1+cpu ; python_version >= "3.10" and sys_platform == "linux"
-torch==2.3.1 ; python_version >= "3.10" and sys_platform == "darwin"
---find-links https://download.pytorch.org/whl/torch_stable.html
-torchvision==0.18.1+cpu ; python_version >= "3.10" and sys_platform == "linux"
-torchvision==0.18.1 ; python_version >= "3.10" and sys_platform == "darwin"
+torch==2.3.1 ; python_version >= "3.10" and python_version < "4.0" and sys_platform == "darwin"
+torch==2.3.1+cpu ; python_version >= "3.10" and python_version < "4.0" and sys_platform == "linux"
+torchvision==0.18.1 ; python_version >= "3.10" and python_version < "4.0" and sys_platform == "darwin"
+torchvision==0.18.1+cpu ; python_version >= "3.10" and python_version < "4.0" and sys_platform == "linux"
 tornado==6.4.2 ; python_version >= "3.10" and python_version < "4.0" and (sys_platform == "darwin" or sys_platform == "linux")
 tqdm==4.67.1 ; python_version >= "3.10" and python_version < "4.0"
 traitlets==5.14.3 ; python_version >= "3.10" and python_version < "4.0"
