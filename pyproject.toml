@@ -2,7 +2,7 @@
 name = "manipulation"
 # Use e.g. 2024.10.4.rc0 if I need to release a release candidate.
 # Use e.g. 2024.10.4.post1 if I need to rerelease on the same day.
-version = "2025.2.16"
+version = "2025.3.3"
 description = "MIT 6.421 - Robotic Manipulation"
 authors = ["Russ Tedrake <russt@mit.edu>"]
 license = "BSD License"
@@ -49,8 +49,8 @@ priority = "explicit"
 [tool.poetry.dependencies]
 python = "<4.0,>=3.10"
 cloudpickle = { version="2.2.1", optional=true} # needs to be pinned for stored files to remain compatible.
-drake = { version = ">=0.0.20250131 <0.1", source = "drake-nightly" }
-#drake = ">=1.37.0"
+#drake = { version = ">=0.0.20250131 <0.1", source = "drake-nightly" }
+drake = ">=1.38.0"
 gradescope-utils = { version=">=0.4.0", optional=true}
 gymnasium = { version=">0.26", optional=true }
 ipython = ">=7.8.0" # TODO: make this optional?
@@ -122,8 +122,8 @@ optional = true
 # script uses `poetry install --only docs`. This include any requirements
 # needed to import for a file that sphinx autodoc is trying to index. None of
 # these should be marked as optional.
-drake = { version = ">=0.0.20250118 <0.1", source = "drake-nightly" }
-#drake = ">=1.37.0"
+#drake = { version = ">=0.0.20250118 <0.1", source = "drake-nightly" }
+drake = ">=1.38.0"
 ipython = ">=7.8.0"
 lxml = {version = ">=4.9.2", extras = ["html_clean"] }
 mpld3  = { version=">=0.5.6", optional=false }
