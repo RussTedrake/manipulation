@@ -62,4 +62,4 @@ export HOMEBREW_NO_INSTALL_CLEANUP=1
 # brew update uses git(1), so HOMEBREW_CURL_RETRIES does not take effect.
 brew update || (sleep 30; brew update)
 
-brew bundle --file="$(dirname ${(%):-%x})/Brewfile" --no-lock
+brew bundle --file="$(dirname ${(%):-%x})/Brewfile"
