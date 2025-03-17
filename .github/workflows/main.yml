@@ -112,7 +112,7 @@ jobs:
       - name: isort
         uses: isort/isort-action@master
         with:
-            configuration: "--profile black"
+            configuration: "--profile black --check-only"
             isort-version: 5.12.0
       - name: autoflake
         uses: creyD/autoflake_action@master
