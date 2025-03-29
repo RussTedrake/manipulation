@@ -4760,13 +4760,13 @@ test = ["pytest"]
 
 [[package]]
 name = "trimesh"
-version = "4.6.5"
+version = "4.6.6"
 description = "Import, export, process, analyze and view triangular meshes."
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "trimesh-4.6.5-py3-none-any.whl", hash = "sha256:17c423658e4504358f6c3abd45fe921f09ad3ad2fc2578d89608af2f2d56bc5e"},
-    {file = "trimesh-4.6.5.tar.gz", hash = "sha256:19a6ea2ad18f8db8bde47ffb3deccb6cddb4d5de717f9b3df47932954f86ee8c"},
+    {file = "trimesh-4.6.6-py3-none-any.whl", hash = "sha256:b310e367a95487a6fa3b3fa12b3cdc7f3024882fd1c318653b5cdaeeed5632fd"},
+    {file = "trimesh-4.6.6.tar.gz", hash = "sha256:6c300190e21799a4f6a905316d8edb502bc1e2462ee6625dc06d5a726875788e"},
 ]
 
 [package.dependencies]
@@ -4787,16 +4787,15 @@ scipy = {version = "*", optional = true, markers = "extra == \"easy\""}
 shapely = {version = "*", optional = true, markers = "extra == \"easy\""}
 "svg.path" = {version = "*", optional = true, markers = "extra == \"easy\""}
 vhacdx = {version = "*", optional = true, markers = "python_version >= \"3.9\" and extra == \"easy\""}
-xatlas = {version = "*", optional = true, markers = "extra == \"easy\""}
 xxhash = {version = "*", optional = true, markers = "extra == \"easy\""}
 
 [package.extras]
 all = ["trimesh[deprecated,easy,recommend,test,test-more]"]
 deprecated = ["gmsh (==4.12.2)"]
-easy = ["charset-normalizer", "colorlog", "embreex", "httpx", "jsonschema", "lxml", "manifold3d (>=2.3.0)", "mapbox_earcut (>=1.0.2)", "networkx", "pillow", "pycollada", "rtree", "scipy", "shapely", "svg.path", "vhacdx", "xatlas", "xxhash"]
+easy = ["charset-normalizer", "colorlog", "embreex", "httpx", "jsonschema", "lxml", "manifold3d (>=2.3.0)", "mapbox_earcut (>=1.0.2)", "networkx", "pillow", "pycollada", "rtree", "scipy", "shapely", "svg.path", "vhacdx", "xxhash"]
 recommend = ["cascadio", "fast-simplification", "meshio", "openctm", "psutil", "pyglet (<2)", "python-fcl", "scikit-image", "sympy"]
 test = ["pyinstrument", "pytest", "pytest-cov", "ruff"]
-test-more = ["coveralls", "ezdxf", "ipython", "matplotlib", "pymeshlab", "pyright", "pytest-beartype", "triangle"]
+test-more = ["coveralls", "ezdxf", "ipython", "marimo", "matplotlib", "pymeshlab", "pyright", "pytest-beartype", "triangle"]
 
 [[package]]
 name = "triton"
@@ -4987,70 +4986,6 @@ files = [
     {file = "widgetsnbextension-4.0.13-py3-none-any.whl", hash = "sha256:74b2692e8500525cc38c2b877236ba51d34541e6385eeed5aec15a70f88a6c71"},
     {file = "widgetsnbextension-4.0.13.tar.gz", hash = "sha256:ffcb67bc9febd10234a362795f643927f4e0c05d9342c727b65d2384f8feacb6"},
 ]
-
-[[package]]
-name = "xatlas"
-version = "0.0.9"
-description = "Python bindings for xatlas"
-optional = true
-python-versions = ">=3.7"
-files = [
-    {file = "xatlas-0.0.9-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:ad470e85ce8737e9e0d8fcfdb93ee47935c6d8925fb28e96516f01ad877704f4"},
-    {file = "xatlas-0.0.9-cp310-cp310-manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:acd2b25df16f4ffa9f79210fe5ddcc5962e5e5f3c236a719fc399022a60030b3"},
-    {file = "xatlas-0.0.9-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:7112a4c90c14a459dfffbffac1319ad3770a50bfb592f03562c8fe564e765ad7"},
-    {file = "xatlas-0.0.9-cp310-cp310-musllinux_1_1_x86_64.whl", hash = "sha256:c9947d3eda61a75981117e38d7c36629fc321fb4f28a40aa88a03654af0865c3"},
-    {file = "xatlas-0.0.9-cp310-cp310-win32.whl", hash = "sha256:d69a62596d6b6c8f0d2d8bd2965ef2c1c57d9c4325e88dd7458ba91776a9943e"},
-    {file = "xatlas-0.0.9-cp310-cp310-win_amd64.whl", hash = "sha256:b6dc196d2c5f5c86513aa790b504f0f5c447b0ae9af27680c56d6ac7281117c2"},
-    {file = "xatlas-0.0.9-cp311-cp311-macosx_10_9_x86_64.whl", hash = "sha256:ed1bf67e5dd3ae30c3a1ecec07672bb5b6b27d635a9ecfcfea3e04ed36fae007"},
-    {file = "xatlas-0.0.9-cp311-cp311-manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:e83b7fee49860a874b5557e345d16e627bfc36db4f010ead8f1c1e5c69daaacf"},
-    {file = "xatlas-0.0.9-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:1729a4723966c2b5a041dd76208c35ddbc0175f08724951d60735700539a83cf"},
-    {file = "xatlas-0.0.9-cp311-cp311-musllinux_1_1_x86_64.whl", hash = "sha256:468774c1c251f487aea5b205df515a988a278a7d4b0b25bc9349ac5e6e61249a"},
-    {file = "xatlas-0.0.9-cp311-cp311-win32.whl", hash = "sha256:ca68acd3211a495ae719371ce2c4821aeb2736fdbf5a713b8a37953c494317be"},
-    {file = "xatlas-0.0.9-cp311-cp311-win_amd64.whl", hash = "sha256:2b0cfe28f0e9cd9ce96bb95301c11e82034f174ddb5d3b8557ccd278326d1b08"},
-    {file = "xatlas-0.0.9-cp312-cp312-macosx_10_9_x86_64.whl", hash = "sha256:bc32d80ab9c701f36bef82593ec856a5767d09df88146233bc436cb0a5d25ffb"},
-    {file = "xatlas-0.0.9-cp312-cp312-manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:baf24a9bd9c4095bec8f374cbd066f550e0541a794d74c0d2f049b800a47c3b6"},
-    {file = "xatlas-0.0.9-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:1a64371bd54663e9618921ada38361e063d2337fbe6330d21d21c08fb91eef38"},
-    {file = "xatlas-0.0.9-cp312-cp312-musllinux_1_1_x86_64.whl", hash = "sha256:b2f712f28bc04e58595886643bffa37c01a5a49072ca12d008922cab3b04dff2"},
-    {file = "xatlas-0.0.9-cp312-cp312-win32.whl", hash = "sha256:f11f06b8a6d3fc2ee6d4c5600d2d0c0f4b88f3714a409c178453ec737101a561"},
-    {file = "xatlas-0.0.9-cp312-cp312-win_amd64.whl", hash = "sha256:e9acff729e2a93f7872d14f6f88d5cb0aba829c8ac122a77fcc5c41e4e21d9c4"},
-    {file = "xatlas-0.0.9-cp37-cp37m-macosx_10_9_x86_64.whl", hash = "sha256:eecfb05c97ab61a46c36619c3074385cad6c140b07eab99b847062daca115ff8"},
-    {file = "xatlas-0.0.9-cp37-cp37m-manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:3c6347ef1c2da9d69a2834b2259c8dcb06408bcec122b0419a29a6cf2b10d337"},
-    {file = "xatlas-0.0.9-cp37-cp37m-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:717becbc668173cd41f5204315c0726797737bc6b6f8e4fec4c95a12f53ed54c"},
-    {file = "xatlas-0.0.9-cp37-cp37m-musllinux_1_1_x86_64.whl", hash = "sha256:f4a7dadf0e5e901fd391715f1bee6c7455f38459e85e7c35d1a2f7b1f5704a68"},
-    {file = "xatlas-0.0.9-cp37-cp37m-win32.whl", hash = "sha256:75689aded66f6a6c23ae5239bf0dad4442c1cea6ea5698ad2435cc7cc7da5ac2"},
-    {file = "xatlas-0.0.9-cp37-cp37m-win_amd64.whl", hash = "sha256:0b5d142dab0add7ebca02f02030a539bc48febb2099270a13885f8da72ed10bf"},
-    {file = "xatlas-0.0.9-cp38-cp38-macosx_10_9_x86_64.whl", hash = "sha256:ce67674c361a41c9767593c16ccfc27ead69738eafcf63410a37e11ff5549e7c"},
-    {file = "xatlas-0.0.9-cp38-cp38-manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:354cba222efe31cee519fde32192ecb02e6174fc6f29a210b4a7c8be52f28b74"},
-    {file = "xatlas-0.0.9-cp38-cp38-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:beeba726fbb04721b263eca64abebc7a80a188b99bb51a6238fab0ba89628792"},
-    {file = "xatlas-0.0.9-cp38-cp38-musllinux_1_1_x86_64.whl", hash = "sha256:7f1c17c731ae93f3a93be22717f08dc49dc7b77bb18495a1aace577f62a13ed4"},
-    {file = "xatlas-0.0.9-cp38-cp38-win32.whl", hash = "sha256:ac37335ca5e768f89f02c54a86a0dcb756c36b32bbddc8b34296457db7c9e1b6"},
-    {file = "xatlas-0.0.9-cp38-cp38-win_amd64.whl", hash = "sha256:133740024e41119ad0c638f4c727db94bef69e26e1909950e1f8904b572510b8"},
-    {file = "xatlas-0.0.9-cp39-cp39-macosx_10_9_x86_64.whl", hash = "sha256:a5dd461e14363a88840847c94c2d33849d214781cf31200325fb3a60e2144aba"},
-    {file = "xatlas-0.0.9-cp39-cp39-manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:0b9cb07b293dd92a197398688617c3676eef79db9dce9725c5703ca1d4ebb7ef"},
-    {file = "xatlas-0.0.9-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:d36ff9ff598116bb16deaaa58edd47a7e88840ce8f77ae870e745c6af9d5654a"},
-    {file = "xatlas-0.0.9-cp39-cp39-musllinux_1_1_x86_64.whl", hash = "sha256:78c5ef55ef9778be617ec32ed10aa455a6d996059f52e9fd3c406ebcf813e9bb"},
-    {file = "xatlas-0.0.9-cp39-cp39-win32.whl", hash = "sha256:8712323399dfb31c067b08df2022d1ba58bde6e38d27055320be997d8dde54b5"},
-    {file = "xatlas-0.0.9-cp39-cp39-win_amd64.whl", hash = "sha256:d44bfde60047c3efde69f29f27b6cd5d7f7b71d8cae0875d30052a8c1f19188c"},
-    {file = "xatlas-0.0.9-pp310-pypy310_pp73-macosx_10_9_x86_64.whl", hash = "sha256:4ba38594c00e0d18a7f55ee5f240b6eefe60c99e1437af63f9715e1f4554cb5b"},
-    {file = "xatlas-0.0.9-pp310-pypy310_pp73-manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:968a6c00f90de4929577584ed872a3a9eeb3846d17e6f9b4b32e71ea931e65de"},
-    {file = "xatlas-0.0.9-pp310-pypy310_pp73-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:70c0e11c87de8ba3304963f965eda8e248cc9573f0115fd1bc7abe06a3746973"},
-    {file = "xatlas-0.0.9-pp37-pypy37_pp73-macosx_10_9_x86_64.whl", hash = "sha256:51acb1bcac5b5c4e14d5eebc4af57b44a54f793071dfe59e97485b0ff38049b9"},
-    {file = "xatlas-0.0.9-pp37-pypy37_pp73-manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:98f2f8b1ee73bcee1001af774a60b59a462d3117633938e3d100a629bee2e865"},
-    {file = "xatlas-0.0.9-pp37-pypy37_pp73-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:9e4796a98154585343cba46838d5a56562e32fbaade96e465d1658defac4f039"},
-    {file = "xatlas-0.0.9-pp38-pypy38_pp73-macosx_10_9_x86_64.whl", hash = "sha256:d740b93acd3c5045bda3694c4180d8b646cdc5bc565a524f1c8148becb66a711"},
-    {file = "xatlas-0.0.9-pp38-pypy38_pp73-manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:d5583f12fbc88b529945be12df4db903822f3a01e17eac6e9a626d227d145035"},
-    {file = "xatlas-0.0.9-pp38-pypy38_pp73-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:4357b9629f49527ff07e99a7442d6c18ffd118cbd2866c0be21e62051f1418c0"},
-    {file = "xatlas-0.0.9-pp39-pypy39_pp73-macosx_10_9_x86_64.whl", hash = "sha256:03bd802840d35146ab42a363ef6a458f0e7692c2a4211c85c2bb916b80b6b361"},
-    {file = "xatlas-0.0.9-pp39-pypy39_pp73-manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:01a038e5b8f1676d8c3f2e76a902a5ba491c9507e1c1551caed0b82c0a085924"},
-    {file = "xatlas-0.0.9-pp39-pypy39_pp73-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:40bb7858e920633848a384d4837618ce37dff1ef07dc3ad3b39f32a6f8670fbd"},
-    {file = "xatlas-0.0.9.tar.gz", hash = "sha256:9d4dbbd50c4f70e4b90b506e0b605b16fbff8a62cb46dd68f8454bde90d41448"},
-]
-
-[package.dependencies]
-numpy = "*"
-
-[package.extras]
-test = ["pytest", "trimesh"]
 
 [[package]]
 name = "xattr"
@@ -5319,4 +5254,4 @@ torch = ["torch", "torchvision"]
 [metadata]
 lock-version = "2.0"
 python-versions = "<4.0,>=3.10"
-content-hash = "aad8826ac29ebd9c8ace3de1a0ef4db88aedafc9a6c360658f23ea42cffd1b9b"
+content-hash = "29a3a699ec2e67d6ce4f97c82b2c52b73063060d20f42fb34118a0cfbfed07a1"
