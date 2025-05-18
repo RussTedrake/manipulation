@@ -37,5 +37,6 @@ directives:
 model_drivers:
     iiwa: !IiwaDriver
       control_mode: position_and_torque
+      desired_kp_gains: [500, 500, 200]
       hand_model_name: wsg
     wsg: !SchunkWsgDriver {}

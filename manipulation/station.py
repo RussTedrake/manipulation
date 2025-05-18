@@ -614,7 +614,7 @@ def _ApplyDriverConfigSim(
 ) -> None:
     if isinstance(driver_config, IiwaDriver):
         model_instance = sim_plant.GetModelInstanceByName(model_instance_name)
-        num_iiwa_positions = sim_plant.num_positions(model_instance)
+        sim_plant.num_positions(model_instance)
 
         # Make the plant for the iiwa controller to use.
         controller_plant = MakeMultibodyPlant(
@@ -629,15 +629,12 @@ def _ApplyDriverConfigSim(
             SharedPointerSystem(controller_plant),
         )
 
-        control_mode = ParseIiwaControlMode(driver_config.control_mode)
         sim_iiwa_driver = SimIiwaDriver.AddToBuilder(
             plant=sim_plant,
             iiwa_instance=model_instance,
+            driver_config=driver_config,
             controller_plant=controller_plant,
             builder=builder,
-            ext_joint_filter_tau=0.01,
-            desired_iiwa_kp_gains=np.full(num_iiwa_positions, 100),
-            control_mode=control_mode,
         )
         for i in range(sim_iiwa_driver.num_input_ports()):
             port = sim_iiwa_driver.get_input_port(i)
