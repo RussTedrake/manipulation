@@ -78,7 +78,10 @@ def _convert_mesh(
         return output_url, output_path
 
     # Load the mesh
-    mesh_or_scene = trimesh.load(path)
+    try:
+        mesh_or_scene = trimesh.load(path)
+    except Exception as e:
+        raise ValueError(f"Failed to load mesh {path}:\n{e}")
     if isinstance(mesh_or_scene, trimesh.Scene):
         meshes = [mesh for mesh in mesh_or_scene.geometry.values()]
     else:
@@ -205,7 +208,83 @@ def _convert_urdf(
 def _convert_sdf(
     input_filename: str, output_filename: str, package_map: PackageMap, overwrite: bool
 ) -> None:
-    raise NotImplementedError("SDF format is not supported yet, but it will be soon.")
+    """Convert an SDF file to be compatible with Drake.
+
+    Args:
+        input_filename: The path to the input SDF file.
+        output_filename: The path where the converted SDF file will be saved.
+        package_map: The PackageMap to use.
+        overwrite: Whether to overwrite existing files.
+    """
+    with open(input_filename, "r") as file:
+        sdf_content = file.read()
+
+    # Remove XML comments to avoid matching filenames inside them
+    sdf_content_no_comments = re.sub(r"<!--.*?-->", "", sdf_content, flags=re.DOTALL)
+
+    # Parse the XML to properly handle SDF structure
+    try:
+        root = etree.fromstring(sdf_content_no_comments)
+    except etree.XMLSyntaxError as e:
+        raise ValueError(f"Invalid SDF XML syntax in {input_filename}: {e}")
+
+    # Find all mesh elements with uri containing .stl, .dae, or .obj extensions
+    mesh_elements = root.xpath(".//mesh[uri]")
+
+    # Filter to only those with target file extensions
+    target_extensions = (".stl", ".dae", ".obj")
+    filtered_mesh_elements = []
+    for mesh_element in mesh_elements:
+        uri_element = mesh_element.find("uri")
+        if uri_element is not None and uri_element.text:
+            uri_text = uri_element.text.strip().lower()
+            if any(uri_text.endswith(ext) for ext in target_extensions):
+                filtered_mesh_elements.append(mesh_element)
+
+    for mesh_element in filtered_mesh_elements:
+        uri_element = mesh_element.find("uri")
+        mesh_url = uri_element.text.strip()
+
+        # Handle scale element
+        scale_element = mesh_element.find("scale")
+        scale = None
+        if scale_element is not None:
+            scale_values = scale_element.text.strip().split()
+            if len(scale_values) == 3:
+                scale = [float(s) for s in scale_values]
+                if len(set(scale)) == 1 and all(s > 0 for s in scale):
+                    # Uniform positive scaling is supported natively by Drake
+                    scale = None
+                else:
+                    scale_element.text = "1 1 1"
+
+        # Don't need to convert .obj files with no scale or uniform scale
+        if mesh_url.lower().endswith(".obj") and scale is None:
+            continue
+
+        # Resolve the mesh path
+        if mesh_url.lower().startswith("package://") or mesh_url.lower().startswith(
+            "file://"
+        ):
+            mesh_path = package_map.ResolveUrl(mesh_url)
+        else:
+            mesh_path = os.path.join(os.path.dirname(input_filename), mesh_url)
+
+        # Convert the mesh
+        output_mesh_url, _ = _convert_mesh(
+            url=mesh_url, path=mesh_path, scale=scale, overwrite=overwrite
+        )
+
+        # Update the URI element text
+        uri_element.text = output_mesh_url
+
+    # Convert back to string
+    output_content = etree.tostring(root, encoding="unicode", pretty_print=True)
+
+    with open(output_filename, "w") as file:
+        file.write(output_content)
+
+    print(f"Converted SDF file '{input_filename}' to '{output_filename}'.")
 
 
 def _process_includes(
@@ -331,7 +410,8 @@ def _convert_mjcf(
         os.path.abspath(input_filename)
     ):
         warnings.warn(
-            f"Output path {os.path.dirname(output_filename)} differs from input path {os.path.dirname(input_filename)}. "
+            f"Output path {os.path.dirname(output_filename)} differs from input path "
+            f"{os.path.dirname(input_filename)}. "
             "This may cause issues with relative paths in the MJCF file."
         )
 
@@ -377,7 +457,8 @@ def _convert_mjcf(
         # Get class name, default to parent_class if not specified
         class_name = element.get("class", parent_class)
 
-        # Process this default element's children (which define defaults for specific types)
+        # Process this default element's children (which define defaults for specific
+        # types)
         for child in element:
             if child.tag != "default":  # Only process non-default children
                 # Create key from class name and element type
@@ -493,7 +574,9 @@ def _convert_mjcf(
                 and mesh_to_material[mesh_name] != material_name
             ):
                 raise AssertionError(
-                    f"Mesh {mesh_name} was already associated with {mesh_to_material[mesh_name]}. We don't handle multiple materials assigned to the same mesh yet."
+                    f"Mesh {mesh_name} was already associated with "
+                    f"{mesh_to_material[mesh_name]}. We don't handle multiple "
+                    "materials assigned to the same mesh yet."
                 )
             mesh_to_material[mesh_name] = material_name
 
@@ -591,7 +674,8 @@ def _convert_mjcf(
             if parent.tag == "worldbody":
                 break
             elif parent.tag == "body":
-                # Then the plane would have been parsed as a dynamic collision element in Drake. Replace it with a large box.
+                # Then the plane would have been parsed as a dynamic collision element
+                # in Drake. Replace it with a large box.
                 geom.attrib["size"] = "1000 1000 1"
                 if "pos" in geom.attrib:
                     pos = [float(value) for value in geom.attrib["pos"].split()]
@@ -623,7 +707,7 @@ def MakeDrakeCompatibleModel(
     overwrite: bool = False,
     remap_mujoco_geometry_groups: dict[int, int] = {},
 ) -> None:
-    """Converts a model file (currently .urdf or .xml)to be compatible with the
+    """Converts a model file (currently .urdf, .sdf, or .xml) to be compatible with the
     Drake multibody parsers.
 
     For all models:
