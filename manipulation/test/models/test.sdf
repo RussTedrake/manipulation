@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<sdf version="1.7">
+  <model name="test">
+    <link name="body">
+      <visual name="visual_stl">
+        <geometry>
+          <mesh>
+            <uri>cube.stl</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <collision name="collision_dae">
+        <geometry>
+          <mesh>
+            <uri>cube.dae</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name="visual_obj">
+        <geometry>
+          <mesh>
+            <uri>cube.obj</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <visual name="visual_obj_scaled">
+        <geometry>
+          <mesh>
+            <uri>file://replace_me_in_test_with_absolute_path/cube.obj</uri>
+            <scale>1 2 3</scale>
+          </mesh>
+        </geometry>
+      </visual>
+      <visual name="visual_obj_scaled_package">
+        <geometry>
+          <mesh>
+            <uri>package://manipulation_test_models/cube.obj</uri>
+            <scale>-1 1 1</scale>
+          </mesh>
+        </geometry>
+      </visual>
+    </link>
+  </model>
+</sdf>

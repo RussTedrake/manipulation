@@ -1,0 +1,3 @@
+# Ignore files written by test_make_drake_compatible_model.py
+cube_from*
+test_modified*
