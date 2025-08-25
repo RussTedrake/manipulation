@@ -1,3 +1,14 @@
+# Enable bzlmod by default (Bazel's new module system)
+# This replaces the WORKSPACE-based dependency management
+build --enable_bzlmod
+common --enable_bzlmod
+
+# Set Python version for automatic pip repository selection
+build --@rules_python//python/config_settings:python_version=3.12
+
+# Python version is automatically selected based on what's available on the system
+# Following Drake's platform defaults: Jammy=3.10, Noble=3.12, macOS=3.13
+
 # Location of the Gurobi license key file, typically named "gurobi.lic".
 build --action_env=GRB_LICENSE_FILE
 
@@ -24,6 +35,7 @@ build --test_env=LANG=en_US.UTF-8
 build --test_env=LC_ALL=en_US.UTF-8
 build --test_env=MOSEKLM_LICENSE_FILE
 build --test_env=MPLBACKEND=Template
+build --test_env=MPLCONFIGDIR=/tmp
 
 # TODO(jamiesnape): Fix "Invalid -W option ignored: invalid module name:
 # 'pydrake.common.deprecation' warning and ensure that Drake deprecation
@@ -43,5 +55,9 @@ build:macos --test_timeout=120,600,1800,7200
 # https://github.com/RobotLocomotion/drake/issues/8475
 build --action_env=PYTHONNOUSERSITE=1
 build --test_env=PYTHONNOUSERSITE=1
+
+# Set matplotlib config directory to avoid conflicts (Drake issue #14250)
+build --action_env=MPLCONFIGDIR=/tmp
+build --action_env=MPLBACKEND=Template
 
 try-import %workspace%/user.bazelrc

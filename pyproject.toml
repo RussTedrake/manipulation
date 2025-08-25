@@ -56,12 +56,12 @@ gymnasium = { version=">0.26", optional=true }
 ipython = ">=7.8.0" # TODO: make this optional?
 ipywidgets = { version=">=8", optional=true } 
 lxml = {version = ">=4.9.2", extras = ["html_clean"] }
-# Note: matplotlib gets additional handling in PoetryExport.sh for bazel. 
+# Note: matplotlib gets additional handling in PoetryExport.py for bazel. 
 matplotlib = ">=3.7.0" # old versions don't build in XCode
 mpld3  = { version=">=0.5.6", optional=false } # TODO: make this optional
 nbconvert = [ 
-  {platform="darwin", version="7.0.0"},
-  {platform="linux", version="6.4.0"},
+  {platform="darwin", version="7.16.6"},
+  {platform="linux", version="7.16.6"},
 ]
 nevergrad = { version=">=0.4.3", optional=true } # TODO: avoid expensive bayesian optimization dep
 numpy = "^2.0.0"
@@ -70,7 +70,7 @@ pycollada = { version=">=0.8", optional=true }
 #pymcubes = ">=0.0.9"
 pyvirtualdisplay = { version=">=3.0", optional=false } # TODO: remove this.
 pyzmq = [ 
-  {platform="darwin", version=">=25.0.0", optional=true}, # needed for python 3.11?
+  {platform="darwin", version=">=27.0.0", optional=true}, # needed for python 3.11?
   {platform="linux", version=">=24.0.0", optional=true}, # <25.0.0 is currently needed for deepnote; this is pinned in htmlbook/Init.ipynb 
 ]
 scene-synthesizer = { version=">=1.13.2", optional=true }
@@ -78,7 +78,7 @@ scipy = { version=">=1.10.0", optional=true }
 setuptools = { version="<71.0.0", optional=true } # https://github.com/pypa/setuptools/issues/4487
 stable-baselines3 = { version=">=2.0.0", optional=true }
 timeout-decorator = { version=">=0.4.1", optional=true }
-torch = { version=">=2.0.1 <2.4.0", optional=true } # 2.4.0 doesn't support +cpu yet; needed for bazel on linux. additional logic in PoetryExport.sh.
+torch = { version=">=2.0.1 <2.4.0", optional=true } # 2.4.0 doesn't support +cpu yet; needed for bazel on linux. additional logic in PoetryExport.py.
 torchvision = { version=">=0.10.1", optional=true }
 tqdm = { version=">=4", optional=true }
 trimesh = { version = ">=4.6.6", optional=true }
