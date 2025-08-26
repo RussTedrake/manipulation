@@ -41,10 +41,10 @@ on:
   schedule:
     - cron: '0 8 * * *'
 jobs:
-  jammy:
-    name: ubuntu 22.04 jammy
-    runs-on: ubuntu-22.04
-    container: ubuntu:22.04
+  noble:
+    name: ubuntu 24.04 noble
+    runs-on: ubuntu-24.04
+    container: ubuntu:24.04
     steps:
       - name: pre-checkout setup
         run: |
@@ -52,7 +52,7 @@ jobs:
           apt-get update -o APT::Acquire::Retries=4 -qq
           apt-get install -o APT::Acquire::Retries=4 -o Dpkg::Use-Pty=0 -qy --no-install-recommends ca-certificates gnupg sudo
           apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E1DD270288B4E6030699E45FA1715D88E1DF1F24
-          echo 'deb http://ppa.launchpad.net/git-core/ppa/ubuntu focal main' > /etc/apt/sources.list.d/git.list
+          echo 'deb http://ppa.launchpad.net/git-core/ppa/ubuntu noble main' > /etc/apt/sources.list.d/git.list
           apt-get update -o APT::Acquire::Retries=4 -qq
           apt-get install -o APT::Acquire::Retries=4 -o Dpkg::Use-Pty=0 -qy --no-install-recommends git
           # Create non-root user for bazel bzlmod compatibility
@@ -69,10 +69,10 @@ jobs:
           # Switch to runner user for remaining commands
           sudo -u runner ./setup/submodule_checkout
           # Install system packages as root, but avoid running bazel as root
-          ./setup/ubuntu/22.04/install_prereqs.sh
+          ./setup/ubuntu/24.04/install_prereqs.sh
           apt-get install -o APT::Acquire::Retries=4 -o Dpkg::Use-Pty=0 -qy --no-install-recommends xvfb
           rm -rf /var/cache/apt/archives/*.deb /var/cache/apt/archives/partial/*.deb /var/cache/apt/*.bin /var/lib/apt/lists/* /var/log/apt/*
-          # Now run bazel operations as non-root user
+          # Now run bazel operations as non-root user (Python 3.12 via .bazelrc linux config)
           sudo -u runner bazel fetch //...
           sudo -u runner bazel run //manipulation:prefetch_remotes
         shell: bash
@@ -83,7 +83,7 @@ jobs:
   #          du /usr/ -hx -d 4 --threshold=1G | sort -hr | head
   #        shell: bash
       - name: test
-        run: sudo -u runner ./book/htmlbook/workflows/ci/jammy/test
+        run: sudo -u runner ./book/htmlbook/workflows/ci/noble/test
         shell: bash
 
   sonoma:

@@ -74,22 +74,50 @@ local_file(
     symlinked_file_path = "tidy",
 )
 
-# Python setup for bzlmod - automatic Drake-style platform detection
-# We create multiple pip repositories for each supported Python version, then 
-# let Bazel's toolchain resolution pick the right one based on what's available
+# Python setup for bzlmod - use host system Python instead of hermetic
+# Configure toolchains to use the host system Python interpreter
 python = use_extension("@rules_python//python/extensions:python.bzl", "python")
 python.toolchain(python_version = "3.10")  # Ubuntu 22.04 (Jammy)
 python.toolchain(python_version = "3.12")  # Ubuntu 24.04 (Noble) 
 python.toolchain(python_version = "3.13")  # macOS
 use_repo(python, "python_3_10", "python_3_12", "python_3_13")
 
-# Python pip dependencies - simplified single version for now
+# Python pip dependencies with automatic platform detection
 pip = use_extension("@rules_python//python/extensions:pip.bzl", "pip")
 
-# Single pip repository for Python dependencies
+# Multi-version pip repository using same hub_name
+# This allows automatic Python version selection at runtime
+pip.parse(
+    hub_name = "manipulation_pip",
+    python_version = "3.10",
+    requirements_darwin = "//:requirements-bazel-mac.txt",
+    requirements_linux = "//:requirements-bazel-linux.txt", 
+    requirements_lock = "//:requirements-bazel.txt",
+    experimental_requirement_cycles = {
+      "lxml": [
+        "lxml",
+        "lxml-html-clean",
+      ],
+    },
+)
+
 pip.parse(
     hub_name = "manipulation_pip",
     python_version = "3.12",
+    requirements_darwin = "//:requirements-bazel-mac.txt",
+    requirements_linux = "//:requirements-bazel-linux.txt", 
+    requirements_lock = "//:requirements-bazel.txt",
+    experimental_requirement_cycles = {
+      "lxml": [
+        "lxml",
+        "lxml-html-clean",
+      ],
+    },
+)
+
+pip.parse(
+    hub_name = "manipulation_pip",
+    python_version = "3.13",
     requirements_darwin = "//:requirements-bazel-mac.txt",
     requirements_linux = "//:requirements-bazel-linux.txt", 
     requirements_lock = "//:requirements-bazel.txt",
