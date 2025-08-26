@@ -61,6 +61,7 @@ apt-get update -qq || (sleep 15; apt-get update -qq)
 # requirements from this repo.
 apt-get install -o APT::Acquire::Retries=4 -o Dpkg::Use-Pty=0 -qy \
   --no-install-recommends $(cat <<EOF
+build-essential
 default-jre
 jupyter-notebook
 libblas-dev
