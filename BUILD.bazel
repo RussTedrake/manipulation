@@ -18,6 +18,6 @@ exports_files(
 # Some methods look for this file to find the root directory.
 filegroup(
     name = "workspace",
-    srcs = ["WORKSPACE.bazel"],
+    srcs = ["MODULE.bazel"],
     visibility = ["//visibility:public"],
 )
