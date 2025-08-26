@@ -84,7 +84,10 @@ def PrefetchAllRemotePackages():
 
     def fetch(package_name):
         print(f"fetching {package_name}")
-        package_map.GetPath(package_name)
+        try:
+            package_map.GetPath(package_name)
+        except ImportError as e:
+            print(f"skipping {package_name} because it requires {e.name}")
 
     fetch("drake_models")
     fetch(AddMujocoMenagerie(package_map))

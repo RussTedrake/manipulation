@@ -3,13 +3,30 @@ import copy
 import os
 import re
 import warnings
-from typing import Tuple
+from typing import Any, Tuple
 
 import numpy as np
-import trimesh
 from lxml import etree
 from PIL import Image  # For image loading
 from pydrake.all import PackageMap, Quaternion, RigidTransform
+
+try:
+    import trimesh
+
+    trimesh_available = True
+except ImportError:
+    trimesh_available = False
+
+    # Create a placeholder for type checking when trimesh is not available
+    class _TrimeshStub:
+        class visual:
+            class material:
+                Material = Any
+                SimpleMaterial = Any
+
+    trimesh = _TrimeshStub()
+    print("trimesh not found.")
+    print("Consider 'pip install trimesh'.")
 
 
 def _convert_mesh(
@@ -33,6 +50,9 @@ def _convert_mesh(
     Returns:
         A tuple containing the URL and path of the converted mesh file.
     """
+    if not trimesh_available:
+        raise ImportError("this method requires trimesh")
+
     # Create a compact matrix string for filename
     if scale is not None:
         scale_str = "_scaled_" + "_".join(
@@ -554,9 +574,10 @@ def _convert_mjcf(
                     raise FileNotFoundError(f"Texture file not found: {texture_path}")
                 image = Image.open(texture_path)
                 props["image"] = image
-        materials[material_element.attrib["name"]] = (
-            trimesh.visual.material.SimpleMaterial(**props)
-        )
+        if trimesh_available:
+            materials[material_element.attrib["name"]] = (
+                trimesh.visual.material.SimpleMaterial(**props)
+            )
 
     mesh_to_material = {}
     # Loop through geoms to find the mesh => material mappings

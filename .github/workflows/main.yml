@@ -103,7 +103,6 @@ jobs:
       - name: test
         run: ./book/htmlbook/workflows/ci/sonoma/test
         shell: zsh -efuo pipefail {0}
-
   lint:
     runs-on: ubuntu-latest
     steps:
@@ -164,11 +163,6 @@ jobs:
   #         sudo -u runner ./setup/submodule_checkout
   #         # Force bazel to use user pip instead of re-downloading everything to be hermetic:
   #         sudo -u runner pip install -U manipulation[all] --extra-index-url https://drake-packages.csail.mit.edu/whl/nightly/
-  #         sudo -u runner truncate -s0 requirements*.txt
-  #         sudo -u runner sed -i '/PYTHONNOUSERSITE/d' .bazelrc
-  #         # Configure bazel to use system Python for pip testing
-  #         sudo -u runner bash -c 'echo "build --action_env=BAZEL_PYTHON=/usr/bin/python3" >> .bazelrc'
-  #         sudo -u runner bash -c 'echo "test --action_env=BAZEL_PYTHON=/usr/bin/python3" >> .bazelrc'
   #         # Run prefetch_remotes using system Python since pip-installed manipulation is available there
   #         sudo -u runner python3 -c "from manipulation.remotes import PrefetchAllRemotePackages; PrefetchAllRemotePackages()"
   #       shell: bash
@@ -180,99 +174,101 @@ jobs:
   #         "from pathlib import Path; from pydrake.all import GetDrakePath; \
   #         print(Path(GetDrakePath()).parent)"` \
   #         MANIPULATION_DATA_DIR="`pwd`/book/data" \
-  #         BAZEL_TEST_FLAGS="--define=use_dependencies=none" \
+  #         BAZEL_TEST_FLAGS="--extra_toolchains=@rules_python//python/runtime_env_toolchains:all" \
   #         ./book/htmlbook/workflows/ci/jammy/test'
   #       shell: bash
-  # jammy-pip-core:
-  #   # This should emulate a student's experience if they are doing exercises
-  #   # via pip install manipulation.
-  #   name: pip notebooks on jammy
-  #   runs-on: ubuntu-22.04
-  #   if: ${{ !contains(github.event.pull_request.labels.*.name, 'requires new pip wheels') }}
-  #   container: ubuntu:22.04
-  #   steps:
-  #     - name: pre-checkout setup
-  #       run: |
-  #         apt-get update -o APT::Acquire::Retries=4 -qq
-  #         apt-get install -o APT::Acquire::Retries=4 -o Dpkg::Use-Pty=0 -qy --no-install-recommends python3-pip git xvfb sudo
-  #         # Create non-root user
-  #         useradd -m -s /bin/bash runner
-  #         echo 'runner ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
-  #       shell: bash
-  #     - name: checkout
-  #       uses: actions/checkout@v2
-  #     - name: test pip installation and exercises
-  #       run: |
-  #         # Fix ownership of the workspace
-  #         chown -R runner:runner .
-  #         # Switch to runner user for remaining commands
-  #         sudo -u runner ./setup/submodule_checkout
-  #         # Install system dependencies for Drake
-  #         ./setup/ubuntu/22.04/install_prereqs.sh
+  noble-pip-core:
+    # This should emulate a student's experience if they are doing exercises
+    # via pip install manipulation.
+    name: pip notebooks on noble
+    runs-on: ubuntu-24.04
+    if: ${{ !contains(github.event.pull_request.labels.*.name, 'requires new pip wheels') }}
+    container: ubuntu:24.04
+    steps:
+      - name: pre-checkout setup
+        run: |
+          apt-get update -o APT::Acquire::Retries=4 -qq
+          apt-get install -o APT::Acquire::Retries=4 -o Dpkg::Use-Pty=0 -qy --no-install-recommends python3-pip git xvfb sudo
+          # Create non-root user
+          useradd -m -s /bin/bash runner
+          echo 'runner ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
+        shell: bash
+      - name: checkout
+        uses: actions/checkout@v2
+      - name: test pip installation and exercises
+        run: |
+          # Fix ownership of the workspace
+          chown -R runner:runner .
+          # Switch to runner user for remaining commands
+          sudo -u runner ./setup/submodule_checkout
+          # Install system dependencies for Drake
+          ./setup/ubuntu/24.04/install_prereqs.sh
           
-  #         # Install manipulation via pip (student experience)
-  #         sudo -u runner pip install manipulation --extra-index-url https://drake-packages.csail.mit.edu/whl/nightly/
-  #         sudo -u runner pip install jupyter nbconvert ipykernel
-  #         # Install kernel for notebook execution
-  #         sudo -u runner python3 -m ipykernel install --user --name=python3
+          # Install manipulation via pip (to mimic student experience)
+          sudo -u runner pip install manipulation --extra-index-url https://drake-packages.csail.mit.edu/whl/nightly/ --break-system-packages
+          sudo -u runner pip install jupyter nbconvert ipykernel --break-system-packages
+          # Install kernel for notebook execution
+          sudo -u runner python3 -m ipykernel install --user --name=python3
+          # Run prefetch_remotes using system Python since pip-installed manipulation is available there
+#          sudo -u runner python3 -c "from manipulation.remotes import PrefetchAllRemotePackages; PrefetchAllRemotePackages()"
+        shell: bash
+      - name: test
+        run: |
+          sudo -u runner bash -c '\
+          EXCLUDE_TESTS="(//book/htmlbook/... + attr(name, .*_linktest$, //...))" \
+          DRAKE_RESOURCE_ROOT=`python3 -c \
+          "from pathlib import Path; from pydrake.all import GetDrakePath; \
+          print(Path(GetDrakePath()).parent)"` \
+          MANIPULATION_DATA_DIR="`pwd`/book/data" \
+          BAZEL_TEST_FLAGS="--extra_toolchains=@rules_python//python/runtime_env_toolchains:all" \
+          ./book/htmlbook/workflows/ci/noble/test'
+        shell: bash
+
+  noble-pip-extra:
+    # This should emulate a student's experience if they are doing exercises
+    # via pip install manipulation[all].
+    name: pip extra on noble
+    runs-on: ubuntu-24.04
+    if: ${{ !contains(github.event.pull_request.labels.*.name, 'requires new pip wheels') }}
+    container: ubuntu:24.04
+    steps:
+      - name: pre-checkout setup
+        run: |
+          apt-get update -o APT::Acquire::Retries=4 -qq
+          apt-get install -o APT::Acquire::Retries=4 -o Dpkg::Use-Pty=0 -qy --no-install-recommends python3-pip git xvfb sudo
+          # Create non-root user
+          useradd -m -s /bin/bash runner
+          echo 'runner ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
+        shell: bash
+      - name: checkout
+        uses: actions/checkout@v2
+      - name: test pip installation and exercises
+        run: |
+          # Fix ownership of the workspace
+          chown -R runner:runner .
+          # Switch to runner user for remaining commands
+          sudo -u runner ./setup/submodule_checkout
+          # Install system dependencies for Drake
+          ./setup/ubuntu/24.04/install_prereqs.sh
           
-  #         # Test all exercise notebooks
-  #         sudo -u runner bash -c '\
-  #         export DISPLAY=:99 && \
-  #         Xvfb :99 -screen 0 1280x1024x24 -ac +extension GLX +extension RANDR +render -noreset & \
-  #         sleep 2 && \
-  #         for notebook in book/*/exercises/*.ipynb; do \
-  #           echo "Testing $notebook..." && \
-  #           python3 -m nbconvert --to python --execute "$notebook" --ExecutePreprocessor.timeout=300 || exit 1; \
-  #         done'
-  #       shell: bash
-  # jammy-pip-extra:
-  #   # This should emulate a student's experience if they are doing the psets
-  #   # via pip install manipulation[all].
-  #   name: pip extra on jammy
-  #   runs-on: ubuntu-22.04
-  #   if: ${{ !contains(github.event.pull_request.labels.*.name, 'requires new pip wheels') }}
-  #   container: ubuntu:22.04
-  #   steps:
-  #     - name: pre-checkout setup
-  #       run: |
-  #         apt-get update -o APT::Acquire::Retries=4 -qq
-  #         apt-get install -o APT::Acquire::Retries=4 -o Dpkg::Use-Pty=0 -qy --no-install-recommends python3-pip git xvfb sudo
-  #         # Create non-root user for bazel bzlmod compatibility
-  #         useradd -m -s /bin/bash runner
-  #         echo 'runner ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
-  #       shell: bash
-  #     - name: checkout
-  #       uses: actions/checkout@v2
-  #     - name: setup and run as non-root user
-  #       run: |
-  #         # Fix ownership of the workspace
-  #         chown -R runner:runner .
-  #         # Switch to runner user for remaining commands
-  #         sudo -u runner ./setup/submodule_checkout
-  #         # Force bazel to use user pip instead of re-downloading everything to be hermetic.
-  #         # Also apply patches to avoid bazel dependency on installed drake.
-  #         ./setup/ubuntu/22.04/install_prereqs.sh
-  #         sudo -u runner pip install manipulation[all] --extra-index-url https://drake-packages.csail.mit.edu/whl/nightly/
-  #         sudo -u runner truncate -s0 requirements*.txt
-  #         sudo -u runner sed -i '/PYTHONNOUSERSITE/d' .bazelrc
-  #         # Configure bazel to use system Python and system site-packages for pip testing
-  #         SITE_PACKAGES=$(sudo -u runner python3 -c "import site; print(':'.join(site.getsitepackages() + [site.getusersitepackages()]))")
-  #         sudo -u runner bash -c 'echo "build --action_env=BAZEL_PYTHON=/usr/bin/python3" >> .bazelrc'
-  #         sudo -u runner bash -c 'echo "test --action_env=BAZEL_PYTHON=/usr/bin/python3" >> .bazelrc'
-  #         sudo -u runner bash -c "echo \"build --action_env=PYTHONPATH=$SITE_PACKAGES\" >> .bazelrc"
-  #         sudo -u runner bash -c "echo \"test --action_env=PYTHONPATH=$SITE_PACKAGES\" >> .bazelrc"
-  #         # Run prefetch_remotes using system Python since pip-installed manipulation is available there
-  #         sudo -u runner python3 -c "from manipulation.remotes import PrefetchAllRemotePackages; PrefetchAllRemotePackages()"
-  #       shell: bash
-  #     - name: test
-  #       run: |
-  #         sudo -u runner bash -c '\
-  #         EXCLUDE_TESTS="(//book/htmlbook/... + attr(name, .*_linktest$, //...))" \
-  #         DRAKE_RESOURCE_ROOT=`python3 -c \
-  #         "from pathlib import Path; from pydrake.all import GetDrakePath; \
-  #         print(Path(GetDrakePath()).parent)"` \
-  #         MANIPULATION_DATA_DIR="`pwd`/book/data" \
-  #         BAZEL_TEST_FLAGS="--define=use_dependencies=none" \
-  #         ./book/htmlbook/workflows/ci/jammy/test'
-  #       shell: bash
+          # Install manipulation via pip (to mimic student experience)
+          sudo -u runner pip install manipulation[all] --extra-index-url https://drake-packages.csail.mit.edu/whl/nightly/ --break-system-packages
+          sudo -u runner pip install jupyter nbconvert ipykernel --break-system-packages
+          # Install kernel for notebook execution
+          sudo -u runner python3 -m ipykernel install --user --name=python3
+
+          # Run prefetch_remotes using system Python since pip-installed manipulation is available there
+          sudo -u runner python3 -c "from manipulation.remotes import PrefetchAllRemotePackages; PrefetchAllRemotePackages()"
+        shell: bash
+      - name: test
+        run: |
+          sudo -u runner bash -c '\
+          EXCLUDE_TESTS="(//book/htmlbook/... + attr(name, .*_linktest$, //...))" \
+          DRAKE_RESOURCE_ROOT=`python3 -c \
+          "from pathlib import Path; from pydrake.all import GetDrakePath; \
+          print(Path(GetDrakePath()).parent)"` \
+          MANIPULATION_DATA_DIR="`pwd`/book/data" \
+          BAZEL_TEST_FLAGS="--extra_toolchains=@rules_python//python/runtime_env_toolchains:all" \
+          ./book/htmlbook/workflows/ci/noble/test'
+        shell: bash
+
