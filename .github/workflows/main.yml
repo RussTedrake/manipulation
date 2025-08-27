@@ -210,7 +210,7 @@ jobs:
           # Install kernel for notebook execution
           sudo -u runner python3 -m ipykernel install --user --name=python3
           # Run prefetch_remotes using system Python since pip-installed manipulation is available there
-#          sudo -u runner python3 -c "from manipulation.remotes import PrefetchAllRemotePackages; PrefetchAllRemotePackages()"
+          sudo -u runner python3 -c "from manipulation.remotes import PrefetchAllRemotePackages; PrefetchAllRemotePackages()"
         shell: bash
       - name: test
         run: |
