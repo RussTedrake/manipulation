@@ -71,7 +71,10 @@ def AddRby1Remote(package_map: PackageMap):
     )
     model_path = package_map.ResolveUrl("package://rby1/urdf/model.urdf")
     drake_model_path = model_path.replace(".urdf", ".drake.urdf")
-    MakeDrakeCompatibleModel(model_path, drake_model_path)
+    try:
+        MakeDrakeCompatibleModel(model_path, drake_model_path)
+    except ImportError as e:
+        print(f"RBY1 model conversion failed; models may not visualize properly: {e}")
     return package_name
 
 
@@ -84,10 +87,7 @@ def PrefetchAllRemotePackages():
 
     def fetch(package_name):
         print(f"fetching {package_name}")
-        try:
-            package_map.GetPath(package_name)
-        except ImportError as e:
-            print(f"skipping {package_name} because it requires {e.name}")
+        package_map.GetPath(package_name)
 
     fetch("drake_models")
     fetch(AddMujocoMenagerie(package_map))
