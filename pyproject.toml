@@ -92,7 +92,8 @@ shapely = {version = "^2.1.1", optional = true}
 [tool.poetry.extras]
 torch = ["torch", "torchvision"]
 rl = ["stable_baselines3", "gymnasium"]
-mesh = ["pycollada", "trimesh", "vhacdx", "coacd", "shapely"]
+mesh = ["pycollada", "trimesh", "vhacdx", "coacd"]
+letter = ["trimesh", "coacd", "shapely"]
 grader = ["gradescope-utils", "timeout-decorator", "nbconvert", "nbformat"]
 # 'all' should have all of the optional dependencies required to run any notebook in this repo.
 all = [
