@@ -1,34 +1,111 @@
-import pathlib
+from pathlib import Path
 
-import coacd
 import trimesh
 from matplotlib.font_manager import FontProperties
 from matplotlib.textpath import TextPath
 from shapely.geometry import MultiPolygon, Polygon
 
+from manipulation.create_sdf_from_mesh import create_sdf_from_mesh
 
-def create_mesh_from_letter(
+
+def create_sdf_asset_from_letter(
+    text: str,
+    font_name: str = "Arial",
+    font_size: int = 100,
+    scale: float = 0.01,
+    mass: float = 1.0,
+    extrusion_height: float = 10.0,
+    is_compliant: bool = False,
+    hydroelastic_modulus: float = 1e8,
+    hunt_crossley_dissipation: float | None = None,
+    mu_dynamic: float | None = 1.0,
+    mu_static: float | None = None,
+    output_dir: str = ".",
+):
+    """
+    Creates a complete SDF asset (mesh + SDF file) from a single letter.
+
+    Args:
+        text (str): The character to convert (single letter only).
+        font_name (str): The name of the font to use (e.g., 'Arial', 'Times New Roman').
+        font_size (int): The font size in points, affecting the mesh resolution.
+        scale (float): Scale factor to convert mesh coordinates to meters.
+        mass (float): The mass in kg of the object for inertia calculations.
+        extrusion_height (float): The height to extrude the 2D letter shape into 3D.
+        is_compliant (bool): Whether to use compliant hydroelastic contact.
+        hydroelastic_modulus (float): The hydroelastic modulus (Pa).
+        hunt_crossley_dissipation (float | None): Hunt-Crossley dissipation parameter (s/m).
+        mu_dynamic (float | None): Coefficient of dynamic friction.
+        mu_static (float | None): Coefficient of static friction.
+        output_dir (str): Directory where the output files will be saved.
+
+    Returns:
+        Path | None: Path to the created SDF file, or None if creation failed.
+    """
+    assert len(text) == 1, "Only one letter can be converted at a time"
+
+    # Create output directory
+    output_path = Path(output_dir)
+    output_path.mkdir(parents=True, exist_ok=True)
+
+    try:
+        # Generate the 3D mesh from the letter
+        mesh = _create_mesh_from_letter(
+            text=text,
+            font_name=font_name,
+            font_size=font_size,
+            extrusion_height=extrusion_height,
+        )
+
+        if mesh is None:
+            print(f"Failed to create mesh for letter '{text}'")
+            return None
+
+        # Save the mesh as an OBJ file
+        mesh_path = output_path / f"{text}.obj"
+        mesh.export(mesh_path)
+
+        # Use create_sdf_from_mesh to generate the SDF file
+        create_sdf_from_mesh(
+            mesh_path=mesh_path,
+            mass=mass,
+            scale=scale,
+            is_compliant=is_compliant,
+            hydroelastic_modulus=hydroelastic_modulus,
+            hunt_crossley_dissipation=hunt_crossley_dissipation,
+            mu_dynamic=mu_dynamic,
+            mu_static=mu_static,
+            preview_with_trimesh=False,  # Don't show preview in automated generation
+            use_coacd=True,
+            coacd_kwargs={
+                "threshold": 0.05,  # ↓ concavity threshold (lower ⇒ more pieces)
+                "preprocess_mode": "auto",
+                # "auto" (default) tries manifold remeshing only if needed
+                "merge": True,  # allow post-merge to minimise hull count
+            },
+        )
+
+        # Return path to the created SDF file
+        sdf_path = output_path / f"{text}.sdf"
+        return sdf_path if sdf_path.exists() else None
+
+    except Exception as e:
+        print(f"Error creating SDF asset for letter '{text}': {e}")
+        return None
+
+
+def _create_mesh_from_letter(
     text: str,
     font_name: str = "Arial",
     font_size: int = 100,
     extrusion_height: float = 10.0,
-    model_dir: str = ".",
 ):
     """
-    Converts a single letter into a 3D mesh.
-
-    Args:
-        text (str): The character(s) to convert.
-        font_name (str): The name of the font to use (e.g., 'Arial', 'Times New Roman').
-        font_size (int): The font size in points, affecting the mesh resolution.
-        extrusion_height (float): The height to extrude the 2D letter shape into 3D.
-        dpi (int): The dots per inch resolution for path generation.
+    Internal function to create a 3D mesh from a letter.
 
     Returns:
-        trimesh.Trimesh: A 3D mesh object of the letter.
-                         Returns None if the font path cannot be generated.
+        trimesh.Trimesh: A 3D mesh object of the letter, or None if creation failed.
     """
-    assert len(text) == 1, "Only one letter can be converted at a time"
     try:
         # Set up font properties
         font_prop = FontProperties(
@@ -44,7 +121,7 @@ def create_mesh_from_letter(
         print("Please ensure the specified font is available on your system.")
         return None
 
-    # --- Process the 2D Path into Shapely Polygons ---
+    # Process the 2D Path into Shapely Polygons
     path_polygons = path.to_polygons(closed_only=True)
 
     if not path_polygons:
@@ -54,7 +131,7 @@ def create_mesh_from_letter(
     # Convert the raw vertex lists into Shapely Polygon objects
     shapely_polygons = [Polygon(p) for p in path_polygons]
 
-    # New robust logic: Identify exteriors as polygons that are not contained by any other polygon.
+    # Identify exteriors as polygons that are not contained by any other polygon
     exteriors = []
     for p1 in shapely_polygons:
         is_exterior = True
@@ -69,7 +146,7 @@ def create_mesh_from_letter(
         if is_exterior:
             exteriors.append(p1)
 
-    # Identify holes by checking which of the remaining polygons are contained within our exteriors.
+    # Identify holes by checking which polygons are contained within exteriors
     final_polygons = []
     all_holes = [p for p in shapely_polygons if p not in exteriors]
 
@@ -90,114 +167,34 @@ def create_mesh_from_letter(
     else:
         final_shape = MultiPolygon(final_polygons)
 
-    # --- Extrude the 2D Polygons into a 3D Mesh ---
     if final_shape.is_empty:
         print("Resulting Shapely polygon is empty.")
         return None
 
-    # Trimesh can directly extrude Shapely Polygons and MultiPolygons
+    # Extrude the 2D shape into a 3D mesh
     mesh = trimesh.creation.extrude_polygon(final_shape, height=extrusion_height)
 
-    # 2) wrap it for CoACD
-    cmesh = coacd.Mesh(mesh.vertices, mesh.faces)
-
-    # 3) run the decomposition
-    parts = coacd.run_coacd(
-        cmesh,
-        threshold=0.05,  # ↓ concavity threshold (lower ⇒ more pieces)
-        preprocess_mode="auto",
-        # "auto" (default) tries manifold remeshing only if needed
-        merge=True,  # allow post-merge to minimise hull count
-    )
-
-    # 4) convert each returned (V, F) pair back to trimesh and save
-
-    # Create directory if it doesn't exist
-    out_dir = pathlib.Path(model_dir) / f"{text}_model"
-    out_dir.mkdir(parents=True, exist_ok=True)
-
-    for i, (v, f) in enumerate(parts):
-        trimesh.Trimesh(v, f, process=False).export(out_dir / f"convex_{i}.obj")
-
-
-def create_urdf_from_mesh(text: str, scale=0.01, model_dir="."):
-    import glob
-    import xml.etree.ElementTree as ET
-
-    model_path = f"{text}_model"
-    # grab the OBJ paths you just exported ----------------------------------------
-    obj_paths = sorted(
-        glob.glob(str(pathlib.Path(model_dir) / model_path / "convex_*.obj"))
-    )  # adjust the glob as needed
-
-    # build the XML ----------------------------------------------------------------
-    robot = ET.Element("robot", name=f"{text}_letter")
-
-    link = ET.SubElement(robot, "link", name=f"{text}_body")
-
-    # ── add dummy inertia ────────────────────────────────────────────
-    inertial = ET.SubElement(link, "inertial")
-    ET.SubElement(inertial, "origin", xyz="0 0 0", rpy="0 0 0")
-    ET.SubElement(inertial, "mass", value="1.0")
-    ET.SubElement(
-        inertial,
-        "inertia",
-        ixx="0.01",
-        ixy="0.0",
-        ixz="0.0",
-        iyy="0.01",
-        iyz="0.0",
-        izz="0.01",
-    )
-
-    for i, path in enumerate(obj_paths):
-        relative_path = path.split("/")[-1]
-        # --------------- collision element ---------------
-        coll = ET.SubElement(link, "collision", name=f"part_{i}")
-        ET.SubElement(coll, "origin", xyz="0 0 0", rpy="0 0 0")
-        c_geom = ET.SubElement(coll, "geometry")
-        ET.SubElement(
-            c_geom,
-            "mesh",
-            filename=str(relative_path),
-            scale=f"{scale} {scale} {scale}",
-        )
-
-        # --------------- *visual* element (same mesh) ----
-        vis = ET.SubElement(link, "visual", name=f"part_{i}_vis")
-        ET.SubElement(vis, "origin", xyz="0 0 0", rpy="0 0 0")
-        v_geom = ET.SubElement(vis, "geometry")
-        ET.SubElement(
-            v_geom,
-            "mesh",
-            filename=str(relative_path),
-            scale=f"{scale} {scale} {scale}",
-        )
-
-    # save -------------------------------------------------------------------------
-    ET.indent(robot)  # Python ≥ 3.9 for pretty-printing
-    ET.ElementTree(robot).write(
-        str(pathlib.Path(model_dir) / model_path / f"{text}_convex.urdf"),
-        xml_declaration=True,
-        encoding="utf-8",
-    )
+    return mesh
 
 
 if __name__ == "__main__":
-    # --- Configuration ---
     LETTER_TO_CONVERT = "P"
-    FONT_TO_USE = (
-        "DejaVu Sans"  # A common font, change if not available. 'Arial' on Windows.
-    )
-    OUTPUT_FILENAME = "letter.stl"
-    EXTRUSION_DEPTH = 15.0  # How "thick" the letter will be
+    FONT_TO_USE = "DejaVu Sans"
+    EXTRUSION_DEPTH = 15.0
 
-    print(f"Attempting to convert the letter '{LETTER_TO_CONVERT}' to a 3D mesh.")
+    print(f"Attempting to convert the letter '{LETTER_TO_CONVERT}' to an SDF asset.")
     print(f"Using font: {FONT_TO_USE}")
 
-    # Generate the mesh
-    create_mesh_from_letter(
-        LETTER_TO_CONVERT, font_name=FONT_TO_USE, extrusion_height=EXTRUSION_DEPTH
+    # Generate the complete SDF asset
+    sdf_path = create_sdf_asset_from_letter(
+        text=LETTER_TO_CONVERT,
+        font_name=FONT_TO_USE,
+        extrusion_height=EXTRUSION_DEPTH,
+        scale=0.01,
+        output_dir=f"{LETTER_TO_CONVERT}_letter_model",
     )
 
-    create_urdf_from_mesh(LETTER_TO_CONVERT)
+    if sdf_path:
+        print(f"Successfully created SDF asset at: {sdf_path}")
+    else:
+        print("Failed to create SDF asset")
