@@ -101,55 +101,64 @@ class LetterGenerationTest(unittest.TestCase):
                         f"OBJ file {obj_file} should not be empty for letter {letter}",
                     )
 
-    # def test_create_mesh_from_letter_different_fonts(self):
-    #     """Test mesh creation with different fonts."""
-    #     fonts_to_test = ["Arial", "DejaVu Sans"]
-    #     letter = "B"
+    def test_create_mesh_from_letter_different_fonts(self):
+        """Test mesh creation with different fonts."""
+        fonts_to_test = ["Arial", "DejaVu Sans"]
+        letter = "B"
 
-    #     for font in fonts_to_test:
-    #         with self.subTest(font=font):
-    #             create_mesh_from_letter(
-    #                 text=letter,
-    #                 font_name=font,
-    #                 font_size=50,
-    #                 extrusion_height=5.0,
-    #                 model_dir=self._tmp_dir
-    #             )
+        for font in fonts_to_test:
+            with self.subTest(font=font):
+                create_mesh_from_letter(
+                    text=letter,
+                    font_name=font,
+                    font_size=50,
+                    extrusion_height=5.0,
+                    model_dir=self._tmp_dir,
+                )
 
-    #             model_dir = Path(self._tmp_dir) / f"{letter}_model"
-    #             self.assertTrue(model_dir.exists(), f"Model directory should be created for font {font}")
+                model_dir = Path(self._tmp_dir) / f"{letter}_model"
+                self.assertTrue(
+                    model_dir.exists(),
+                    f"Model directory should be created for font {font}",
+                )
 
-    # def test_create_mesh_from_letter_different_parameters(self):
-    #     """Test mesh creation with different parameters."""
-    #     letter = "C"
+    def test_create_mesh_from_letter_different_parameters(self):
+        """Test mesh creation with different parameters."""
+        letter = "C"
 
-    #     # Test with different font sizes
-    #     for font_size in [50, 100, 200]:
-    #         with self.subTest(font_size=font_size):
-    #             create_mesh_from_letter(
-    #                 text=letter,
-    #                 font_name="Arial",
-    #                 font_size=font_size,
-    #                 extrusion_height=10.0,
-    #                 model_dir=self._tmp_dir
-    #             )
+        # Test with different font sizes
+        for font_size in [50, 100, 200]:
+            with self.subTest(font_size=font_size):
+                create_mesh_from_letter(
+                    text=letter,
+                    font_name="Arial",
+                    font_size=font_size,
+                    extrusion_height=10.0,
+                    model_dir=self._tmp_dir,
+                )
 
-    #             model_dir = Path(self._tmp_dir) / f"{letter}_model"
-    #             self.assertTrue(model_dir.exists(), f"Model directory should be created for font_size {font_size}")
+                model_dir = Path(self._tmp_dir) / f"{letter}_model"
+                self.assertTrue(
+                    model_dir.exists(),
+                    f"Model directory should be created for font_size {font_size}",
+                )
 
-    #     # Test with different extrusion heights
-    #     for height in [5.0, 15.0, 25.0]:
-    #         with self.subTest(extrusion_height=height):
-    #             create_mesh_from_letter(
-    #                 text=letter,
-    #                 font_name="Arial",
-    #                 font_size=100,
-    #                 extrusion_height=height,
-    #                 model_dir=self._tmp_dir
-    #             )
+        # Test with different extrusion heights
+        for height in [5.0, 15.0, 25.0]:
+            with self.subTest(extrusion_height=height):
+                create_mesh_from_letter(
+                    text=letter,
+                    font_name="Arial",
+                    font_size=100,
+                    extrusion_height=height,
+                    model_dir=self._tmp_dir,
+                )
 
-    #             model_dir = Path(self._tmp_dir) / f"{letter}_model"
-    #             self.assertTrue(model_dir.exists(), f"Model directory should be created for height {height}")
+                model_dir = Path(self._tmp_dir) / f"{letter}_model"
+                self.assertTrue(
+                    model_dir.exists(),
+                    f"Model directory should be created for height {height}",
+                )
 
     # def test_create_mesh_from_letter_complex_letters(self):
     #     """Test mesh creation with letters that have holes (like 'O', 'P', 'R')."""
