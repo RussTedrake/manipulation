@@ -1,11 +1,27 @@
 from pathlib import Path
 
-import trimesh
 from matplotlib.font_manager import FontProperties
 from matplotlib.textpath import TextPath
-from shapely.geometry import MultiPolygon, Polygon
 
 from manipulation.create_sdf_from_mesh import create_sdf_from_mesh
+
+try:
+    import trimesh  # noqa: F401
+
+    trimesh_available = True
+except ImportError:
+    trimesh_available = False
+    print("trimesh not found.")
+    print("Consider 'pip install trimesh'.")
+
+try:
+    from shapely.geometry import MultiPolygon, Polygon  # noqa: F401
+
+    shapely_available = True
+except ImportError:
+    shapely_available = False
+    print("shapely not found.")
+    print("Consider 'pip install shapely'.")
 
 
 def create_sdf_asset_from_letter(

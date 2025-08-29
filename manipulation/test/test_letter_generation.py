@@ -5,7 +5,6 @@ from pathlib import Path
 
 from manipulation.letter_generation import create_sdf_asset_from_letter
 
-# Test for optional dependencies
 try:
     import trimesh  # noqa: F401
 
@@ -25,16 +24,6 @@ except ImportError:
     print("Consider 'pip install shapely'.")
 
 try:
-    from matplotlib.font_manager import FontProperties  # noqa: F401
-    from matplotlib.textpath import TextPath  # noqa: F401
-
-    matplotlib_available = True
-except ImportError:
-    matplotlib_available = False
-    print("matplotlib not found.")
-    print("Consider 'pip install matplotlib'.")
-
-try:
     import coacd  # noqa: F401
 
     coacd_available = True
@@ -44,9 +33,7 @@ except ImportError:
     print("Consider 'pip install coacd'.")
 
 # Import the module under test only if dependencies are available
-dependencies_available = all(
-    [trimesh_available, shapely_available, matplotlib_available, coacd_available]
-)
+dependencies_available = all([trimesh_available, shapely_available, coacd_available])
 
 if dependencies_available:
     from manipulation.letter_generation import create_sdf_asset_from_letter
@@ -54,7 +41,7 @@ if dependencies_available:
 
 @unittest.skipIf(
     not dependencies_available,
-    "Requires trimesh, shapely, matplotlib, and coacd dependencies.",
+    "Requires trimesh, shapely, and coacd dependencies.",
 )
 class LetterGenerationTest(unittest.TestCase):
 

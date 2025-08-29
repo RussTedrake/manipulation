@@ -83,7 +83,7 @@ rt_py_library(
 
 rt_py_binary(
     name = "prefetch_remotes",
-    tags = ["requires-network", "no-sandbox"], 
+    tags = ["requires-network", "no-sandbox"],
     srcs = ["prefetch_remotes.py"],
     deps = ["remotes"],
 )
@@ -140,6 +140,26 @@ rt_py_library(
     name = "clutter",
     srcs = ["clutter.py"],
     imports = [".."],
+    visibility = ["//visibility:public"],
+)
+
+rt_py_library(
+    name = "letter_generation",
+    srcs = [
+        "letter_generation.py",
+        "create_sdf_from_mesh.py",
+    ],
+    imports = [".."],
+    deps = [
+        "manipulation",
+        requirement("lxml"),
+    ],
+    optional_deps = [
+        requirement("trimesh"),
+        requirement("shapely"),
+        requirement("coacd"),
+        requirement("vhacdx"),
+    ],
     visibility = ["//visibility:public"],
 )
 
@@ -241,6 +261,18 @@ rt_py_test(
     deps = [
       "manipulation",
       "mustard_depth_camera_example",
+    ],
+)
+
+rt_py_test(
+    name = "test_letter_generation",
+    srcs = [
+        "test/test_letter_generation.py",
+    ],
+    imports = [".."],
+    deps = [
+      "manipulation",
+      "letter_generation",
     ],
 )
 
