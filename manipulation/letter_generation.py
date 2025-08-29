@@ -178,20 +178,62 @@ def _create_mesh_from_letter(
 
 
 if __name__ == "__main__":
-    LETTER_TO_CONVERT = "P"
-    FONT_TO_USE = "DejaVu Sans"
-    EXTRUSION_DEPTH = 15.0
+    import argparse
 
-    print(f"Attempting to convert the letter '{LETTER_TO_CONVERT}' to an SDF asset.")
-    print(f"Using font: {FONT_TO_USE}")
+    parser = argparse.ArgumentParser(
+        description="Create an SDF asset from a single letter."
+    )
+    parser.add_argument(
+        "letter",
+        type=str,
+        help="The letter to convert (single character only)",
+    )
+    parser.add_argument(
+        "--font",
+        type=str,
+        default="DejaVu Sans",
+        help="Font name to use (default: DejaVu Sans)",
+    )
+    parser.add_argument(
+        "--extrusion-height",
+        type=float,
+        default=15.0,
+        help="Height to extrude the 2D letter shape (default: 15.0)",
+    )
+    parser.add_argument(
+        "--scale",
+        type=float,
+        default=0.01,
+        help="Scale factor to convert mesh coordinates to meters (default: 0.01)",
+    )
+    parser.add_argument(
+        "--output-dir",
+        type=str,
+        default=None,
+        help="Output directory (default: {letter}_model)",
+    )
+
+    args = parser.parse_args()
+
+    # Validate letter input
+    if len(args.letter) != 1:
+        print(f"Error: Letter must be a single character, got '{args.letter}'")
+        exit(1)
+
+    # Set default output directory if not provided
+    output_dir = args.output_dir or f"{args.letter}_model"
+
+    print(f"Attempting to convert the letter '{args.letter}' to an SDF asset.")
+    print(f"Using font: {args.font}")
+    print(f"Extrusion height: {args.extrusion_height}")
 
     # Generate the complete SDF asset
     sdf_path = create_sdf_asset_from_letter(
-        text=LETTER_TO_CONVERT,
-        font_name=FONT_TO_USE,
-        extrusion_height=EXTRUSION_DEPTH,
-        scale=0.01,
-        output_dir=f"{LETTER_TO_CONVERT}_letter_model",
+        text=args.letter,
+        font_name=args.font,
+        extrusion_height=args.extrusion_height,
+        scale=args.scale,
+        output_dir=output_dir,
     )
 
     if sdf_path:
