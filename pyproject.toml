@@ -47,10 +47,10 @@ url = "https://drake-packages.csail.mit.edu/whl/nightly/"
 priority = "explicit"
 
 [tool.poetry.dependencies]
-python = ">=3.10,<4.0"  # Support Python 3.10 (Jammy CI), Python 3.12 (Noble CI), and 3.13 (macOS)
+python = ">=3.10,<3.14"  # Support Python 3.10 (Jammy CI), Python 3.12 (Noble CI), and 3.13 (macOS)
 cloudpickle = { version="2.2.1", optional=true} # needs to be pinned for stored files to remain compatible.
 #drake = { version = ">=0.0.20250131 <0.1", source = "drake-nightly" }
-drake = ">=1.41.0"
+drake = "==1.44.0"
 gradescope-utils = { version=">=0.4.0", optional=true}
 gymnasium = { version=">0.26", optional=true }
 ipython = ">=7.8.0" # TODO: make this optional?
@@ -125,7 +125,7 @@ optional = true
 # needed to import for a file that sphinx autodoc is trying to index. None of
 # these should be marked as optional.
 #drake = { version = ">=0.0.20250118 <0.1", source = "drake-nightly" }
-drake = ">=1.41.0"
+drake = "==1.44.0"
 ipython = ">=7.8.0"
 lxml = {version = ">=4.9.2", extras = ["html_clean"] }
 mpld3  = { version=">=0.5.6", optional=false }
