@@ -74,12 +74,15 @@ local_file(
     symlinked_file_path = "tidy",
 )
 
-# Python setup for bzlmod - use host system Python instead of hermetic
-# Configure toolchains to use the host system Python interpreter
+# Note: We allow bazel to run as root in containerized environments (CI,
+# Docker, Deepnote). This maintains cache consistency since dependencies are
+# installed as root in Dockerfile and eliminates the need for complex user
+# management in CI workflows.
+
 python = use_extension("@rules_python//python/extensions:python.bzl", "python")
-python.toolchain(python_version = "3.10")  # Ubuntu 22.04 (Jammy)
-python.toolchain(python_version = "3.12")  # Ubuntu 24.04 (Noble) 
-python.toolchain(python_version = "3.13")  # macOS
+python.toolchain(python_version = "3.10", ignore_root_user_error = True) 
+python.toolchain(python_version = "3.12", ignore_root_user_error = True)
+python.toolchain(python_version = "3.13", ignore_root_user_error = True)
 use_repo(python, "python_3_10", "python_3_12", "python_3_13")
 
 # Python pip dependencies with automatic platform detection
