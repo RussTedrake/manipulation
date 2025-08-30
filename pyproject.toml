@@ -54,12 +54,12 @@ drake = ">=1.41.0"
 gradescope-utils = { version=">=0.4.0", optional=true}
 gymnasium = { version=">0.26", optional=true }
 ipython = ">=7.8.0" # TODO: make this optional?
-ipywidgets = { version=">=8", optional=true }
+ipywidgets = { version=">=8", optional=true } 
 lxml = {version = ">=4.9.2", extras = ["html_clean"] }
-# Note: matplotlib gets additional handling in PoetryExport.py for bazel.
+# Note: matplotlib gets additional handling in PoetryExport.py for bazel. 
 matplotlib = ">=3.7.0" # old versions don't build in XCode
 mpld3  = { version=">=0.5.6", optional=false } # TODO: make this optional
-nbconvert = [
+nbconvert = [ 
   {platform="darwin", version="7.16.6", optional=true},
   {platform="linux", version="7.16.6", optional=true},
 ]
@@ -70,9 +70,9 @@ psutil = { version=">=5.9.*", optional=true }
 pycollada = { version=">=0.8", optional=true }
 #pymcubes = ">=0.0.9"
 pyvirtualdisplay = { version=">=3.0", optional=false } # TODO: remove this.
-pyzmq = [
+pyzmq = [ 
   {platform="darwin", version=">=27.0.0", optional=true}, # needed for python 3.11?
-  {platform="linux", version=">=24.0.0", optional=true}, # <25.0.0 is currently needed for deepnote; this is pinned in htmlbook/Init.ipynb
+  {platform="linux", version=">=24.0.0", optional=true}, # <25.0.0 is currently needed for deepnote; this is pinned in htmlbook/Init.ipynb 
 ]
 scene-synthesizer = { version=">=1.13.2", optional=true }
 scipy = { version=">=1.10.0", optional=true }
