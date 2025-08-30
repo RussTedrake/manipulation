@@ -509,7 +509,7 @@ description = "Approximate Convex Decomposition for 3D Meshes with Collision-Awa
 optional = true
 python-versions = ">=3.9"
 groups = ["main"]
-markers = "extra == \"mesh\" or extra == \"all\""
+markers = "extra == \"mesh\" or extra == \"letter\" or extra == \"all\""
 files = [
     {file = "coacd-1.0.7-cp39-abi3-macosx_11_0_arm64.whl", hash = "sha256:67a6badf5903e0f64d689156b4f3a1c67a60e5c4402b0fbc085280844252a125"},
     {file = "coacd-1.0.7-cp39-abi3-macosx_11_0_x86_64.whl", hash = "sha256:dd823f968ade4ead1f8ea579d6317c39eaa12e0f14031b3bcb6ea43a9d92c3b6"},
@@ -4956,7 +4956,7 @@ description = "Manipulation and analysis of geometric objects"
 optional = true
 python-versions = ">=3.10"
 groups = ["main"]
-markers = "extra == \"all\""
+markers = "extra == \"all\" or extra == \"letter\""
 files = [
     {file = "shapely-2.1.1-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:d8ccc872a632acb7bdcb69e5e78df27213f7efd195882668ffba5405497337c6"},
     {file = "shapely-2.1.1-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:f24f2ecda1e6c091da64bcbef8dd121380948074875bd1b247b3d17e99407099"},
@@ -6338,6 +6338,7 @@ type = ["pytest-mypy"]
 [extras]
 all = ["cloudpickle", "coacd", "gradescope-utils", "gymnasium", "ipywidgets", "nevergrad", "psutil", "pycollada", "pyzmq", "pyzmq", "scene-synthesizer", "scipy", "stable-baselines3", "timeout-decorator", "torch", "torchvision", "tqdm", "trimesh", "vhacdx"]
 grader = ["gradescope-utils", "nbconvert", "nbconvert", "nbformat", "timeout-decorator"]
+letter = ["coacd", "shapely", "trimesh"]
 mesh = ["coacd", "pycollada", "trimesh", "vhacdx"]
 rl = ["gymnasium", "stable-baselines3"]
 torch = ["torch", "torchvision"]
@@ -6345,4 +6346,4 @@ torch = ["torch", "torchvision"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10,<4.0"
-content-hash = "5845ae6901245ac62b52c88f0b918a2075974c657b14a2c90494fc32aa679148"
+content-hash = "7205593745eb4478ffa873646834b964bdb5702129cc85d496514ef09ed5e601"
