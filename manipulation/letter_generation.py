@@ -1,3 +1,4 @@
+import logging
 from pathlib import Path
 
 from matplotlib.font_manager import FontProperties
@@ -74,7 +75,7 @@ def create_sdf_asset_from_letter(
         )
 
         if mesh is None:
-            print(f"Failed to create mesh for letter '{text}'")
+            logging.error(f"Failed to create mesh for letter '{text}'")
             return None
 
         # Save the mesh as an OBJ file
@@ -106,7 +107,7 @@ def create_sdf_asset_from_letter(
         return sdf_path if sdf_path.exists() else None
 
     except Exception as e:
-        print(f"Error creating SDF asset for letter '{text}': {e}")
+        logging.error(f"Error creating SDF asset for letter '{text}': {e}")
         return None
 
 
@@ -133,15 +134,15 @@ def _create_mesh_from_letter(
         path = TextPath((0, 0), text, size=font_size, prop=font_prop)
 
     except Exception as e:
-        print(f"Error generating font path: {e}")
-        print("Please ensure the specified font is available on your system.")
+        logging.error(f"Error generating font path: {e}")
+        logging.error("Please ensure the specified font is available on your system.")
         return None
 
     # Process the 2D Path into Shapely Polygons
     path_polygons = path.to_polygons(closed_only=True)
 
     if not path_polygons:
-        print("No polygons were generated from the text path.")
+        logging.warning("No polygons were generated from the text path.")
         return None
 
     # Convert the raw vertex lists into Shapely Polygon objects
@@ -173,7 +174,7 @@ def _create_mesh_from_letter(
 
     # If no valid polygons were created, exit.
     if not final_polygons:
-        print("Could not construct valid geometry from paths.")
+        logging.warning("Could not construct valid geometry from paths.")
         return None
 
     # Combine the resulting polygons. If there's only one, it's a Polygon.
@@ -184,7 +185,7 @@ def _create_mesh_from_letter(
         final_shape = MultiPolygon(final_polygons)
 
     if final_shape.is_empty:
-        print("Resulting Shapely polygon is empty.")
+        logging.warning("Resulting Shapely polygon is empty.")
         return None
 
     # Extrude the 2D shape into a 3D mesh
@@ -233,15 +234,17 @@ if __name__ == "__main__":
 
     # Validate letter input
     if len(args.letter) != 1:
-        print(f"Error: Letter must be a single character, got '{args.letter}'")
+        logging.warning(
+            f"Error: Letter must be a single character, got '{args.letter}'"
+        )
         exit(1)
 
     # Set default output directory if not provided
     output_dir = args.output_dir or f"{args.letter}_model"
 
-    print(f"Attempting to convert the letter '{args.letter}' to an SDF asset.")
-    print(f"Using font: {args.font}")
-    print(f"Extrusion height: {args.extrusion_height}")
+    logging.info(f"Attempting to convert the letter '{args.letter}' to an SDF asset.")
+    logging.info(f"Using font: {args.font}")
+    logging.info(f"Extrusion height: {args.extrusion_height}")
 
     # Generate the complete SDF asset
     sdf_path = create_sdf_asset_from_letter(
@@ -253,6 +256,6 @@ if __name__ == "__main__":
     )
 
     if sdf_path:
-        print(f"Successfully created SDF asset at: {sdf_path}")
+        logging.info(f"Successfully created SDF asset at: {sdf_path}")
     else:
-        print("Failed to create SDF asset")
+        logging.info("Failed to create SDF asset")
