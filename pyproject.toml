@@ -146,9 +146,11 @@ mysql-connector-python = { version=">=8.0.23" }
 packaging = ">=24.2"
 pip-requirements-parser = ">=32.0"
 pre-commit = "^3.4.0"
+requests = { version=">=2.25.1" }
+
+[tool.poetry.requires-plugins]
 poetry-plugin-export = "^1.0.0"
 poetry-pre-commit-plugin = "^0.1.2"
-requests = { version=">=2.25.1" }
 
 [tool.black]
 include = '\.ipynb?$|\.pyi?$'
