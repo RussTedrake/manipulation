@@ -59,9 +59,9 @@ lxml = {version = ">=4.9.2", extras = ["html_clean"] }
 # Note: matplotlib gets additional handling in PoetryExport.py for bazel. 
 matplotlib = ">=3.7.0" # old versions don't build in XCode
 mpld3  = { version=">=0.5.6", optional=false } # TODO: make this optional
-nbconvert = [ 
-  {platform="darwin", version="7.16.6", optional=true},
-  {platform="linux", version="7.16.6", optional=true},
+nbconvert = [
+  {platform="darwin", version="7.14.2", optional=true},
+  {platform="linux", version="7.14.2", optional=true},
 ]
 nbformat = { version=">=5.0.0", optional=true }
 nevergrad = { version=">=0.4.3", optional=true } # TODO: avoid expensive bayesian optimization dep
