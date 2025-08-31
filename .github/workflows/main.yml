@@ -104,7 +104,7 @@ jobs:
       - name: setup python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.10' 
+          python-version: '3.10'
       - name: black
         uses: psf/black@stable
         with:
@@ -123,7 +123,7 @@ jobs:
       - name: Install and configure Poetry
         uses: snok/install-poetry@v1
         with:
-          version: 1.8.2
+          version: 2.1.4
           virtualenvs-create: true
           virtualenvs-in-project: true
       - name: build the docs
@@ -151,7 +151,7 @@ jobs:
 
           # Note: we **don't** reinstall drake's dependencies here. If we need
           # to do that, we should update our docker image.
-          
+
           # Install manipulation via pip (to mimic student experience)
           # Use --break-system-packages to handle externally managed environment
           # Only install manipulation[all] to avoid conflicts with system packages
@@ -182,7 +182,7 @@ jobs:
           ./setup/submodule_checkout
           # Install system dependencies for Drake
           ./setup/ubuntu/24.04/install_prereqs.sh
-          
+
           # Install manipulation via pip (to mimic student experience)
           # Handle system package conflicts by using --ignore-installed for problematic packages
           pip install manipulation jupyter nbconvert ipykernel --extra-index-url https://drake-packages.csail.mit.edu/whl/nightly/ --break-system-packages --ignore-installed traitlets
@@ -216,7 +216,7 @@ jobs:
           ./setup/submodule_checkout
           # Install system dependencies for Drake
           ./setup/ubuntu/24.04/install_prereqs.sh
-          
+
           # Install manipulation via pip (to mimic student experience)
           # Handle system package conflicts by using --ignore-installed for problematic packages
           pip install manipulation[all] jupyter nbconvert ipykernel --extra-index-url https://drake-packages.csail.mit.edu/whl/nightly/ --break-system-packages --ignore-installed traitlets
