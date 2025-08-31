@@ -241,42 +241,16 @@ def _visualize_letter(sdf_path: Path, letter: str, output_dir: str) -> None:
         letter (str): The letter character.
         output_dir (str): Output directory containing the model files.
     """
-    import os
-
-    from pydrake.geometry import Meshcat
     from pydrake.visualization import ModelVisualizer
 
-    # Create package.xml content
-    package_xml_content = """<?xml version="1.0"?>
-<package>
-  <name>temporary_package</name>
-</package>
-"""
-
-    # Create package.xml in the output directory
-    package_xml_path = os.path.join(output_dir, "package.xml")
     try:
-        with open(package_xml_path, "w") as f:
-            f.write(package_xml_content)
-
         logging.info("Starting Drake ModelVisualizer...")
 
-        # Create Meshcat instance
-        meshcat = Meshcat()
-        print(f"Meshcat URL: {meshcat.web_url()}")
+        # Create ModelVisualizer with no contact visualization
+        visualizer = ModelVisualizer(publish_contacts=False)
 
-        # Create ModelVisualizer
-        visualizer = ModelVisualizer(meshcat=meshcat)
-        parser = visualizer.parser()
-
-        # Add package path so Drake can find our model
-        parser.package_map().AddPackageXml(package_xml_path)
-
-        # Create the package URL for the SDF file
-        sdf_url = f"package://temporary_package/{letter}.sdf"
-
-        # Load the model
-        parser.AddModelsFromUrl(sdf_url)
+        # Load the SDF file directly
+        visualizer.AddModels(str(sdf_path))
 
         logging.info("Model loaded. Close the visualizer window to continue...")
 
@@ -285,14 +259,6 @@ def _visualize_letter(sdf_path: Path, letter: str, output_dir: str) -> None:
 
     except Exception as e:
         logging.error(f"Error during visualization: {e}")
-    finally:
-        # Clean up: remove package.xml
-        try:
-            if os.path.exists(package_xml_path):
-                os.remove(package_xml_path)
-                logging.info("Cleaned up package.xml file")
-        except Exception as e:
-            logging.warning(f"Could not remove package.xml: {e}")
 
 
 if __name__ == "__main__":
