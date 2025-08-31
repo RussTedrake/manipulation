@@ -268,6 +268,7 @@ rt_py_test(
     name = "test_letter_generation",
     srcs = [
         "test/test_letter_generation.py",
+        "//manipulation:letter_generation.py",
     ],
     imports = [".."],
     deps = [
