@@ -3,8 +3,6 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from manipulation.letter_generation import create_sdf_asset_from_letter
-
 try:
     import trimesh  # noqa: F401
 
