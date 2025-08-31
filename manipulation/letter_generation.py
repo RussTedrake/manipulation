@@ -38,7 +38,7 @@ def create_sdf_asset_from_letter(
     mu_dynamic: float | None = 1.0,
     mu_static: float | None = None,
     output_dir: str = ".",
-):
+) -> Path | None:
     """
     Creates a complete SDF asset (mesh + SDF file) from a single letter.
 
@@ -116,7 +116,7 @@ def _create_mesh_from_letter(
     font_name: str = "Arial",
     font_size: int = 100,
     extrusion_height: float = 10.0,
-):
+) -> "trimesh.Trimesh | None":
     """
     Internal function to create a 3D mesh from a letter.
 
