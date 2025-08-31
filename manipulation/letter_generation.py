@@ -59,7 +59,11 @@ def create_sdf_asset_from_letter(
     Returns:
         Path | None: Path to the created SDF file, or None if creation failed.
     """
-    assert len(text) == 1, "Only one letter can be converted at a time"
+    if len(text) > 1:
+        raise ValueError("Only one letter can be converted at a time")
+
+    if extrusion_height <= 0:
+        raise ValueError("Extrusion height must be positive")
 
     # Create output directory
     output_path = Path(output_dir)
