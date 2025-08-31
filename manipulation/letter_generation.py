@@ -7,7 +7,7 @@ from matplotlib.textpath import TextPath
 from manipulation.create_sdf_from_mesh import create_sdf_from_mesh
 
 try:
-    import trimesh  # noqa: F401
+    import trimesh
 
     trimesh_available = True
 except ImportError:
@@ -16,7 +16,8 @@ except ImportError:
     print("Consider 'pip install trimesh'.")
 
 try:
-    from shapely.geometry import MultiPolygon, Polygon  # noqa: F401
+    from shapely.affinity import scale as shapely_scale
+    from shapely.geometry import MultiPolygon, Polygon
 
     shapely_available = True
 except ImportError:
@@ -28,10 +29,9 @@ except ImportError:
 def create_sdf_asset_from_letter(
     text: str,
     font_name: str = "Arial",
-    font_size: int = 100,
-    scale: float = 0.01,
+    letter_height_meters: float = 0.4,
+    extrusion_depth_meters: float = 0.2,
     mass: float = 1.0,
-    extrusion_height: float = 10.0,
     is_compliant: bool = False,
     hydroelastic_modulus: float = 1e8,
     hunt_crossley_dissipation: float | None = None,
@@ -45,10 +45,9 @@ def create_sdf_asset_from_letter(
     Args:
         text (str): The character to convert (single letter only).
         font_name (str): The name of the font to use (e.g., 'Arial', 'Times New Roman').
-        font_size (int): The font size in points, affecting the mesh resolution.
-        scale (float): Scale factor to convert mesh coordinates to meters.
+        letter_height_meters (float): The physical height of the letter in meters.
+        extrusion_depth_meters (float): The physical depth/thickness of the letter in meters.
         mass (float): The mass in kg of the object for inertia calculations.
-        extrusion_height (float): The height to extrude the 2D letter shape into 3D.
         is_compliant (bool): Whether to use compliant hydroelastic contact.
         hydroelastic_modulus (float): The hydroelastic modulus (Pa).
         hunt_crossley_dissipation (float | None): Hunt-Crossley dissipation parameter (s/m).
@@ -62,8 +61,11 @@ def create_sdf_asset_from_letter(
     if len(text) > 1:
         raise ValueError("Only one letter can be converted at a time")
 
-    if extrusion_height <= 0:
-        raise ValueError("Extrusion height must be positive")
+    if letter_height_meters <= 0:
+        raise ValueError("Letter height must be positive")
+
+    if extrusion_depth_meters <= 0:
+        raise ValueError("Extrusion depth must be positive")
 
     # Create output directory
     output_path = Path(output_dir)
@@ -74,8 +76,8 @@ def create_sdf_asset_from_letter(
         mesh = _create_mesh_from_letter(
             text=text,
             font_name=font_name,
-            font_size=font_size,
-            extrusion_height=extrusion_height,
+            letter_height_meters=letter_height_meters,
+            extrusion_depth_meters=extrusion_depth_meters,
         )
 
         if mesh is None:
@@ -90,7 +92,7 @@ def create_sdf_asset_from_letter(
         create_sdf_from_mesh(
             mesh_path=mesh_path,
             mass=mass,
-            scale=scale,
+            scale=1.0,  # Mesh is already in correct units
             is_compliant=is_compliant,
             hydroelastic_modulus=hydroelastic_modulus,
             hunt_crossley_dissipation=hunt_crossley_dissipation,
@@ -118,24 +120,36 @@ def create_sdf_asset_from_letter(
 def _create_mesh_from_letter(
     text: str,
     font_name: str = "Arial",
-    font_size: int = 100,
-    extrusion_height: float = 10.0,
+    letter_height_meters: float = 0.4,
+    extrusion_depth_meters: float = 0.2,
 ) -> "trimesh.Trimesh | None":
     """
     Internal function to create a 3D mesh from a letter.
 
+    Args:
+        text (str): The character to convert.
+        font_name (str): The name of the font to use.
+        letter_height_meters (float): The physical height of the letter in meters.
+        extrusion_depth_meters (float): The physical depth/thickness of the letter in meters.
+
     Returns:
-        trimesh.Trimesh: A 3D mesh object of the letter, or None if creation failed.
+        trimesh.Trimesh: A 3D mesh object of the letter in meters, or None if creation failed.
     """
+    if not trimesh_available or not shapely_available:
+        logging.error("Both trimesh and shapely are required for mesh generation")
+        return None
     try:
+        # Use a fixed font size for good mesh resolution, we'll scale to physical size later
+        internal_font_size = 100
+
         # Set up font properties
         font_prop = FontProperties(
-            family=font_name, style="normal", weight="normal", size=font_size
+            family=font_name, style="normal", weight="normal", size=internal_font_size
         )
 
         # Generate the 2D path of the text
         # A text path is a sequence of vertices and control codes (e.g., MOVETO, LINETO)
-        path = TextPath((0, 0), text, size=font_size, prop=font_prop)
+        path = TextPath((0, 0), text, size=internal_font_size, prop=font_prop)
 
     except Exception as e:
         logging.error(f"Error generating font path: {e}")
@@ -192,8 +206,26 @@ def _create_mesh_from_letter(
         logging.warning("Resulting Shapely polygon is empty.")
         return None
 
-    # Extrude the 2D shape into a 3D mesh
-    mesh = trimesh.creation.extrude_polygon(final_shape, height=extrusion_height)
+    # Calculate the current bounds of the shape in font coordinates
+    bounds = final_shape.bounds  # (minx, miny, maxx, maxy)
+    current_height = bounds[3] - bounds[1]  # maxy - miny
+
+    if current_height <= 0:
+        logging.warning("Letter has no height in font coordinates.")
+        return None
+
+    # Calculate scale factor to achieve desired physical height
+    scale_factor = letter_height_meters / current_height
+
+    # Scale the shape to physical dimensions
+    final_shape_scaled = shapely_scale(
+        final_shape, xfact=scale_factor, yfact=scale_factor, origin=(0, 0)
+    )
+
+    # Extrude the 2D shape into a 3D mesh using physical depth
+    mesh = trimesh.creation.extrude_polygon(
+        final_shape_scaled, height=extrusion_depth_meters
+    )
 
     return mesh
 
@@ -216,16 +248,16 @@ if __name__ == "__main__":
         help="Font name to use (default: DejaVu Sans)",
     )
     parser.add_argument(
-        "--extrusion-height",
+        "--letter-height",
         type=float,
-        default=15.0,
-        help="Height to extrude the 2D letter shape (default: 15.0)",
+        default=0.4,
+        help="Physical height of the letter in meters (default: 0.4)",
     )
     parser.add_argument(
-        "--scale",
+        "--extrusion-depth",
         type=float,
-        default=0.01,
-        help="Scale factor to convert mesh coordinates to meters (default: 0.01)",
+        default=0.2,
+        help="Physical depth/thickness of the letter in meters (default: 0.2)",
     )
     parser.add_argument(
         "--output-dir",
@@ -248,14 +280,15 @@ if __name__ == "__main__":
 
     logging.info(f"Attempting to convert the letter '{args.letter}' to an SDF asset.")
     logging.info(f"Using font: {args.font}")
-    logging.info(f"Extrusion height: {args.extrusion_height}")
+    logging.info(f"Letter height: {args.letter_height} meters")
+    logging.info(f"Extrusion depth: {args.extrusion_depth} meters")
 
     # Generate the complete SDF asset
     sdf_path = create_sdf_asset_from_letter(
         text=args.letter,
         font_name=args.font,
-        extrusion_height=args.extrusion_height,
-        scale=args.scale,
+        letter_height_meters=args.letter_height,
+        extrusion_depth_meters=args.extrusion_depth,
         output_dir=output_dir,
     )
 
