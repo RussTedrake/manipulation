@@ -58,8 +58,8 @@ def create_sdf_asset_from_letter(
     Returns:
         Path | None: Path to the created SDF file, or None if creation failed.
     """
-    if len(text) > 1:
-        raise ValueError("Only one letter can be converted at a time")
+    if len(text) == 0 or len(text) > 1:
+        raise ValueError("Letter must be a single character")
 
     if letter_height_meters <= 0:
         raise ValueError("Letter height must be positive")
@@ -153,7 +153,9 @@ def _create_mesh_from_letter(
 
     except Exception as e:
         logging.error(f"Error generating font path: {e}")
-        logging.error("Please ensure the specified font is available on your system.")
+        logging.error(
+            f"Please ensure the specified font: '{font_name}' is available on your system."
+        )
         return None
 
     # Process the 2D Path into Shapely Polygons

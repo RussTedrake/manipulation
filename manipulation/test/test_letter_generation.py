@@ -53,15 +53,15 @@ class LetterGenerationTest(unittest.TestCase):
 
     def test_create_sdf_asset_from_letter(self):
         # Expected number of convex pieces for each letter
-        letter_expected_pieces = {"I": 1, "A": 6}
+        letter_expected_pieces = {"I": 1, "A": 5}
 
         for letter, expected_pieces in letter_expected_pieces.items():
             with self.subTest(letter=letter):
                 create_sdf_asset_from_letter(
                     text=letter,
-                    font_name="Arial",
-                    font_size=100,
-                    extrusion_height=10.0,
+                    font_name="DejaVu Sans",
+                    letter_height_meters=0.4,
+                    extrusion_depth_meters=0.15,
                     output_dir=f"{self._tmp_dir}/{letter}_model",
                 )
 
@@ -89,7 +89,7 @@ class LetterGenerationTest(unittest.TestCase):
 
     def test_create_sdf_asset_different_fonts(self):
         """Test SDF asset creation with different fonts."""
-        fonts_to_test = ["Arial", "DejaVu Sans"]
+        fonts_to_test = ["DejaVu Sans", "Times New Roman"]
         letter = "B"
 
         for font in fonts_to_test:
@@ -97,8 +97,8 @@ class LetterGenerationTest(unittest.TestCase):
                 sdf_path = create_sdf_asset_from_letter(
                     text=letter,
                     font_name=font,
-                    font_size=50,
-                    extrusion_height=5.0,
+                    letter_height_meters=0.4,
+                    extrusion_depth_meters=0.15,
                     output_dir=self._tmp_dir,
                 )
 
@@ -114,64 +114,65 @@ class LetterGenerationTest(unittest.TestCase):
         """Test SDF asset creation with different parameters."""
         letter = "C"
 
-        # Test with different font sizes
-        for font_size in [50, 100, 200]:
-            with self.subTest(font_size=font_size):
+        # Test with different letter heights
+        for letter_height in [0.2, 0.4, 0.6]:
+            with self.subTest(letter_height=letter_height):
                 sdf_path = create_sdf_asset_from_letter(
                     text=letter,
                     font_name="Arial",
-                    font_size=font_size,
-                    extrusion_height=10.0,
+                    letter_height_meters=letter_height,
+                    extrusion_depth_meters=0.15,
                     output_dir=self._tmp_dir,
                 )
 
                 self.assertIsNotNone(
-                    sdf_path, f"SDF path should not be None for font_size {font_size}"
+                    sdf_path,
+                    f"SDF path should not be None for letter_height {letter_height}",
                 )
                 if sdf_path:
                     self.assertTrue(
                         sdf_path.exists(),
-                        f"SDF file should exist for font_size {font_size}",
+                        f"SDF file should exist for letter_height {letter_height}",
                     )
 
-        # Test with different extrusion heights
-        for height in [5.0, 15.0, 25.0]:
-            with self.subTest(extrusion_height=height):
+        # Test with different extrusion depths
+        for depth in [0.1, 0.15, 0.2]:
+            with self.subTest(extrusion_depth=depth):
                 sdf_path = create_sdf_asset_from_letter(
                     text=letter,
                     font_name="Arial",
-                    font_size=100,
-                    extrusion_height=height,
+                    letter_height_meters=0.4,
+                    extrusion_depth_meters=depth,
                     output_dir=self._tmp_dir,
                 )
 
                 self.assertIsNotNone(
-                    sdf_path, f"SDF path should not be None for height {height}"
+                    sdf_path, f"SDF path should not be None for depth {depth}"
                 )
                 if sdf_path:
                     self.assertTrue(
-                        sdf_path.exists(), f"SDF file should exist for height {height}"
+                        sdf_path.exists(), f"SDF file should exist for depth {depth}"
                     )
 
     def test_create_sdf_asset_invalid_input(self):
         """Test error handling with invalid inputs."""
         # Test with multiple characters (should fail)
-        with self.assertRaises(AssertionError):
+        with self.assertRaises(ValueError):
             create_sdf_asset_from_letter(
                 text="AB",  # Multiple characters
-                font_name="Arial",
-                font_size=100,
-                extrusion_height=10.0,
+                font_name="DejaVu Sans",
+                letter_height_meters=0.4,
+                extrusion_depth_meters=0.15,
                 output_dir=self._tmp_dir,
             )
 
         # Test with empty string (should fail)
-        with self.assertRaises(AssertionError):
+        with self.assertRaises(ValueError):
             create_sdf_asset_from_letter(
                 text="",  # Empty string
-                font_name="Arial",
-                font_size=100,
-                extrusion_height=10.0,
+                font_name="DejaVu Sans",
+                letter_height_meters=0.4,
+                extrusion_depth_meters=0.15,
                 output_dir=self._tmp_dir,
             )
 
