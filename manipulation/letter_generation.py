@@ -259,7 +259,7 @@ if __name__ == "__main__":
         output_dir=output_dir,
     )
 
-    if sdf_path:
+    if sdf_path is not None:
         logging.info(f"Successfully created SDF asset at: {sdf_path}")
     else:
         logging.info("Failed to create SDF asset")
