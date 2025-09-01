@@ -1656,7 +1656,7 @@ description = "Library for geometric robustness"
 optional = true
 python-versions = ">=3.8"
 groups = ["main"]
-markers = "extra == \"all\""
+markers = "extra == \"all\" or extra == \"letter\""
 files = [
     {file = "manifold3d-3.2.1-cp310-cp310-macosx_10_14_universal2.whl", hash = "sha256:8f8163bf4aa221fb3d23ca9e2f56431219f598e2ba24df8ea26e12d143cbec71"},
     {file = "manifold3d-3.2.1-cp310-cp310-macosx_10_14_x86_64.whl", hash = "sha256:0108c083b2758aebce2ac2fc29fb29f46289d558844b21e4744a1d577a97bae5"},
@@ -1710,7 +1710,7 @@ description = "Python bindings for the mapbox earcut C++ polygon triangulation l
 optional = true
 python-versions = ">=3.9"
 groups = ["main"]
-markers = "extra == \"all\""
+markers = "extra == \"all\" or extra == \"letter\""
 files = [
     {file = "mapbox_earcut-1.0.3-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:5f999a8651bdb3ae8805c9a7cf91337bbb5e858d7724811f3b5baa79bfa3c61a"},
     {file = "mapbox_earcut-1.0.3-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:a59cc707fc0d47f778f912ede6b21e8798e7d82829d772cf2ebaea216cb04828"},
@@ -4768,9 +4768,9 @@ full = ["pyglet (<2)"]
 testing = ["pytest", "pytest-cov", "setuptools"]
 
 [extras]
-all = ["cloudpickle", "coacd", "gradescope-utils", "gymnasium", "ipywidgets", "nevergrad", "psutil", "pycollada", "pyzmq", "pyzmq", "scene-synthesizer", "scipy", "stable-baselines3", "timeout-decorator", "torch", "torchvision", "tqdm", "trimesh", "vhacdx"]
+all = ["cloudpickle", "coacd", "gradescope-utils", "gymnasium", "ipywidgets", "manifold3d", "mapbox-earcut", "nevergrad", "psutil", "pycollada", "pyzmq", "pyzmq", "scene-synthesizer", "scipy", "shapely", "stable-baselines3", "timeout-decorator", "torch", "torchvision", "tqdm", "trimesh", "vhacdx"]
 grader = ["gradescope-utils", "nbconvert", "nbconvert", "nbformat", "timeout-decorator"]
-letter = ["coacd", "shapely", "trimesh"]
+letter = ["coacd", "manifold3d", "mapbox-earcut", "shapely", "trimesh"]
 mesh = ["coacd", "pycollada", "trimesh", "vhacdx"]
 rl = ["gymnasium", "stable-baselines3"]
 torch = ["torch", "torchvision"]
@@ -4778,4 +4778,4 @@ torch = ["torch", "torchvision"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10,<4.0"
-content-hash = "79f27c790edd8980b65741328a53cc768df5a99df4746cfd2d0647360faa6174"
+content-hash = "613bf787884590d7cf1f95914504abc8e027d715d56f9322c5dd8861741de751"
