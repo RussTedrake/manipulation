@@ -17,3 +17,9 @@ rt_py_library(
     srcs = ["test_physics_simulation_and_robots.py"],
     visibility = ["//visibility:public"],
 )
+
+rt_py_library(
+    name = "test_hardwarestation_and_scenarios",
+    srcs = ["test_hardwarestation_and_scenarios.py"],
+    visibility = ["//visibility:public"],
+)
