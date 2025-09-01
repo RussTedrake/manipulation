@@ -155,7 +155,7 @@ jobs:
           # Install manipulation via pip (to mimic student experience)
           # Use --break-system-packages to handle externally managed environment
           # Only install manipulation[all] to avoid conflicts with system packages
-          pip install manipulation[all] --extra-index-url https://drake-packages.csail.mit.edu/whl/nightly/ --break-system-packages
+          pip install --upgrade manipulation[all] --extra-index-url https://drake-packages.csail.mit.edu/whl/nightly/ --break-system-packages
         shell: bash
       - name: test
         run: |
