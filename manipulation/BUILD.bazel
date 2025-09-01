@@ -274,5 +274,9 @@ rt_py_test(
       "manipulation",
       "letter_generation",
     ],
+    optional_deps = [
+        requirement("mapbox_earcut"),
+        requirement("manifold3d"),
+    ],
 )
 

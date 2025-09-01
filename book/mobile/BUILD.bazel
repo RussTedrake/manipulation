@@ -44,6 +44,7 @@ rt_ipynb_test(
       "//manipulation",
       "//manipulation:remotes",
       requirement("scene_synthesizer"),
+      requirement("scipy"), # scene_synthesizer needs scipy, but does not declare it as a dependency
     ],
 )
 

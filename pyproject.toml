@@ -59,10 +59,10 @@ lxml = {version = ">=4.9.2", extras = ["html_clean"] }
 # Note: matplotlib gets additional handling in PoetryExport.py for bazel. 
 matplotlib = ">=3.7.0" # old versions don't build in XCode
 mpld3  = { version=">=0.5.6", optional=false } # TODO: make this optional
-nbconvert = [ 
-  {platform="darwin", version="7.16.6", optional=true},
-  {platform="linux", version="7.16.6", optional=true},
-]
+nbconvert = [
+  {platform="darwin", version="7.14.2", optional=true},
+  {platform="linux", version="7.14.2", optional=true},
+] # pegged to 7.14.2 because the latest version is 7.16.6 has conflicts with bleach
 nbformat = { version=">=5.0.0", optional=true }
 nevergrad = { version=">=0.4.3", optional=true } # TODO: avoid expensive bayesian optimization dep
 numpy = "^2.0.0"
@@ -88,12 +88,14 @@ vhacdx = { version=">=0.0.5", optional=true }
 #wandb = ">=0.14.0"
 coacd = { version="^1.0.5", optional=true }
 shapely = { version="^2.1.1", optional=true }
+mapbox-earcut = { version="^1.0.3", optional=true }
+manifold3d = { version="^3.2.1", optional=true }
 
 [tool.poetry.extras]
 torch = ["torch", "torchvision"]
 rl = ["stable_baselines3", "gymnasium"]
 mesh = ["pycollada", "trimesh", "vhacdx", "coacd"]
-letter = ["shapely", "trimesh", "coacd"]
+letter = ["shapely", "trimesh", "coacd", "mapbox-earcut", "manifold3d"]
 grader = ["gradescope-utils", "timeout-decorator", "nbconvert", "nbformat"]
 # 'all' should have all of the optional dependencies required to run any notebook in this repo.
 all = [
@@ -114,7 +116,10 @@ all = [
   "tqdm",
   "trimesh",
   "vhacdx",
-  "coacd"
+  "coacd",
+  "shapely",
+  "mapbox-earcut",
+  "manifold3d"
 ]
 
 [tool.poetry.group.docs]
@@ -146,9 +151,11 @@ mysql-connector-python = { version=">=8.0.23" }
 packaging = ">=24.2"
 pip-requirements-parser = ">=32.0"
 pre-commit = "^3.4.0"
-poetry-plugin-export = "^1.0.0"
-poetry-pre-commit-plugin = "^0.1.2"
 requests = { version=">=2.25.1" }
+
+[tool.poetry.requires-plugins]
+poetry-plugin-export = ">=1.8"
+poetry-pre-commit-plugin = ">=0.2"
 
 [tool.black]
 include = '\.ipynb?$|\.pyi?$'
