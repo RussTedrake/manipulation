@@ -134,7 +134,9 @@ class TestPhysicsSimulationFullSystem(unittest.TestCase):
         """Test that simulate_full_system function runs without errors"""
         simulate_full_system = self.notebook_locals["simulate_full_system"]
         RigidTransform = self.notebook_locals["RigidTransform"]
-        create_sdf_asset_from_letter = self.notebook_locals["create_sdf_asset_from_letter"]
+        create_sdf_asset_from_letter = self.notebook_locals[
+            "create_sdf_asset_from_letter"
+        ]
 
         # Generate test letters in temporary directory
         test_initials = "BPG"
@@ -147,10 +149,11 @@ class TestPhysicsSimulationFullSystem(unittest.TestCase):
                 letter_height_meters=0.2,
                 extrusion_depth_meters=0.07,
                 output_dir=assets_dir / f"{letter}_model",
-                        )
+            )
 
         try:
             import os
+
             original_cwd = os.getcwd()
             os.chdir(self._tmp_dir)
 
@@ -162,7 +165,7 @@ class TestPhysicsSimulationFullSystem(unittest.TestCase):
                     RigidTransform([1.1, 0.0, 1.0]),
                 ],
                 table_pose=RigidTransform([0.5, 0.0, -0.05]),
-                simulation_time=0.1
+                simulation_time=0.1,
             )
             self.assertTrue(True, "simulate_full_system completed without errors")
         except Exception as e:
