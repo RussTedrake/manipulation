@@ -5,278 +5,280 @@
 # Licensed under the BSD 3-Clause License. See LICENSE.TXT for details.
 
 load("//book/htmlbook/tools/python:requirements.bzl", "requirement")
-load("//book/htmlbook/tools/python:defs.bzl", "rt_py_library", "rt_py_test", "rt_py_binary")
+load(
+    "//book/htmlbook/tools/python:defs.bzl",
+    "rt_py_library",
+    "rt_py_test",
+    "rt_py_binary",
+)
 
 rt_py_library(
-    name = "manipulation",
-    srcs = [
+    name="manipulation",
+    srcs=[
         "__init__.py",
         "utils.py",
     ],
-    data = [
-      "@drake_models",
+    data=[
+        "@drake_models",
     ],
-    imports = [".."],
-    visibility = ["//visibility:public"],
-    deps = [
-      requirement("drake"),
-      requirement("ipython"),
-      requirement("mpld3"),
-      requirement("pyvirtualdisplay"),
-    ],
-)
-
-rt_py_library(
-    name = "meshcat_utils",
-    srcs = ["meshcat_utils.py"],
-    imports = [".."],
-    visibility = ["//visibility:public"],
-)
-
-rt_py_library(
-    name = "make_drake_compatible_model",
-    srcs = ["make_drake_compatible_model.py"],
-    imports = [".."],
-    visibility = ["//visibility:public"],
-    deps = [
-      requirement("drake"),
-      requirement("lxml"),
-    ],
-    optional_deps = [
-      requirement("pycollada"),
-      requirement("trimesh"),
+    imports=[".."],
+    visibility=["//visibility:public"],
+    deps=[
+        requirement("drake"),
+        requirement("ipython"),
+        requirement("mpld3"),
+        requirement("pyvirtualdisplay"),
     ],
 )
 
 rt_py_library(
-    name = "mustard_depth_camera_example",
-    srcs = ["mustard_depth_camera_example.py"],
-    imports = [".."],
-    visibility = ["//visibility:public"],
-    deps = [
-      "scenarios",
+    name="meshcat_utils",
+    srcs=["meshcat_utils.py"],
+    imports=[".."],
+    visibility=["//visibility:public"],
+)
+
+rt_py_library(
+    name="make_drake_compatible_model",
+    srcs=["make_drake_compatible_model.py"],
+    imports=[".."],
+    visibility=["//visibility:public"],
+    deps=[
+        requirement("drake"),
+        requirement("lxml"),
+    ],
+    optional_deps=[
+        requirement("pycollada"),
+        requirement("trimesh"),
     ],
 )
 
 rt_py_library(
-    name = "scenarios",
-    data = ["//manipulation/models"],
-    deps = [
-      "//manipulation",
-      "//manipulation:systems",
+    name="mustard_depth_camera_example",
+    srcs=["mustard_depth_camera_example.py"],
+    imports=[".."],
+    visibility=["//visibility:public"],
+    deps=[
+        "scenarios",
     ],
-    srcs = ["scenarios.py"],
-    imports = [".."],
-    visibility = ["//visibility:public"],
 )
 
 rt_py_library(
-    name = "remotes",
-    srcs = ["remotes.py"],
-    imports = [".."],
-    deps = [
-      "make_drake_compatible_model",
-      requirement("drake"),
+    name="scenarios",
+    data=["//manipulation/models"],
+    deps=[
+        "//manipulation",
+        "//manipulation:systems",
     ],
-    visibility = ["//visibility:public"],
+    srcs=["scenarios.py"],
+    imports=[".."],
+    visibility=["//visibility:public"],
+)
+
+rt_py_library(
+    name="remotes",
+    srcs=["remotes.py"],
+    imports=[".."],
+    deps=[
+        "make_drake_compatible_model",
+        requirement("drake"),
+    ],
+    visibility=["//visibility:public"],
 )
 
 rt_py_binary(
-    name = "prefetch_remotes",
-    tags = ["requires-network", "no-sandbox"],
-    srcs = ["prefetch_remotes.py"],
-    deps = ["remotes"],
+    name="prefetch_remotes",
+    tags=["requires-network", "no-sandbox"],
+    srcs=["prefetch_remotes.py"],
+    deps=["remotes"],
 )
 
 rt_py_library(
-    name = "directives_tree",
-    deps = [
-      "//manipulation",
+    name="directives_tree",
+    deps=[
+        "//manipulation",
     ],
-    srcs = ["directives_tree.py"],
-    imports = [".."],
-    visibility = ["//visibility:public"],
+    srcs=["directives_tree.py"],
+    imports=[".."],
+    visibility=["//visibility:public"],
 )
 
 rt_py_library(
-    name = "station",
-    deps = [
-      "//manipulation",
-      "scenarios",
-      "systems",
-      "directives_tree",
+    name="station",
+    deps=[
+        "//manipulation",
+        "scenarios",
+        "systems",
+        "directives_tree",
     ],
-    srcs = ["station.py"],
-    imports = [".."],
-    visibility = ["//visibility:public"],
+    srcs=["station.py"],
+    imports=[".."],
+    visibility=["//visibility:public"],
 )
 
 rt_py_library(
-    name = "systems",
-    srcs = ["systems.py"],
-    imports = [".."],
-    visibility = ["//visibility:public"],
+    name="systems",
+    srcs=["systems.py"],
+    imports=[".."],
+    visibility=["//visibility:public"],
 )
 
 rt_py_library(
-    name = "pick",
-    srcs = ["pick.py"],
-    imports = [".."],
-    visibility = ["//visibility:public"],
+    name="pick",
+    srcs=["pick.py"],
+    imports=[".."],
+    visibility=["//visibility:public"],
 )
 
 # TODO(russt): Rename this to pose.py
 rt_py_library(
-    name = "icp",
-    srcs = ["icp.py"],
-    imports = [".."],
-    deps = [
-      requirement("scipy"), # TODO(russt): remove this dep?
+    name="icp",
+    srcs=["icp.py"],
+    imports=[".."],
+    deps=[
+        requirement("scipy"),  # TODO(russt): remove this dep?
     ],
-    visibility = ["//visibility:public"],
+    visibility=["//visibility:public"],
 )
 
 rt_py_library(
-    name = "clutter",
-    srcs = ["clutter.py"],
-    imports = [".."],
-    visibility = ["//visibility:public"],
+    name="clutter",
+    srcs=["clutter.py"],
+    imports=[".."],
+    visibility=["//visibility:public"],
 )
 
 rt_py_library(
-    name = "letter_generation",
-    srcs = [
+    name="letter_generation",
+    srcs=[
         "letter_generation.py",
         "create_sdf_from_mesh.py",
     ],
-    imports = [".."],
-    deps = [
+    imports=[".."],
+    deps=[
         "manipulation",
         requirement("lxml"),
     ],
-    optional_deps = [
+    optional_deps=[
         requirement("trimesh"),
         requirement("shapely"),
         requirement("coacd"),
         requirement("vhacdx"),
-    ],
-    visibility = ["//visibility:public"],
-)
-
-rt_py_test(
-    name = "test_create_sdf_from_mesh",
-    srcs = [
-        "test/test_create_sdf_from_mesh.py",
-        "//manipulation:create_sdf_from_mesh.py",
-    ],
-    imports = [".."],
-    deps = [
-      "manipulation",
-      requirement("lxml"),
-    ],
-    optional_deps = [
-      requirement("trimesh"),
-      requirement("vhacdx"),
-    ],
-)
-
-rt_py_test(
-    name = "test_gym",
-    data = ["//manipulation:models"],
-    srcs = ["test/test_gym.py"],
-    imports = [".."],
-    deps = [
-      "//manipulation/envs:box_flipup",
-      "manipulation",
-      "scenarios",
-    ],
-    optional_deps = [
-      requirement("stable_baselines3"),
-    ],
-)
-
-rt_py_test(
-    name = "test_make_drake_compatible_model",
-    srcs = ["test/test_make_drake_compatible_model.py"],
-    imports = [".."],
-    tags = ["requires-network", "no-sandbox"],
-    timeout = "moderate",  # TODO(russt): consider moving the menagerie work to the prefetch_remotes
-    data = [
-      "//manipulation/test/models:models",
-    ],
-    deps = [
-      "manipulation",
-      "//manipulation:make_drake_compatible_model",
-      "//manipulation:remotes",
-    ],
-)
-
-rt_py_test(
-    name = "test_meshcat_utils",
-    srcs = ["test/test_meshcat_utils.py"],
-    tags = ["requires-network"], # For gurobi
-    imports = [".."],
-    deps = [
-      "manipulation",
-      "//manipulation:meshcat_utils",
-    ],
-)
-
-rt_py_test(
-    name = "test_model_directives",
-    srcs = ["test/test_model_directives.py"],
-    data = ["//manipulation:models"],
-    imports = [".."],
-    deps = ["manipulation"],
-)
-
-rt_py_test(
-    name = "test_directives_tree",
-    srcs = ["test/test_directives_tree.py"],
-    data = ["//manipulation:station"],
-    imports = [".."],
-    deps = ["manipulation"],
-)
-
-rt_py_test(
-    name = "test_inverse_dynamics_driver",
-    srcs = ["test/test_inverse_dynamics_driver.py"],
-    data = ["//manipulation:station"],
-    imports = [".."],
-    deps = ["manipulation"],
-)
-
-rt_py_test(
-    name = "test_hardware_station_interface",
-    srcs = ["test/test_hardware_station_interface.py"],
-    data = ["//manipulation:station"],
-    imports = [".."],
-    deps = ["manipulation"],
-)
-
-rt_py_test(
-    name = "test_utils",
-    srcs = ["test/test_utils.py"],
-    imports = [".."],
-    deps = [
-      "manipulation",
-      "mustard_depth_camera_example",
-    ],
-)
-
-rt_py_test(
-    name = "test_letter_generation",
-    srcs = [
-        "test/test_letter_generation.py",
-    ],
-    imports = [".."],
-    deps = [
-      "manipulation",
-      "letter_generation",
-    ],
-    optional_deps = [
         requirement("mapbox_earcut"),
         requirement("manifold3d"),
     ],
+    visibility=["//visibility:public"],
 )
 
+rt_py_test(
+    name="test_create_sdf_from_mesh",
+    srcs=[
+        "test/test_create_sdf_from_mesh.py",
+        "//manipulation:create_sdf_from_mesh.py",
+    ],
+    imports=[".."],
+    deps=[
+        "manipulation",
+        requirement("lxml"),
+    ],
+    optional_deps=[
+        requirement("trimesh"),
+        requirement("vhacdx"),
+    ],
+)
+
+rt_py_test(
+    name="test_gym",
+    data=["//manipulation:models"],
+    srcs=["test/test_gym.py"],
+    imports=[".."],
+    deps=[
+        "//manipulation/envs:box_flipup",
+        "manipulation",
+        "scenarios",
+    ],
+    optional_deps=[
+        requirement("stable_baselines3"),
+    ],
+)
+
+rt_py_test(
+    name="test_make_drake_compatible_model",
+    srcs=["test/test_make_drake_compatible_model.py"],
+    imports=[".."],
+    tags=["requires-network", "no-sandbox"],
+    timeout="moderate",  # TODO(russt): consider moving the menagerie work to the prefetch_remotes
+    data=[
+        "//manipulation/test/models:models",
+    ],
+    deps=[
+        "manipulation",
+        "//manipulation:make_drake_compatible_model",
+        "//manipulation:remotes",
+    ],
+)
+
+rt_py_test(
+    name="test_meshcat_utils",
+    srcs=["test/test_meshcat_utils.py"],
+    tags=["requires-network"],  # For gurobi
+    imports=[".."],
+    deps=[
+        "manipulation",
+        "//manipulation:meshcat_utils",
+    ],
+)
+
+rt_py_test(
+    name="test_model_directives",
+    srcs=["test/test_model_directives.py"],
+    data=["//manipulation:models"],
+    imports=[".."],
+    deps=["manipulation"],
+)
+
+rt_py_test(
+    name="test_directives_tree",
+    srcs=["test/test_directives_tree.py"],
+    data=["//manipulation:station"],
+    imports=[".."],
+    deps=["manipulation"],
+)
+
+rt_py_test(
+    name="test_inverse_dynamics_driver",
+    srcs=["test/test_inverse_dynamics_driver.py"],
+    data=["//manipulation:station"],
+    imports=[".."],
+    deps=["manipulation"],
+)
+
+rt_py_test(
+    name="test_hardware_station_interface",
+    srcs=["test/test_hardware_station_interface.py"],
+    data=["//manipulation:station"],
+    imports=[".."],
+    deps=["manipulation"],
+)
+
+rt_py_test(
+    name="test_utils",
+    srcs=["test/test_utils.py"],
+    imports=[".."],
+    deps=[
+        "manipulation",
+        "mustard_depth_camera_example",
+    ],
+)
+
+rt_py_test(
+    name="test_letter_generation",
+    srcs=[
+        "test/test_letter_generation.py",
+    ],
+    imports=[".."],
+    deps=[
+        "manipulation",
+        "letter_generation",
+    ],
+)
