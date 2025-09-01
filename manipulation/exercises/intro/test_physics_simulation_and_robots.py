@@ -1,4 +1,7 @@
+import shutil
+import tempfile
 import unittest
+from pathlib import Path
 
 import numpy as np
 import timeout_decorator
@@ -110,3 +113,59 @@ class TestPhysicsSimulationVerification(unittest.TestCase):
             np.allclose(q_final, expected_q_final, atol=1e-4),
             f"Final positions mismatch: got {q_final}, expected {expected_q_final}",
         )
+
+
+class TestPhysicsSimulationFullSystem(unittest.TestCase):
+    def __init__(self, test_name, notebook_locals):
+        super().__init__(test_name)
+        self.notebook_locals = notebook_locals
+
+    @classmethod
+    def setUpClass(cls):
+        cls._tmp_dir = tempfile.mkdtemp()
+
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(cls._tmp_dir)
+
+    @weight(10)
+    @timeout_decorator.timeout(30.0)
+    def test_simulate_full_system_basic(self):
+        """Test that simulate_full_system function runs without errors"""
+        simulate_full_system = self.notebook_locals["simulate_full_system"]
+        RigidTransform = self.notebook_locals["RigidTransform"]
+        create_sdf_asset_from_letter = self.notebook_locals["create_sdf_asset_from_letter"]
+
+        # Generate test letters in temporary directory
+        test_initials = "BPG"
+        assets_dir = Path(self._tmp_dir) / "work/assets"
+
+        for letter in test_initials:
+            create_sdf_asset_from_letter(
+                text=letter,
+                font_name="Arial",
+                letter_height_meters=0.2,
+                extrusion_depth_meters=0.07,
+                output_dir=assets_dir / f"{letter}_model",
+                        )
+
+        try:
+            import os
+            original_cwd = os.getcwd()
+            os.chdir(self._tmp_dir)
+
+            simulate_full_system(
+                initial_iiwa_positions=np.array([0, 0, 0, 0, 0, 0, 0]),
+                initial_letter_poses=[
+                    RigidTransform([0.7, 0.0, 1.0]),
+                    RigidTransform([0.9, 0.0, 1.0]),
+                    RigidTransform([1.1, 0.0, 1.0]),
+                ],
+                table_pose=RigidTransform([0.5, 0.0, -0.05]),
+                simulation_time=0.1
+            )
+            self.assertTrue(True, "simulate_full_system completed without errors")
+        except Exception as e:
+            self.fail(f"simulate_full_system raised an exception: {e}")
+        finally:
+            os.chdir(original_cwd)
