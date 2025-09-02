@@ -133,9 +133,11 @@ class TestHardwareStationFullSystem(unittest.TestCase):
     @timeout_decorator.timeout(30.0)
     def test_create_bimanual_with_assets_structure(self):
         """Test creation of full system with table and initials"""
-        create_bimanual_IIWA14_with_table_and_initials = self.notebook_locals[
-            "create_bimanual_IIWA14_with_table_and_initials"
-        ]
+        create_bimanual_IIWA14_with_table_and_initials_and_assets = (
+            self.notebook_locals[
+                "create_bimanual_IIWA14_with_table_and_initials_and_assets"
+            ]
+        )
 
         # Generate assets once
         self._setup_assets_once()
@@ -144,7 +146,9 @@ class TestHardwareStationFullSystem(unittest.TestCase):
             original_cwd = os.getcwd()
             os.chdir(self._tmp_dir)
 
-            diagram, station = create_bimanual_IIWA14_with_table_and_initials()
+            diagram, station = (
+                create_bimanual_IIWA14_with_table_and_initials_and_assets()
+            )
 
             # Test return types
             self.assertIsInstance(diagram, Diagram, "Should return a Diagram")
@@ -153,9 +157,9 @@ class TestHardwareStationFullSystem(unittest.TestCase):
             # Get the plant from the station and check model instances
             plant = station.GetSubsystemByName("plant")
             num_model_instances = plant.num_model_instances()
-            # Should have: world, iiwa_left, iiwa_right, table, B_letter, P_letter, G_letter (7 total)
+            # Should have: world, iiwa_left, iiwa_right, table, B_letter, P_letter, G_letter, mustard_bottle (8 total)
             self.assertGreaterEqual(
-                num_model_instances, 7, "Should have at least 7 model instances"
+                num_model_instances, 8, "Should have at least 8 model instances"
             )
 
         finally:
@@ -182,6 +186,9 @@ class TestHardwareStationFullSystem(unittest.TestCase):
                     RigidTransform([0.7, 0.0, 1.0]),
                     RigidTransform([0.9, 0.0, 1.0]),
                     RigidTransform([1.1, 0.0, 1.0]),
+                ],
+                object_poses=[
+                    RigidTransform([0.5, 0.0, 0.75]),
                 ],
                 simulation_time=0.1,
                 use_realtime=False,
