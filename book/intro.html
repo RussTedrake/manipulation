@@ -11,7 +11,7 @@
     <script type="text/javascript" src="chapters.js"></script>
     <script type="text/javascript" src="htmlbook/book.js"></script>
 
-    <script src="htmlbook/mathjax-config.js" defer></script> 
+    <script src="htmlbook/mathjax-config.js" defer></script>
     <script type="text/javascript" id="MathJax-script" defer
       src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js">
     </script>
@@ -29,9 +29,9 @@
 <div data-type="titlepage" pdf="no">
   <header>
     <h1><a href="index.html" style="text-decoration:none;">Robotic Manipulation</a></h1>
-    <p data-type="subtitle">Perception, Planning, and Control</p> 
+    <p data-type="subtitle">Perception, Planning, and Control</p>
     <p style="font-size: 18px;"><a href="http://people.csail.mit.edu/russt/">Russ Tedrake</a></p>
-    <p style="font-size: 14px; text-align: right;"> 
+    <p style="font-size: 14px; text-align: right;">
       &copy; Russ Tedrake, 2020-2024<br/>
       Last modified <span id="last_modified"></span>.</br>
       <script>
@@ -44,8 +44,8 @@
 
 <p pdf="no"><b>Note:</b> These are working notes used for <a
 href="http://manipulation.csail.mit.edu/Fall2025/">a course being taught
-at MIT</a>. They will be updated throughout the Fall 2024 semester.  <!-- <a 
-href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture videos are available on YouTube</a>.--></p> 
+at MIT</a>. They will be updated throughout the Fall 2024 semester.  <!-- <a
+href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture videos are available on YouTube</a>.--></p>
 
 <table style="width:100%;" pdf="no"><tr style="width:100%">
   <td style="width:33%;text-align:left;"><a class="previous_chapter"></a></td>
@@ -57,16 +57,16 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture videos a
 </script>
 <!-- EVERYTHING ABOVE THIS LINE IS OVERWRITTEN BY THE INSTALL SCRIPT -->
 <chapter style="counter-reset: chapter 0"><h1>Introduction</h1>
-    
+
   <p>It's worth taking time to appreciate just how amazing humans are when
   performing tasks with our hands.  Tasks that often feel mundane to us --
   loading the dishwasher, chopping vegetables, folding laundry -- remain as
   incredibly challenging tasks for robots and are at the very forefront of
   robotics research.</p>
-    
+
   <figure><span title="Artwork by Reed Alspach"><img style="width:24%" src="data/plate_pick_final_3.JPG"/>&nbsp;<img style="width:24%" src="data/plate_pick_final_4.JPG"/>&nbsp;<img style="width:24%" src="data/plate_pick_final_5.JPG"/>&nbsp;<img style="width:24%" src="data/plate_pick_final_6.JPG">  </span>
   </figure>
-  
+
   <p>Consider the problem of picking up a single plate from a stack of plates in
   the sink and placing it into the dishwasher.  Clearly you first have to
   perceive that there is a plate in the sink and that it is accessible. Getting
@@ -86,7 +86,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture videos a
   justification for this strategy is subtle -- it is a way to achieve the
   kinematically accurate task without requiring much kinematic accuracy on the
   position/orientation of the plate.</p>
-  
+
   <figure>
     <todo>Move this to the manip repo (or not?) and definitely implement the deferred loading.</todo>
     <video style="width:114%; margin-left:-7%" controls poster="https://s3.amazonaws.com/media-p.slid.es/videos/1350152/TpzT02Cy/plate_pickup_thumb_00001.jpg" muted="">
@@ -99,7 +99,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture videos a
     team at the Toyota Research Institute</a>.
     </figcaption>
   </figure>
-    
+
   <p>Perhaps one of the reasons that these problems remain so hard is that they
   require strong capabilities in numerous technical areas that have
   traditionally been somewhat disparate; it's challenging to be an expert in all
@@ -120,17 +120,17 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture videos a
   exerting forces, rapidly and easily transitioning between sticking and sliding
   frictional regimes -- these alone are incredibly rich and difficult problems
   from the perspective of dynamics and control.</p>
-  
-    
+
+
   <p>There is a lot for us to discuss!</p>
-  
+
   <!-- two core research problems (that I like to focus on): 1) there are many
   tasks that we don't know how to program a robot to do robustly even in a
   single instance in lab (reach into your pocket and pull out the keys); 2)
   achieving robustness of a complete manipulation stack in the open-world. -->
-  
+
   <section><h1>Manipulation is more than pick-and-place</h1>
-  
+
     <p>There are a large number of applications for manipulation.  Picking up an
     object from one bin and placing it into another bin -- one version of the
     famous "pick and place" problem -- is a great application for robotic
@@ -143,7 +143,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture videos a
     that, for instance, use suction.  It can often be done without having a very
     accurate understanding of the shape, pose, mass, nor friction of the
     object(s) to be picked.</p>
-  
+
     <p>The goal for these notes, however, is to examine the much broader view of
     manipulation than what is captured by the pick and place problem.  Even our
     thought experiment of loading the dishwasher -- arguably a more advanced
@@ -157,7 +157,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture videos a
     way to empirically evaluate prosthetic hands.  Matt Mason also gave a broad
     and thoughtful definition of manipulation in the opening of his 2018 review
     paper<elib>Mason18</elib>.</p>
-      
+
     <p>It's also important to recognize that manipulation research today looks
     very different than manipulation research looked like in the 1980s and
     1990s.  During that time there was a strong and beautiful focus on
@@ -169,11 +169,11 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture videos a
     Is grasping a sufficient description of what your hand is doing when you are
     buttoning your shirt?  Making a salad?  Spreading peanut butter on
     toast?</p>
-  
-  </section>  
-  
+
+  </section>
+
   <section><h1>Open-world manipulation</h1>
-    
+
     <p>Perhaps because humans are so good at manipulation, our expectations in
     terms of performance and robustness for these tasks are extremely high.
     It's not enough to be able to load one set of plates in a laboratory
@@ -184,7 +184,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture videos a
     verifying robustness of a complex manipulation stack with physics,
     perception, planning, and control in the loop is already daunting.  But how
     do we provide test coverage for every kitchen in the world?</p>
-  
+
     <p>The idea that the world has infinite variability (there will never be a
     point at which you have seen every possible kitchen) is often referred to as
     the "open-world" or "open-domain" problem -- a term popularized first in the
@@ -193,7 +193,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture videos a
     about aspects of the manipulation problem, and trying to embrace the
     diversity and complexity of the entire world.  But it's important to walk
     that line.</p>
-  
+
     <p>There is a chance that the diversity of manipulation in the open world
     might actually make the problem easier.  We are just at the dawn of the era
     of big data in robotics; the impact this will have cannot be overstated.
@@ -205,13 +205,13 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture videos a
     landscape may become much simpler.  But to the extent that is true, then we
     should aim to understand it rigorously!</p>
   </section>
-  
+
   <section><h1>Simulation</h1>
-      
+
     <p>There is another reason that we are now entering a golden age for
     manipulation research.  Our software tools have (very recently) gotten much
     better!</p>
-      
+
     <p>I remember a just few years ago (~2015) talking to my PhD students, who
     were all quite adept at using simulation for developing control systems for
     walking robots, about using simulation for manipulation.  "You can't work
@@ -222,7 +222,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture videos a
     though, was the centrality of perception for manipulation; it was generally
     accepted that one could not simulate a camera well enough to be
     meaningful.</p>
-      
+
     <p>How quickly things can change!  The last few years has seen a rapid
     adoption of video-game quality rendering by the robotics and computer vision
     communities.  The growing consensus now is that game-engine renderers
@@ -232,7 +232,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture videos a
     amazing, as we were all very concerned before that training a deep learning
     perception system in simulation would allow it to exploit any quirks of the
     simulated images that could make the problem easier.</p>
-      
+
     <p>We have also seen dramatic improvements in the quality and performance
     of contact simulation.  Making robust and performant simulations of
     multi-body contact involves dealing with complex geometry queries and stiff
@@ -240,11 +240,11 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture videos a
     improvements in the mathematical formulations of and numerical solutions
     for the governing equations, but today's solvers are good enough to be
     extremely useful.</p>
-      
+
 </section>
-    
+
 <section><h1>These notes are interactive</h1>
-    
+
     <p>By leveraging the power of simulation, and the new availability of free
     online interactive compute, I am trying to make these notes more than what
     you would find in a traditional text.  Each chapter will have working code
@@ -256,7 +256,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture videos a
     research code and making it more broadly available. Because all of the code
     is open source, it is entirely up to you how deep into the rabbit hole you
     choose to go.</p>
-    
+
     <p>Mortimer Adler famously said "Reading a [great] book should be a
     conversation between you and the author." In addition to the interactive
     graphics/code, I've added the ability to highlight/comment/ask questions
@@ -271,40 +271,40 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture videos a
     href="https://github.com/RussTedrake/manipulation/releases">pdf</a>, or
     make private annotations right on the website using the same annotation
     tool.</p>
-      
+
     <p>I have organized the software examples into notebooks by chapter.  There
     is an "Launch in Deepnote" button at the top of each chapter; I'd encourage
     you to open it immediately when you are reading the chapter.  Go ahead and
     "duplicate" the chapter project and run the first cell in one of the
     notebooks to startup the cloud machine. Then as you read the text, I will
     have examples that will have corresponding sections in the notebooks.</p>
-      
+
     <example id="teleop2d"><h1>Teleoperation in 2D.</h1>
-      
+
       <p>Before we get into any autonomous manipulation, let's start by just
       getting a feel for what it will be like to work on manipulation in an
       online Jupyter notebook.  This example will open up a new window with our
-      3D visualizer, and in the "Controls" menu in the visualizer, you will 
-      find sliders that you can use to drive the end-effector of the robot 
+      3D visualizer, and in the "Controls" menu in the visualizer, you will
+      find sliders that you can use to drive the end-effector of the robot
       around. Give it a spin!</p>
 
       <script>document.write(notebook_link('intro'))</script>
-      
+
     </example>
-            
+
     <example><h1>Teleoperation in 3D.</h1>
-      
+
       <p>I offered a 2D visualization / control first because everything is simpler in 2D. But the simulation is actually
         running fully in 3D. Run the second example to see it.</p>
 
       <script>document.write(notebook_link('intro'))</script>
-        
+
     </example>
 
   </section>
-  
+
   <section><h1>Model-based design and analysis</h1>
-    
+
     <p>Thanks to progress in simulation, it is now possible to pursue a
     meaningful study of manipulation without needing a physical robot.  But the
     software advances in simulation (of our robot dynamics, sensors, actuators
@@ -313,7 +313,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture videos a
     algorithms in perception, planning, and control. In addition to providing
     those individual algorithms, a major goal of these notes is to attempt to
     bridle the complexity of using them together in a systematic way.</p>
-      
+
     <p>Many of you will be familiar with <a href="http://ros.org">ROS (the
     Robot Operating System)</a>.  I believe that ROS was one of the best things
     to happen to robotics in the last decades.  It meant that experts from
@@ -334,36 +334,36 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture videos a
     full manipulation stack with repeatable deterministic simulations (even if
     they include randomness) is surprisingly rare in the field but hugely
     valuable.</p>
-      
+
     <p>The key building block in our work will be <drake></drake>
     <b>Systems</b>, and systems can be combined in complex combinations into
     <b>Diagrams</b>.  System diagrams have long been the modeling paradigm used
     in controls, and the software aspect of it will be very familiar to you if
     you've used tools like Simulink, LabView, or Modelica.  These software tools
     refer to the block-diagram design paradigm as "model-based design".</p>
-    
+
     <example><h1>System Diagrams</h1>
-        
+
         <p>Even the examples above, which relied on you to perform teleoperation
         instead of having an autonomy stack, were still the result of combining
         numerous parts.  For any system (a system diagram is still a system)
         that you have in <drake></drake>, you can visualize that diagram
         directly in the notebook.</p>
-        
+
         <iframe width="100%" height="300px" src="https://people.csail.mit.edu/russt/uploads/manip_station.html"></iframe>
         <todo>Update this to the newer rendering, and host the file in
         manipulation/data.</todo>
-        
+
         <p>This graphic is interactive.  Make sure you zoom in and click around
         to get a sense for the amount of complexity that we can abstract away in
         this framework.  For instance, try expanding the
         <code>iiwa_controller</code> block.</p>
-        
+
         <p>Whenever you are ready to learn more about the Systems Framework in
         <drake></drake>, I recommend starting with the "Modeling Dynamical
         Systems" tutorial linked from the <a href="http://drake.mit.edu">main
         Drake website</a>.</p>
-        
+
     </example>
 
     <p>Let me be transparent: not everybody likes this systems framework for
@@ -375,11 +375,11 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture videos a
     approach.  I believe that getting to the next level of maturity in our
     open-world manipulation systems requires more maturity from our building
     blocks.</p>
-        
-  </section> 
-  
+
+  </section>
+
   <section><h1>Organization of these notes</h1>
-  
+
     <p>The remaining chapters of these notes are organized around the
     component-level building blocks of manipulation.  Many of these components
     each individually build on a wealth of literature (e.g. from computer
@@ -388,12 +388,12 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture videos a
     relevant ideas from each field <i>as they relate to manipulation</i>, and
     pointers to more literature.  Even finding a single notation across all of
     the fields can be a challenge!</p>
-        
+
     <p>The next few chapters will give you a minimal background on the relevant
     robot hardware that we are simulating, on (some of) the details about
     simulating them, and on the geometry and kinematics basics that we will use
     heavily through the notes.</p>
-        
+
     <p>For the remainder of the notes, rather than organize the chapters into
     "Perception", "Planning", and "Control", I've decided to spiral through
     these topics.  In the first part, we'll do just enough perception, planning,
@@ -401,16 +401,16 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture videos a
     pick-and-place manipulation of known isolated objects.  Then I'll try to
     motivate each new chapter by describing what our previous system cannot do,
     and what we hope it will do by the end of the chapter.</p>
-      
+
     <p>I welcome any feedback.  And don't forget to interact!</p>
-      
-<!--      
+
+<!--
     <p>One thing that we’ll leave out is humans.  It’s not that I don’t like humans, but we have enough to do here without trying to model them.  Let’s call it future work.  The one exception is when we talk about control of the arm — a few simple heuristics at this level can make the robots much safer if operating around humans.  The robot won’t understand them, but we want to make sure we still don’t hurt them.  Or other robots/agents in the scene.</p>
--->    
+-->
   </section>
 
   <section><h1>Exercises</h1>
-  
+
     <exercise id="drake_exercise"><h1>Familiarize yourself with Drake</h1>
 
       <p><drake></drake> is a powerful and mature software library that can
@@ -435,8 +435,8 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture videos a
         open.  The <a href="https://drake.mit.edu/pydrake/index.html">Python
         documentation</a> is (mostly) auto-generated from this and isn't
         curated as carefully; I tend to look there only in the rare cases that
-        the Python interface differs from C++.  
-        
+        the Python interface differs from C++.
+
         <div>In C++ doxygen, search for "Spatial Vectors".  What ascii
         characters do we use to denote an angular acceleration in
         code?</div></li>
@@ -446,7 +446,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture videos a
         examples of how to use a function, you can always look at the source
         code.  These days you can <a
         href="https://github1s.com/RobotLocomotion/drake" target="_vscode">use
-        VS Code</a> to explore the code right in your browser.  What value of 
+        VS Code</a> to explore the code right in your browser.  What value of
         <code>convergence_tol</code> do I use in the <a
         href="https://github1s.com/RobotLocomotion/drake/blob/HEAD/bindings/pydrake/systems/test/controllers_test.py"
         target="_vscode">unit test for "fitted value iteration"?</a> </li>
@@ -460,6 +460,19 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture videos a
       knowledge base that will make Drake more useful and accessible for
       everyone.</p>
     </exercise>
+
+    <exercise id="drake_systems_fundamentals"><h1>Drake Systems Fundamentals</h1>
+
+      <p>This exercise will introduce you to Drake's block-diagram systems framework, and we will work with some core concepts in Drake including <code>LeafSystem</code>, <code>Diagram</code>, <code>Context</code>, and <code>Simulator</code>. For this exercise you will implement a custom dynamical system from scratch using Drake's systems framework. You will work exclusively in <script>document.write(notebook_link('intro', notebook='01_drake_systems_fundamentals', link_text='this notebook'))</script>. You will be asked to complete the following steps:</p>
+
+      <ol type="a">
+        <li>Implement a custom <code>LeafSystem</code> for an inverted pendulum</li>
+        <li>Build and wire systems into a <code>Diagram</code> for simulation</li>
+        <li>Run simulations using Drake's built-in tools</li>
+      </ol>
+
+    </exercise>
+
     <!--
     <exercise id="state_space_practice">
         <h1>State-space practice</h1>
@@ -506,14 +519,14 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture videos a
 <ol>
 
 <li id=Mason18>
-<span class="author">Matthew T Mason</span>, 
-<span class="title">"Toward robotic manipulation"</span>, 
+<span class="author">Matthew T Mason</span>,
+<span class="title">"Toward robotic manipulation"</span>,
 <span class="publisher">Annual Review of Control, Robotics, and Autonomous Systems</span>, vol. 1, pp. 1--28, <span class="year">2018</span>.
 
 </li><br>
 <li id=Adler41>
-<span class="author">Mortimer J Adler</span>, 
-<span class="title">"How to Mark a Book"</span>, 
+<span class="author">Mortimer J Adler</span>,
+<span class="title">"How to Mark a Book"</span>,
 <span class="publisher">The Saturday Review of Literature</span>, July 6, <span class="year">1941</span>.
 [&nbsp;<a href="http://www.maebrussell.com/Articles%20and%20Notes/How%20To%20Mark%20A%20Book.html">link</a>&nbsp;]
 
