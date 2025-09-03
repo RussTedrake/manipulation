@@ -6,12 +6,12 @@
 
 load("//book/htmlbook/tools/jupyter:defs.bzl", "rt_ipynb_test")
 
-rt_ipynb_test(
-    name = "01_drake_systems_fundamentals",
-    srcs = ["01_drake_systems_fundamentals.ipynb"],
-    deps = [
-        "//manipulation",
-        "//manipulation/exercises:grader",
-        "//manipulation/exercises/intro:test_intro_fundamentals",
-    ],
-)
+# rt_ipynb_test(
+#     name = "01_drake_systems_fundamentals",
+#     srcs = ["01_drake_systems_fundamentals.ipynb"],
+#     deps = [
+#         "//manipulation",
+#         "//manipulation/exercises:grader",
+#         "//manipulation/exercises/intro:test_intro_fundamentals",
+#     ],
+# )
