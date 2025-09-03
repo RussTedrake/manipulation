@@ -26,3 +26,15 @@ load("//book/htmlbook/tools/jupyter:defs.bzl", "rt_ipynb_test")
 #         "//manipulation/exercises/intro:test_physics_simulation_and_robots",
 #     ],
 # )
+
+# rt_ipynb_test(
+#     name = "04_hardwarestation_and_scenarios",
+#     srcs = ["04_hardwarestation_and_scenarios.ipynb"],
+#     deps = [
+#         "//manipulation",
+#         "//manipulation:letter_generation",
+#         "//manipulation:station",
+#         "//manipulation/exercises:grader",
+#         "//manipulation/exercises/intro:test_hardwarestation_and_scenarios",
+#     ],
+# )
