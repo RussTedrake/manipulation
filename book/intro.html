@@ -473,6 +473,19 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture videos a
 
     </exercise>
 
+    <exercise id="physics_simulation_and_robots"><h1>Physics Simulation and Robot Loading</h1>
+
+      <p>Building on the systems framework from the previous exercise, you'll now learn how to set up a scene with robots and custom assets. Specifically, this exercise will show you how to load the Kuka iiwa robot from <a href="https://github.com/RobotLocomotion/models">Drake's model database</a> and create your own custom objects by writing <code>SDF</code> files from scratch. By the end, you'll have a simulation where your custom initials fall onto a table you created, with a 7-DOF Kuka iiwa robot in the scene! You will work exclusively in <script>document.write(notebook_link('intro', notebook='02_physics_simulation_and_robots', link_text='this notebook'))</script>. You will be asked to complete the following steps:</p>
+
+      <ol type="a">
+        <li>Load the Kuka iiwa14 robot into a <code>Diagram</code> using <code>Parser</code> and <code>MultibodyPlant</code></li>
+        <li>Implement a simple proportional controller as a <code>LeafSystem</code> that computes joint torques to position the robot at a desired joint configuration</li>
+        <li>Author a custom <code>SDF</code> file to define a table, then generate <code>SDF</code> assets for your initials using a provided letter generation API</li>
+        <li>Assemble a simulation with the robot, your custom table, and your initials</li>
+      </ol>
+
+    </exercise>
+
     <!--
     <exercise id="state_space_practice">
         <h1>State-space practice</h1>
