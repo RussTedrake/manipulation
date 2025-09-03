@@ -1,0 +1,17 @@
+# -*- mode: python -*-
+# vi: set ft=python :
+
+# Copyright 2025-2026 Massachusetts Institute of Technology.
+# Licensed under the BSD 3-Clause License. See LICENSE.TXT for details.
+
+load("//book/htmlbook/tools/jupyter:defs.bzl", "rt_ipynb_test")
+
+# rt_ipynb_test(
+#     name = "02_drake_systems_fundamentals",
+#     srcs = ["02_drake_systems_fundamentals.ipynb"],
+#     deps = [
+#         "//manipulation",
+#         "//manipulation/exercises:grader",
+#         "//manipulation/exercises/intro:test_intro_fundamentals",
+#     ],
+# )

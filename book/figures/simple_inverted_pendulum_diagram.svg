@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="582pt" height="143pt" viewBox="0.00 0.00 581.75 143.00">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 139)">
+<title>_13</title>
+<polygon fill="white" stroke="none" points="-4,4 -4,-139 577.75,-139 577.75,4 -4,4"/>
+<g id="clust1" class="cluster">
+<title>cluster13diagram</title>
+<polygon fill="none" stroke="black" points="8,-8 8,-127 565.75,-127 565.75,-8 8,-8"/>
+<text text-anchor="start" x="261" y="-106.7" font-family="Times,serif" font-weight="bold" font-size="14.00">Diagram</text>
+</g>
+<g id="clust2" class="cluster">
+<title>cluster13subsystems</title>
+<polygon fill="none" stroke="white" points="16,-16 16,-86 557.75,-86 557.75,-16 16,-16"/>
+</g>
+<!-- s10 -->
+<g id="node1" class="node">
+<title>s10</title>
+<polygon fill="none" stroke="black" points="220.5,-51 220.5,-73.5 396.75,-73.5 396.75,-51 220.5,-51"/>
+<text text-anchor="start" x="223.5" y="-58.2" font-family="Times,serif" font-weight="bold" font-size="14.00">__main__.InvertedPendulum</text>
+<polygon fill="none" stroke="black" points="220.5,-28.5 220.5,-51 312.75,-51 312.75,-28.5 220.5,-28.5"/>
+<text text-anchor="start" x="249.38" y="-34.7" font-family="Times,serif" font-size="14.00">torque</text>
+<polygon fill="none" stroke="black" points="312.75,-28.5 312.75,-51 396.75,-51 396.75,-28.5 312.75,-28.5"/>
+<text text-anchor="start" x="341.62" y="-34.7" font-family="Times,serif" font-size="14.00">theta</text>
+</g>
+<!-- s12 -->
+<g id="node3" class="node">
+<title>s12</title>
+<polygon fill="none" stroke="black" points="448.75,-51 448.75,-73.5 541.75,-73.5 541.75,-51 448.75,-51"/>
+<text text-anchor="start" x="451.75" y="-58.2" font-family="Times,serif" font-weight="bold" font-size="14.00">VectorLogSink</text>
+<polygon fill="none" stroke="black" points="448.75,-28.5 448.75,-51 506.5,-51 506.5,-28.5 448.75,-28.5"/>
+<text text-anchor="start" x="466.38" y="-34.7" font-family="Times,serif" font-size="14.00">data</text>
+<polyline fill="none" stroke="grey" points="506.5,-28.5 541.75,-28.5 541.75,-51"/>
+</g>
+<!-- s10&#45;&gt;s12 -->
+<g id="edge1" class="edge">
+<title>s10:e-&gt;s12:w</title>
+<path fill="none" stroke="black" d="M397.75,-39.75C415.63,-39.75 422.72,-39.75 436.39,-39.75"/>
+<polygon fill="black" stroke="black" points="436.24,-43.25 446.24,-39.75 436.24,-36.25 436.24,-43.25"/>
+</g>
+<!-- s11 -->
+<g id="node2" class="node">
+<title>s11</title>
+<polygon fill="none" stroke="black" points="32,-51 32,-73.5 168.5,-73.5 168.5,-51 32,-51"/>
+<text text-anchor="start" x="35" y="-58.2" font-family="Times,serif" font-weight="bold" font-size="14.00">ConstantVectorSource</text>
+<polyline fill="none" stroke="grey" points="32,-51 32,-28.5 93.5,-28.5"/>
+<polygon fill="none" stroke="black" points="93.5,-28.5 93.5,-51 168.5,-51 168.5,-28.5 93.5,-28.5"/>
+<text text-anchor="start" x="124.25" y="-34.7" font-family="Times,serif" font-size="14.00">y0</text>
+</g>
+<!-- s11&#45;&gt;s10 -->
+<g id="edge2" class="edge">
+<title>s11:e-&gt;s10:w</title>
+<path fill="none" stroke="black" d="M169.5,-39.75C187.38,-39.75 194.47,-39.75 208.14,-39.75"/>
+<polygon fill="black" stroke="black" points="207.99,-43.25 217.99,-39.75 207.99,-36.25 207.99,-43.25"/>
+</g>
+</g>
+</svg>
