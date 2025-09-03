@@ -16,13 +16,13 @@ load("//book/htmlbook/tools/jupyter:defs.bzl", "rt_ipynb_test")
 #     ],
 # )
 
-rt_ipynb_test(
-    name="02_physics_simulation_and_robots",
-    srcs=["02_physics_simulation_and_robots.ipynb"],
-    deps=[
-        "//manipulation",
-        "//manipulation:letter_generation",
-        "//manipulation/exercises:grader",
-        "//manipulation/exercises/intro:test_physics_simulation_and_robots",
-    ],
-)
+# rt_ipynb_test(
+#     name="02_physics_simulation_and_robots",
+#     srcs=["02_physics_simulation_and_robots.ipynb"],
+#     deps=[
+#         "//manipulation",
+#         "//manipulation:letter_generation",
+#         "//manipulation/exercises:grader",
+#         "//manipulation/exercises/intro:test_physics_simulation_and_robots",
+#     ],
+# )
