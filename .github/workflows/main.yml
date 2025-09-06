@@ -62,6 +62,7 @@ jobs:
       - name: checkout solutions
         run: |
           git clone https://x-access-token:${{ secrets.SOLUTIONS_TOKEN }}@github.com/RobotLocomotion/manipulation-solutions.git solutions
+          cd solutions && git checkout $(cat ../solutions_sha.txt) && cd ..
         shell: bash
       - name: setup and build
         run: |
@@ -92,6 +93,7 @@ jobs:
       - name: checkout solutions
         run: |
           git clone https://x-access-token:${{ secrets.SOLUTIONS_TOKEN }}@github.com/RobotLocomotion/manipulation-solutions.git solutions
+          cd solutions && git checkout $(cat ../solutions_sha.txt) && cd ..
         shell: zsh -efuo pipefail {0}
       - name: submodule checkout
         run:  ./setup/submodule_checkout
@@ -154,6 +156,7 @@ jobs:
       - name: checkout solutions
         run: |
           git clone https://x-access-token:${{ secrets.SOLUTIONS_TOKEN }}@github.com/RobotLocomotion/manipulation-solutions.git solutions
+          cd solutions && git checkout $(cat ../solutions_sha.txt) && cd ..
         shell: bash
       - name: setup
         run: |
@@ -192,6 +195,7 @@ jobs:
       - name: checkout solutions
         run: |
           git clone https://x-access-token:${{ secrets.SOLUTIONS_TOKEN }}@github.com/RobotLocomotion/manipulation-solutions.git solutions
+          cd solutions && git checkout $(cat ../solutions_sha.txt) && cd ..
         shell: bash
       - name: setup
         run: |
@@ -230,6 +234,7 @@ jobs:
       - name: checkout solutions
         run: |
           git clone https://x-access-token:${{ secrets.SOLUTIONS_TOKEN }}@github.com/RobotLocomotion/manipulation-solutions.git solutions
+          cd solutions && git checkout $(cat ../solutions_sha.txt) && cd ..
         shell: bash
       - name: setup
         run: |
