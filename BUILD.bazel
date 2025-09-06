@@ -11,6 +11,7 @@ exports_files(
     [
       "LICENSE.TXT",
       "pyproject.toml",
+      "solutions_sha.txt",
     ],
     visibility = ["//visibility:public"],
 )
