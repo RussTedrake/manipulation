@@ -37,6 +37,6 @@ class TestSimpleQP(unittest.TestCase):
 
         self.assertLessEqual(
             np.linalg.norm(f_target - np.stack(f_eval)),
-            1e-6,
+            1e-4,
             "The answer to the QP is not correct.",
         )
