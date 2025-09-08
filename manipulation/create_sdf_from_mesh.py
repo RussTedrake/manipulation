@@ -80,7 +80,7 @@ def _perform_convex_decomposition(
         used for creating the mesh parts directory.
         preview_with_trimesh (bool): Whether to open (and block on) a window to preview
         the decomposition.
-        use_coacd (bool): Whether to use CoACD instead of VHACD for decomposition.
+        decomposition_method (str): Type of decomposition (either "coacd", "vhacd", or "aabb").
         coacd_kwargs (dict | None): The CoACD-specific parameters.
         vhacd_kwargs (dict | None): The VHACD-specific parameters.
 
@@ -207,16 +207,16 @@ def create_sdf_from_mesh(
         mu_static (Union[float, None]): The coefficient of static friction.
         preview_with_trimesh (bool): Whether to open (and block on) a window to preview
         the decomposition.
-        use_coacd (bool): Whether to use CoACD instead of VHACD for convex decomposition.
+        decomposition_method (str): Type of decomposition (either "coacd", "vhacd", or "aabb").
         coacd_kwargs (dict | None): The CoACD-specific parameters.
         vhacd_kwargs (dict | None): The VHACD-specific parameters.
     """
-    """
-    if (use_coacd and vhacd_kwargs is not None) or (
-        not use_coacd and coacd_kwargs is not None
+
+    if (decomposition_method == "coacd" and vhacd_kwargs is not None) or (
+        decomposition_method == "vhacd" and coacd_kwargs is not None
     ):
         raise ValueError("Cannot use both CoACD and VHACD.")
-    """
+
     # Construct SDF path
     dir_path = mesh_path.parent
     mesh_name = mesh_path.stem
