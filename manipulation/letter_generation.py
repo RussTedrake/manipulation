@@ -38,6 +38,7 @@ def create_sdf_asset_from_letter(
     mu_dynamic: float | None = 1.0,
     mu_static: float | None = None,
     output_dir: str = ".",
+    use_coacd: bool = True,
 ) -> Path | None:
     """
     Creates a complete SDF asset (mesh + SDF file) from a single letter.
@@ -88,6 +89,18 @@ def create_sdf_asset_from_letter(
         mesh_path = output_path / f"{text}.obj"
         mesh.export(mesh_path)
 
+        if use_coacd:
+            decomposition_method = "coacd"
+            decomp_kwargs = {
+                "threshold": 0.05,  # ↓ concavity threshold (lower ⇒ more pieces)
+                "preprocess_mode": "auto",
+                # "auto" (default) tries manifold remeshing only if needed
+                "merge": True,  # allow post-merge to minimise hull count
+            }
+        else:
+            decomposition_method = "aabb"
+            decomp_kwargs = None
+
         # Use create_sdf_from_mesh to generate the SDF file
         create_sdf_from_mesh(
             mesh_path=mesh_path,
@@ -99,13 +112,8 @@ def create_sdf_asset_from_letter(
             mu_dynamic=mu_dynamic,
             mu_static=mu_static,
             preview_with_trimesh=False,  # Don't show preview in automated generation
-            use_coacd=True,
-            coacd_kwargs={
-                "threshold": 0.05,  # ↓ concavity threshold (lower ⇒ more pieces)
-                "preprocess_mode": "auto",
-                # "auto" (default) tries manifold remeshing only if needed
-                "merge": True,  # allow post-merge to minimise hull count
-            },
+            decomposition_method=decomposition_method,
+            coacd_kwargs=decomp_kwargs,
         )
 
         # Return path to the created SDF file

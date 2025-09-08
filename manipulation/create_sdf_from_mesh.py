@@ -65,7 +65,7 @@ def _perform_convex_decomposition(
     mesh_name: str,
     mesh_dir: Path,
     preview_with_trimesh: bool,
-    use_coacd: bool = False,
+    decomposition_method="str",
     coacd_kwargs: dict | None = None,
     vhacd_kwargs: dict | None = None,
 ) -> List[Path]:
@@ -102,7 +102,7 @@ def _perform_convex_decomposition(
         + "complicated meshes and fine resolution settings."
     )
     try:
-        if use_coacd:
+        if decomposition_method == "coacd":
             try:
                 import coacd
             except ImportError:
@@ -118,7 +118,7 @@ def _perform_convex_decomposition(
             for vertices, faces in coacd_result:
                 piece = trimesh.Trimesh(vertices, faces)
                 convex_pieces.append(piece)
-        else:
+        elif decomposition_method == "vhacd":
             try:
                 import vhacdx  # noqa: F401
             except ImportError:
@@ -130,6 +130,12 @@ def _perform_convex_decomposition(
             convex_pieces = mesh.convex_decomposition(**vhacd_settings)
             if not isinstance(convex_pieces, list):
                 convex_pieces = [convex_pieces]
+        elif decomposition_method == "aabb":
+            convex_pieces = [mesh.bounding_box.to_mesh()]
+        else:
+            raise NotImplementedError(
+                "select a decomposition_method from coacd, vhacd, or aabb"
+            )
     except Exception as e:
         logging.error(f"Problem performing decomposition: {e}")
         exit(1)
@@ -169,7 +175,7 @@ def create_sdf_from_mesh(
     mu_dynamic: Union[float, None],
     mu_static: Union[float, None],
     preview_with_trimesh: bool,
-    use_coacd: bool = False,
+    decomposition_method: str = "vhacd",
     coacd_kwargs: dict | None = None,
     vhacd_kwargs: dict | None = None,
 ) -> None:
@@ -205,11 +211,12 @@ def create_sdf_from_mesh(
         coacd_kwargs (dict | None): The CoACD-specific parameters.
         vhacd_kwargs (dict | None): The VHACD-specific parameters.
     """
+    """
     if (use_coacd and vhacd_kwargs is not None) or (
         not use_coacd and coacd_kwargs is not None
     ):
         raise ValueError("Cannot use both CoACD and VHACD.")
-
+    """
     # Construct SDF path
     dir_path = mesh_path.parent
     mesh_name = mesh_path.stem
@@ -255,7 +262,7 @@ def create_sdf_from_mesh(
         mesh_name=mesh_name,
         mesh_dir=dir_path,
         preview_with_trimesh=preview_with_trimesh,
-        use_coacd=use_coacd,
+        decomposition_method=decomposition_method,
         coacd_kwargs=coacd_kwargs,
         vhacd_kwargs=vhacd_kwargs,
     )
