@@ -65,7 +65,7 @@ def _perform_convex_decomposition(
     mesh_name: str,
     mesh_dir: Path,
     preview_with_trimesh: bool,
-    decomposition_method="str",
+    decomposition_method: str,
     coacd_kwargs: dict | None = None,
     vhacd_kwargs: dict | None = None,
 ) -> List[Path]:
