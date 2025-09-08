@@ -38,7 +38,7 @@ def create_sdf_asset_from_letter(
     mu_dynamic: float | None = 1.0,
     mu_static: float | None = None,
     output_dir: str = ".",
-    use_coacd: bool = True,
+    use_bbox_collision_geometry: bool = False,
 ) -> Path | None:
     """
     Creates a complete SDF asset (mesh + SDF file) from a single letter.
@@ -55,6 +55,7 @@ def create_sdf_asset_from_letter(
         mu_dynamic (float | None): Coefficient of dynamic friction.
         mu_static (float | None): Coefficient of static friction.
         output_dir (str): Directory where the output files will be saved.
+        use_bbox_collision_geometry (bool): Whether to use axis-aligned bbox or coacd as collision geometry
 
     Returns:
         Path | None: Path to the created SDF file, or None if creation failed.
@@ -89,7 +90,11 @@ def create_sdf_asset_from_letter(
         mesh_path = output_path / f"{text}.obj"
         mesh.export(mesh_path)
 
-        if use_coacd:
+        if use_bbox_collision_geometry:
+            decomposition_method = "aabb"
+            decomp_kwargs = None
+
+        else:
             decomposition_method = "coacd"
             decomp_kwargs = {
                 "threshold": 0.05,  # ↓ concavity threshold (lower ⇒ more pieces)
@@ -97,9 +102,6 @@ def create_sdf_asset_from_letter(
                 # "auto" (default) tries manifold remeshing only if needed
                 "merge": True,  # allow post-merge to minimise hull count
             }
-        else:
-            decomposition_method = "aabb"
-            decomp_kwargs = None
 
         # Use create_sdf_from_mesh to generate the SDF file
         create_sdf_from_mesh(

@@ -10,7 +10,7 @@ import logging
 import os
 import sys
 from pathlib import Path
-from typing import List, Tuple, Union
+from typing import List, Literal, Tuple, Union
 
 import numpy as np
 from lxml import etree as ET
@@ -65,7 +65,7 @@ def _perform_convex_decomposition(
     mesh_name: str,
     mesh_dir: Path,
     preview_with_trimesh: bool,
-    decomposition_method: str,
+    decomposition_method: Literal["coacd", "vhacd", "aabb"],
     coacd_kwargs: dict | None = None,
     vhacd_kwargs: dict | None = None,
 ) -> List[Path]:
@@ -134,7 +134,7 @@ def _perform_convex_decomposition(
             convex_pieces = [mesh.bounding_box.to_mesh()]
         else:
             raise NotImplementedError(
-                "select a decomposition_method from coacd, vhacd, or aabb"
+                f"decomposition_method {decomposition_method} invalid. Select a decomposition_method from coacd, vhacd, or aabb"
             )
     except Exception as e:
         logging.error(f"Problem performing decomposition: {e}")
@@ -175,7 +175,7 @@ def create_sdf_from_mesh(
     mu_dynamic: Union[float, None],
     mu_static: Union[float, None],
     preview_with_trimesh: bool,
-    decomposition_method: str = "vhacd",
+    decomposition_method: Literal["vhacd", "coacd", "aabb"] = "vhacd",
     coacd_kwargs: dict | None = None,
     vhacd_kwargs: dict | None = None,
 ) -> None:
