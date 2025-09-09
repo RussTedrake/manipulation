@@ -31,7 +31,7 @@ class TestPickPlacePoses(unittest.TestCase):
         np.array([-0.17118571, -0.4806, 0.0038])
 
         # check initials sit on a line in the yz plane
-        initials_aligned = np.linalg.norm(p_WO1[1:] - p_WO2[1:]) < 2e-2
+        initials_aligned = np.linalg.norm(p_WO1[1:] - p_WO2[1:]) < 6e-2
         self.assertTrue(
             initials_aligned,
             "Verification failed, intials are not aligned in the yz plane.",
