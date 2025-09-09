@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-def plot_planar_manipulator(q, p_ACplot):
+def plot_planar_manipulator(q: np.ndarray, p_ACplot: np.ndarray) -> None:
     """
     Plot manipulator with joint positions q and the end-effector location
     p_ACplot.
@@ -42,7 +42,7 @@ def plot_planar_manipulator(q, p_ACplot):
     plt.gca().set_aspect("equal", adjustable="box")
 
 
-def plot_two_planar_manipulators(q1, q2, p_ACplot):
+def plot_two_planar_manipulators(q1: np.ndarray, q2: np.ndarray, p_ACplot: np.ndarray) -> None:
     """
     Plot two planr manipulators with joint positions q1, q2
 
