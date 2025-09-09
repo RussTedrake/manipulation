@@ -59,6 +59,11 @@ jobs:
         shell: bash
       - name: checkout
         uses: actions/checkout@v4
+      - name: checkout solutions
+        run: |
+          git clone https://x-access-token:${{ secrets.SOLUTIONS_TOKEN }}@github.com/RobotLocomotion/manipulation-solutions.git solutions
+          cd solutions && git checkout $(cat ../solutions_sha.txt) && cd ..
+        shell: bash
       - name: setup and build
         run: |
           ./setup/submodule_checkout
@@ -85,6 +90,11 @@ jobs:
     steps:
       - name: checkout
         uses: actions/checkout@v4
+      - name: checkout solutions
+        run: |
+          git clone https://x-access-token:${{ secrets.SOLUTIONS_TOKEN }}@github.com/RobotLocomotion/manipulation-solutions.git solutions
+          cd solutions && git checkout $(cat ../solutions_sha.txt) && cd ..
+        shell: zsh -efuo pipefail {0}
       - name: submodule checkout
         run:  ./setup/submodule_checkout
         shell: zsh -efuo pipefail {0}
@@ -143,6 +153,11 @@ jobs:
     steps:
       - name: checkout
         uses: actions/checkout@v4
+      - name: checkout solutions
+        run: |
+          git clone https://x-access-token:${{ secrets.SOLUTIONS_TOKEN }}@github.com/RobotLocomotion/manipulation-solutions.git solutions
+          cd solutions && git checkout $(cat ../solutions_sha.txt) && cd ..
+        shell: bash
       - name: setup
         run: |
           apt-get update -o APT::Acquire::Retries=4 -qq
@@ -177,6 +192,11 @@ jobs:
         shell: bash
       - name: checkout
         uses: actions/checkout@v4
+      - name: checkout solutions
+        run: |
+          git clone https://x-access-token:${{ secrets.SOLUTIONS_TOKEN }}@github.com/RobotLocomotion/manipulation-solutions.git solutions
+          cd solutions && git checkout $(cat ../solutions_sha.txt) && cd ..
+        shell: bash
       - name: setup
         run: |
           ./setup/submodule_checkout
@@ -211,6 +231,11 @@ jobs:
         shell: bash
       - name: checkout
         uses: actions/checkout@v4
+      - name: checkout solutions
+        run: |
+          git clone https://x-access-token:${{ secrets.SOLUTIONS_TOKEN }}@github.com/RobotLocomotion/manipulation-solutions.git solutions
+          cd solutions && git checkout $(cat ../solutions_sha.txt) && cd ..
+        shell: bash
       - name: setup
         run: |
           ./setup/submodule_checkout

@@ -1,7 +1,14 @@
 #!/usr/bin/env python3
 
+import html
 import os
 import subprocess
+import sys
+
+# Disable chunked encoding - must be set before any output
+os.environ["no-gzip"] = "1"
+os.environ["no-chunked-encoding"] = "1"
+os.environ["HTTP_NO_CHUNKED_ENCODING"] = "1"
 
 try:
     # Do all work first
@@ -37,22 +44,48 @@ try:
                 "rm -rf book/python && "
                 "cp -r /tmp/manip_doc/html book/python",
             ],
+            stdin=subprocess.DEVNULL,
             stdout=log_file,
             stderr=subprocess.STDOUT,
             start_new_session=True,
+            close_fds=True,
         )
 
-    print("Content-Type: text/html\n")
-    print("<html><body>")
-    print("<p>pulling repo...</p>")
-    print(f"<pre>{git_output}</pre>")
-    print("<p>done.</p>")
-    print("<p>Documentation build started in the background.</p>")
-    print("<p>Check /tmp/manipulation_build_docs.log for progress.</p>")
-    print("</body></html>")
+    # Build response body first
+    body = (
+        "<html><body>\n"
+        "<p>pulling repo...</p>\n"
+        f"<pre>{html.escape(git_output)}</pre>\n"
+        "<p>done.</p>\n"
+        "<p>Documentation build started in the background.</p>\n"
+        "<p>Check /tmp/manipulation_build_docs.log for progress.</p>\n"
+        "</body></html>\n"
+    )
+
+    # Build complete response
+    response = (
+        "Content-Type: text/html\r\n"
+        "\r\n"
+        "<html><body>\n"
+        "<p>pulling repo...</p>\n"
+        f"<pre>{html.escape(git_output)}</pre>\n"
+        "<p>done.</p>\n"
+        "<p>Documentation build started in the background.</p>\n"
+        "<p>Check /tmp/manipulation_build_docs.log for progress.</p>\n"
+        "</body></html>\n"
+    )
+
+    # Write response and immediately exit
+    sys.stdout.write(response)
+    sys.stdout.flush()
 
 except Exception as e:
-    print("Content-Type: text/html\n")
-    print("<html><body>")
-    print(f"<p>Error: {str(e)}</p>")
-    print("</body></html>")
+    error_response = (
+        "Content-Type: text/html\r\n"
+        "\r\n"
+        "<html><body>\n"
+        f"<p>Error: {html.escape(str(e))}</p>\n"
+        "</body></html>\n"
+    )
+    sys.stdout.write(error_response)
+    sys.stdout.flush()

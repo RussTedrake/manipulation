@@ -109,12 +109,11 @@ class TestIntroFundamentalsSimulationExercises(unittest.TestCase):
         """Test Verification 2: With applied torque"""
         simulate_pendulum = self.notebook_locals["simulate_pendulum"]
 
-        # Using torque=0.0 as shown in your solution code
-        times, outputs = simulate_pendulum([-0.1, 0.2], simulation_time=1.8, torque=0.0)
+        times, outputs = simulate_pendulum([-0.1, 0.2], simulation_time=1.8, torque=0.5)
         final_angle = outputs[0, -1]
 
         # Expected value from running the solution
-        expected_final_angle = -0.118236
+        expected_final_angle = -0.10743
 
         self.assertAlmostEqual(
             final_angle,
