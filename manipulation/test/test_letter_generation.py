@@ -89,7 +89,7 @@ class LetterGenerationTest(unittest.TestCase):
 
     def test_create_sdf_asset_different_fonts(self):
         """Test SDF asset creation with different fonts."""
-        fonts_to_test = ["DejaVu Sans", "Times New Roman"]
+        fonts_to_test = ["DejaVu Sans", "DejaVu Serif"]
         letter = "B"
 
         for font in fonts_to_test:
@@ -119,7 +119,7 @@ class LetterGenerationTest(unittest.TestCase):
             with self.subTest(letter_height=letter_height):
                 sdf_path = create_sdf_asset_from_letter(
                     text=letter,
-                    font_name="Arial",
+                    font_name="DejaVu Sans",
                     letter_height_meters=letter_height,
                     extrusion_depth_meters=0.15,
                     output_dir=self._tmp_dir,
@@ -140,7 +140,7 @@ class LetterGenerationTest(unittest.TestCase):
             with self.subTest(extrusion_depth=depth):
                 sdf_path = create_sdf_asset_from_letter(
                     text=letter,
-                    font_name="Arial",
+                    font_name="DejaVu Sans",
                     letter_height_meters=0.4,
                     extrusion_depth_meters=depth,
                     output_dir=self._tmp_dir,
@@ -152,6 +152,27 @@ class LetterGenerationTest(unittest.TestCase):
                 if sdf_path:
                     self.assertTrue(
                         sdf_path.exists(), f"SDF file should exist for depth {depth}"
+                    )
+
+        for use_bbox_collision_geometry in [True, False]:
+            with self.subTest(extrusion_depth=depth):
+                sdf_path = create_sdf_asset_from_letter(
+                    text=letter,
+                    font_name="DejaVu Sans",
+                    letter_height_meters=0.4,
+                    extrusion_depth_meters=depth,
+                    output_dir=self._tmp_dir,
+                    use_bbox_collision_geometry=use_bbox_collision_geometry,
+                )
+
+                self.assertIsNotNone(
+                    sdf_path,
+                    f"SDF path should not be None for use_bbox_collision_geometry {use_bbox_collision_geometry}",
+                )
+                if sdf_path:
+                    self.assertTrue(
+                        sdf_path.exists(),
+                        f"SDF file should exist for use_bbox_collision_geometry {use_bbox_collision_geometry}",
                     )
 
     def test_create_sdf_asset_invalid_input(self):

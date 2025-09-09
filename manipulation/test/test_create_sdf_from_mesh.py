@@ -61,6 +61,7 @@ class CreateSDFFromMeshTest(unittest.TestCase):
             mu_dynamic=1.0,
             mu_static=None,
             preview_with_trimesh=False,
+            decomposition_method="vhacd",
         )
         self.assertTrue(
             os.path.exists(self._mesh_path.replace("obj", "sdf")),
@@ -88,7 +89,7 @@ class CreateSDFFromMeshTest(unittest.TestCase):
             mu_dynamic=1.0,
             mu_static=None,
             preview_with_trimesh=False,
-            use_coacd=True,
+            decomposition_method="coacd",
             coacd_kwargs={
                 "threshold": 0.1,
                 "resolution": 1000,
@@ -103,6 +104,45 @@ class CreateSDFFromMeshTest(unittest.TestCase):
             num_mesh_pieces == 1,
             f"An incorrect number of mesh pieces were created ({num_mesh_pieces} pieces)",
         )
+
+    def test_create_sdf_from_mesh_with_aabb(self):
+        create_sdf_from_mesh(
+            mesh_path=Path(self._mesh_path),
+            mass=1.0,
+            scale=1.5,
+            is_compliant=True,
+            hydroelastic_modulus=1e8,
+            hunt_crossley_dissipation=None,
+            mu_dynamic=1.0,
+            mu_static=None,
+            preview_with_trimesh=False,
+            decomposition_method="aabb",
+        )
+        mesh_pieces_dir = self._mesh_path.replace(".obj", "_parts")
+        self.assertTrue(
+            os.path.exists(mesh_pieces_dir), "Mesh pieces dir does not exist"
+        )
+        num_mesh_pieces = len(fnmatch.filter(os.listdir(mesh_pieces_dir), "*.*"))
+        self.assertTrue(
+            num_mesh_pieces == 1,
+            f"An incorrect number of mesh pieces were created ({num_mesh_pieces} pieces)",
+        )
+
+    def test_create_sdf_from_mesh_invalid_decomposition(self):
+        with self.assertRaises(SystemExit):
+            # Test with unimplemented decomposition method (should fail)
+            create_sdf_from_mesh(
+                mesh_path=Path(self._mesh_path),
+                mass=1.0,
+                scale=1.5,
+                is_compliant=True,
+                hydroelastic_modulus=1e8,
+                hunt_crossley_dissipation=None,
+                mu_dynamic=1.0,
+                mu_static=None,
+                preview_with_trimesh=False,
+                decomposition_method="obb",
+            )
 
 
 if __name__ == "__main__":

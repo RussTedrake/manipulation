@@ -10,7 +10,7 @@ import logging
 import os
 import sys
 from pathlib import Path
-from typing import List, Tuple, Union
+from typing import List, Literal, Tuple, Union
 
 import numpy as np
 from lxml import etree as ET
@@ -65,11 +65,14 @@ def _perform_convex_decomposition(
     mesh_name: str,
     mesh_dir: Path,
     preview_with_trimesh: bool,
-    use_coacd: bool = False,
+    decomposition_method: Literal["coacd", "vhacd", "aabb"],
     coacd_kwargs: dict | None = None,
     vhacd_kwargs: dict | None = None,
 ) -> List[Path]:
-    """Given a mesh, performs a convex decomposition of it with either VHACD or CoACD.
+    """Given a mesh, performs a convex decomposition of it with either VHACD, CoACD,
+    or an Axis-Aligned Bounding Box (AABB). Note that if the AABB is selected, we
+    represent it as a mesh, rather than a primitive Box type. This is less computationally
+    efficient but allows AABB to follow the same semantics as VHACD and CoACD.
     The resulting convex parts are saved in a subfolder named `<mesh_filename>_parts`.
 
     Args:
@@ -80,7 +83,7 @@ def _perform_convex_decomposition(
         used for creating the mesh parts directory.
         preview_with_trimesh (bool): Whether to open (and block on) a window to preview
         the decomposition.
-        use_coacd (bool): Whether to use CoACD instead of VHACD for decomposition.
+        decomposition_method (str): Type of decomposition (either "coacd", "vhacd", or "aabb").
         coacd_kwargs (dict | None): The CoACD-specific parameters.
         vhacd_kwargs (dict | None): The VHACD-specific parameters.
 
@@ -102,7 +105,7 @@ def _perform_convex_decomposition(
         + "complicated meshes and fine resolution settings."
     )
     try:
-        if use_coacd:
+        if decomposition_method == "coacd":
             try:
                 import coacd
             except ImportError:
@@ -118,7 +121,7 @@ def _perform_convex_decomposition(
             for vertices, faces in coacd_result:
                 piece = trimesh.Trimesh(vertices, faces)
                 convex_pieces.append(piece)
-        else:
+        elif decomposition_method == "vhacd":
             try:
                 import vhacdx  # noqa: F401
             except ImportError:
@@ -130,6 +133,13 @@ def _perform_convex_decomposition(
             convex_pieces = mesh.convex_decomposition(**vhacd_settings)
             if not isinstance(convex_pieces, list):
                 convex_pieces = [convex_pieces]
+        elif decomposition_method == "aabb":
+            # TODO: add support for primitive types (e.g. Box) so we don't have to use the mesh representation of the AABB.
+            convex_pieces = [mesh.bounding_box.to_mesh()]
+        else:
+            raise NotImplementedError(
+                f"decomposition_method {decomposition_method} invalid. Select a decomposition_method from coacd, vhacd, or aabb"
+            )
     except Exception as e:
         logging.error(f"Problem performing decomposition: {e}")
         exit(1)
@@ -169,7 +179,7 @@ def create_sdf_from_mesh(
     mu_dynamic: Union[float, None],
     mu_static: Union[float, None],
     preview_with_trimesh: bool,
-    use_coacd: bool = False,
+    decomposition_method: Literal["vhacd", "coacd", "aabb"] = "coacd",
     coacd_kwargs: dict | None = None,
     vhacd_kwargs: dict | None = None,
 ) -> None:
@@ -201,12 +211,13 @@ def create_sdf_from_mesh(
         mu_static (Union[float, None]): The coefficient of static friction.
         preview_with_trimesh (bool): Whether to open (and block on) a window to preview
         the decomposition.
-        use_coacd (bool): Whether to use CoACD instead of VHACD for convex decomposition.
+        decomposition_method (str): Type of decomposition (either "coacd", "vhacd", or "aabb").
         coacd_kwargs (dict | None): The CoACD-specific parameters.
         vhacd_kwargs (dict | None): The VHACD-specific parameters.
     """
-    if (use_coacd and vhacd_kwargs is not None) or (
-        not use_coacd and coacd_kwargs is not None
+
+    if (decomposition_method == "coacd" and vhacd_kwargs is not None) or (
+        decomposition_method == "vhacd" and coacd_kwargs is not None
     ):
         raise ValueError("Cannot use both CoACD and VHACD.")
 
@@ -255,7 +266,7 @@ def create_sdf_from_mesh(
         mesh_name=mesh_name,
         mesh_dir=dir_path,
         preview_with_trimesh=preview_with_trimesh,
-        use_coacd=use_coacd,
+        decomposition_method=decomposition_method,
         coacd_kwargs=coacd_kwargs,
         vhacd_kwargs=vhacd_kwargs,
     )

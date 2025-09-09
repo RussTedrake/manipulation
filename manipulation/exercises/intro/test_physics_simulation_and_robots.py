@@ -140,7 +140,7 @@ class TestPhysicsSimulationFullSystem(unittest.TestCase):
 
         # Generate test letters in temporary directory
         test_initials = "BPG"
-        assets_dir = Path(self._tmp_dir) / "work/assets"
+        assets_dir = Path(self._tmp_dir) / "assets"
 
         for letter in test_initials:
             create_sdf_asset_from_letter(
