@@ -69,7 +69,10 @@ def _perform_convex_decomposition(
     coacd_kwargs: dict | None = None,
     vhacd_kwargs: dict | None = None,
 ) -> List[Path]:
-    """Given a mesh, performs a convex decomposition of it with either VHACD or CoACD.
+    """Given a mesh, performs a convex decomposition of it with either VHACD, CoACD,
+    or an Axis-Aligned Bounding Box (AABB). Note that if the AABB is selected, we
+    represent it as a mesh, rather than a primitive Box type. This is less computationally
+    efficient but allows AABB to follow the same semantics as VHACD and CoACD.
     The resulting convex parts are saved in a subfolder named `<mesh_filename>_parts`.
 
     Args:
@@ -131,6 +134,7 @@ def _perform_convex_decomposition(
             if not isinstance(convex_pieces, list):
                 convex_pieces = [convex_pieces]
         elif decomposition_method == "aabb":
+            # TODO: add support for primitive types (e.g. Box) so we don't have to use the mesh representation of the AABB.
             convex_pieces = [mesh.bounding_box.to_mesh()]
         else:
             raise NotImplementedError(
@@ -175,7 +179,7 @@ def create_sdf_from_mesh(
     mu_dynamic: Union[float, None],
     mu_static: Union[float, None],
     preview_with_trimesh: bool,
-    decomposition_method: Literal["vhacd", "coacd", "aabb"] = "vhacd",
+    decomposition_method: Literal["vhacd", "coacd", "aabb"] = "coacd",
     coacd_kwargs: dict | None = None,
     vhacd_kwargs: dict | None = None,
 ) -> None:
