@@ -61,3 +61,14 @@ rt_ipynb_test(
         "//manipulation:station",
     ],
 )
+
+rt_ipynb_test(
+    name = "14_pickplace_initials",
+    srcs = ["14_pickplace_initials.ipynb"],
+    deps = [
+        "//manipulation",
+        "//manipulation/exercises:grader",
+        "//manipulation/exercises/pick:test_pickplace_initials",
+        "//manipulation:station",
+    ],
+)

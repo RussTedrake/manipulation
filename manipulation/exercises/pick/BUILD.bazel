@@ -41,3 +41,15 @@ rt_py_library(
     srcs = ["test_rigid_transforms.py"],
     visibility = ["//visibility:public"],
 )
+
+rt_py_library(
+    name = "test_rigid_transforms",
+    srcs = ["test_rigid_transforms.py"],
+    visibility = ["//visibility:public"],
+)
+
+rt_py_library(
+    name="test_pickplace_initials",
+    srcs=["test_pickplace_initials.py"],
+    visibility = ["//visibility:public"],
+)
