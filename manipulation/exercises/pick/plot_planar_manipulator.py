@@ -42,14 +42,16 @@ def plot_planar_manipulator(q: np.ndarray, p_ACplot: np.ndarray) -> None:
     plt.gca().set_aspect("equal", adjustable="box")
 
 
-def plot_two_planar_manipulators(q1: np.ndarray, q2: np.ndarray, p_ACplot: np.ndarray) -> None:
+def plot_two_planar_manipulators(
+    q1: np.ndarray, q2: np.ndarray, p_ACplot: np.ndarray
+) -> None:
     """
     Plot two planr manipulators with joint positions q1, q2
 
     The intented use is the following:
 
     - q1, q2 = inverse_kinematics(x, y)
-    - plot_two_planar_manipulators(q1, q2, np.array([x, y])) 
+    - plot_two_planar_manipulators(q1, q2, np.array([x, y]))
 
     It is meant to verify the correctness of the inverse kinematics solution
 
@@ -87,7 +89,6 @@ def plot_two_planar_manipulators(q1: np.ndarray, q2: np.ndarray, p_ACplot: np.nd
 
     # Plot user provided position
     plt.plot(p_ACplot[0], p_ACplot[1], "kx", markersize=15)
-    
 
     # Set settings so things visualize nicely
     plt.xlim([-2.2, 2.2])
