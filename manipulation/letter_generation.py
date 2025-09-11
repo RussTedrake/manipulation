@@ -39,6 +39,7 @@ def create_sdf_asset_from_letter(
     mu_static: float | None = None,
     output_dir: str = ".",
     use_bbox_collision_geometry: bool = False,
+    include_normals: bool = True,
 ) -> Path | None:
     """
     Creates a complete SDF asset (mesh + SDF file) from a single letter.
@@ -56,6 +57,7 @@ def create_sdf_asset_from_letter(
         mu_static (float | None): Coefficient of static friction.
         output_dir (str): Directory where the output files will be saved.
         use_bbox_collision_geometry (bool): Whether to use axis-aligned bbox or coacd as collision geometry
+        include_normals (bool): Whether to include the normals in the obj file.
 
     Returns:
         Path | None: Path to the created SDF file, or None if creation failed.
@@ -88,7 +90,7 @@ def create_sdf_asset_from_letter(
 
         # Save the mesh as an OBJ file
         mesh_path = output_path / f"{text}.obj"
-        mesh.export(mesh_path)
+        mesh.export(mesh_path, include_normals=include_normals)
 
         if use_bbox_collision_geometry:
             decomposition_method = "aabb"
