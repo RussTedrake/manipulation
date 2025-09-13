@@ -24,3 +24,9 @@ rt_py_library(
     srcs = ["test_ransac.py"],
     visibility = ["//visibility:public"],
 )
+
+rt_py_library(
+    name = "test_pickplace_initials_with_geometry",
+    srcs = ["test_pickplace_initials_with_geometry.py"],
+    visibility = ["//visibility:public"],
+)
