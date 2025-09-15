@@ -18,17 +18,19 @@ class TestPickPlacePoses(unittest.TestCase):
         initials = self.notebook_locals["initials"]
         plant_context = plant.GetMyContextFromRoot(context)
 
+        model_instance1 = plant.GetModelInstanceByName("first_initial")
         X_WO1 = plant.EvalBodyPoseInWorld(
-            plant_context, plant.GetBodyByName(f"{initials[0]}_body_link")
+            plant_context,
+            plant.GetBodyByName(f"{initials[0]}_body_link", model_instance1),
         )
         p_WO1 = X_WO1.translation()
-        np.array([-0.52055, -0.4852, 0.0038])
 
+        model_instance2 = plant.GetModelInstanceByName("last_initial")
         X_WO2 = plant.EvalBodyPoseInWorld(
-            plant_context, plant.GetBodyByName(f"{initials[1]}_body_link")
+            plant_context,
+            plant.GetBodyByName(f"{initials[1]}_body_link", model_instance2),
         )
         p_WO2 = X_WO2.translation()
-        np.array([-0.17118571, -0.4806, 0.0038])
 
         # check initials sit on a line in the yz plane
         initials_aligned = np.linalg.norm(p_WO1[1:] - p_WO2[1:]) < 6e-2
