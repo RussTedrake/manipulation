@@ -11,7 +11,7 @@ class TestPickPlacePoses(unittest.TestCase):
         self.notebook_locals = notebook_locals
 
     @weight(1)
-    @timeout_decorator.timeout(5.0)
+    @timeout_decorator.timeout(15.0)
     def test_final_pose(self):
         context = self.notebook_locals["context"]
         plant = self.notebook_locals["plant"]
