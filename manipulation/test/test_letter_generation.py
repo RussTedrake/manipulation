@@ -197,6 +197,27 @@ class LetterGenerationTest(unittest.TestCase):
                 output_dir=self._tmp_dir,
             )
 
+    def test_create_sdf_asset_include_normals(self):
+        """Test SDF asset creation with include_normals."""
+        letter = "D"
+        sdf_path = create_sdf_asset_from_letter(
+            text=letter,
+            font_name="DejaVu Sans",
+            letter_height_meters=0.4,
+            extrusion_depth_meters=0.15,
+            output_dir=self._tmp_dir,
+            include_normals=True,
+        )
+        self.assertIsNotNone(
+            sdf_path,
+            f"SDF path should not be None for include_normals True",
+        )
+        if sdf_path:
+            self.assertTrue(
+                sdf_path.exists(),
+                f"SDF file should exist for include_normals True",
+            )
+
 
 if __name__ == "__main__":
     unittest.main()
