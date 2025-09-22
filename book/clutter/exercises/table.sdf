@@ -3,7 +3,6 @@
   <model name="table">
     <pose>0 0 0 0 0 0</pose>
     <link name="table_link">
-      <!-- TODO: Add inertial properties -->
       <inertial>
         <mass>20</mass>
         <inertia>
@@ -15,7 +14,6 @@
           <izz>1.0</izz>
         </inertia>
       </inertial>
-      <!-- TODO: Add collision geometry -->
       <collision name="box_collision">
         <geometry>
           <box>
@@ -23,7 +21,6 @@
           </box>
         </geometry>
       </collision>
-      <!-- TODO: Add visual geometry -->
       <visual name="box_visual">
         <geometry>
           <box>
