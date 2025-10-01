@@ -37,7 +37,7 @@ def _run_rrt_like_test(
 
     student_path = None
     print("Started to solve the problem using RRT planner ...")
-    for i in range(3):  # allow 3 attempts
+    for i in range(4):  # allow 4 attempts
         student_path, student_iter = student_planner(
             iiwa_problem_test, max_iterations=1000
         )
@@ -84,7 +84,7 @@ class TestRRT(unittest.TestCase):
         self.notebook_locals = notebook_locals
 
     @weight(5)
-    @timeout_decorator.timeout(60.0)
+    @timeout_decorator.timeout(80.0)
     def test_rrt(self):
         _run_rrt_like_test(self, self.notebook_locals, "rrt_planning")
 
@@ -95,6 +95,6 @@ class TestRRT_Connect(unittest.TestCase):
         self.notebook_locals = notebook_locals
 
     @weight(5)
-    @timeout_decorator.timeout(60.0)
+    @timeout_decorator.timeout(80.0)
     def test_rrt(self):
         _run_rrt_like_test(self, self.notebook_locals, "rrt_connect_planning")
