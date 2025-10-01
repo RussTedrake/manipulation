@@ -172,6 +172,9 @@ class TestIK_initials(unittest.TestCase):
     def test_ik_initials(self):
         """Test solve_ik_for_pose"""
         sim = self.notebook_locals["sim"]
+        solve_ik_for_pose = self.notebook_locals["solve_ik_for_pose"]
+        X_WGgoal = self.notebook_locals["X_WGgoal"]
+
         goal_pose_1 = RigidTransform(
             R=RotationMatrix(
                 [
