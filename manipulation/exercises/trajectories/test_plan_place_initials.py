@@ -161,6 +161,7 @@ class TestShortcut(unittest.TestCase):
         )
         print("\n All Shortcut tests passed!!")
 
+
 class TestIK_initials(unittest.TestCase):
     def __init__(self, test_name, notebook_locals):
         super().__init__(test_name)
