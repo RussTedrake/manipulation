@@ -161,7 +161,6 @@ class TestShortcut(unittest.TestCase):
         )
         print("\n All Shortcut tests passed!!")
 
-
 class TestIK_initials(unittest.TestCase):
     def __init__(self, test_name, notebook_locals):
         super().__init__(test_name)
@@ -173,10 +172,9 @@ class TestIK_initials(unittest.TestCase):
         """Test solve_ik_for_pose"""
         sim = self.notebook_locals["sim"]
         solve_ik_for_pose = self.notebook_locals["solve_ik_for_pose"]
-        X_WGgoal = self.notebook_locals["X_WGgoal"]
 
         goal_pose_1 = RigidTransform(
-            R=RotationMatrix(
+            RotationMatrix(
                 [
                     [-1.8190895947787466e-16, 0.2392493292139824, -0.970958165149591],
                     [
@@ -187,78 +185,60 @@ class TestIK_initials(unittest.TestCase):
                     [1.8684985011115333e-16, -0.9709581651495918, -0.23924932921398262],
                 ]
             ),
-            p=[0.4656169556555604, 1.7009951107294353e-16, 0.6793215789060889],
+            [0.4656169556555604, 1.7009951107294353e-16, 0.6793215789060889],
         )
-        q_1 = solve_ik_for_pose(sim.plant, goal_pose_1)
-        expected_q_1 = np.array([0.0, 0.1, 0.0, -1.2, 0.0, 1.6, 0.0])
-        self.assertTrue(
-            np.allclose(q_1, expected_q_1, rtol=1e-3, atol=1e-3),
-            msg="Solve IK did not return the right configuration",
-        )
+
         goal_pose_2 = RigidTransform(
-            R=RotationMatrix(
+            RotationMatrix(
                 [
                     [0.0, 1.2246467991473532e-16, -1.0],
                     [0.0, 1.0, 1.2246467991473532e-16],
                     [1.0, 0.0, 0.0],
                 ]
             ),
-            p=[0.49574, -0.41000000000000003, 0.30500000000000005],
-        )
-        q_2 = solve_ik_for_pose(sim.plant, goal_pose_2)
-        expected_q_2 = np.array(
-            [
-                -1.1688572431460438,
-                1.4481423604041106,
-                1.0845467203926242,
-                -0.6786145496792692,
-                0.33947951551636457,
-                2.0944,
-                -0.23165835214610261,
-            ]
-        )
-        self.assertTrue(
-            np.allclose(q_2, expected_q_2, rtol=1e-3, atol=1e-3),
-            msg="Solve IK did not return the right configuration",
+            [0.49574, -0.410, 0.305],
         )
 
         goal_pose_3 = RigidTransform(
             R=RotationMatrix(
                 [
-                    [0.24740395925452294, 0.9689124217106447, 0.0],
+                    [0, 1, 0.0],
                     [0.0, 0.0, 1.0],
-                    [0.9689124217106447, -0.24740395925452294, 0.0],
+                    [1, 0, 0.0],
                 ]
             ),
-            p=[0.69, -0.07, 0.66],
+            p=[0.8, -0.2, 0.3],
         )
-        q_3 = solve_ik_for_pose(
-            sim.plant,
-            X_WGgoal,
-            q_nominal=np.array(
-                [
-                    -1.2174015807522878,
-                    1.3862382560567923,
-                    1.0926513407617533,
-                    -1.151008010687216,
-                    0.3190492366645747,
-                    1.7700459492329792,
-                    -0.3454830562538682,
-                ]
-            ),
-        )
-        expected_q_3 = np.array(
-            [
-                -0.37711420693337305,
-                0.3343843380934042,
-                0.3078540071016872,
-                -1.3067810143455565,
-                0.4245340122667193,
-                0.21543550973908265,
-                1.0323692848229227,
-            ]
-        )
-        self.assertTrue(
-            np.allclose(q_3, expected_q_3, rtol=1e-3, atol=1e-3),
-            msg="Solve IK did not return the right configuration",
-        )
+
+        for goal_pose in [goal_pose_1, goal_pose_2, goal_pose_3]:
+            q = solve_ik_for_pose(sim.plant, goal_pose)
+            self.assertTrue(q is not None, "IK failed, no configuration returned!")
+
+            sim.SetStationConfiguration(q, sim.gripper_setpoint)
+
+            gripper_frame = sim.plant.GetFrameByName("body")
+            X_WG_actual = sim.plant.CalcRelativeTransform(
+                sim.context_plant, sim.plant.world_frame(), gripper_frame
+            )
+
+            # Position check
+            pos_err = np.linalg.norm(
+                goal_pose.translation() - X_WG_actual.translation(), ord=np.inf
+            )
+            self.assertTrue(
+                pos_err <= 0.016,  # just slightly more than default for tolerance
+                "End effector position doesn't match goal position.",
+            )
+
+            # Orientation check (angle-axis)
+            rot_err = (
+                goal_pose.rotation()
+                .InvertAndCompose(X_WG_actual.rotation())
+                .ToAngleAxis()
+                .angle()
+            )
+            self.assertTrue(
+                rot_err
+                <= 0.011 * np.pi,  # just slightly more than default for tolerance
+                "End effector orientation doesn't match goal orientation.",
+            )
