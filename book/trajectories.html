@@ -1441,6 +1441,7 @@ example, too?-->
         <li> Implement the RRT algorithm for the Kuka arm.
         </li>
         <li> Answer questions regarding its properties. </li>
+        <li> Implement the RRT-Connect algorithm for the Kuka arm.</li>
       </ol>
     </exercise>    
 
@@ -1466,6 +1467,17 @@ Name one pair of nodes for which the shortcutting algorithm would result in a sh
       <ol type="a">
         <li> Implement a QP that finds the closest point on an obstacle to an ellipse in free-space. </li>
         <li> Implement the part of the algorithm that searches for a set of hyperplanes that separate a free-space ellipse from all the obstacles. </li>
+      </ol>
+
+    </exercise> 
+
+    <exercise><h1>Plan and Place</h1>
+      <p> For this exercise, you will build on the manipulating letter assets exercises from previous chapters. You will use RRT-Connect to plan and simulate a collision-free trajectory for manipulating your initial in a cluttered environment. Then, you will implement shortcutting to improve your path quality and reduce some of the "RRT Dance". You will work exclusively in <script>document.write(notebook_link('trajectories', notebook='5_plan_place_initials', link_text='this notebook'))</script>. You will be asked to complete the following steps: </p>
+      <ol type="a">
+        <li> Define keyframe poses. </li>
+        <li> Implement an optimization-based inverse kinematics function that, for each keyframe pose, solves for a feasible robot configuration </li>
+        <li> Implement RRT-Connect. </li>
+        <li> Implement shortcutting. </li>
       </ol>
 
     </exercise> 
