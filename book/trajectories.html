@@ -1482,6 +1482,25 @@ Name one pair of nodes for which the shortcutting algorithm would result in a sh
 
     </exercise> 
 
+    <exercise><h1>Iiwa Path Planning through Shelves Using IRIS and GCS in Joint Space</h1>
+      <p> For this exercise, you will practice finding large collision-free configuration-space regions with IRIS and planning a trajectory through them in joint space with GCS for the Kuka Iiwa manipulator. You will work in <script>document.write(notebook_link('trajectories', notebook='gcs_with_kuka_iiwa', link_text='this notebook'))</script>. You will be asked to complete the following steps: </p>
+      <ol type="a">
+        <li> Define and compute IRIS regions in joint space around your desired start and end points. </li>
+        <li> Formulate a GCS trajectory planning problem through your IRIS regions and solve it to plan Iiwa's joint space path. </li>
+      </ol>
+
+    </exercise> 
+
+    <exercise><h1>Trajectory Optimization Around a Shelf Exterior </h1>
+      <p> Through this exercise, you will better understand how the state of your robot's environment affects the techniques you use when formulating and solving your trajectory optimization problem. Specifically, we'll look at the effects of operating at the boundaries of the Iiwa's kinematic workspace and with complex collision constraints applied as you move its gripper from the upper RH side outside of the shelf to the bottom LH side outside of the shelf. You will work in <script>document.write(notebook_link('trajectories', notebook='kinematic_trajopt_around_shelf_iiwa', link_text='this notebook'))</script>. You will be asked to complete the following steps: </p>
+      <ol type="a">
+        <li> Define and solve a kinematic trajectory optimization in the Kuka Iiwa's full joint space without collision constraints. </li>
+        <li> Add collision constraints to the prior formulation, use the prior "karate chop" trajectory as an initial guess, and diagnose why this second iteration fails to converge within the default solver parameters. </li>
+        <li> Investigate how a more informative initial guess will enable faster convergence to a solution. </li>
+      </ol>
+
+    </exercise> 
+
   </section>
 
 </chapter>
