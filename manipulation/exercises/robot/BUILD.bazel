@@ -29,3 +29,9 @@ rt_py_library(
     srcs = ["test_survey.py"],
     visibility = ["//visibility:public"],
 )
+
+rt_py_library(
+    name = "test_pid",
+    srcs = ["test_pid.py"],
+    visibility = ["//visibility:public"],
+)
