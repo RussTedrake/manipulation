@@ -577,7 +577,7 @@ if __name__ == "__main__":
         mu_dynamic=mu_dynamic,
         mu_static=mu_static,
         preview_with_trimesh=args.preview,
-        use_coacd=args.use_coacd,
-        coacd_kwargs=coacd_params,
-        vhacd_kwargs=vhacd_params,
+        decomposition_method="coacd" if args.use_coacd else "vhacd",
+        coacd_kwargs=coacd_params if args.use_coacd else None,
+        vhacd_kwargs=None if args.use_coacd else vhacd_params,
     )
