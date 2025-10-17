@@ -1,0 +1,38 @@
+<sdf xmlns:drake="drake.mit.edu" version="1.7">
+  <model name="peg">
+    <link name="peg_body_link">
+      <pose>0 0 0 0 0 0</pose>
+      <inertial>
+        <mass>0.5</mass>
+        <pose>-0.03000 0.00000 0.06333 0 0 0</pose>
+        <inertia>
+          <ixx>8.03571e-04</ixx>
+          <ixy>-6.84554e-21</ixy>
+          <ixz>-0.00000e+00</ixz>
+          <iyy>8.04887e-04</iyy>
+          <iyz>2.80750e-20</iyz>
+          <izz>2.98684e-04</izz>
+        </inertia>
+      </inertial>
+      <visual name="visual">
+        <geometry>
+          <mesh>
+            <uri>peg.obj</uri>
+            <scale>0.003 0.003 0.003</scale>
+          </mesh>
+        </geometry>
+      </visual>
+      <collision name="collision_000">
+        <geometry>
+          <mesh>
+            <uri>peg_parts/convex_piece_000.obj</uri>
+            <drake:declare_convex/>
+          </mesh>
+        </geometry>
+        <drake:proximity_properties>
+          <drake:rigid_hydroelastic/>
+        </drake:proximity_properties>
+      </collision>
+    </link>
+  </model>
+</sdf>
