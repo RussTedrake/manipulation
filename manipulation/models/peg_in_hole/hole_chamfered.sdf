@@ -1,34 +1,45 @@
 <sdf xmlns:drake="drake.mit.edu" version="1.7">
-  <model name="peg">
-    <link name="peg_body_link">
+  <model name="hole_chamfered">
+    <link name="hole_chamfered_body_link">
       <pose>0 0 0 0 0 0</pose>
       <inertial>
-        <mass>0.5</mass>
-        <pose>-0.03000 0.00000 0.09750 0 0 0</pose>
+        <mass>5.0</mass>
+        <pose>0.00040 -0.09000 0.05984 0 0 0</pose>
         <inertia>
-          <ixx>1.73438e-03</ixx>
-          <ixy>-0.00000e+00</ixy>
-          <ixz>3.01650e-19</ixz>
-          <iyy>1.73438e-03</iyy>
-          <iyz>4.02200e-20</iyz>
-          <izz>3.00000e-04</izz>
+          <ixx>1.19706e-02</ixx>
+          <ixy>-5.83405e-19</ixy>
+          <ixz>-1.54724e-06</ixz>
+          <iyy>5.31157e-02</iyy>
+          <iyz>-4.97839e-18</iyz>
+          <izz>5.31451e-02</izz>
         </inertia>
       </inertial>
       <visual name="visual">
         <geometry>
           <mesh>
-            <uri>peg.obj</uri>
+            <uri>hole_chamfered.obj</uri>
             <scale>0.003 0.003 0.003</scale>
           </mesh>
         </geometry>
         <material>
-          <diffuse>1.0 0.9 0.9 1.0</diffuse>
+          <diffuse>0.9 0.9 0.9 1.0</diffuse>
         </material>
       </visual>
       <collision name="collision_000">
         <geometry>
           <mesh>
-            <uri>peg_parts/convex_piece_000.obj</uri>
+            <uri>hole_chamfered_parts/convex_piece_000.obj</uri>
+            <drake:declare_convex/>
+          </mesh>
+        </geometry>
+        <drake:proximity_properties>
+          <drake:rigid_hydroelastic/>
+        </drake:proximity_properties>
+      </collision>
+      <collision name="collision_001">
+        <geometry>
+          <mesh>
+            <uri>hole_chamfered_parts/convex_piece_001.obj</uri>
             <drake:declare_convex/>
           </mesh>
         </geometry>
