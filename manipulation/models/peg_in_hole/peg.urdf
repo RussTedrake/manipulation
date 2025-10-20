@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<robot name="peg">
+  <link name="peg_body_link">
+    <inertial>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <mass value="0.1"/>
+        <inertia ixx="0.0002175" ixy="0" ixz="0" iyy="0.0002175" iyz="0" izz="6e-05"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.06308 0.06308 0.2"/>
+      </geometry>
+      <material name="red">
+        <color rgba="0.8 0.1 0.1 0.9"/>
+      </material>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="0.06308 0.06308 0.2"/>
+    </geometry>
+    <drake:proximity_properties>
+        <drake:mu_dynamic value="0.5"/>
+        <drake:mu_static value="0.5"/>
+        <drake:compliant_hydroelastic/>
+        <drake:hydroelastic_modulus value="90000000"/>
+    </drake:proximity_properties>
+    </collision>
+    </link>
+</robot>

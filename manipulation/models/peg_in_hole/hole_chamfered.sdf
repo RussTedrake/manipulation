@@ -4,14 +4,14 @@
       <pose>0 0 0 0 0 0</pose>
       <inertial>
         <mass>5.0</mass>
-        <pose>0.00040 -0.09000 0.05984 0 0 0</pose>
+        <pose>0.00042 -0.09000 0.10386 0 0 0</pose>
         <inertia>
-          <ixx>1.19706e-02</ixx>
-          <ixy>-5.83405e-19</ixy>
-          <ixz>-1.54724e-06</ixz>
-          <iyy>5.31157e-02</iyy>
-          <iyz>-4.97839e-18</iyz>
-          <izz>5.31451e-02</izz>
+          <ixx>2.40312e-02</ixx>
+          <ixy>-1.81611e-18</ixy>
+          <ixz>-1.09023e-05</ixz>
+          <iyy>6.55162e-02</iyy>
+          <iyz>-1.14796e-17</iyz>
+          <izz>5.34850e-02</izz>
         </inertia>
       </inertial>
       <visual name="visual">
@@ -33,7 +33,9 @@
           </mesh>
         </geometry>
         <drake:proximity_properties>
-          <drake:rigid_hydroelastic/>
+            <drake:mu_dynamic>1</drake:mu_dynamic>
+            <drake:mu_static>1</drake:mu_static>
+            <drake:rigid_hydroelastic/>
         </drake:proximity_properties>
       </collision>
       <collision name="collision_001">
@@ -46,8 +48,7 @@
         <drake:proximity_properties>
             <drake:mu_dynamic>1</drake:mu_dynamic>
             <drake:mu_static>1</drake:mu_static>
-            <drake:compliant_hydroelastic/>
-            <drake:hydroelastic_modulus>1.0e7</drake:hydroelastic_modulus>
+            <drake:rigid_hydroelastic/>
         </drake:proximity_properties>
       </collision>
     </link>
