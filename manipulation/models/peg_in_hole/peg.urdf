@@ -3,13 +3,13 @@
   <link name="peg_body_link">
     <inertial>
       <origin rpy="0 0 0" xyz="0 0 0"/>
-      <mass value="0.1"/>
+      <mass value="0.5"/>
         <inertia ixx="0.0002175" ixy="0" ixz="0" iyy="0.0002175" iyz="0" izz="6e-05"/>
     </inertial>
     <visual>
       <origin xyz="0 0 0" rpy="0 0 0"/>
       <geometry>
-        <box size="0.06308 0.06308 0.2"/>
+        <box size="0.062 0.062 0.2"/>
       </geometry>
       <material name="red">
         <color rgba="0.8 0.1 0.1 0.9"/>
@@ -17,7 +17,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.06308 0.06308 0.2"/>
+        <box size="0.062 0.062 0.2"/>
     </geometry>
     <drake:proximity_properties>
         <drake:mu_dynamic value="0.5"/>
