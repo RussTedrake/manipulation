@@ -33,8 +33,8 @@
           </mesh>
         </geometry>
         <drake:proximity_properties>
-            <drake:mu_dynamic>1</drake:mu_dynamic>
-            <drake:mu_static>1</drake:mu_static>
+            <drake:mu_dynamic>0.5</drake:mu_dynamic>
+            <drake:mu_static>0.5</drake:mu_static>
             <drake:rigid_hydroelastic/>
         </drake:proximity_properties>
       </collision>
@@ -46,8 +46,8 @@
           </mesh>
         </geometry>
         <drake:proximity_properties>
-            <drake:mu_dynamic>1</drake:mu_dynamic>
-            <drake:mu_static>1</drake:mu_static>
+            <drake:mu_dynamic>0.5</drake:mu_dynamic>
+            <drake:mu_static>0.5</drake:mu_static>
             <drake:rigid_hydroelastic/>
         </drake:proximity_properties>
       </collision>
