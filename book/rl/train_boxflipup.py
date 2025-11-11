@@ -12,6 +12,7 @@ import sys
 from pathlib import Path
 
 import gymnasium as gym
+import wandb
 
 # `multiprocessing` also provides this method, but empirically `psutil`'s
 # version seems more reliable.
@@ -30,7 +31,6 @@ from stable_baselines3.common.vec_env import SubprocVecEnv
 from wandb.integration.sb3 import WandbCallback
 
 import manipulation.envs.box_flipup  # no-member
-import wandb
 
 
 class OffsetCheckpointCallback(BaseCallback):
