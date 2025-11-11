@@ -24,3 +24,9 @@ rt_py_library(
     srcs = ["test_normal.py"],
     visibility = ["//visibility:public"],
 )
+
+rt_py_library(
+    name = "test_grasp_letters",
+    srcs = ["test_grasp_letters.py"],
+    visibility = ["//visibility:public"],
+)

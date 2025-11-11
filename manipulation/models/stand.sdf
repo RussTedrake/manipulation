@@ -1,0 +1,93 @@
+<?xml version="1.0"?>
+<sdf version="1.7">
+  <model name="stand">
+    <link name="stand_body">
+      <!-- Tabletop -->
+      <visual name="top">
+        <pose>0 0 0.25 0 0 0</pose> <!-- top surface at z = 0.25 -->
+        <geometry>
+          <box>
+            <size>0.3 0.3 0.02</size> <!-- 30cm square, 2cm thick -->
+          </box>
+        </geometry>
+      </visual>
+      <collision name="top">
+        <pose>0 0 0.25 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.3 0.3 0.02</size>
+          </box>
+        </geometry>
+      </collision>
+
+      <!-- Four legs -->
+      <visual name="leg1">
+        <pose>0.13 0.13 0.125 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.04 0.04 0.25</size> <!-- 25cm tall -->
+          </box>
+        </geometry>
+      </visual>
+      <collision name="leg1">
+        <pose>0.13 0.13 0.125 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.04 0.04 0.25</size>
+          </box>
+        </geometry>
+      </collision>
+
+      <visual name="leg2">
+        <pose>-0.13 0.13 0.125 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.04 0.04 0.25</size>
+          </box>
+        </geometry>
+      </visual>
+      <collision name="leg2">
+        <pose>-0.13 0.13 0.125 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.04 0.04 0.25</size>
+          </box>
+        </geometry>
+      </collision>
+
+      <visual name="leg3">
+        <pose>0.13 -0.13 0.125 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.04 0.04 0.25</size>
+          </box>
+        </geometry>
+      </visual>
+      <collision name="leg3">
+        <pose>0.13 -0.13 0.125 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.04 0.04 0.25</size>
+          </box>
+        </geometry>
+      </collision>
+
+      <visual name="leg4">
+        <pose>-0.13 -0.13 0.125 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.04 0.04 0.25</size>
+          </box>
+        </geometry>
+      </visual>
+      <collision name="leg4">
+        <pose>-0.13 -0.13 0.125 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.04 0.04 0.25</size>
+          </box>
+        </geometry>
+      </collision>
+    </link>
+  </model>
+</sdf>

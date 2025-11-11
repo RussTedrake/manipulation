@@ -1441,6 +1441,7 @@ example, too?-->
         <li> Implement the RRT algorithm for the Kuka arm.
         </li>
         <li> Answer questions regarding its properties. </li>
+        <li> Implement the RRT-Connect algorithm for the Kuka arm.</li>
       </ol>
     </exercise>    
 
@@ -1466,6 +1467,36 @@ Name one pair of nodes for which the shortcutting algorithm would result in a sh
       <ol type="a">
         <li> Implement a QP that finds the closest point on an obstacle to an ellipse in free-space. </li>
         <li> Implement the part of the algorithm that searches for a set of hyperplanes that separate a free-space ellipse from all the obstacles. </li>
+      </ol>
+
+    </exercise> 
+
+    <exercise><h1>Plan and Place</h1>
+      <p> For this exercise, you will build on the manipulating letter assets exercises from previous chapters. You will use RRT-Connect to plan and simulate a collision-free trajectory for manipulating your initial in a cluttered environment. Then, you will implement shortcutting to improve your path quality and reduce some of the "RRT Dance". You will work exclusively in <script>document.write(notebook_link('trajectories', notebook='5_plan_place_initials', link_text='this notebook'))</script>. You will be asked to complete the following steps: </p>
+      <ol type="a">
+        <li> Define keyframe poses. </li>
+        <li> Implement an optimization-based inverse kinematics function that, for each keyframe pose, solves for a feasible robot configuration </li>
+        <li> Implement RRT-Connect. </li>
+        <li> Implement shortcutting. </li>
+      </ol>
+
+    </exercise> 
+
+    <exercise><h1>Iiwa Path Planning through Shelves Using IRIS and GCS in Joint Space</h1>
+      <p> For this exercise, you will practice finding large collision-free configuration-space regions with IRIS and planning a trajectory through them in joint space with GCS for the Kuka Iiwa manipulator. You will work in <script>document.write(notebook_link('trajectories', notebook='gcs_with_kuka_iiwa', link_text='this notebook'))</script>. You will be asked to complete the following steps: </p>
+      <ol type="a">
+        <li> Define and compute IRIS regions in joint space around your desired start and end points. </li>
+        <li> Formulate a GCS trajectory planning problem through your IRIS regions and solve it to plan Iiwa's joint space path. </li>
+      </ol>
+
+    </exercise> 
+
+    <exercise><h1>Trajectory Optimization Around a Shelf Exterior </h1>
+      <p> Through this exercise, you will better understand how the environment around the robot affects the techniques you use when formulating and solving your trajectory optimization problem. Specifically, we'll look at the effects of operating at the boundaries of the Iiwa's kinematic workspace and with complex collision constraints as you move the gripper around the outside of a shelf. You will work in <script>document.write(notebook_link('trajectories', notebook='kinematic_trajopt_around_shelf_iiwa', link_text='this notebook'))</script>. You will be asked to complete the following steps: </p>
+      <ol type="a">
+        <li> Define and solve a kinematic trajectory optimization in the Kuka Iiwa's full joint space without collision constraints. </li>
+        <li> Add collision constraints to the prior formulation, use the prior "karate chop" trajectory as an initial guess, and diagnose why this second iteration fails to converge within the default solver parameters. </li>
+        <li> Investigate how a more informative initial guess will enable faster convergence to a solution. </li>
       </ol>
 
     </exercise> 
