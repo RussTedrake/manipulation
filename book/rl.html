@@ -308,10 +308,10 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture videos a
         <li> Take a look at the <a href="https://github.com/RussTedrake/manipulation/blob/master/manipulation/envs/box_flipup.py">code</a> used to generate the environment. 
           Let $\theta$ denote the angle of the box from the vertical, $\omega$ denote the angular velocity of the box, $q_f$ denote the observed position of the finger, 
           $v_f$ denote the velocity of the finger, and $u_f$ denote the commanded position of the finger. What is the reward function used here to train the policy? 
-          Write it down mathematically (use the modulo operator to handle the ''wrapping around'' of the angle). What do the individual terms in the reward
+          Write it down mathematically (use the modulo operator to handle the wrap-around of the angle). What do the individual terms in the reward
           function represent? Why do they make sense?</li>
         <li> Although we will not go into the exact details of how PPO works here, it works quite similarly to REINFORCE but using both (i) a learned value function to reduce variance, and (ii) an approximate
-          objective, along with a ''trust region'' constraint by clipping the per-sample loss to ensure that the policy is not updated too much at each step. Briefly explain why you think that 
+          objective, along with a trust-region constraint by clipping the per-sample loss to ensure that the policy is not updated too much at each step. Briefly explain why you think that 
           (a) PPO might be more stable and sample efficient than REINFORCE, and (b) how you might expect PPO to perform on the box flipping task if the clipping limits are set to be too small or too large.</li>
         <li> We've trained a PPO-based policy to flip the box for 3,000,000 steps (see 
           <a href="https://youtube.com/playlist?list=PLOZK7fx6sI6lvDalINByA_kbYfBxn76by&si=XUndO5UDHMJcywr2">here</a> for videos of the
