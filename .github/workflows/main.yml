@@ -51,7 +51,7 @@ jobs:
   check-approval:
     name: Check PR approval status
     runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request_target'
+    if: github.event_name == 'pull_request_target' || github.event_name == 'push' || github.event_name == 'schedule'
     outputs:
       should-run: ${{ steps.check.outputs.should-run }}
       is-trusted: ${{ steps.check.outputs.is-trusted }}
@@ -59,6 +59,14 @@ jobs:
       - name: Check approval status
         id: check
         run: |
+          # For push events (commits to master) and scheduled runs, always run
+          if [[ "${{ github.event_name }}" != "pull_request_target" ]]; then
+            echo "is-trusted=true" >> $GITHUB_OUTPUT
+            echo "should-run=true" >> $GITHUB_OUTPUT
+            echo "✅ Push or scheduled event - running tests automatically"
+            exit 0
+          fi
+
           # Check if this is a trusted contributor
           if [[ "${{ github.event.pull_request.author_association }}" == "COLLABORATOR" ]] || \
              [[ "${{ github.event.pull_request.author_association }}" == "MEMBER" ]] || \

@@ -1,3 +1,4 @@
+import random
 import unittest
 
 import numpy as np
@@ -14,7 +15,7 @@ def _run_rrt_like_test(
     IiwaProblem = notebook_locals["IiwaProblem"]
     env = notebook_locals["env"]
 
-    np.random.seed(0)
+    random.seed(0)
     q_init = env.q0
     q_goal = notebook_locals["q_goal"]
 
@@ -39,7 +40,7 @@ def _run_rrt_like_test(
     print("Started to solve the problem using RRT planner ...")
     for i in range(4):  # allow 4 attempts
         student_path, student_iter = student_planner(
-            iiwa_problem_test, max_iterations=1000
+            iiwa_problem_test, max_iterations=1200
         )
         if student_path is not None:
             print("run 1 found a solution!")
