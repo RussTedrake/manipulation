@@ -50,13 +50,12 @@ priority = "explicit"
 python = ">=3.10,<4.0"  # Support Python 3.10 (Jammy CI), Python 3.12 (Noble CI), and 3.13 (macOS)
 cloudpickle = { version="2.2.1", optional=true} # needs to be pinned for stored files to remain compatible.
 #drake = { version = ">=0.0.20250131 <0.1", source = "drake-nightly" }
-drake = ">=1.41.0"
+drake = ">=1.45.0"
 gradescope-utils = { version=">=0.4.0", optional=true}
 gymnasium = { version=">0.26", optional=true }
 ipython = ">=7.8.0" # TODO: make this optional?
 ipywidgets = { version=">=8", optional=true } 
 lxml = {version = ">=4.9.2", extras = ["html_clean"] }
-# Note: matplotlib gets additional handling in PoetryExport.py for bazel. 
 matplotlib = ">=3.7.0" # old versions don't build in XCode
 mpld3  = { version=">=0.5.6", optional=false } # TODO: make this optional
 nbconvert = [
@@ -132,7 +131,7 @@ optional = true
 # needed to import for a file that sphinx autodoc is trying to index. None of
 # these should be marked as optional.
 #drake = { version = ">=0.0.20250118 <0.1", source = "drake-nightly" }
-drake = ">=1.41.0"
+drake = ">=1.45.0"
 ipython = ">=7.8.0"
 lxml = {version = ">=4.9.2", extras = ["html_clean"] }
 mpld3  = { version=">=0.5.6", optional=false }
@@ -150,12 +149,10 @@ black = { version = ">=23.*", extras = ["jupyter"] }
 mysql-connector-python = { version=">=8.0.23" }
 packaging = ">=24.2"
 pip-requirements-parser = ">=32.0"
+pytest = ">=8.0"
+pytest-timeout = ">=2.3.1"
 pre-commit = "^3.4.0"
 requests = { version=">=2.25.1" }
-
-[tool.poetry.requires-plugins]
-poetry-plugin-export = ">=1.8"
-poetry-pre-commit-plugin = ">=0.2"
 
 [tool.black]
 include = '\.ipynb?$|\.pyi?$'
@@ -190,6 +187,21 @@ ignore-init-module-imports = true
 remove-all-unused-imports = true
 remove-duplicate-keys = true
 remove-unused-variables = true
+
+[tool.pytest.ini_options]
+minversion = "8.0"
+addopts = "-ra"
+testpaths = [
+  "book",
+  "manipulation/test",
+  "solutions",
+]
+python_files = [
+  "test_*.py",
+]
+markers = [
+  "notebook: notebook execution tests",
+]
 
 [tool.pyright]
 include = ["manipulation"]

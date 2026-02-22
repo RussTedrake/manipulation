@@ -46,9 +46,17 @@ camera_ids:
         self.assertTrue(station.HasSubsystemNamed("camera0.data_subscriber"))
         self.assertTrue(station.HasSubsystemNamed("camera0.data_receiver"))
 
-        in_system, out_system = next(iter(station.connection_map().items()))
-        self.assertIsInstance(in_system[0], LcmImageArrayToImages)
-        self.assertIsInstance(out_system[0], LcmSubscriberSystem)
+        connection_map = station.connection_map()
+        has_camera_connection = any(
+            isinstance(in_sys[0], LcmImageArrayToImages)
+            and isinstance(out_sys[0], LcmSubscriberSystem)
+            for in_sys, out_sys in connection_map.items()
+        )
+        self.assertTrue(
+            has_camera_connection,
+            "Expected at least one connection from LcmImageArrayToImages to "
+            "LcmSubscriberSystem in connection_map",
+        )
 
 
 if __name__ == "__main__":

@@ -53,17 +53,10 @@ fi
 apt-get install -o APT::Acquire::Retries=4 -o Dpkg::Use-Pty=0 -qy \
   --no-install-recommends ca-certificates gnupg
 
-APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=1 apt-key adv \
-  -q --fetch-keys https://bazel.build/bazel-release.pub.gpg
-
-echo 'deb [arch=amd64] https://storage.googleapis.com/bazel-apt stable jdk1.8' \
-  > /etc/apt/sources.list.d/bazel.list
-
 apt-get update -qq || (sleep 15; apt-get update -qq)
 
 apt-get install -o APT::Acquire::Retries=4 -o Dpkg::Use-Pty=0 -qy \
   --no-install-recommends $(cat <<EOF
-bazel
 jupyter
 jupyter-nbconvert
 jupyter-notebook
