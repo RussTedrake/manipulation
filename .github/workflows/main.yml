@@ -37,21 +37,20 @@ on:
       - synchronize
   pull_request_target:
     types:
-      - opened
-      - reopened
-      - synchronize
       - labeled
   push:
     branches:
       - master
   schedule:
     - cron: '0 8 * * *'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 jobs:
-  # First job: Check if we should run tests with solutions
   check-approval:
     name: Check PR approval status
     runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request_target' || github.event_name == 'push' || github.event_name == 'schedule'
     outputs:
       should-run: ${{ steps.check.outputs.should-run }}
       is-trusted: ${{ steps.check.outputs.is-trusted }}
@@ -59,7 +58,6 @@ jobs:
       - name: Check approval status
         id: check
         run: |
-          # For push events (commits to master) and scheduled runs, always run
           if [[ "${{ github.event_name }}" != "pull_request_target" ]]; then
             echo "is-trusted=true" >> $GITHUB_OUTPUT
             echo "should-run=true" >> $GITHUB_OUTPUT
@@ -67,7 +65,6 @@ jobs:
             exit 0
           fi
 
-          # Check if this is a trusted contributor
           if [[ "${{ github.event.pull_request.author_association }}" == "COLLABORATOR" ]] || \
              [[ "${{ github.event.pull_request.author_association }}" == "MEMBER" ]] || \
              [[ "${{ github.event.pull_request.author_association }}" == "OWNER" ]]; then
@@ -84,8 +81,9 @@ jobs:
             echo "⏳ First-time contributor - waiting for maintainer approval"
             echo "To approve this PR for CI, add the 'approved-for-ci' label"
           fi
-  noble:
-    name: ubuntu 24.04 noble
+
+  noble-poetry:
+    name: ubuntu noble using poetry
     runs-on: ubuntu-24.04
     container: ubuntu:24.04
     needs: [check-approval]
@@ -94,6 +92,7 @@ jobs:
        github.event.pull_request.head.repo.full_name == github.repository)
       ||
       (github.event_name == 'pull_request_target' &&
+       github.event.pull_request.head.repo.full_name != github.repository &&
        needs.check-approval.outputs.should-run == 'true')
       ||
       (github.event_name != 'pull_request' &&
@@ -103,101 +102,221 @@ jobs:
         run: |
           export APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=1 DEBIAN_FRONTEND=noninteractive
           apt-get update -o APT::Acquire::Retries=4 -qq
-          apt-get install -o APT::Acquire::Retries=4 -o Dpkg::Use-Pty=0 -qy --no-install-recommends ca-certificates gnupg
+          apt-get install -o APT::Acquire::Retries=4 -o Dpkg::Use-Pty=0 -qy --no-install-recommends ca-certificates gnupg sudo
           apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E1DD270288B4E6030699E45FA1715D88E1DF1F24
           echo 'deb http://ppa.launchpad.net/git-core/ppa/ubuntu noble main' > /etc/apt/sources.list.d/git.list
           apt-get update -o APT::Acquire::Retries=4 -qq
           apt-get install -o APT::Acquire::Retries=4 -o Dpkg::Use-Pty=0 -qy --no-install-recommends git
+          # Create non-root user for running repository setup / tests
+          useradd -m -s /bin/bash runner
+          echo 'runner ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
           rm -rf /var/cache/apt/archives/*.deb /var/cache/apt/archives/partial/*.deb /var/cache/apt/*.bin /var/lib/apt/lists/* /var/log/apt/*
         shell: bash
-      
-      # For pull_request_target: carefully checkout PR code excluding .github/
+
       - name: checkout PR code
         if: github.event_name == 'pull_request_target'
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           ref: ${{ github.event.pull_request.head.sha }}
           sparse-checkout: |
             *
             !.github
           sparse-checkout-cone-mode: false
-      
-      # For regular events: normal checkout
+
       - name: checkout
         if: github.event_name != 'pull_request_target'
-        uses: actions/checkout@v4
-      
+        uses: actions/checkout@v6
+        with:
+          submodules: recursive
+
       - name: checkout solutions
+        env:
+          SOLUTIONS_TOKEN: ${{ secrets.SOLUTIONS_TOKEN }}
         run: |
-          git clone https://x-access-token:${{ secrets.SOLUTIONS_TOKEN }}@github.com/RobotLocomotion/manipulation-solutions.git solutions
+          if [[ -z "${SOLUTIONS_TOKEN}" ]]; then
+            echo "SOLUTIONS_TOKEN not available; skipping solutions checkout"
+            exit 0
+          fi
+          git clone https://x-access-token:${SOLUTIONS_TOKEN}@github.com/RobotLocomotion/manipulation-solutions.git solutions
           cd solutions && git checkout $(cat ../solutions_sha.txt) && cd ..
         shell: bash
-      - name: setup and build
+
+      - name: install dependencies
         run: |
-          ./setup/submodule_checkout
+          # Fix ownership of the workspace
+          chown -R runner:runner .
+          # Switch to runner user for remaining commands
+          sudo -H -u runner ./setup/submodule_checkout
+          # Install system packages as root
           ./setup/ubuntu/24.04/install_prereqs.sh
           apt-get install -o APT::Acquire::Retries=4 -o Dpkg::Use-Pty=0 -qy --no-install-recommends xvfb
+          sudo -H -u runner python3 -m pip install --user --break-system-packages poetry==2.1.4
+          sudo -H -u runner python3 -m poetry config virtualenvs.in-project true
+          sudo -H -u runner python3 -m poetry install --all-extras --with dev
           rm -rf /var/cache/apt/archives/*.deb /var/cache/apt/archives/partial/*.deb /var/cache/apt/*.bin /var/lib/apt/lists/* /var/log/apt/*
-          # Run bazel operations as root (Python 3.12 via .bazelrc linux config)
-          bazel fetch //...
-          bazel run //manipulation:prefetch_remotes
-        shell: bash
-  #      - name: Check disk space
-  #        run: |
-  #          dpkg-query -Wf '${Installed-Size}\t${Package}\n' | sort -nr | head
-  #          df . -h
-  #          du /usr/ -hx -d 4 --threshold=1G | sort -hr | head
-  #        shell: bash
-      - name: test
-        run: ./book/htmlbook/workflows/ci/noble/test
         shell: bash
 
-  sonoma:
-    name: macos sonoma 14
-    runs-on: macos-14
+      - name: test
+        run: |
+          set -euo pipefail
+          VENV_PYTHON="$(pwd)/.venv/bin/python"
+          sudo -H -u runner xvfb-run \
+            --auto-servernum \
+            --server-args='-screen 0 1280x1024x24 -ac +extension GLX +extension RANDR +render -noreset' \
+            "$VENV_PYTHON" -m pytest -ra
+        shell: bash
+
+  # TODO(russt): add noble-pip-core workflow which only runs the tests in manipulation,
+  # but uses the manipulation module from pip.
+  noble-pip-all:
+    name: ubuntu noble using pip all
+    runs-on: ubuntu-24.04
+    container: ubuntu:24.04
+    needs: [check-approval]
+    if: >
+      ((github.event_name == 'pull_request' &&
+        github.event.pull_request.head.repo.full_name == github.repository)
+       ||
+       (github.event_name == 'pull_request_target' &&
+        github.event.pull_request.head.repo.full_name != github.repository &&
+        needs.check-approval.outputs.should-run == 'true')
+       ||
+       (github.event_name != 'pull_request' &&
+        github.event_name != 'pull_request_target'))
+      &&
+      !contains(github.event.pull_request.labels.*.name, 'requires new pip wheels')
+    steps:
+      - name: pre-checkout setup
+        run: |
+          export APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=1 DEBIAN_FRONTEND=noninteractive
+          apt-get update -o APT::Acquire::Retries=4 -qq
+          apt-get install -o APT::Acquire::Retries=4 -o Dpkg::Use-Pty=0 -qy --no-install-recommends ca-certificates gnupg sudo
+          apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E1DD270288B4E6030699E45FA1715D88E1DF1F24
+          echo 'deb http://ppa.launchpad.net/git-core/ppa/ubuntu noble main' > /etc/apt/sources.list.d/git.list
+          apt-get update -o APT::Acquire::Retries=4 -qq
+          apt-get install -o APT::Acquire::Retries=4 -o Dpkg::Use-Pty=0 -qy --no-install-recommends git
+          # Create non-root user for running repository setup / tests
+          useradd -m -s /bin/bash runner
+          echo 'runner ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
+          rm -rf /var/cache/apt/archives/*.deb /var/cache/apt/archives/partial/*.deb /var/cache/apt/*.bin /var/lib/apt/lists/* /var/log/apt/*
+        shell: bash
+
+      - name: checkout PR code
+        if: github.event_name == 'pull_request_target'
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          sparse-checkout: |
+            *
+            !.github
+          sparse-checkout-cone-mode: false
+
+      - name: checkout
+        if: github.event_name != 'pull_request_target'
+        uses: actions/checkout@v6
+        with:
+          submodules: recursive
+
+      - name: checkout solutions
+        env:
+          SOLUTIONS_TOKEN: ${{ secrets.SOLUTIONS_TOKEN }}
+        run: |
+          if [[ -z "${SOLUTIONS_TOKEN}" ]]; then
+            echo "SOLUTIONS_TOKEN not available; skipping solutions checkout"
+            exit 0
+          fi
+          git clone https://x-access-token:${SOLUTIONS_TOKEN}@github.com/RobotLocomotion/manipulation-solutions.git solutions
+          cd solutions && git checkout $(cat ../solutions_sha.txt) && cd ..
+        shell: bash
+
+      - name: install dependencies
+        run: |
+          # Fix ownership of the workspace
+          chown -R runner:runner .
+          # Switch to runner user for remaining commands
+          sudo -H -u runner ./setup/submodule_checkout
+          # Install system packages as root
+          ./setup/ubuntu/24.04/install_prereqs.sh
+          apt-get install -o APT::Acquire::Retries=4 -o Dpkg::Use-Pty=0 -qy --no-install-recommends xvfb
+          rm -rf ./manipulation  # remove local module, force pip module.
+          sudo -H -u runner python3 -m pip install --user --break-system-packages --upgrade manipulation[all] pytest pytest-timeout
+          rm -rf /var/cache/apt/archives/*.deb /var/cache/apt/archives/partial/*.deb /var/cache/apt/*.bin /var/lib/apt/lists/* /var/log/apt/*
+        shell: bash
+
+      - name: test
+        run: |
+          set -euo pipefail
+          find book/htmlbook -type f -name 'test_*.py' -delete  # remove htmlbook tests (extra Python requirements)
+          sudo -H -u runner MANIPULATION_DATA_DIR="$(pwd)/book/data" xvfb-run \
+            --auto-servernum \
+            --server-args='-screen 0 1280x1024x24 -ac +extension GLX +extension RANDR +render -noreset' \
+            python3 -m pytest -ra
+        shell: bash
+
+  sequoia:
+    name: macos sequoia 15
+    runs-on: macos-15
     needs: [check-approval]
     if: >
       (github.event_name == 'pull_request' &&
        github.event.pull_request.head.repo.full_name == github.repository)
       ||
       (github.event_name == 'pull_request_target' &&
+       github.event.pull_request.head.repo.full_name != github.repository &&
        needs.check-approval.outputs.should-run == 'true')
       ||
       (github.event_name != 'pull_request' &&
        github.event_name != 'pull_request_target')
     steps:
-      # For pull_request_target: carefully checkout PR code excluding .github/
       - name: checkout PR code
         if: github.event_name == 'pull_request_target'
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           ref: ${{ github.event.pull_request.head.sha }}
           sparse-checkout: |
             *
             !.github
           sparse-checkout-cone-mode: false
-      
-      # For regular events: normal checkout
+
       - name: checkout
         if: github.event_name != 'pull_request_target'
-        uses: actions/checkout@v4
-      
+        uses: actions/checkout@v6
+        with:
+          submodules: recursive
+
+      - name: setup python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
       - name: checkout solutions
+        env:
+          SOLUTIONS_TOKEN: ${{ secrets.SOLUTIONS_TOKEN }}
         run: |
-          git clone https://x-access-token:${{ secrets.SOLUTIONS_TOKEN }}@github.com/RobotLocomotion/manipulation-solutions.git solutions
+          if [[ -z "${SOLUTIONS_TOKEN}" ]]; then
+            echo "SOLUTIONS_TOKEN not available; skipping solutions checkout"
+            exit 0
+          fi
+          git clone https://x-access-token:${SOLUTIONS_TOKEN}@github.com/RobotLocomotion/manipulation-solutions.git solutions
           cd solutions && git checkout $(cat ../solutions_sha.txt) && cd ..
         shell: zsh -efuo pipefail {0}
-      - name: submodule checkout
-        run:  ./setup/submodule_checkout
-        shell: zsh -efuo pipefail {0}
+
       - name: setup
         run: |
-          ./book/htmlbook/workflows/ci/sonoma/setup
-          bazel run //manipulation:prefetch_remotes
+          ./setup/submodule_checkout
+          ./setup/mac/install_prereqs.sh
+          python -m pip install --user poetry==2.1.4
+          python -m poetry config virtualenvs.in-project true
+          python -m poetry env use "$(python -c 'import sys; print(sys.executable)')"
+          python -m poetry install --all-extras --with dev
         shell: zsh -efuo pipefail {0}
+
       - name: test
-        run: ./book/htmlbook/workflows/ci/sonoma/test
+        run: |
+          set -euo pipefail
+          .venv/bin/python -m pytest -ra
         shell: zsh -efuo pipefail {0}
+
   lint:
     runs-on: ubuntu-latest
     needs: [check-approval]
@@ -206,240 +325,64 @@ jobs:
        github.event.pull_request.head.repo.full_name == github.repository)
       ||
       (github.event_name == 'pull_request_target' &&
+       github.event.pull_request.head.repo.full_name != github.repository &&
        needs.check-approval.outputs.should-run == 'true')
       ||
       (github.event_name != 'pull_request' &&
        github.event_name != 'pull_request_target')
     steps:
-      # For pull_request_target: carefully checkout PR code excluding .github/
       - name: checkout PR code
         if: github.event_name == 'pull_request_target'
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           ref: ${{ github.event.pull_request.head.sha }}
           sparse-checkout: |
             *
             !.github
           sparse-checkout-cone-mode: false
-      
-      # For regular events: normal checkout
+
       - name: checkout repo
         if: github.event_name != 'pull_request_target'
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
+        with:
+          submodules: recursive
+
       - name: setup python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.10' 
+          python-version: '3.10'
+
       - name: black
         uses: psf/black@stable
         with:
           version: 24.10.0
           jupyter: true
+
       - name: isort
         uses: isort/isort-action@master
         with:
-            configuration: "--profile black --check-only"
-            isort-version: 5.12.0
+          configuration: "--profile black --check-only"
+          isort-version: 5.12.0
+
       - name: autoflake
         uses: creyD/autoflake_action@master
         with:
-            options: --remove-all-unused-imports --in-place
-            # Pegging version s.t. https://github.com/creyD/autoflake_action/issues/1
+          options: --remove-all-unused-imports --in-place
+          # Pegging version s.t. https://github.com/creyD/autoflake_action/issues/1
+
       - name: Install and configure Poetry
         uses: snok/install-poetry@v1
         with:
           version: 2.1.4
           virtualenvs-create: true
           virtualenvs-in-project: true
+
       - name: build the docs
         run: |
           poetry install --only docs
           source .venv/bin/activate
           sphinx-build -M html manipulation book/python
         shell: bash
+
       - name: Test full poetry install
         run: poetry install
-  # The following jobs rely on the pip wheels being up to date. They can be disabled for a PR by adding the "requires new pip wheels" label.
-  docker:
-    name: dockerfile
-    runs-on: ubuntu-latest
-    needs: [check-approval]
-    if: >
-      ((github.event_name == 'pull_request' &&
-        github.event.pull_request.head.repo.full_name == github.repository)
-       ||
-       (github.event_name == 'pull_request_target' &&
-        needs.check-approval.outputs.should-run == 'true')
-       ||
-       (github.event_name != 'pull_request' &&
-        github.event_name != 'pull_request_target'))
-      &&
-      !contains(github.event.pull_request.labels.*.name, 'requires new pip wheels')
-    container: russtedrake/manipulation:latest
-    steps:
-      # For pull_request_target: carefully checkout PR code excluding .github/
-      - name: checkout PR code
-        if: github.event_name == 'pull_request_target'
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.pull_request.head.sha }}
-          sparse-checkout: |
-            *
-            !.github
-          sparse-checkout-cone-mode: false
-      
-      # For regular events: normal checkout
-      - name: checkout
-        if: github.event_name != 'pull_request_target'
-        uses: actions/checkout@v4
-      
-      - name: checkout solutions
-        run: |
-          git clone https://x-access-token:${{ secrets.SOLUTIONS_TOKEN }}@github.com/RobotLocomotion/manipulation-solutions.git solutions
-          cd solutions && git checkout $(cat ../solutions_sha.txt) && cd ..
-        shell: bash
-      - name: setup
-        run: |
-          apt-get update -o APT::Acquire::Retries=4 -qq
-          apt-get install -o APT::Acquire::Retries=4 -o Dpkg::Use-Pty=0 -qy --no-install-recommends python3-pip git xvfb
-          ./setup/submodule_checkout
-
-          # Note: we **don't** reinstall drake's dependencies here. If we need
-          # to do that, we should update our docker image.
-          
-          # Install manipulation via pip (to mimic student experience)
-          # Use --break-system-packages to handle externally managed environment
-          # Only install manipulation[all] to avoid conflicts with system packages
-          pip install --upgrade manipulation[all] --extra-index-url https://drake-packages.csail.mit.edu/whl/nightly/ --break-system-packages
-        shell: bash
-      - name: test
-        run: |
-          ./book/htmlbook/workflows/ci/noble/test_wheels
-        shell: bash
-
-  noble-pip-core:
-    # This should emulate a student's experience if they are doing exercises
-    # via pip install manipulation.
-    name: pip notebooks on noble
-    runs-on: ubuntu-24.04
-    needs: [check-approval]
-    if: >
-      ((github.event_name == 'pull_request' &&
-        github.event.pull_request.head.repo.full_name == github.repository)
-       ||
-       (github.event_name == 'pull_request_target' &&
-        needs.check-approval.outputs.should-run == 'true')
-       ||
-       (github.event_name != 'pull_request' &&
-        github.event_name != 'pull_request_target'))
-      &&
-      !contains(github.event.pull_request.labels.*.name, 'requires new pip wheels')
-    container: ubuntu:24.04
-    steps:
-      - name: pre-checkout setup
-        run: |
-          apt-get update -o APT::Acquire::Retries=4 -qq
-          apt-get install -o APT::Acquire::Retries=4 -o Dpkg::Use-Pty=0 -qy --no-install-recommends python3-pip git xvfb
-        shell: bash
-      
-      # For pull_request_target: carefully checkout PR code excluding .github/
-      - name: checkout PR code
-        if: github.event_name == 'pull_request_target'
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.pull_request.head.sha }}
-          sparse-checkout: |
-            *
-            !.github
-          sparse-checkout-cone-mode: false
-      
-      # For regular events: normal checkout
-      - name: checkout
-        if: github.event_name != 'pull_request_target'
-        uses: actions/checkout@v4
-      
-      - name: checkout solutions
-        run: |
-          git clone https://x-access-token:${{ secrets.SOLUTIONS_TOKEN }}@github.com/RobotLocomotion/manipulation-solutions.git solutions
-          cd solutions && git checkout $(cat ../solutions_sha.txt) && cd ..
-        shell: bash
-      - name: setup
-        run: |
-          ./setup/submodule_checkout
-          # Install system dependencies for Drake
-          ./setup/ubuntu/24.04/install_prereqs.sh
-          
-          # Install manipulation via pip (to mimic student experience)
-          # Handle system package conflicts by using --ignore-installed for problematic packages
-          pip install manipulation jupyter nbconvert ipykernel --extra-index-url https://drake-packages.csail.mit.edu/whl/nightly/ --break-system-packages --ignore-installed traitlets
-
-        shell: bash
-      - name: test
-        run: |
-          # The manipulation library needs be robust against partial
-          # installations, but the examples will assume a full installation. So
-          # we test only the manipulation library here.
-          ./book/htmlbook/workflows/ci/noble/test_wheels --core-library-only
-        shell: bash
-
-  noble-pip-extra:
-    # This should emulate a student's experience if they are doing exercises
-    # via pip install manipulation[all].
-    name: pip extra on noble
-    runs-on: ubuntu-24.04
-    needs: [check-approval]
-    if: >
-      ((github.event_name == 'pull_request' &&
-        github.event.pull_request.head.repo.full_name == github.repository)
-       ||
-       (github.event_name == 'pull_request_target' &&
-        needs.check-approval.outputs.should-run == 'true')
-       ||
-       (github.event_name != 'pull_request' &&
-        github.event_name != 'pull_request_target'))
-      &&
-      !contains(github.event.pull_request.labels.*.name, 'requires new pip wheels')
-    container: ubuntu:24.04
-    steps:
-      - name: pre-checkout setup
-        run: |
-          apt-get update -o APT::Acquire::Retries=4 -qq
-          apt-get install -o APT::Acquire::Retries=4 -o Dpkg::Use-Pty=0 -qy --no-install-recommends python3-pip git xvfb
-        shell: bash
-      
-      # For pull_request_target: carefully checkout PR code excluding .github/
-      - name: checkout PR code
-        if: github.event_name == 'pull_request_target'
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.pull_request.head.sha }}
-          sparse-checkout: |
-            *
-            !.github
-          sparse-checkout-cone-mode: false
-      
-      # For regular events: normal checkout
-      - name: checkout
-        if: github.event_name != 'pull_request_target'
-        uses: actions/checkout@v4
-      
-      - name: checkout solutions
-        run: |
-          git clone https://x-access-token:${{ secrets.SOLUTIONS_TOKEN }}@github.com/RobotLocomotion/manipulation-solutions.git solutions
-          cd solutions && git checkout $(cat ../solutions_sha.txt) && cd ..
-        shell: bash
-      - name: setup
-        run: |
-          ./setup/submodule_checkout
-          # Install system dependencies for Drake
-          ./setup/ubuntu/24.04/install_prereqs.sh
-          
-          # Install manipulation via pip (to mimic student experience)
-          # Handle system package conflicts by using --ignore-installed for problematic packages
-          pip install manipulation[all] jupyter nbconvert ipykernel --extra-index-url https://drake-packages.csail.mit.edu/whl/nightly/ --break-system-packages --ignore-installed traitlets
-        shell: bash
-      - name: test
-        run: |
-          ./book/htmlbook/workflows/ci/noble/test_wheels
-        shell: bash
-

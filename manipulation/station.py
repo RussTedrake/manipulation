@@ -1326,6 +1326,7 @@ def _ApplyCameraLcmIdInterface(
 ) -> None:
     lcm = lcm_buses.Find("Driver for " + camera_config.name, camera_config.lcm_bus)
 
+    print(camera_config.name, camera_id)
     camera_data_receiver = builder.AddSystem(LcmImageArrayToImages())
     camera_data_receiver.set_name(camera_config.name + ".data_receiver")
     camera_data_subscriber = builder.AddSystem(
@@ -1408,19 +1409,20 @@ def _MakeHardwareStationInterface(
     lcm_buses = ApplyLcmBusConfig(lcm_buses=scenario.lcm_buses, builder=builder)
 
     # Add drivers.
-    _ApplyDriverConfigsInterface(
-        driver_configs=scenario.model_drivers,
-        lcm_buses=lcm_buses,
-        builder=builder,
-    )
-
-    if meshcat is not None:
-        _WireDriverStatusReceiversToToPose(
-            model_instance_names=scenario.model_drivers.keys(),
+    if scenario.model_drivers:
+        _ApplyDriverConfigsInterface(
+            driver_configs=scenario.model_drivers,
+            lcm_buses=lcm_buses,
             builder=builder,
-            plant=plant,
-            to_pose=to_pose,
         )
+
+        if meshcat is not None:
+            _WireDriverStatusReceiversToToPose(
+                model_instance_names=scenario.model_drivers.keys(),
+                builder=builder,
+                plant=plant,
+                to_pose=to_pose,
+            )
 
     # Add camera ids
     for camera_name, camera_id in scenario.camera_ids.items():
