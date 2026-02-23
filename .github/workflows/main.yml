@@ -314,6 +314,7 @@ jobs:
       - name: test
         run: |
           set -euo pipefail
+          .venv/bin/python manipulation/test/test_hardware_station_interface.py
           .venv/bin/python -m pytest -ra
         shell: zsh -efuo pipefail {0}
 
