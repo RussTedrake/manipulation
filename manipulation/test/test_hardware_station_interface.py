@@ -1,4 +1,3 @@
-import sys
 import unittest
 
 from pydrake.all import StartMeshcat
@@ -6,10 +5,6 @@ from pydrake.all import StartMeshcat
 from manipulation.station import LoadScenario, MakeHardwareStation, Scenario
 
 
-@unittest.skipIf(
-    sys.platform == "darwin",
-    "Disabled on macOS pending Drake issue: https://github.com/RobotLocomotion/drake/issues/24118",
-)
 class HardwareStationInterfaceTest(unittest.TestCase):
     def get_scenario(self) -> Scenario:
         scenario_data = """

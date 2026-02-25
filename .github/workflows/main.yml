@@ -309,6 +309,9 @@ jobs:
           python -m poetry config virtualenvs.in-project true
           python -m poetry env use "$(python -c 'import sys; print(sys.executable)')"
           python -m poetry install --all-extras --with dev
+          # Enable lcm multicast; see drake #22322 for details.
+          sudo route -nv delete 224.0.0.0/4
+          sudo route -nv add -net 224.0.0.0/4 -interface lo0          
         shell: zsh -efuo pipefail {0}
 
       - name: test
