@@ -1,6 +1,5 @@
 import os
 from datetime import date
-from pathlib import Path
 from urllib.request import urlretrieve
 from warnings import warn
 
@@ -131,24 +130,17 @@ def colorize_labels(image: ImageLabel16I):
 
 
 def GetDrakeVersion() -> str:
-    """Returns a string representing the Drake version, if availableor "source"."""
-    drake_version_txt = (
-        Path(GetDrakePath()).parent.parent / "doc" / "drake" / "VERSION.TXT"
-    )
-    if drake_version_txt.is_file():
-        with open(drake_version_txt, "r") as f:
-            drake_version = f.read()
-        drake_version = drake_version.split()[0]
-    else:
-        drake_version = "source"
-    return drake_version
+    """Returns a string representing the Drake version, if available or "source"."""
+    import importlib.metadata
+
+    try:
+        return importlib.metadata.version("drake")
+    except importlib.metadata.PackageNotFoundError:
+        return "source"
 
 
 def DrakeVersionGreaterThan(minimum_date: date):
     """Check that the Drake version is at least `minimum_data`."""
-    drake_version_txt = (
-        Path(GetDrakePath()).parent.parent / "doc" / "drake" / "VERSION.TXT"
-    )
     version_dates = {
         "1.13.0": date(year=2023, month=2, day=14),
         "1.14.0": date(year=2023, month=3, day=15),
@@ -163,29 +155,33 @@ def DrakeVersionGreaterThan(minimum_date: date):
         "1.23.0": date(year=2023, month=11, day=17),
         "1.24.0": date(year=2023, month=12, day=18),
     }
-    # If the file doesn't exist, then we should pass. A source install won't
-    # have VERSION.TXT
-    if drake_version_txt.is_file():
-        with open(drake_version_txt, "r") as f:
-            drake_version = f.read()
-        drake_version = drake_version.split()[0]
-        if len(drake_version) == 14:
+    drake_version = GetDrakeVersion()
+    # A source install won't have package metadata; assume it's new enough.
+    if drake_version == "source":
+        return
+    # Nightly builds look like "0.0.YYYYMMDD" via importlib.metadata.
+    if drake_version.startswith("0.0."):
+        date_str = drake_version[4:]
+        if len(date_str) == 8:
             drake_date = date(
-                year=int(drake_version[:4]),
-                month=int(drake_version[4:6]),
-                day=int(drake_version[6:8]),
+                year=int(date_str[:4]),
+                month=int(date_str[4:6]),
+                day=int(date_str[6:8]),
             )
-        elif drake_version in version_dates:
-            drake_date = version_dates[drake_version]
         else:
             warn(f"Unrecognized drake version {drake_version}")
             return
-        if drake_date < minimum_date:
-            raise (
-                RuntimeError(
-                    f"You need to update your Drake version. Python is using the Drake installation in {GetDrakePath()}. This installation was from a nightly build on {drake_date}, but this method requires Drake from at least {minimum_date}."
-                )
+    elif drake_version in version_dates:
+        drake_date = version_dates[drake_version]
+    else:
+        warn(f"Unrecognized drake version {drake_version}")
+        return
+    if drake_date < minimum_date:
+        raise (
+            RuntimeError(
+                f"You need to update your Drake version. Python is using the Drake installation in {GetDrakePath()}. This installation was from a nightly build on {drake_date}, but this method requires Drake from at least {minimum_date}."
             )
+        )
 
 
 def RenderDiagram(system: System, max_depth: int | None = None):
