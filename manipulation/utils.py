@@ -130,7 +130,7 @@ def colorize_labels(image: ImageLabel16I):
 
 
 def GetDrakeVersion() -> str:
-    """Returns a string representing the Drake version, if available or "source"."""
+    """Returns a string representing the Drake version, if available, or "source"."""
     import importlib.metadata
 
     try:
@@ -140,7 +140,7 @@ def GetDrakeVersion() -> str:
 
 
 def DrakeVersionGreaterThan(minimum_date: date):
-    """Check that the Drake version is at least `minimum_data`."""
+    """Check that the Drake version is at least `minimum_date`."""
     version_dates = {
         "1.13.0": date(year=2023, month=2, day=14),
         "1.14.0": date(year=2023, month=3, day=15),
