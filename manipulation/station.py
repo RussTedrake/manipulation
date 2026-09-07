@@ -611,6 +611,7 @@ def _ApplyDriverConfigSim(
     scenario: Scenario,
     package_xmls: typing.List[str],
     builder: DiagramBuilder,
+    parser_preload_callback: typing.Callable[[Parser], None],
 ) -> None:
     if isinstance(driver_config, IiwaDriver):
         model_instance = sim_plant.GetModelInstanceByName(model_instance_name)
@@ -622,6 +623,7 @@ def _ApplyDriverConfigSim(
             model_instance_names=[model_instance_name],
             add_frozen_child_instances=True,
             package_xmls=package_xmls,
+            parser_preload_callback=parser_preload_callback,
         )
         # Keep the controller plant alive during the Diagram lifespan.
         builder.AddNamedSystem(
@@ -693,6 +695,7 @@ def _ApplyDriverConfigSim(
             model_instance_names=model_instance_names,
             add_frozen_child_instances=True,
             package_xmls=package_xmls,
+            parser_preload_callback=parser_preload_callback,
         )
 
         # Add the controller
@@ -801,6 +804,7 @@ def _ApplyDriverConfigsSim(
     scenario: Scenario,
     package_xmls: typing.List[str],
     builder: DiagramBuilder,
+    parser_preload_callback: typing.Callable[[Parser], None],
 ) -> None:
     for model_instance_name, driver_config in driver_configs.items():
         _ApplyDriverConfigSim(
@@ -810,6 +814,7 @@ def _ApplyDriverConfigsSim(
             scenario=scenario,
             package_xmls=package_xmls,
             builder=builder,
+            parser_preload_callback=parser_preload_callback,
         )
 
 
@@ -911,7 +916,9 @@ def MakeHardwareStation(
         parser_preload_callback: A callback function that will be called after
             the Parser is created, but before any directives are processed. This
             can be used to add additional packages to the parser, or to add
-            additional model directives.
+            additional model directives. The resulting package mappings are also
+            used by simulation controller plants; the callback itself is only
+            called for the simulation plant.
 
         parser_prefinalize_callback: A callback function that will be called
             after the directives are processed, but before the plant is
@@ -978,6 +985,15 @@ def MakeHardwareStation(
     # messages and dispatching them to the receivers, i.e., "pump" the bus.)
     lcm_buses = ApplyLcmBusConfig(lcm_buses=scenario.lcm_buses, builder=builder)
 
+    def configure_controller_parser(controller_parser: Parser) -> None:
+        # Preserve package overrides without calling GetPath(), which would
+        # eagerly download even unused remote packages. Do not repeat the user's
+        # callback, which may also add models to the simulation plant.
+        packages = controller_parser.package_map()
+        for name in packages.GetPackageNames():
+            packages.Remove(name)
+        packages.AddMap(parser.package_map())
+
     # Add drivers.
     _ApplyDriverConfigsSim(
         driver_configs=scenario.model_drivers,
@@ -985,6 +1001,7 @@ def MakeHardwareStation(
         scenario=scenario,
         package_xmls=package_xmls,
         builder=builder,
+        parser_preload_callback=configure_controller_parser,
     )
 
     # Setup a virtual display if needed (for simulating cameras)

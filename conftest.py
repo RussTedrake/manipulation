@@ -10,7 +10,6 @@ REPO_ROOT = Path(__file__).resolve().parent
 def pytest_configure() -> None:
     os.environ.setdefault("MPLBACKEND", "Agg")
     os.environ.setdefault("MPLCONFIGDIR", "/tmp/matplotlib")
-    os.environ.setdefault("XDG_CACHE_HOME", "/tmp")
     Path("/tmp/matplotlib").mkdir(parents=True, exist_ok=True)
     if str(REPO_ROOT) not in sys.path:
         sys.path.insert(0, str(REPO_ROOT))
