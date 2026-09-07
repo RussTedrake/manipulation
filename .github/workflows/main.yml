@@ -102,7 +102,7 @@ jobs:
         run: |
           export APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=1 DEBIAN_FRONTEND=noninteractive
           apt-get update -o APT::Acquire::Retries=4 -qq
-          apt-get install -o APT::Acquire::Retries=4 -o Dpkg::Use-Pty=0 -qy --no-install-recommends ca-certificates gnupg sudo zstd
+          apt-get install -o APT::Acquire::Retries=4 -o Dpkg::Use-Pty=0 -qy --no-install-recommends ca-certificates gnupg sudo
           apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E1DD270288B4E6030699E45FA1715D88E1DF1F24
           echo 'deb http://ppa.launchpad.net/git-core/ppa/ubuntu noble main' > /etc/apt/sources.list.d/git.list
           apt-get update -o APT::Acquire::Retries=4 -qq
@@ -141,23 +141,8 @@ jobs:
           cd solutions && git checkout $(cat ../solutions_sha.txt) && cd ..
         shell: bash
 
-      # pull_request_target runs use the base branch cache scope; keep them uncached.
-      - name: cache Python downloads
-        if: github.event_name != 'pull_request_target'
-        uses: actions/cache@v5
-        with:
-          path: |
-            /home/runner/.cache/pip
-            /home/runner/.cache/pypoetry
-          key: python-downloads-v1-${{ runner.os }}-${{ runner.arch }}-noble-poetry-${{ hashFiles('poetry.lock', 'pyproject.toml', '.github/workflows/main.yml') }}
-          restore-keys: |
-            python-downloads-v1-${{ runner.os }}-${{ runner.arch }}-noble-poetry-
-
       - name: install dependencies
         run: |
-          # Cache actions run as root; pip / Poetry run as runner.
-          mkdir -p /home/runner/.cache/pip /home/runner/.cache/pypoetry
-          chown -R runner:runner /home/runner/.cache/pip /home/runner/.cache/pypoetry
           # Fix ownership of the workspace
           chown -R runner:runner .
           # Switch to runner user for remaining commands
@@ -217,7 +202,7 @@ jobs:
         run: |
           export APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=1 DEBIAN_FRONTEND=noninteractive
           apt-get update -o APT::Acquire::Retries=4 -qq
-          apt-get install -o APT::Acquire::Retries=4 -o Dpkg::Use-Pty=0 -qy --no-install-recommends ca-certificates gnupg sudo zstd
+          apt-get install -o APT::Acquire::Retries=4 -o Dpkg::Use-Pty=0 -qy --no-install-recommends ca-certificates gnupg sudo
           apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E1DD270288B4E6030699E45FA1715D88E1DF1F24
           echo 'deb http://ppa.launchpad.net/git-core/ppa/ubuntu noble main' > /etc/apt/sources.list.d/git.list
           apt-get update -o APT::Acquire::Retries=4 -qq
@@ -256,22 +241,8 @@ jobs:
           cd solutions && git checkout $(cat ../solutions_sha.txt) && cd ..
         shell: bash
 
-      # pull_request_target runs use the base branch cache scope; keep them uncached.
-      - name: cache Python downloads
-        if: github.event_name != 'pull_request_target'
-        uses: actions/cache@v5
-        with:
-          path: |
-            /home/runner/.cache/pip
-          key: python-downloads-v1-${{ runner.os }}-${{ runner.arch }}-noble-pip-all-${{ hashFiles('poetry.lock', 'pyproject.toml', '.github/workflows/main.yml') }}
-          restore-keys: |
-            python-downloads-v1-${{ runner.os }}-${{ runner.arch }}-noble-pip-all-
-
       - name: install dependencies
         run: |
-          # Cache actions run as root; pip / Poetry run as runner.
-          mkdir -p /home/runner/.cache/pip
-          chown -R runner:runner /home/runner/.cache/pip
           # Fix ownership of the workspace
           chown -R runner:runner .
           # Switch to runner user for remaining commands
