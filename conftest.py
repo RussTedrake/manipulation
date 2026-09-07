@@ -19,6 +19,13 @@ def pytest_configure() -> None:
 
 
 def pytest_ignore_collect(collection_path, config):  # type: ignore[no-untyped-def]
+    # This textbook now releases notebooks for local Jupyter and Colab;
+    # publishing a package no longer updates the retired Deepnote projects.
+    if (
+        Path(collection_path).resolve()
+        == (REPO_ROOT / "book/htmlbook/test_check_deepnote_requirements.py").resolve()
+    ):
+        return True
     solutions_dir = REPO_ROOT / "solutions"
     if solutions_dir.exists():
         return None
