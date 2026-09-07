@@ -102,7 +102,7 @@ jobs:
         run: |
           export APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=1 DEBIAN_FRONTEND=noninteractive
           apt-get update -o APT::Acquire::Retries=4 -qq
-          apt-get install -o APT::Acquire::Retries=4 -o Dpkg::Use-Pty=0 -qy --no-install-recommends ca-certificates gnupg sudo
+          apt-get install -o APT::Acquire::Retries=4 -o Dpkg::Use-Pty=0 -qy --no-install-recommends ca-certificates gnupg sudo zstd
           apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E1DD270288B4E6030699E45FA1715D88E1DF1F24
           echo 'deb http://ppa.launchpad.net/git-core/ppa/ubuntu noble main' > /etc/apt/sources.list.d/git.list
           apt-get update -o APT::Acquire::Retries=4 -qq
@@ -141,8 +141,23 @@ jobs:
           cd solutions && git checkout $(cat ../solutions_sha.txt) && cd ..
         shell: bash
 
+      # pull_request_target runs use the base branch cache scope; keep them uncached.
+      - name: cache Python downloads
+        if: github.event_name != 'pull_request_target'
+        uses: actions/cache@v5
+        with:
+          path: |
+            /home/runner/.cache/pip
+            /home/runner/.cache/pypoetry
+          key: python-downloads-v1-${{ runner.os }}-${{ runner.arch }}-noble-poetry-${{ hashFiles('poetry.lock', 'pyproject.toml', '.github/workflows/main.yml') }}
+          restore-keys: |
+            python-downloads-v1-${{ runner.os }}-${{ runner.arch }}-noble-poetry-
+
       - name: install dependencies
         run: |
+          # Cache actions run as root; pip / Poetry run as runner.
+          mkdir -p /home/runner/.cache/pip /home/runner/.cache/pypoetry
+          chown -R runner:runner /home/runner/.cache/pip /home/runner/.cache/pypoetry
           # Fix ownership of the workspace
           chown -R runner:runner .
           # Switch to runner user for remaining commands
@@ -166,8 +181,17 @@ jobs:
           set -euo pipefail
           VENV_PYTHON="$(pwd)/.venv/bin/python"
           sudo -H -u runner env -u DISPLAY XDG_CACHE_HOME=/tmp \
-            DRAKE_ALLOW_NETWORK=lcm:meshcat "$VENV_PYTHON" -m pytest -ra
+            DRAKE_ALLOW_NETWORK=lcm:meshcat "$VENV_PYTHON" -m pytest -ra --durations=30 --junitxml=test-results/pytest.xml
         shell: bash
+
+      - name: upload test timings
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pytest-${{ github.job }}
+          path: test-results/pytest.xml
+          if-no-files-found: ignore
+          retention-days: 14
 
   # TODO(russt): add noble-pip-core workflow which only runs the tests in manipulation,
   # but uses the manipulation module from pip.
@@ -193,7 +217,7 @@ jobs:
         run: |
           export APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=1 DEBIAN_FRONTEND=noninteractive
           apt-get update -o APT::Acquire::Retries=4 -qq
-          apt-get install -o APT::Acquire::Retries=4 -o Dpkg::Use-Pty=0 -qy --no-install-recommends ca-certificates gnupg sudo
+          apt-get install -o APT::Acquire::Retries=4 -o Dpkg::Use-Pty=0 -qy --no-install-recommends ca-certificates gnupg sudo zstd
           apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E1DD270288B4E6030699E45FA1715D88E1DF1F24
           echo 'deb http://ppa.launchpad.net/git-core/ppa/ubuntu noble main' > /etc/apt/sources.list.d/git.list
           apt-get update -o APT::Acquire::Retries=4 -qq
@@ -232,8 +256,22 @@ jobs:
           cd solutions && git checkout $(cat ../solutions_sha.txt) && cd ..
         shell: bash
 
+      # pull_request_target runs use the base branch cache scope; keep them uncached.
+      - name: cache Python downloads
+        if: github.event_name != 'pull_request_target'
+        uses: actions/cache@v5
+        with:
+          path: |
+            /home/runner/.cache/pip
+          key: python-downloads-v1-${{ runner.os }}-${{ runner.arch }}-noble-pip-all-${{ hashFiles('poetry.lock', 'pyproject.toml', '.github/workflows/main.yml') }}
+          restore-keys: |
+            python-downloads-v1-${{ runner.os }}-${{ runner.arch }}-noble-pip-all-
+
       - name: install dependencies
         run: |
+          # Cache actions run as root; pip / Poetry run as runner.
+          mkdir -p /home/runner/.cache/pip
+          chown -R runner:runner /home/runner/.cache/pip
           # Fix ownership of the workspace
           chown -R runner:runner .
           # Switch to runner user for remaining commands
@@ -257,8 +295,17 @@ jobs:
           find book/htmlbook -type f -name 'test_*.py' -delete  # remove htmlbook tests (extra Python requirements)
           sudo -H -u runner env -u DISPLAY MANIPULATION_DATA_DIR="$(pwd)/book/data" \
             XDG_CACHE_HOME=/tmp DRAKE_ALLOW_NETWORK=lcm:meshcat \
-            python3 -m pytest -ra
+            python3 -m pytest -ra --durations=30 --junitxml=test-results/pytest.xml
         shell: bash
+
+      - name: upload test timings
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pytest-${{ github.job }}
+          path: test-results/pytest.xml
+          if-no-files-found: ignore
+          retention-days: 14
 
   sequoia:
     name: macos sequoia 15
@@ -308,6 +355,18 @@ jobs:
           cd solutions && git checkout $(cat ../solutions_sha.txt) && cd ..
         shell: zsh -efuo pipefail {0}
 
+      # pull_request_target runs use the base branch cache scope; keep them uncached.
+      - name: cache Python downloads
+        if: github.event_name != 'pull_request_target'
+        uses: actions/cache@v5
+        with:
+          path: |
+            ~/Library/Caches/pip
+            ~/Library/Caches/pypoetry
+          key: python-downloads-v1-${{ runner.os }}-${{ runner.arch }}-sequoia-${{ hashFiles('poetry.lock', 'pyproject.toml', '.github/workflows/main.yml') }}
+          restore-keys: |
+            python-downloads-v1-${{ runner.os }}-${{ runner.arch }}-sequoia-
+
       - name: setup
         run: |
           ./setup/submodule_checkout
@@ -328,8 +387,17 @@ jobs:
       - name: test
         run: |
           set -euo pipefail
-          XDG_CACHE_HOME=/tmp DRAKE_ALLOW_NETWORK=lcm:meshcat .venv/bin/python -m pytest -ra
+          XDG_CACHE_HOME=/tmp DRAKE_ALLOW_NETWORK=lcm:meshcat .venv/bin/python -m pytest -ra --durations=30 --junitxml=test-results/pytest.xml
         shell: zsh -efuo pipefail {0}
+
+      - name: upload test timings
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pytest-${{ github.job }}
+          path: test-results/pytest.xml
+          if-no-files-found: ignore
+          retention-days: 14
 
   lint:
     runs-on: ubuntu-latest

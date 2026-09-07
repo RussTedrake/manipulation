@@ -27,3 +27,18 @@ by tests; it deliberately excludes models such as Gymnasium Robotics that
 notebooks only download in interactive mode.
 
 See Drake's [network policy documentation](https://drake.mit.edu/doxygen_cxx/group__allow__network.html).
+
+# CI timings and caches
+
+Each test job prints its 30 slowest pytest phases and uploads a JUnit report as
+`pytest-<job-id>`, retained for 14 days and uploaded even on test failure when
+available. Compare per-test times alongside Actions step timings.
+
+The three test jobs cache pip/Poetry downloads; installation still runs every
+time, including the pip job's upgrade check. Keys include OS, architecture, job,
+and dependency/workflow hashes, with older downloads as a fallback. Labeled fork
+runs (`pull_request_target`) remain uncached because they use the base branch's
+cache scope. Drake packages are still fetched afresh on each runner.
+
+The first run populates caches. Compare a subsequent run, including cache
+transfer time, to decide whether the savings justify keeping them.
