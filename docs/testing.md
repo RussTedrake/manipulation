@@ -21,8 +21,9 @@ DRAKE_ALLOW_NETWORK=lcm:meshcat .venv/bin/python -m pytest -ra
 
 If a test reports that PackageMap networking is disabled and no matching cache
 entry exists, check that prefetch and pytest use the same user and cache directory.
-If a test adds a new remote package, add it to `PrefetchAllRemotePackages` in
-`manipulation/remotes.py`. Packages registered directly by notebooks belong in
-`setup/prefetch_remotes.py`, which also works with the pip job’s published wheel.
+If a test adds a new remote package, add it to `setup/prefetch_remotes.py`, which
+also works with the pip job's published wheel. This list covers packages used
+by tests; it deliberately excludes models such as Gymnasium Robotics that
+notebooks only download in interactive mode.
 
 See Drake's [network policy documentation](https://drake.mit.edu/doxygen_cxx/group__allow__network.html).

@@ -2,14 +2,21 @@
 
 from pydrake.multibody.parsing import PackageMap
 
-from manipulation.remotes import PrefetchAllRemotePackages
+from manipulation.remotes import AddMujocoMenagerie, AddRby1Remote, AddSpotRemote
 
 if __name__ == "__main__":
-    PrefetchAllRemotePackages()
+    packages = PackageMap()
+    print("fetching drake_models")
+    packages.GetPath("drake_models")
+    # Only prefetch packages used by tests. In particular, the Gymnasium
+    # Robotics notebook deliberately skips its remote models during CI.
+    for add_package in (AddMujocoMenagerie, AddSpotRemote, AddRby1Remote):
+        name = add_package(packages)
+        print(f"fetching {name}")
+        packages.GetPath(name)
 
     # book/trajectories/iris_builder.ipynb registers this package directly.
     # Keep this in the checkout so pip CI can also use older manipulation wheels.
-    packages = PackageMap()
     packages.AddRemote(
         "gcs",
         PackageMap.RemoteParams(

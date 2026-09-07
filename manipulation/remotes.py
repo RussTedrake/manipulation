@@ -42,7 +42,7 @@ def AddSpotRemote(package_map: PackageMap) -> str:
 
 def AddGymnasiumRobotics(package_map: PackageMap) -> str:
     """Add the remote `gymnasium_robotics` package to the given PackageMap.
-    https://github.com/Farama-Foundation/Gymnasium-Robotics"""
+    https://github.com/google-deepmind/gymnasium_robotics"""
     package_name = "gymnasium_robotics"
     package_map.AddRemote(
         package_name=package_name,
@@ -50,7 +50,7 @@ def AddGymnasiumRobotics(package_map: PackageMap) -> str:
             urls=[
                 f"https://github.com/Farama-Foundation/Gymnasium-Robotics/archive/refs/tags/v1.3.1.tar.gz"
             ],
-            sha256=("438931a7f4eaa53ea5d1aad5ebf82c7ae1b437e3e98d5478219caa9e9dff9512"),
+            sha256=("d274b3ee1d34337aa35d4686447fda6a6d20dfcb4d375eab91b4e49b1108afde"),
             strip_prefix="Gymnasium-Robotics-1.3.1/gymnasium_robotics/envs/assets/",
         ),
     )
