@@ -326,18 +326,6 @@ jobs:
           cd solutions && git checkout $(cat ../solutions_sha.txt) && cd ..
         shell: zsh -efuo pipefail {0}
 
-      # pull_request_target runs use the base branch cache scope; keep them uncached.
-      - name: cache Python downloads
-        if: github.event_name != 'pull_request_target'
-        uses: actions/cache@v5
-        with:
-          path: |
-            ~/Library/Caches/pip
-            ~/Library/Caches/pypoetry
-          key: python-downloads-v1-${{ runner.os }}-${{ runner.arch }}-sequoia-${{ hashFiles('poetry.lock', 'pyproject.toml', '.github/workflows/main.yml') }}
-          restore-keys: |
-            python-downloads-v1-${{ runner.os }}-${{ runner.arch }}-sequoia-
-
       - name: setup
         run: |
           ./setup/submodule_checkout
