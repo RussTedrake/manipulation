@@ -149,7 +149,6 @@ jobs:
           sudo -H -u runner ./setup/submodule_checkout
           # Install system packages as root
           ./setup/ubuntu/24.04/install_prereqs.sh
-          apt-get install -o APT::Acquire::Retries=4 -o Dpkg::Use-Pty=0 -qy --no-install-recommends xvfb
           sudo -H -u runner python3 -m pip install --user --break-system-packages poetry==2.1.4
           sudo -H -u runner python3 -m poetry config virtualenvs.in-project true
           sudo -H -u runner python3 -m poetry install --all-extras --with dev
@@ -160,10 +159,7 @@ jobs:
         run: |
           set -euo pipefail
           VENV_PYTHON="$(pwd)/.venv/bin/python"
-          sudo -H -u runner xvfb-run \
-            --auto-servernum \
-            --server-args='-screen 0 1280x1024x24 -ac +extension GLX +extension RANDR +render -noreset' \
-            "$VENV_PYTHON" -m pytest -ra
+          sudo -H -u runner env -u DISPLAY "$VENV_PYTHON" -m pytest -ra
         shell: bash
 
   # TODO(russt): add noble-pip-core workflow which only runs the tests in manipulation,
@@ -237,7 +233,6 @@ jobs:
           sudo -H -u runner ./setup/submodule_checkout
           # Install system packages as root
           ./setup/ubuntu/24.04/install_prereqs.sh
-          apt-get install -o APT::Acquire::Retries=4 -o Dpkg::Use-Pty=0 -qy --no-install-recommends xvfb
           rm -rf ./manipulation  # remove local module, force pip module.
           sudo -H -u runner python3 -m pip install --user --break-system-packages --upgrade manipulation[all] pytest pytest-timeout
           rm -rf /var/cache/apt/archives/*.deb /var/cache/apt/archives/partial/*.deb /var/cache/apt/*.bin /var/lib/apt/lists/* /var/log/apt/*
@@ -247,9 +242,7 @@ jobs:
         run: |
           set -euo pipefail
           find book/htmlbook -type f -name 'test_*.py' -delete  # remove htmlbook tests (extra Python requirements)
-          sudo -H -u runner MANIPULATION_DATA_DIR="$(pwd)/book/data" xvfb-run \
-            --auto-servernum \
-            --server-args='-screen 0 1280x1024x24 -ac +extension GLX +extension RANDR +render -noreset' \
+          sudo -H -u runner env -u DISPLAY MANIPULATION_DATA_DIR="$(pwd)/book/data" \
             python3 -m pytest -ra
         shell: bash
 

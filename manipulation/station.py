@@ -1,6 +1,4 @@
 import dataclasses as dc
-import os
-import sys
 import typing
 import warnings
 from copy import copy
@@ -986,13 +984,6 @@ def MakeHardwareStation(
         package_xmls=package_xmls,
         builder=builder,
     )
-
-    # Setup a virtual display if needed (for simulating cameras)
-    if scenario.cameras and sys.platform == "linux" and os.getenv("DISPLAY") is None:
-        from pyvirtualdisplay import Display
-
-        virtual_display = Display(visible=0, size=(1400, 900))
-        virtual_display.start()
 
     # Add scene cameras.
     for _, camera in scenario.cameras.items():
