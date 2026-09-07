@@ -30,10 +30,10 @@ COPY setup/docker/pip.conf /root/.config/pip/pip.conf
 COPY setup/ubuntu/24.04/install_prereqs.sh /tmp/
 RUN /tmp/install_prereqs.sh
 RUN apt-get -q update && apt-get -q install -y --no-install-recommends \
-    curl git nginx-light python-is-python3 python3-pip python3-venv xvfb \
+    curl git python-is-python3 python3-pip python3-venv \
     && apt-get remove -y python3-notebook && apt-get autoremove -y && apt-get -q clean
 # Install the Python dependencies and library from PyPI.
-RUN pip3 install -r /tmp/requirements.txt pyvirtualdisplay manipulation[all] --ignore-installed --break-system-packages
+RUN pip3 install -r /tmp/requirements.txt manipulation[all] --ignore-installed --break-system-packages
 # Bake model data into the image up-front, instead of fetching on demand.
 RUN python3 -c 'from pydrake.all import PackageMap; PackageMap().GetPath("drake_models")'
 RUN python3 -c 'from manipulation.prefetch_remotes import PrefetchAllRemotePackages; PrefetchAllRemotePackages()'
