@@ -155,11 +155,18 @@ jobs:
           rm -rf /var/cache/apt/archives/*.deb /var/cache/apt/archives/partial/*.deb /var/cache/apt/*.bin /var/lib/apt/lists/* /var/log/apt/*
         shell: bash
 
+      - name: prefetch remote packages
+        run: |
+          sudo -H -u runner env XDG_CACHE_HOME=/tmp \
+            "$(pwd)/.venv/bin/python" -m setup.prefetch_remotes
+        shell: bash
+
       - name: test
         run: |
           set -euo pipefail
           VENV_PYTHON="$(pwd)/.venv/bin/python"
-          sudo -H -u runner env -u DISPLAY "$VENV_PYTHON" -m pytest -ra
+          sudo -H -u runner env -u DISPLAY XDG_CACHE_HOME=/tmp \
+            DRAKE_ALLOW_NETWORK=lcm:meshcat "$VENV_PYTHON" -m pytest -ra
         shell: bash
 
   # TODO(russt): add noble-pip-core workflow which only runs the tests in manipulation,
@@ -238,11 +245,18 @@ jobs:
           rm -rf /var/cache/apt/archives/*.deb /var/cache/apt/archives/partial/*.deb /var/cache/apt/*.bin /var/lib/apt/lists/* /var/log/apt/*
         shell: bash
 
+      - name: prefetch remote packages
+        run: |
+          sudo -H -u runner env XDG_CACHE_HOME=/tmp \
+            python3 -m setup.prefetch_remotes
+        shell: bash
+
       - name: test
         run: |
           set -euo pipefail
           find book/htmlbook -type f -name 'test_*.py' -delete  # remove htmlbook tests (extra Python requirements)
           sudo -H -u runner env -u DISPLAY MANIPULATION_DATA_DIR="$(pwd)/book/data" \
+            XDG_CACHE_HOME=/tmp DRAKE_ALLOW_NETWORK=lcm:meshcat \
             python3 -m pytest -ra
         shell: bash
 
@@ -307,10 +321,14 @@ jobs:
           sudo route -nv add -net 224.0.0.0/4 -interface lo0          
         shell: zsh -efuo pipefail {0}
 
+      - name: prefetch remote packages
+        run: XDG_CACHE_HOME=/tmp .venv/bin/python -m setup.prefetch_remotes
+        shell: zsh -efuo pipefail {0}
+
       - name: test
         run: |
           set -euo pipefail
-          .venv/bin/python -m pytest -ra
+          XDG_CACHE_HOME=/tmp DRAKE_ALLOW_NETWORK=lcm:meshcat .venv/bin/python -m pytest -ra
         shell: zsh -efuo pipefail {0}
 
   lint:
