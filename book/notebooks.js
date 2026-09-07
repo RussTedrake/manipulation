@@ -1,4 +1,4 @@
-// Loaded after htmlbook/book.js to select Colab for this textbook.
+// Colab links for this textbook, derived from the notebook file layout.
 function notebook_link(chapter, notebook, link_text = "") {
   const name = notebook || chapter;
   const path = `book/${chapter}/${name}.ipynb`;

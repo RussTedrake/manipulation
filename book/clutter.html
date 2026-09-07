@@ -304,10 +304,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture videos a
     
       <p>Drake has a very useful <code>ModelVisualizer</code> tool that
       publishes by the illustration and collision geometry roles to Meshcat
-      (see, for example, the Drake <script>document.write(drake_tutorials_link(
-        'authoring_multibody_simulation',
-        link_text='tutorial on authoring multibody simulations'))
-      </script>). This is very useful for designing new models, but also for 
+      (see, for example, the Drake <a href="https://drake.mit.edu/tutorials/authoring_multibody_simulation.html">tutorial on authoring multibody simulations</a>). This is very useful for designing new models, but also for
       understanding the contact geometry of existing models.</p>
 
       <p>We used this tool before, when we were visualizing the various robot
@@ -367,10 +364,7 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture videos a
     current configurations of the geometry which selects contact points consistently
     from one time step to the next.</p>
 
-    <p>One of the innovations in Drake which makes it particularly good at simulating complex contact situations is that we have moved away from point contact models. When we enable <a href="https://drake.mit.edu/doxygen_cxx/group__hydroelastic__user__guide.html">hydroelastic contact in Drake</a>, the spatial forces between two penetrating bodies are computed by taking an integral over a "hydroelastic surface" which generalizes the notion of a contact patch <elib>Elandt19</elib>. As of this writing, you still have to "opt-in" to using hydroelastic in Drake (see <script>document.write(drake_tutorials_link(
-      'hydroelastic_contact_basics',
-                ext='this tutorial on hydroelastic'))
-    </script>); I'm working to use it in all of my examples in these notes.</p>
+    <p>One of the innovations in Drake which makes it particularly good at simulating complex contact situations is that we have moved away from point contact models. When we enable <a href="https://drake.mit.edu/doxygen_cxx/group__hydroelastic__user__guide.html">hydroelastic contact in Drake</a>, the spatial forces between two penetrating bodies are computed by taking an integral over a "hydroelastic surface" which generalizes the notion of a contact patch <elib>Elandt19</elib>. As of this writing, you still have to "opt-in" to using hydroelastic in Drake (see <a href="https://drake.mit.edu/tutorials/hydroelastic_contact_basics.html">this tutorial on hydroelastic</a>); I'm working to use it in all of my examples in these notes.</p>
 
     <todo>More about hydroelastic here.  Show some of the nice videos.
       https://youtu.be/5-k2Pc6OmzE</todo>
