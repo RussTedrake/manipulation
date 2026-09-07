@@ -4,7 +4,7 @@
 # Copyright 2020 Massachusetts Institute of Technology.
 # Licensed under the BSD 3-Clause License. See LICENSE.TXT for details.
 
-# See Deepnote_docker.sh for usage.
+# Run setup/docker/publish.sh from the repository root to publish this image.
 #
 # IMPORTANT: This image must be built for multiple platforms to support CI:
 # docker buildx build --platform linux/amd64,linux/arm64 -t russtedrake/manipulation:latest --push .
@@ -32,10 +32,7 @@ RUN /tmp/install_prereqs.sh
 RUN apt-get -q update && apt-get -q install -y --no-install-recommends \
     curl git nginx-light python-is-python3 python3-pip python3-venv xvfb \
     && apt-get remove -y python3-notebook && apt-get autoremove -y && apt-get -q clean
-# We still pip install the requirements, because otherwise deepnote will
-# install old versions of e.g. scipy which cannot be upgraded in the
-# Init notebook.  Drake is also installed in /opt/drake, but is not used (since 
-# I've not added it to the path / pythonpath).
+# Install the Python dependencies and library from PyPI.
 RUN pip3 install -r /tmp/requirements.txt pyvirtualdisplay manipulation[all] --ignore-installed --break-system-packages
 # Bake model data into the image up-front, instead of fetching on demand.
 RUN python3 -c 'from pydrake.all import PackageMap; PackageMap().GetPath("drake_models")'

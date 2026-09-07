@@ -8,8 +8,8 @@
     <link rel="canonical" href="http://manipulation.csail.mit.edu/pick.html" />
 
     <script src="https://hypothes.is/embed.js" async></script>
-    <script type="text/javascript" src="chapters.js"></script>
     <script type="text/javascript" src="htmlbook/book.js"></script>
+    <script type="text/javascript" src="notebooks.js"></script>
 
     <script src="htmlbook/mathjax-config.js" defer></script> 
     <script type="text/javascript" id="MathJax-script" defer
@@ -53,8 +53,6 @@ href="https://www.youtube.com/channel/UChfUOAhz7ynELF-s_1LPpWg">Lecture videos a
   <td style="width:33%;text-align:right;"><a class="next_chapter" href=pose.html>Next Chapter</a></td>
 </tr></table>
 
-<script type="text/javascript">document.write(notebook_header('pick'))
-</script>
 <!-- EVERYTHING ABOVE THIS LINE IS OVERWRITTEN BY THE INSTALL SCRIPT -->
 <chapter style="counter-reset: chapter 2"><h1>Basic Pick and Place</h1>
 
@@ -1154,9 +1152,7 @@ Velocity names: ['$world_base_link_wx', '$world_base_link_wy', '$world_base_link
       recommend <elib>Boyd04a</elib>; it is free online and even reading the
       first chapter can be incredibly valuable.  For a very short introduction
       to using optimization in Drake, please take a look at the
-      <script>document.write(drake_tutorials_link(
-        'mathematical_program',
-        link_text='tutorials on MathematicalProgram'))</script>.
+      <a href="https://drake.mit.edu/tutorials/mathematical_program.html">tutorials on MathematicalProgram</a>.
       I use the term "mathematical program" almost synonymously with
       "optimization problem".  Mathematical program is perhaps slightly more
       appropriate if we don't actually have an objective; only constraints.</p>
@@ -1463,7 +1459,7 @@ Velocity names: ['$world_base_link_wx', '$world_base_link_wy', '$world_base_link
   </exercise>
 
   <exercise id="planar_manipulator"><h1>Planar Manipulator</h1>
-      <p> For this exercise you will derive the translational forward kinematics ${^A}p{^C}=f(q)$ and the translational Jacobian $J(q)$ of a planar two-link manipulator. You will work exclusively in <script>document.write(notebook_link('pick', notebook='05_planar_manipulator', link_text='this notebook'))</script>. You will be asked to complete the following steps: </p>
+      <p> For this exercise you will derive the translational forward kinematics ${^A}p{^C}=f(q)$ and the translational Jacobian $J(q)$ of a planar two-link manipulator. You will work exclusively in <script>document.write(notebook_link('pick', notebook='exercises/05_planar_manipulator', link_text='this notebook'))</script>. You will be asked to complete the following steps: </p>
 
       <ol type="a">
         <li> Derive the forward kinematics of the manipulator. </li>
@@ -1525,7 +1521,7 @@ Velocity names: ['$world_base_link_wx', '$world_base_link_wy', '$world_base_link
   </exercise>
 
   <exercise id="spatial_transforms"><h1>Spatial Transforms and Grasp Pose</h1>
-      <p> For this exercise you will apply your knowledge on spatial algebra to write poses of frames in different reference frames, and design a grasp pose yourself. You will work exclusively in <script>document.write(notebook_link('pick', notebook='07_rigid_transforms', link_text='this notebook'))</script>. You will be asked to complete the following steps: </p>
+      <p> For this exercise you will apply your knowledge on spatial algebra to write poses of frames in different reference frames, and design a grasp pose yourself. You will work exclusively in <script>document.write(notebook_link('pick', notebook='exercises/07_rigid_transforms', link_text='this notebook'))</script>. You will be asked to complete the following steps: </p>
 
       <ol type="a">
         <li> Express poses of frames in different reference frames using spatial algebra. </li>
@@ -1534,7 +1530,7 @@ Velocity names: ['$world_base_link_wx', '$world_base_link_wy', '$world_base_link
   </exercise>
 
   <exercise id="robot_painter"><h1>The Robot Painter</h1>
-      <p> For this exercise you will design interesting trajectories for the robot to follow, and observe the robot virtually painting in the air! You will work exclusively in <script>document.write(notebook_link('pick', notebook='08_robot_painter', link_text='this notebook'))</script>. You will be asked to complete the following steps: </p>
+      <p> For this exercise you will design interesting trajectories for the robot to follow, and observe the robot virtually painting in the air! You will work exclusively in <script>document.write(notebook_link('pick', notebook='exercises/08_robot_painter', link_text='this notebook'))</script>. You will be asked to complete the following steps: </p>
 
       <ol type="a">
         <li> Design and compute the poses of key frames of a designated trajectory. </li>
@@ -1543,11 +1539,11 @@ Velocity names: ['$world_base_link_wx', '$world_base_link_wy', '$world_base_link
   </exercise>  
 
   <exercise id="intro_to_qp"><h1>Introduction to QPs</h1>
-      <p> For this exercise you will practice the syntax of solving Quadratic Programs (QPs) via Drake's MathematicalProgram interface. You will work exclusively in <script>document.write(notebook_link('pick', notebook='09_intro_to_qp', link_text='this notebook'))</script>.</p> 
+      <p> For this exercise you will practice the syntax of solving Quadratic Programs (QPs) via Drake's MathematicalProgram interface. You will work exclusively in <script>document.write(notebook_link('pick', notebook='exercises/09_intro_to_qp', link_text='this notebook'))</script>.</p>
   </exercise>  
 
   <exercise id="virtual_wall"><h1>Virtual Wall</h1>
-      <p> For this exercise you will implement a virtual wall for a robot manipulator, using an optimization-based approach to differential inverse kinematics. You will work exclusively in <script>document.write(notebook_link('pick', notebook='10_differential_ik_optimization', link_text='this notebook'))</script>. You will be asked to complete the following steps: </p>
+      <p> For this exercise you will implement a virtual wall for a robot manipulator, using an optimization-based approach to differential inverse kinematics. You will work exclusively in <script>document.write(notebook_link('pick', notebook='exercises/10_differential_ik_optimization', link_text='this notebook'))</script>. You will be asked to complete the following steps: </p>
 
       <ol type="a">
         <li> Implement a optimization-based differential IK controller with joint velocity limits. </li>
@@ -1626,7 +1622,7 @@ Velocity names: ['$world_base_link_wx', '$world_base_link_wy', '$world_base_link
   </ol>
 
   <exercise id="pick_place_initials"><h1>Grasping and Manipulating Assets</h1>
-  <p> For this exercise we will build on the <a href="https://manipulation.csail.mit.edu/pick.html#example13">Pick and Place Demo</a> we developed this chapter. You will program the robot to pick and place letter assets corresponding to your initials. You will work exclusively in <script>document.write(notebook_link('pick', notebook='14_pickplace_initials', link_text='this notebook'))</script>. You will be asked to complete the following steps: </p>
+  <p> For this exercise we will build on the <a href="https://manipulation.csail.mit.edu/pick.html#example13">Pick and Place Demo</a> we developed this chapter. You will program the robot to pick and place letter assets corresponding to your initials. You will work exclusively in <script>document.write(notebook_link('pick', notebook='exercises/14_pickplace_initials', link_text='this notebook'))</script>. You will be asked to complete the following steps: </p>
 
   <ol type="a">
       <li> Solve for grasp and placement poses of the assets. </li>
