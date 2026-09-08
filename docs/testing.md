@@ -65,3 +65,9 @@ TEST_ALL_MENAGERIE=1 .venv/bin/python -m pytest \
 This checks conversion for all matching scenes. Asset references and Drake loading
 are asserted for the two representatives; other upstream scenes can contain
 dangling material references or use unsupported MJCF features. Generated files stay in temporary directories, outside the model cache.
+
+Ubuntu CI sets `INSTALL_JUPYTER=0` when installing system prerequisites because
+its Python environment supplies the notebook dependencies. The prerequisite
+script still installs system Jupyter by default for local users. CI uses
+Ubuntu's Git package and retains apt lists through setup to avoid redundant
+repository setup and downloads.
