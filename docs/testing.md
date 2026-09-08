@@ -39,3 +39,23 @@ Download caching was evaluated in CI, including archive restoration overhead.
 Linux restoration cost more than the installation time it saved, and macOS did
 not show a consistent setup improvement. The workflow therefore keeps fresh
 dependency installation and model prefetch without download cache actions.
+
+# Menagerie conversion coverage
+
+The default conversion test uses Panda (STL meshes, includes, and defaults) and
+ANYmal B (textures and materials). It copies each model to a temporary directory,
+converts its scene, checks mesh references, and loads the result with Drake.
+[Drake's Menagerie tests](https://github.com/RobotLocomotion/drake/blob/master/multibody/parsing/test/detail_mujoco_parser_examples_test.cc)
+exercise raw MJCF parsing, not this conversion code.
+
+When updating the Menagerie revision in `manipulation/remotes.py`, run the full
+conversion sweep locally:
+
+```sh
+TEST_ALL_MENAGERIE=1 .venv/bin/python -m pytest \
+  manipulation/test/test_make_drake_compatible_model.py -k mujoco_menagerie
+```
+
+This checks conversion for all matching scenes. Asset references and Drake loading
+are asserted for the two representatives; other upstream scenes can contain
+dangling material references or use unsupported MJCF features. Generated files stay in temporary directories, outside the model cache.

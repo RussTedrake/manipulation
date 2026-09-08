@@ -99,7 +99,9 @@ class LetterGenerationTest(unittest.TestCase):
                     font_name=font,
                     letter_height_meters=0.4,
                     extrusion_depth_meters=0.15,
-                    output_dir=self._tmp_dir,
+                    output_dir=f"{self._tmp_dir}/{font}",
+                    # Exercise font geometry without repeating CoACD coverage.
+                    use_bbox_collision_geometry=True,
                 )
 
                 self.assertIsNotNone(
@@ -114,54 +116,35 @@ class LetterGenerationTest(unittest.TestCase):
         """Test SDF asset creation with different parameters."""
         letter = "C"
 
-        # Test with different letter heights
-        for letter_height in [0.2, 0.4, 0.6]:
-            with self.subTest(letter_height=letter_height):
+        dimensions = [(height, 0.15) for height in (0.2, 0.4, 0.6)]
+        dimensions += [(0.4, depth) for depth in (0.1, 0.2)]
+        for height, depth in dimensions:
+            with self.subTest(height=height, depth=depth):
                 sdf_path = create_sdf_asset_from_letter(
                     text=letter,
                     font_name="DejaVu Sans",
-                    letter_height_meters=letter_height,
-                    extrusion_depth_meters=0.15,
-                    output_dir=self._tmp_dir,
-                )
-
-                self.assertIsNotNone(
-                    sdf_path,
-                    f"SDF path should not be None for letter_height {letter_height}",
-                )
-                if sdf_path:
-                    self.assertTrue(
-                        sdf_path.exists(),
-                        f"SDF file should exist for letter_height {letter_height}",
-                    )
-
-        # Test with different extrusion depths
-        for depth in [0.1, 0.15, 0.2]:
-            with self.subTest(extrusion_depth=depth):
-                sdf_path = create_sdf_asset_from_letter(
-                    text=letter,
-                    font_name="DejaVu Sans",
-                    letter_height_meters=0.4,
+                    letter_height_meters=height,
                     extrusion_depth_meters=depth,
-                    output_dir=self._tmp_dir,
+                    output_dir=f"{self._tmp_dir}/dimensions_{height}_{depth}",
+                    use_bbox_collision_geometry=True,
                 )
+                self.assertIsNotNone(sdf_path)
+                self.assertTrue(sdf_path.exists())
+                mesh = trimesh.load_mesh(sdf_path.with_suffix(".obj"))
+                self.assertAlmostEqual(mesh.extents[1], height)
+                self.assertAlmostEqual(mesh.extents[2], depth)
 
-                self.assertIsNotNone(
-                    sdf_path, f"SDF path should not be None for depth {depth}"
-                )
-                if sdf_path:
-                    self.assertTrue(
-                        sdf_path.exists(), f"SDF file should exist for depth {depth}"
-                    )
-
+    def test_create_sdf_asset_collision_geometry(self):
+        """Exercise both collision methods independently of dimension tests."""
+        letter = "C"
         for use_bbox_collision_geometry in [True, False]:
-            with self.subTest(extrusion_depth=depth):
+            with self.subTest(use_bbox_collision_geometry=use_bbox_collision_geometry):
                 sdf_path = create_sdf_asset_from_letter(
                     text=letter,
                     font_name="DejaVu Sans",
                     letter_height_meters=0.4,
-                    extrusion_depth_meters=depth,
-                    output_dir=self._tmp_dir,
+                    extrusion_depth_meters=0.15,
+                    output_dir=f"{self._tmp_dir}/collision_{use_bbox_collision_geometry}",
                     use_bbox_collision_geometry=use_bbox_collision_geometry,
                 )
 
