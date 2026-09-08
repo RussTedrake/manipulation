@@ -40,6 +40,12 @@ Linux restoration cost more than the installation time it saved, and macOS did
 not show a consistent setup improvement. The workflow therefore keeps fresh
 dependency installation and model prefetch without download cache actions.
 
+The Linux pip job installs CPU-only PyTorch and torchvision wheels from PyTorch's
+CPU index. A temporary constraints file preserves those builds during the
+`manipulation[all]` install, and the job verifies their build tags afterward.
+This choice is confined to CI: the published dependency requirements and Poetry
+lockfile are unchanged, and downstream users can continue using GPU builds.
+
 # Menagerie conversion coverage
 
 The default conversion test uses Panda (STL meshes, includes, and defaults) and
