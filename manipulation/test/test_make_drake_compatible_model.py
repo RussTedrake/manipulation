@@ -1,10 +1,13 @@
 import os
-import re
+import shutil
 import tempfile
 import unittest
+from pathlib import Path
 
 from lxml import etree
-from pydrake.multibody.parsing import PackageMap
+from pydrake.multibody.parsing import PackageMap, Parser
+from pydrake.multibody.plant import AddMultibodyPlantSceneGraph
+from pydrake.systems.framework import DiagramBuilder
 
 from manipulation.utils import FindResource
 
@@ -173,48 +176,71 @@ class TestMakeDrakeCompatibleModel(unittest.TestCase):
         os.remove(output_filename)
 
     def test_mujoco_menagerie(self):
-        """Test all files in the mujoco_menagerie package."""
+        """Cover our conversion pipeline; Drake tests raw Menagerie parsing."""
         package_map = PackageMap()
         AddMujocoMenagerie(package_map)
-        menagerie = package_map.GetPath("mujoco_menagerie")
-        # Find all XML files recursively under the menagerie path
-        results = ""
-        for root, dirs, files in os.walk(menagerie):
-            for file in files:
-                if file.endswith(".drake.xml"):
+        menagerie = Path(package_map.GetPath("mujoco_menagerie"))
+        representative_scenes = (
+            "franka_emika_panda/scene.xml",  # STL meshes, includes, defaults.
+            "anybotics_anymal_b/scene.xml",  # File-backed textures and materials.
+        )
+        scenes = [menagerie / scene for scene in representative_scenes]
+        if os.environ.get("TEST_ALL_MENAGERIE") == "1":
+            scenes = sorted(menagerie.rglob("*scene.xml"))
+        self.assertTrue(scenes)
+        for scene in scenes:
+            relative_scene = scene.relative_to(menagerie).as_posix()
+            with self.subTest(
+                scene=relative_scene
+            ), tempfile.TemporaryDirectory() as tmp:
+                # Keep generated meshes out of the shared package cache. Recompute
+                # outputs even if an older local run left converted assets there.
+                model_dir = Path(tmp) / scene.parent.name
+                shutil.copytree(scene.parent, model_dir)
+                output = model_dir / "scene.drake.xml"
+                MakeDrakeCompatibleModel(
+                    str(model_dir / scene.name), str(output), overwrite=True
+                )
+                self.assertTrue(output.is_file())
+                # Preserve the full sweep's conversion-smoke-test contract.
+                # Some other upstream OBJ files have dangling material references.
+                if relative_scene not in representative_scenes:
                     continue
-                if file.endswith("scene.xml"):
-                    with self.subTest(file=file):
-                        original_file = os.path.join(root, file)
-                        drake_compatible_file = original_file.replace(
-                            ".xml", ".drake.xml"
-                        )
-                        try:
-                            MakeDrakeCompatibleModel(
-                                original_file, drake_compatible_file
-                            )
-                            results += (
-                                f"PASS: {os.path.relpath(root, menagerie)}/{file}\n"
-                            )
-                        except Exception as e:
-                            rel_path = os.path.relpath(root, menagerie)
-                            # Known type/message pairs that we expect to encounter
-                            known_exceptions = [
-                                # No more known exceptions (yeah!)... but the format is:
-                                # (KeyError, r".*'file'.*", "Need to parse defaults"),
-                            ]
-                            known_failure = False
-                            for exc_type, msg_pattern, note in known_exceptions:
-                                if isinstance(e, exc_type) and re.match(
-                                    msg_pattern, str(e)
-                                ):
-                                    results += f"FAIL: {os.path.join(rel_path, file)}: {note}\n"
-                                    known_failure = True
-                                    break
-                            if not known_failure:
-                                results += f"FAIL: {os.path.join(rel_path, file)}: Unregistered exception\n"
-                                raise  # Re-raise if not a known exception
-        print(results)
+                root = etree.parse(output)
+                self.assertFalse(root.findall(".//include"))
+                meshdir = ""
+                for compiler in root.findall(".//compiler"):
+                    meshdir = compiler.get("meshdir", compiler.get("assetdir", meshdir))
+                meshes = root.findall(".//asset/mesh")
+                self.assertTrue(meshes)
+                textures = []
+                for mesh in meshes:
+                    mesh_path = model_dir / meshdir / mesh.get("file")
+                    self.assertTrue(mesh_path.is_file())
+                    if mesh_path.suffix.lower() == ".obj":
+                        for line in mesh_path.read_text().splitlines():
+                            if line.startswith("mtllib "):
+                                material = (
+                                    mesh_path.parent
+                                    / line.removeprefix("mtllib ").strip()
+                                )
+                                self.assertTrue(material.is_file())
+                                for entry in material.read_text().splitlines():
+                                    if entry.startswith("map_Kd "):
+                                        texture = (
+                                            material.parent
+                                            / entry.removeprefix("map_Kd ").strip()
+                                        )
+                                        self.assertTrue(texture.is_file())
+                                        textures.append(texture)
+                if relative_scene == "anybotics_anymal_b/scene.xml":
+                    self.assertTrue(textures)
+
+                builder = DiagramBuilder()
+                plant, _ = AddMultibodyPlantSceneGraph(builder, time_step=0.001)
+                models = Parser(plant).AddModels(str(output))
+                self.assertTrue(models)
+                plant.Finalize()
 
 
 if __name__ == "__main__":

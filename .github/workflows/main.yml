@@ -100,17 +100,12 @@ jobs:
     steps:
       - name: pre-checkout setup
         run: |
-          export APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=1 DEBIAN_FRONTEND=noninteractive
+          export DEBIAN_FRONTEND=noninteractive
           apt-get update -o APT::Acquire::Retries=4 -qq
-          apt-get install -o APT::Acquire::Retries=4 -o Dpkg::Use-Pty=0 -qy --no-install-recommends ca-certificates gnupg sudo
-          apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E1DD270288B4E6030699E45FA1715D88E1DF1F24
-          echo 'deb http://ppa.launchpad.net/git-core/ppa/ubuntu noble main' > /etc/apt/sources.list.d/git.list
-          apt-get update -o APT::Acquire::Retries=4 -qq
-          apt-get install -o APT::Acquire::Retries=4 -o Dpkg::Use-Pty=0 -qy --no-install-recommends git
+          apt-get install -o APT::Acquire::Retries=4 -o Dpkg::Use-Pty=0 -qy --no-install-recommends ca-certificates sudo git
           # Create non-root user for running repository setup / tests
           useradd -m -s /bin/bash runner
           echo 'runner ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
-          rm -rf /var/cache/apt/archives/*.deb /var/cache/apt/archives/partial/*.deb /var/cache/apt/*.bin /var/lib/apt/lists/* /var/log/apt/*
         shell: bash
 
       - name: checkout PR code
@@ -148,7 +143,7 @@ jobs:
           # Switch to runner user for remaining commands
           sudo -H -u runner ./setup/submodule_checkout
           # Install system packages as root
-          ./setup/ubuntu/24.04/install_prereqs.sh
+          INSTALL_JUPYTER=0 ./setup/ubuntu/24.04/install_prereqs.sh
           sudo -H -u runner python3 -m pip install --user --break-system-packages poetry==2.1.4
           sudo -H -u runner python3 -m poetry config virtualenvs.in-project true
           sudo -H -u runner python3 -m poetry install --all-extras --with dev
@@ -166,8 +161,17 @@ jobs:
           set -euo pipefail
           VENV_PYTHON="$(pwd)/.venv/bin/python"
           sudo -H -u runner env -u DISPLAY XDG_CACHE_HOME=/tmp \
-            DRAKE_ALLOW_NETWORK=lcm:meshcat "$VENV_PYTHON" -m pytest -ra
+            DRAKE_ALLOW_NETWORK=lcm:meshcat "$VENV_PYTHON" -m pytest -ra --durations=30 --junitxml=test-results/pytest.xml
         shell: bash
+
+      - name: upload test timings
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pytest-${{ github.job }}
+          path: test-results/pytest.xml
+          if-no-files-found: ignore
+          retention-days: 14
 
   # TODO(russt): add noble-pip-core workflow which only runs the tests in manipulation,
   # but uses the manipulation module from pip.
@@ -191,17 +195,12 @@ jobs:
     steps:
       - name: pre-checkout setup
         run: |
-          export APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=1 DEBIAN_FRONTEND=noninteractive
+          export DEBIAN_FRONTEND=noninteractive
           apt-get update -o APT::Acquire::Retries=4 -qq
-          apt-get install -o APT::Acquire::Retries=4 -o Dpkg::Use-Pty=0 -qy --no-install-recommends ca-certificates gnupg sudo
-          apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E1DD270288B4E6030699E45FA1715D88E1DF1F24
-          echo 'deb http://ppa.launchpad.net/git-core/ppa/ubuntu noble main' > /etc/apt/sources.list.d/git.list
-          apt-get update -o APT::Acquire::Retries=4 -qq
-          apt-get install -o APT::Acquire::Retries=4 -o Dpkg::Use-Pty=0 -qy --no-install-recommends git
+          apt-get install -o APT::Acquire::Retries=4 -o Dpkg::Use-Pty=0 -qy --no-install-recommends ca-certificates sudo git
           # Create non-root user for running repository setup / tests
           useradd -m -s /bin/bash runner
           echo 'runner ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
-          rm -rf /var/cache/apt/archives/*.deb /var/cache/apt/archives/partial/*.deb /var/cache/apt/*.bin /var/lib/apt/lists/* /var/log/apt/*
         shell: bash
 
       - name: checkout PR code
@@ -241,7 +240,14 @@ jobs:
           # Install system packages as root
           ./setup/ubuntu/24.04/install_prereqs.sh
           rm -rf ./manipulation  # remove local module, force pip module.
-          sudo -H -u runner python3 -m pip install --user --break-system-packages --upgrade manipulation[all] pytest pytest-timeout
+          # CPU wheels are a CI-only choice; leave published requirements unchanged.
+          sudo -H -u runner python3 -m pip install --user --break-system-packages \
+            --index-url https://download.pytorch.org/whl/cpu 'torch>=2.3,<3.0' 'torchvision>=0.18,<1.0'
+          # Keep the subsequent resolver from replacing these with GPU builds.
+          sudo -H -u runner python3 -c 'from importlib.metadata import version; print("\n".join(f"{p}=={version(p)}" for p in ("torch", "torchvision")))' > /tmp/ci-torch-constraints.txt
+          sudo -H -u runner python3 -m pip install --user --break-system-packages \
+            --constraint /tmp/ci-torch-constraints.txt --upgrade manipulation[all] pytest pytest-timeout
+          sudo -H -u runner python3 -c 'import torch, torchvision; print(torch.__version__, torchvision.__version__); assert "+cpu" in torch.__version__ and "+cpu" in torchvision.__version__; assert torch.version.cuda is None'
           rm -rf /var/cache/apt/archives/*.deb /var/cache/apt/archives/partial/*.deb /var/cache/apt/*.bin /var/lib/apt/lists/* /var/log/apt/*
         shell: bash
 
@@ -257,8 +263,17 @@ jobs:
           find book/htmlbook -type f -name 'test_*.py' -delete  # remove htmlbook tests (extra Python requirements)
           sudo -H -u runner env -u DISPLAY MANIPULATION_DATA_DIR="$(pwd)/book/data" \
             XDG_CACHE_HOME=/tmp DRAKE_ALLOW_NETWORK=lcm:meshcat \
-            python3 -m pytest -ra
+            python3 -m pytest -ra --durations=30 --junitxml=test-results/pytest.xml
         shell: bash
+
+      - name: upload test timings
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pytest-${{ github.job }}
+          path: test-results/pytest.xml
+          if-no-files-found: ignore
+          retention-days: 14
 
   sequoia:
     name: macos sequoia 15
@@ -328,8 +343,17 @@ jobs:
       - name: test
         run: |
           set -euo pipefail
-          XDG_CACHE_HOME=/tmp DRAKE_ALLOW_NETWORK=lcm:meshcat .venv/bin/python -m pytest -ra
+          XDG_CACHE_HOME=/tmp DRAKE_ALLOW_NETWORK=lcm:meshcat .venv/bin/python -m pytest -ra --durations=30 --junitxml=test-results/pytest.xml
         shell: zsh -efuo pipefail {0}
+
+      - name: upload test timings
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pytest-${{ github.job }}
+          path: test-results/pytest.xml
+          if-no-files-found: ignore
+          retention-days: 14
 
   lint:
     runs-on: ubuntu-latest
