@@ -151,7 +151,9 @@ jobs:
           ./setup/ubuntu/24.04/install_prereqs.sh
           sudo -H -u runner python3 -m pip install --user --break-system-packages poetry==2.1.4
           sudo -H -u runner python3 -m poetry config virtualenvs.in-project true
-          sudo -H -u runner python3 -m poetry install --all-extras --with dev
+          sudo -H -u runner python3 -m setup.ci_poetry_cpu
+          sudo -H -u runner python3 -m poetry install --only-root
+          sudo -H -u runner "$(pwd)/.venv/bin/python" -c 'import torch, torchvision; print(torch.__version__, torchvision.__version__); assert "+cpu" in torch.__version__ and "+cpu" in torchvision.__version__; assert torch.version.cuda is None'
           rm -rf /var/cache/apt/archives/*.deb /var/cache/apt/archives/partial/*.deb /var/cache/apt/*.bin /var/lib/apt/lists/* /var/log/apt/*
         shell: bash
 

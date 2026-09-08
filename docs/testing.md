@@ -46,6 +46,12 @@ CPU index. A temporary constraints file preserves those builds during the
 This choice is confined to CI: the published dependency requirements and Poetry
 lockfile are unchanged, and downstream users can continue using GPU builds.
 
+Linux Poetry CI uses `setup/ci_poetry_cpu.py` to select CPU variants of its locked
+torch/torchvision versions. It temporarily adds an explicit source, re-locks,
+checks retained dependency versions, and installs dependencies. Both input files
+are restored even on failure, before installing the root package with its original
+metadata. macOS continues using the committed lockfile directly.
+
 # Menagerie conversion coverage
 
 The default conversion test uses Panda (STL meshes, includes, and defaults) and
