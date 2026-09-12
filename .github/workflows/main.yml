@@ -44,6 +44,13 @@ on:
   schedule:
     - cron: '0 8 * * *'
 
+# Avoid multiplying native numerical-library threads across pytest workers.
+env:
+  OMP_NUM_THREADS: '1'
+  OPENBLAS_NUM_THREADS: '1'
+  MKL_NUM_THREADS: '1'
+  NUMEXPR_NUM_THREADS: '1'
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
@@ -160,8 +167,9 @@ jobs:
         run: |
           set -euo pipefail
           VENV_PYTHON="$(pwd)/.venv/bin/python"
-          sudo -H -u runner env -u DISPLAY XDG_CACHE_HOME=/tmp \
-            DRAKE_ALLOW_NETWORK=lcm:meshcat "$VENV_PYTHON" -m pytest -ra --durations=30 --junitxml=test-results/pytest.xml
+          sudo --preserve-env=OMP_NUM_THREADS,OPENBLAS_NUM_THREADS,MKL_NUM_THREADS,NUMEXPR_NUM_THREADS \
+            -H -u runner env -u DISPLAY XDG_CACHE_HOME=/tmp \
+            DRAKE_ALLOW_NETWORK=lcm:meshcat "$VENV_PYTHON" -m pytest -n 2 --dist loadfile -ra --durations=30 --junitxml=test-results/pytest.xml
         shell: bash
 
       - name: upload test timings
@@ -246,7 +254,7 @@ jobs:
           # Keep the subsequent resolver from replacing these with GPU builds.
           sudo -H -u runner python3 -c 'from importlib.metadata import version; print("\n".join(f"{p}=={version(p)}" for p in ("torch", "torchvision")))' > /tmp/ci-torch-constraints.txt
           sudo -H -u runner python3 -m pip install --user --break-system-packages \
-            --constraint /tmp/ci-torch-constraints.txt --upgrade manipulation[all] pytest pytest-timeout
+            --constraint /tmp/ci-torch-constraints.txt --upgrade manipulation[all] pytest pytest-timeout 'pytest-xdist>=3.6,<4'
           sudo -H -u runner python3 -c 'import torch, torchvision; print(torch.__version__, torchvision.__version__); assert "+cpu" in torch.__version__ and "+cpu" in torchvision.__version__; assert torch.version.cuda is None'
           rm -rf /var/cache/apt/archives/*.deb /var/cache/apt/archives/partial/*.deb /var/cache/apt/*.bin /var/lib/apt/lists/* /var/log/apt/*
         shell: bash
@@ -261,9 +269,10 @@ jobs:
         run: |
           set -euo pipefail
           find book/htmlbook -type f -name 'test_*.py' -delete  # remove htmlbook tests (extra Python requirements)
-          sudo -H -u runner env -u DISPLAY MANIPULATION_DATA_DIR="$(pwd)/book/data" \
+          sudo --preserve-env=OMP_NUM_THREADS,OPENBLAS_NUM_THREADS,MKL_NUM_THREADS,NUMEXPR_NUM_THREADS \
+            -H -u runner env -u DISPLAY MANIPULATION_DATA_DIR="$(pwd)/book/data" \
             XDG_CACHE_HOME=/tmp DRAKE_ALLOW_NETWORK=lcm:meshcat \
-            python3 -m pytest -ra --durations=30 --junitxml=test-results/pytest.xml
+            python3 -m pytest -n 2 --dist loadfile -ra --durations=30 --junitxml=test-results/pytest.xml
         shell: bash
 
       - name: upload test timings
@@ -343,7 +352,7 @@ jobs:
       - name: test
         run: |
           set -euo pipefail
-          XDG_CACHE_HOME=/tmp DRAKE_ALLOW_NETWORK=lcm:meshcat .venv/bin/python -m pytest -ra --durations=30 --junitxml=test-results/pytest.xml
+          XDG_CACHE_HOME=/tmp DRAKE_ALLOW_NETWORK=lcm:meshcat .venv/bin/python -m pytest -n 2 --dist loadfile -ra --durations=30 --junitxml=test-results/pytest.xml
         shell: zsh -efuo pipefail {0}
 
       - name: upload test timings
