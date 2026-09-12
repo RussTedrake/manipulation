@@ -1006,13 +1006,8 @@ def MakeHardwareStation(
     for _, camera in scenario.cameras.items():
         _ApplyCameraConfigSim(config=camera, builder=builder, lcm_buses=lcm_buses)
 
-    # Add visualization.
-    if meshcat:
-        ApplyVisualizationConfig(
-            scenario.visualization, builder, meshcat=meshcat, lcm_buses=lcm_buses
-        )
-
-    # Export "cheat" ports.
+    # Export "cheat" ports before visualization so Meshcat's mouse interaction
+    # does not connect the spatial force input that the station exposes.
     builder.ExportInput(
         sim_plant.get_applied_generalized_force_input_port(),
         "applied_generalized_force",
@@ -1021,6 +1016,13 @@ def MakeHardwareStation(
         sim_plant.get_applied_spatial_force_input_port(),
         "applied_spatial_force",
     )
+
+    # Add visualization.
+    if meshcat:
+        ApplyVisualizationConfig(
+            scenario.visualization, builder, meshcat=meshcat, lcm_buses=lcm_buses
+        )
+
     # Export any actuation (non-empty) input ports that are not already
     # connected (e.g. by a driver).
     for i in range(sim_plant.num_model_instances()):
