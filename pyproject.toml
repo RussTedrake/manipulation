@@ -2,7 +2,7 @@
 name = "manipulation"
 # Use e.g. 2024.10.4.rc0 if I need to release a release candidate.
 # Use e.g. 2024.10.4.post1 if I need to rerelease on the same day.
-version = "2026.9.12"
+version = "2026.9.12.post1"
 description = "MIT 6.421 - Robotic Manipulation"
 authors = ["Russ Tedrake <russt@mit.edu>"]
 license = "BSD License"
@@ -73,6 +73,7 @@ pyzmq = [
   {platform="linux", version=">=24.0.0", optional=true},
 ]
 scene-synthesizer = { version=">=1.13.2", optional=true }
+requests = { version=">=2.25.1", optional=true }
 scipy = { version=">=1.10.0", optional=true }
 setuptools = { version="<71.0.0", optional=true } # https://github.com/pypa/setuptools/issues/4487
 stable-baselines3 = { version=">=2.0.0", optional=true }
@@ -104,6 +105,7 @@ all = [
   "psutil",
   "pycollada",
   "pyzmq",
+  "requests",
   "scene-synthesizer",
   "scipy",
   "stable_baselines3",
