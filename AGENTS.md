@@ -1,5 +1,6 @@
 # Repository Agent Notes
 
+- Direct pushes to `master` in the private `RobotLocomotion/manipulation-solutions` repository are authorized for task-related solutions changes; a separate solutions PR is not required. Preserve unrelated work and never force-push without explicit authorization.
 - Use the GitHub account `RussTedrake` (never `RussTedrake-walden`) for all `gh` operations in this repository and all nested repositories. Before GitHub writes, verify `gh api user --jq .login` and switch with `gh auth switch --hostname github.com --user RussTedrake` if needed. Commits must use `Russ Tedrake <russt@mit.edu>`.
 - Always run Python commands (including tests, linting, type checks, scripts, and tooling) using the repository virtual environment at `.venv`.
 - Prefer `.venv/bin/python -m <tool>` over system Python or globally installed executables.
