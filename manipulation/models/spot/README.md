@@ -1,5 +1,8 @@
 
-The models in this directory were obtained from https://github.com/bdaiinstitute/spot_ros2.
+The models in this directory were obtained from https://github.com/rai-opensource/spot_ros2
+(formerly `bdaiinstitute/spot_ros2`). Their mesh assets now live in
+https://github.com/rai-opensource/spot_description and are fetched by
+`AddSpotRemote` in `manipulation/remotes.py`.
 
 They were modified in the following ways:
 - use package paths to reference the assets

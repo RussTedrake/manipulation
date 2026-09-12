@@ -25,16 +25,18 @@ def AddMujocoMenagerie(package_map: PackageMap) -> str:
 
 def AddSpotRemote(package_map: PackageMap) -> str:
     """Add the remote `spot_description` package to the given PackageMap.
-    https://github.com/wrangel-bdai/spot_ros2"""
+    https://github.com/rai-opensource/spot_description"""
     package_name = "spot_description"
     package_map.AddRemote(
         package_name=package_name,
         params=PackageMap.RemoteParams(
+            # Asset submodule revision used by rai-opensource/spot_ros2 at
+            # fc0eb245d47e146cf2a4c4fa47c9739f89bc79bd.
             urls=[
-                f"https://github.com/wrangel-bdai/spot_ros2/archive/20965ef7bba98598ee10878c7b54e6ef28a300c6.tar.gz"
+                "https://github.com/rai-opensource/spot_description/archive/156d1802bfb117f219dbfce7597d283d5fabc968.tar.gz"
             ],
-            sha256=("20a4f12896b04cc73e186cf876bf2c7e905ee88f8add8ea51bf52dfc888674b4"),
-            strip_prefix="spot_ros2-20965ef7bba98598ee10878c7b54e6ef28a300c6/spot_description/",
+            sha256=("ab68ae01f4ae23e63b00a3efb6dcf2cf68d1bf19d0f2f0e79a0cb3012fcc476f"),
+            strip_prefix="spot_description-156d1802bfb117f219dbfce7597d283d5fabc968/spot_description/",
         ),
     )
     return package_name
