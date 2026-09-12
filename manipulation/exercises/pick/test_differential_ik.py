@@ -10,6 +10,28 @@ class TestDifferentialIK(unittest.TestCase):
         super().__init__(test_name)
         self.notebook_locals = notebook_locals
 
+    def _check_velocity(self, value):
+        velocity = np.asarray(value).squeeze()
+        self.assertEqual(velocity.shape, (7,), "Return seven joint velocities")
+        self.assertTrue(
+            np.all(np.isfinite(velocity)), "Joint velocities must be finite"
+        )
+        self.assertLessEqual(
+            np.max(np.abs(velocity)), 3.0 + 1e-6, "Joint velocity limit exceeded"
+        )
+        return velocity
+
+    def _check_tracking_cost(self, J_G, desired, velocity, reference):
+        # J_G is 6 x 7, so the optimal joint velocity need not be unique.
+        # The stored solutions give reference costs, not required joint velocities.
+        cost = np.linalg.norm(J_G @ velocity - desired) ** 2
+        reference_cost = np.linalg.norm(J_G @ reference - desired) ** 2
+        self.assertLessEqual(
+            cost,
+            reference_cost + 1e-6,
+            "The feasible joint velocity does not minimize tracking error",
+        )
+
     @weight(4)
     @timeout_decorator.timeout(1.0)
     def test_diffik_qp(self):
@@ -290,16 +312,9 @@ class TestDifferentialIK(unittest.TestCase):
             ]
         )
 
-        f_eval = []
-        for i in range(4):
-            f_eval.append(f(J_G_lst[i], V_G_desired, None, None, None))
-        f_eval = np.array(f_eval).squeeze()
-
-        self.assertLessEqual(
-            np.linalg.norm(f_target - np.stack(f_eval)),
-            1e-3,
-            "DiffIKQP input-output response is not correct",
-        )
+        for J_G, reference in zip(J_G_lst, f_target):
+            velocity = self._check_velocity(f(J_G, V_G_desired, None, None, None))
+            self._check_tracking_cost(J_G, V_G_desired, velocity, reference)
 
     @weight(6)
     @timeout_decorator.timeout(1.0)
@@ -590,16 +605,21 @@ class TestDifferentialIK(unittest.TestCase):
             ]
         )
 
-        f_eval = []
-        for i in range(4):
-            f_eval.append(f(J_G_lst[i], V_G_desired, None, None, p_now_lst[i]))
-        f_eval = np.array(f_eval).squeeze()
-
-        self.assertLessEqual(
-            np.linalg.norm(f_target - np.stack(f_eval)),
-            1e-3,
-            "DiffIKQP_Wall implementation is not correct.",
-        )
+        for J_G, p_now, reference in zip(J_G_lst, p_now_lst, f_target):
+            velocity = self._check_velocity(f(J_G, V_G_desired, None, None, p_now))
+            # Check the wall in velocity units, matching the joint-limit tolerance.
+            translation_velocity = J_G[3:] @ velocity
+            lower = (np.array([-0.3, -1.0, 0.0]) - p_now) / 4e-3
+            upper = (np.array([0.3, 1.0, 1.0]) - p_now) / 4e-3
+            self.assertTrue(
+                np.all(translation_velocity >= lower - 1e-6),
+                "The predicted end-effector position crosses the wall",
+            )
+            self.assertTrue(
+                np.all(translation_velocity <= upper + 1e-6),
+                "The predicted end-effector position crosses the wall",
+            )
+            self._check_tracking_cost(J_G, V_G_desired, velocity, reference)
 
         # 2. Check that it cannot find solutions when it shouldn't.
 
