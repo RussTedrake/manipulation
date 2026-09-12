@@ -45,8 +45,9 @@ class TestStochasticOptimization(unittest.TestCase):
         """Test approximated gradient function"""
         np.random.seed(7)
         approximated_gradient = self.notebook_locals["approximated_gradient"]
+        # With sigma^2 = 0.25, this rate preserves the reference trajectory.
         f_eval = self.gradient_descent(
-            0.1, approximated_gradient, initial_x=np.array([2.0, 2.0]), iter=5
+            0.025, approximated_gradient, initial_x=np.array([2.0, 2.0]), iter=5
         )
         f_eval = np.array(f_eval)
 
@@ -64,7 +65,7 @@ class TestStochasticOptimization(unittest.TestCase):
         self.assertLessEqual(
             np.linalg.norm(f_target - f_eval),
             1e-2,
-            "You have wrong approximated gradients.",
+            "Check the Gaussian sample and the division by its variance (0.25).",
         )
 
     @weight(1)
@@ -82,8 +83,9 @@ class TestStochasticOptimization(unittest.TestCase):
         def reduced_function(x, rate):
             return approximated_gradient_with_baseline(x, rate, baseline)
 
+        # With sigma^2 = 0.25, this rate preserves the reference trajectory.
         f_eval = self.gradient_descent(
-            0.1, reduced_function, initial_x=np.array([2.0, 2.0]), iter=5
+            0.025, reduced_function, initial_x=np.array([2.0, 2.0]), iter=5
         )
         f_eval = np.array(f_eval)
 
@@ -101,5 +103,5 @@ class TestStochasticOptimization(unittest.TestCase):
         self.assertLessEqual(
             np.linalg.norm(f_target - f_eval),
             1e-2,
-            "You have wrong approixmated gradients" "with baseline",
+            "Check the baseline and the division by the perturbation variance.",
         )
