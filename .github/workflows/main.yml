@@ -52,7 +52,8 @@ env:
   NUMEXPR_NUM_THREADS: '1'
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  # Label-triggered runs must not cancel the regular pull-request checks.
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 jobs:
   check-approval:
