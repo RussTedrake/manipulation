@@ -6,7 +6,9 @@ from pydrake.multibody.parsing import PackageMap
 from manipulation.station import LoadScenario, MakeHardwareStation
 
 
-@pytest.mark.parametrize("driver", ["IiwaDriver", "InverseDynamicsDriver"])
+@pytest.mark.parametrize(
+    "driver", ["IiwaDriver", "InverseDynamicsDriver", "JointStiffnessDriver"]
+)
 def test_controller_uses_station_package_overrides(tmp_path, driver):
     models = Path(PackageMap().GetPath("drake_models"))
     for child in models.iterdir():

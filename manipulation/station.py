@@ -31,6 +31,7 @@ from pydrake.all import (
     IiwaControlMode,
     IiwaDriver,
     IiwaStatusReceiver,
+    InverseDynamics,
     InverseDynamicsController,
     Joint,
     LcmBuses,
@@ -121,13 +122,16 @@ class JointPdControllerGains:
 class JointStiffnessDriver:
     """A simulation-only driver that sets up MultibodyPlant to act as if it is
     being controlled with a JointStiffnessController. The MultibodyPlant must
-    be using SAP as the (discrete-time) contact solver.
+    be using SAP as the (discrete-time) contact solver. Gravity compensation,
+    optional feedforward torque, and PD control share the actuator effort limits.
+    Gravity compensation uses the full simulation state, including attached loads.
 
     Args:
         gains: A mapping of {actuator_name: JointPdControllerGains} for each
             actuator that should be controlled.
-        hand_model_name: If set, then the gravity compensation will be turned
-            off for this model instance (e.g. for a hand).
+        hand_model_name: Retained for backwards compatibility. Attached hand
+            loads are included automatically; if supplied, this must name an
+            existing model instance.
     """
 
     # Must have one element for every (named) actuator in the model_instance.
@@ -537,6 +541,31 @@ def MakeRobotDiagram(
     return robot_builder.Build()
 
 
+class _JointStiffnessFeedforward(LeafSystem):
+    """Map gravity forces to this model's actuators and add optional feedforward."""
+
+    def __init__(self, plant: MultibodyPlant, model_instance: ModelInstanceIndex):
+        super().__init__()
+        self._plant = plant
+        self._model_instance = model_instance
+        self._actuation_pseudoinverse = plant.MakeActuationMatrixPseudoinverse()
+        num_inputs = plant.num_actuated_dofs(model_instance)
+        self.DeclareVectorInputPort("gravity_compensation", plant.num_velocities())
+        self.DeclareVectorInputPort("tau_feedforward", num_inputs)
+        self.DeclareVectorOutputPort("actuation", num_inputs, self.CalcOutput)
+
+    def CalcOutput(self, context, output):
+        # Generalized forces and actuators can have different sizes and ordering.
+        actuation = self._plant.GetActuationFromArray(
+            self._model_instance,
+            self._actuation_pseudoinverse @ self.get_input_port(0).Eval(context),
+        )
+        feedforward = self.get_input_port(1)
+        if feedforward.HasValue(context):
+            actuation += feedforward.Eval(context)
+        output.SetFromVector(actuation)
+
+
 class _MultiplexState(LeafSystem):
     def __init__(self, plant: MultibodyPlant, model_instance_names: typing.List[str]):
         LeafSystem.__init__(self)
@@ -779,14 +808,38 @@ def _ApplyDriverConfigSim(
     elif isinstance(driver_config, JointStiffnessDriver):
         model_instance = sim_plant.GetModelInstanceByName(model_instance_name)
 
-        # PD gains and gravity comp are set in ApplyPrefinalizeDriverConfigsSim
+        # PD gains are set in ApplyPrefinalizeDriverConfigsSim. Keep gravity
+        # enabled and supply compensation through the actuation input so SAP
+        # limits the total effort (gravity compensation + feedforward + PD).
+        gravity_compensation = builder.AddSystem(
+            InverseDynamics(
+                sim_plant, InverseDynamics.InverseDynamicsMode.kGravityCompensation
+            )
+        )
+        gravity_compensation.set_name(model_instance_name + ".gravity_compensation")
+        feedforward = builder.AddSystem(
+            _JointStiffnessFeedforward(sim_plant, model_instance)
+        )
+        feedforward.set_name(model_instance_name + ".feedforward")
+        builder.Connect(
+            sim_plant.get_state_output_port(),
+            gravity_compensation.get_input_port_estimated_state(),
+        )
+        builder.Connect(
+            gravity_compensation.get_output_port_generalized_force(),
+            feedforward.get_input_port(0),
+        )
+        builder.Connect(
+            feedforward.get_output_port(),
+            sim_plant.get_actuation_input_port(model_instance),
+        )
 
         builder.ExportInput(
             sim_plant.get_desired_state_input_port(model_instance),
             model_instance_name + ".desired_state",
         )
         builder.ExportInput(
-            sim_plant.get_actuation_input_port(model_instance),
+            feedforward.get_input_port(1),
             model_instance_name + ".tau_feedforward",
         )
         builder.ExportOutput(
@@ -833,13 +886,10 @@ def _ApplyPrefinalizeDriverConfigSim(
             actuator = sim_plant.GetJointActuatorByName(name, model_instance)
             actuator.set_controller_gains(PdControllerGains(p=gains.kp, d=gains.kd))
 
-        # Turn off gravity to model (perfect) gravity compensation.
-        sim_plant.set_gravity_enabled(model_instance, False)
+        # Preserve validation of the legacy hand model name. Its actual load is
+        # now accounted for by inverse dynamics on the full simulation plant.
         if driver_config.hand_model_name:
-            sim_plant.set_gravity_enabled(
-                sim_plant.GetModelInstanceByName(driver_config.hand_model_name),
-                False,
-            )
+            sim_plant.GetModelInstanceByName(driver_config.hand_model_name)
 
 
 def _ApplyPrefinalizeDriverConfigsSim(
