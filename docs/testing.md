@@ -32,8 +32,20 @@ See Drake's [network policy documentation](https://drake.mit.edu/doxygen_cxx/gro
 
 Each test job prints its 30 slowest pytest phases and uploads a JUnit report as
 `pytest-<job-id>`, retained for 14 days and uploaded even on test failure when
-available. Compare per-test times alongside Actions step timings. Test execution
-remains serial.
+available. Compare per-test times alongside Actions step timings.
+
+CI uses two pytest-xdist workers with `--dist loadfile`. Tests in the same file
+stay on one worker because some model-conversion tests write shared mesh files.
+Notebook subprocesses already use separate temporary working directories. Remote
+packages are prefetched before workers start, and native numerical-library thread
+counts are limited to one to avoid oversubscribing the runner.
+
+Local pytest remains serial by default. To try the CI configuration:
+
+```sh
+OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 NUMEXPR_NUM_THREADS=1 \
+  .venv/bin/python -m pytest -n 2 --dist loadfile -ra --durations=30
+```
 
 Download caching was evaluated in CI, including archive restoration overhead.
 Linux restoration cost more than the installation time it saved, and macOS did
