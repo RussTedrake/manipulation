@@ -1,5 +1,6 @@
 {
   "elib_url": "https://manipulation.csail.mit.edu/htmlbook/elib.cgi",
+  "annotation_notifier_health_url": "https://underactuated-r1.csail.mit.edu/hypothesis-health.json",
   "chapter_ids" : [
     "intro",
     "robot",
