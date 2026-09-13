@@ -75,3 +75,35 @@ After changing the shared CGI, update the htmlbook submodule commit as well as
 the parent repository's submodule pointer. The deployed shared CGI must match
 its committed version. No Apache restart is required for CGI
 source updates.
+
+## Annotation notifier health
+
+An hourly user cron job on `underactuated-r1` runs
+`/var/www/html/hypothesis_feed/notifier.py` using
+`/var/www/manipulation/.venv/bin/python`, with a 20-minute timeout. It checks
+annotations for both books and sends new-annotation digests. Its private
+`health.json`, notification state, backlog snapshots, and rotating `notifier.log`
+remain in that directory. Credentials still live in the original private
+`hypothesis_feed.py`; moving the notifier into htmlbook is deferred.
+
+After updating its private health state, the notifier atomically publishes
+`public-health.json` with only `last_success` (an ISO 8601 timestamp) and
+`consecutive_failures`. Failed runs retain the previous success timestamp. The
+public file has mode 644; private state retains mode 600. Apache serves it through
+a symlink at `/var/www/underactuated/book/hypothesis-health.json`, giving the URL
+`https://underactuated-r1.csail.mit.edu/hypothesis-health.json`. No Apache restart
+is required. Do not link or expose the private health file or log.
+
+`book/chapters.json` selects this endpoint with
+`annotation_notifier_health_url`. Htmlbook's `test_notifier_health.py` runs in the
+normal pytest suite, including the daily scheduled CI run. It bypasses caches
+and fails for unreachable/malformed status, a success older than three hours,
+or two consecutive failures. It also rejects timestamps more than five minutes
+in the future. Books without an endpoint configured skip this operational check.
+
+This uses the existing CI failure notification channel, with detection delayed
+until CI runs. A stopped cron job or server outage is detected by stale status
+or an unreachable endpoint. Diagnose failures using the server's crontab,
+`notifier.log`, and private `health.json`; do not manually advance `last_success`
+to clear an alert. The notifier also attempts its own failure/recovery emails,
+but those cannot report a broken SMTP connection.
