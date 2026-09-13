@@ -184,7 +184,9 @@ def DrakeVersionGreaterThan(minimum_date: date):
         )
 
 
-def RenderDiagram(system: System, max_depth: int | None = None):
+def RenderDiagram(
+    system: System, max_depth: int | None = None, filename: str | None = None
+):
     """Use pydot to render the GraphViz diagram of the given system.
 
     Args:
@@ -192,14 +194,14 @@ def RenderDiagram(system: System, max_depth: int | None = None):
         max_depth (int, optional): Sets a limit to the depth of nested diagrams
             to visualize. Use zero to render a diagram as a single system
             block. Defaults to 1.
+        filename (str, optional): Save the diagram as an SVG file instead of
+            displaying it. Defaults to None, which displays the diagram inline.
     """
-    display(
-        SVG(
-            pydot.graph_from_dot_data(system.GetGraphvizString(max_depth=max_depth))[
-                0
-            ].create_svg()
-        )
-    )
+    graph = pydot.graph_from_dot_data(system.GetGraphvizString(max_depth=max_depth))[0]
+    if filename is None:
+        display(SVG(graph.create_svg()))
+    else:
+        graph.write_svg(filename)
 
 
 # Adapted from Drake's system_doxygen.py.  Just make an html rendering of the
