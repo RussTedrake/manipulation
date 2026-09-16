@@ -75,7 +75,7 @@ pyzmq = [
 scene-synthesizer = { version=">=1.13.2", optional=true }
 requests = { version=">=2.25.1", optional=true }
 scipy = { version=">=1.10.0", optional=true }
-setuptools = { version="<71.0.0", optional=true } # https://github.com/pypa/setuptools/issues/4487
+setuptools = { version=">=83.0.0", optional=true }
 stable-baselines3 = { version=">=2.0.0", optional=true }
 timeout-decorator = { version=">=0.4.1", optional=true }
 torch = { version=">=2.3,<3.0", optional=true } # torch 2.3+ works for Python 3.12, 2.4+ needed for Python 3.13
@@ -88,6 +88,9 @@ coacd = { version="^1.0.5", optional=true }
 shapely = { version="^2.1.1", optional=true }
 mapbox-earcut = { version="^1.0.3", optional=true }
 manifold3d = { version="^3.2.1", optional=true }
+
+pillow = ">=12.3.0" # transitive dependency pinned for dependabot
+tornado = ">=6.5.8" # transitive dependency pinned for dependabot
 
 [tool.poetry.extras]
 torch = ["torch", "torchvision"]
@@ -140,11 +143,13 @@ sphinx = ">=7.2.6"
 sphinx_rtd_theme = ">=2.0.0"
 trimesh = { version = ">=4.6.6", optional=false }
 vhacdx = { version=">=0.0.5", optional=false }
+pillow = ">=12.3.0" # transitive dependency pinned for dependabot
+tornado = ">=6.5.8" # transitive dependency pinned for dependabot
 
 [tool.poetry.group.dev.dependencies]
 # These should not appear as requirements in any BUILD.bazel (except htmlbook)
 beautifulsoup4 = { version=">=4.6.3" }
-black = { version = ">=23.*", extras = ["jupyter"] }
+black = { version = ">=26.3.1", extras = ["jupyter"] }
 mysql-connector-python = { version=">=8.0.23" }
 packaging = ">=24.2"
 pip-requirements-parser = ">=32.0"

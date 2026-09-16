@@ -74,7 +74,7 @@ class DrakeGymTest(unittest.TestCase):
         # externally observable, so don't test it.
 
         # return_options changes the return type.
-        (observation, opts) = dut.reset()
+        observation, opts = dut.reset()
         self.assertIsInstance(opts, dict)
         self.assertTrue(dut.observation_space.contains(observation))
 

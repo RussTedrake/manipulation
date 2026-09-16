@@ -1,0 +1,8 @@
+version: 2
+updates:
+  - package-ecosystem: pip
+    directory: "/"
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 0  # Keep security updates; disable routine version PRs.
+    versioning-strategy: increase
