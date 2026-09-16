@@ -93,19 +93,15 @@ def _station(
             + _transmission("joint")
             + "</robot>"
         )
-        directives = (
-            f"""
+        directives = f"""
 - add_model:
     name: other
     file: {path.as_uri()}
 - add_weld:
     parent: world
     child: other::base
-"""
-            + directives
-        )
-    scenario = LoadScenario(
-        data=f"""
+""" + directives
+    scenario = LoadScenario(data=f"""
 plant_config:
     time_step: {_DT}
     discrete_contact_approximation: sap
@@ -118,8 +114,7 @@ model_drivers:
             joint_motor: {{kp: 100, kd: 20}}
 {"            second_motor: {kp: 100, kd: 20}" if multiple else ""}
 {"    other: !ZeroForceDriver {}" if unrelated else ""}
-"""
-    )
+""")
     station = MakeHardwareStation(scenario)
     simulator = Simulator(station)
     context = simulator.get_mutable_context()

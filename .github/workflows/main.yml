@@ -403,7 +403,7 @@ jobs:
       - name: black
         uses: psf/black@stable
         with:
-          version: 24.10.0
+          version: 26.5.1
           jupyter: true
 
       - name: isort

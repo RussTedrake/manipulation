@@ -4,6 +4,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
+import numpy as np
 from lxml import etree
 from pydrake.multibody.parsing import PackageMap, Parser
 from pydrake.multibody.plant import AddMultibodyPlantSceneGraph
@@ -153,6 +154,63 @@ class TestMakeDrakeCompatibleModel(unittest.TestCase):
         self.assertIn('file="cube_from_stl.obj"', output_content)
         # Clean up the temp file
         os.remove(output_filename)
+
+    def test_mjcf_mesh_reference_pose(self):
+        # An asymmetric tetrahedron makes an omitted rotation observable.
+        vertices = np.array([[0, 0, 0], [2, 0, 0], [0, 3, 0], [0, 0, 4]])
+        for translate, rotate in [
+            (False, False),
+            (True, False),
+            (False, True),
+            (True, True),
+        ]:
+            with self.subTest(
+                translate=translate, rotate=rotate
+            ), tempfile.TemporaryDirectory() as tmp:
+                directory = Path(tmp)
+                mesh_path = directory / "mesh.obj"
+                mesh_path.write_text(
+                    "".join(f"v {x} {y} {z}\n" for x, y, z in vertices)
+                    + "f 1 3 2\nf 1 2 4\nf 1 4 3\nf 2 3 4\n"
+                )
+                attributes = ""
+                if translate:
+                    attributes += ' refpos="1 2 3"'
+                if rotate:
+                    # Non-unit quaternion for a 90-degree rotation about z.
+                    attributes += ' refquat="2 0 0 2"'
+                source = directory / "model.xml"
+                source.write_text(
+                    '<mujoco><asset><mesh name="mesh" file="mesh.obj"'
+                    + attributes
+                    + '/></asset><worldbody><geom type="mesh" mesh="mesh"/>'
+                    "</worldbody></mujoco>"
+                )
+                output = directory / "model.drake.xml"
+                MakeDrakeCompatibleModel(str(source), str(output))
+                mesh = etree.parse(output).find(".//asset/mesh")
+                if translate:
+                    self.assertEqual(mesh.get("refpos"), "0 0 0")
+                if rotate:
+                    self.assertEqual(mesh.get("refquat"), "1 0 0 0")
+                if not translate and not rotate:
+                    self.assertEqual(mesh.get("file"), "mesh.obj")
+                actual = np.array(
+                    [
+                        [float(value) for value in line.split()[1:4]]
+                        for line in (directory / mesh.get("file"))
+                        .read_text()
+                        .splitlines()
+                        if line.startswith("v ")
+                    ]
+                )
+                expected = vertices - ([1, 2, 3] if translate else np.zeros(3))
+                if rotate:
+                    expected = expected[:, [1, 0, 2]] * [1, -1, 1]
+                # Compare vertex sets independently of OBJ export ordering.
+                np.testing.assert_allclose(
+                    sorted(map(tuple, actual)), sorted(map(tuple, expected)), atol=1e-7
+                )
 
     def test_mjcf_defaults(self):
         input_filename = FindResource("test/models/test_defaults.xml")

@@ -14,25 +14,21 @@ def test_controller_uses_station_package_overrides(tmp_path, driver):
     for child in models.iterdir():
         (tmp_path / child.name).symlink_to(child, target_is_directory=child.is_dir())
     # This directive only exists in the override, even if drake_models is cached.
-    (tmp_path / "local_iiwa.yaml").write_text(
-        """directives:
+    (tmp_path / "local_iiwa.yaml").write_text("""directives:
 - add_model:
     name: iiwa
     file: package://drake_models/iiwa_description/urdf/iiwa14_no_collision.urdf
 - add_weld:
     parent: world
     child: iiwa::base
-"""
-    )
-    scenario = LoadScenario(
-        data=f"""
+""")
+    scenario = LoadScenario(data=f"""
 directives:
 - add_directives:
     file: package://drake_models/local_iiwa.yaml
 model_drivers:
     iiwa: !{driver} {{}}
-"""
-    )
+""")
     calls = []
 
     def preload(parser):
