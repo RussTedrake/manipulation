@@ -616,13 +616,18 @@ def _convert_mjcf(
             mesh_element_w_defaults.attrib["name"] = mesh_name
             mesh_element.attrib["name"] = mesh_name
 
+        # TODO(russt): After the next major Drake release includes
+        # https://github.com/RobotLocomotion/drake/pull/24985 and our minimum
+        # supported Drake version has that support, preserve refpos/refquat and
+        # let Drake handle them instead of baking the reference pose into meshes.
         X_MG = RigidTransform()
         if "refpos" in mesh_element_w_defaults.attrib:
             refpos = [
                 float(value)
                 for value in mesh_element_w_defaults.attrib["refpos"].split()
             ]
-            X_MG.set_translation(-refpos)
+            # Inverting X_MG below subtracts refpos before the inverse rotation.
+            X_MG.set_translation(refpos)
             mesh_element.attrib["refpos"] = "0 0 0"
         if "refquat" in mesh_element_w_defaults.attrib:
             refquat = np.array(
@@ -672,8 +677,13 @@ def _convert_mjcf(
         if mesh_name in mesh_to_material:
             material = materials[mesh_to_material[mesh_name]]
 
-        if mesh_url.lower().endswith(".obj") and scale is None and material is None:
-            # Don't need to convert .obj files with no scale or uniform scale.
+        if (
+            mesh_url.lower().endswith(".obj")
+            and scale is None
+            and material is None
+            and np.allclose(X_GM, np.eye(4))
+        ):
+            # Leave OBJ files alone only when no mesh transformation is needed.
             continue
 
         output_mesh_url, output_mesh_path = _convert_mesh(
