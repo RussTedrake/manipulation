@@ -2,7 +2,7 @@
 name = "manipulation"
 # Use e.g. 2024.10.4.rc0 if I need to release a release candidate.
 # Use e.g. 2024.10.4.post1 if I need to rerelease on the same day.
-version = "2026.9.17"
+version = "2026.9.17.post1"
 description = "MIT 6.421 - Robotic Manipulation"
 authors = ["Russ Tedrake <russt@mit.edu>"]
 license = "BSD License"
@@ -55,7 +55,7 @@ gradescope-utils = { version=">=0.4.0", optional=true}
 gymnasium = { version=">0.26", optional=true }
 ipython = ">=7.8.0" # TODO: make this optional?
 ipywidgets = { version=">=8", optional=true } 
-lxml = {version = ">=4.9.2", extras = ["html_clean"] }
+lxml = {version = ">=6.1.0", extras = ["html_clean"] }
 matplotlib = ">=3.7.0" # old versions don't build in XCode
 mpld3  = { version=">=0.5.6", optional=false } # TODO: make this optional
 nbconvert = [
@@ -92,19 +92,32 @@ manifold3d = { version="^3.2.1", optional=true }
 pillow = ">=12.3.0" # transitive dependency pinned for dependabot
 tornado = ">=6.5.8" # transitive dependency pinned for dependabot
 mistune = { version=">=3.3.3", optional=true } # transitive dependency pinned for dependabot
+bleach = { version=">=6.4.0", optional=true } # transitive dependency pinned for dependabot
+soupsieve = { version=">=2.8.4", optional=true } # transitive dependency pinned for dependabot
+idna = { version=">=3.15", optional=true } # transitive dependency pinned for dependabot
+urllib3 = { version=">=2.7.0", optional=true } # transitive dependency pinned for dependabot
 
 [tool.poetry.extras]
 torch = ["torch", "torchvision"]
 rl = ["stable_baselines3", "gymnasium"]
 mesh = ["pycollada", "trimesh", "vhacdx", "coacd"]
 letter = ["shapely", "trimesh", "coacd", "mapbox-earcut", "manifold3d"]
-grader = ["gradescope-utils", "timeout-decorator", "nbconvert", "nbformat", "mistune"]
+grader = [
+  "gradescope-utils",
+  "timeout-decorator",
+  "nbconvert",
+  "nbformat",
+  "mistune",
+  "bleach",
+  "soupsieve",
+]
 # 'all' should have all of the optional dependencies required to run any notebook in this repo.
 all = [
   "cloudpickle",
   "gradescope-utils",
   "gymnasium",
   "ipywidgets",
+  "idna",
   "nevergrad",
   "psutil",
   "pycollada",
@@ -118,6 +131,7 @@ all = [
   "torchvision",
   "tqdm",
   "trimesh",
+  "urllib3",
   "vhacdx",
   "coacd",
   "shapely",
@@ -137,7 +151,7 @@ optional = true
 #drake = { version = ">=0.0.20250118 <0.1", source = "drake-nightly" }
 drake = ">=1.45.0"
 ipython = ">=7.8.0"
-lxml = {version = ">=4.9.2", extras = ["html_clean"] }
+lxml = {version = ">=6.1.0", extras = ["html_clean"] }
 mpld3  = { version=">=0.5.6", optional=false }
 myst-parser = ">=2.0.0"
 sphinx = ">=7.2.6"
