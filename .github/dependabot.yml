@@ -5,4 +5,7 @@ updates:
     schedule:
       interval: weekly
     open-pull-requests-limit: 0  # Keep security updates; disable routine version PRs.
+    # Raise existing minimums in pyproject.toml as well as updating poetry.lock.
+    # Transitive dependencies must first be declared in pyproject.toml (and
+    # their applicable extras); this strategy does not add new declarations.
     versioning-strategy: increase
