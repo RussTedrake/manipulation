@@ -2,7 +2,7 @@
 name = "manipulation"
 # Use e.g. 2024.10.4.rc0 if I need to release a release candidate.
 # Use e.g. 2024.10.4.post1 if I need to rerelease on the same day.
-version = "2026.9.15"
+version = "2026.9.17"
 description = "MIT 6.421 - Robotic Manipulation"
 authors = ["Russ Tedrake <russt@mit.edu>"]
 license = "BSD License"
@@ -59,9 +59,9 @@ lxml = {version = ">=4.9.2", extras = ["html_clean"] }
 matplotlib = ">=3.7.0" # old versions don't build in XCode
 mpld3  = { version=">=0.5.6", optional=false } # TODO: make this optional
 nbconvert = [
-  {platform="darwin", version="7.14.2", optional=true},
-  {platform="linux", version="7.14.2", optional=true},
-] # pegged to 7.14.2 because the latest version is 7.16.6 has conflicts with bleach
+  {platform="darwin", version=">=7.17.1,<8", optional=true},
+  {platform="linux", version=">=7.17.1,<8", optional=true},
+] # Updated for compatibility with patched Mistune.
 nbformat = { version=">=5.0.0", optional=true }
 nevergrad = { version=">=0.4.3", optional=true } # TODO: avoid expensive bayesian optimization dep
 numpy = "^2.0.0"
@@ -91,13 +91,14 @@ manifold3d = { version="^3.2.1", optional=true }
 
 pillow = ">=12.3.0" # transitive dependency pinned for dependabot
 tornado = ">=6.5.8" # transitive dependency pinned for dependabot
+mistune = { version=">=3.3.3", optional=true } # transitive dependency pinned for dependabot
 
 [tool.poetry.extras]
 torch = ["torch", "torchvision"]
 rl = ["stable_baselines3", "gymnasium"]
 mesh = ["pycollada", "trimesh", "vhacdx", "coacd"]
 letter = ["shapely", "trimesh", "coacd", "mapbox-earcut", "manifold3d"]
-grader = ["gradescope-utils", "timeout-decorator", "nbconvert", "nbformat"]
+grader = ["gradescope-utils", "timeout-decorator", "nbconvert", "nbformat", "mistune"]
 # 'all' should have all of the optional dependencies required to run any notebook in this repo.
 all = [
   "cloudpickle",
