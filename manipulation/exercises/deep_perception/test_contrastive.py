@@ -59,11 +59,12 @@ class TestContrastive(unittest.TestCase):
         super().__init__(test_name)
         self.notebook_locals = notebook_locals
         np.random.seed(0)
-        self._f = f_factory(np.random.rand(480, 640, 128))
-        self._img_a = np.random.rand(480, 640, 3)
-        self._img_b = np.random.rand(480, 640, 3)
-        self._u_a = get_random_indices(4096, 480, 640)
-        self._u_b = get_random_indices(4096, 480, 640)
+        height, width, feature_dim = 128, 160, 32
+        self._f = f_factory(np.random.rand(height, width, feature_dim))
+        self._img_a = np.random.rand(height, width, 3)
+        self._img_b = np.random.rand(height, width, 3)
+        self._u_a = get_random_indices(4096, height, width)
+        self._u_b = get_random_indices(4096, height, width)
         self._match = np.random.rand(4096, 1) > 0.4
 
     @weight(4)
