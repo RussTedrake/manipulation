@@ -52,7 +52,7 @@ class TestPIDController(unittest.TestCase):
             ki=5,
             q_initial=q_initial,
             q_desired=q_desired,
-            simulation_time=2.0,
+            simulation_time=1.25,
         )
 
         q_expected = np.array([0, 0, 0, 0, 0, 0, 0])
