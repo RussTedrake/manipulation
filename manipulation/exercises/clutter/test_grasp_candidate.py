@@ -161,14 +161,27 @@ class TestGraspCandidate(unittest.TestCase):
             "Length of returned array is not correct.",
         )
 
-        for X_WP in grasp_candidates:
+        # Repeating the line search from a candidate returns the last
+        # collision-free grid point before penetration. The signed distance
+        # changes by at most the translation, so it is bounded by the grid
+        # spacing used in find_minimum_distance. This holds for either valid
+        # Darboux frame (they differ by a 180 degree rotation about y).
+        y_grid_spacing = 0.1 / 9
+
+        for i, X_WP in enumerate(grasp_candidates):
             distance, X_WP_new = find_minimum_distance(pcd, X_WP)
             self.assertLessEqual(
-                distance, 1e-2
-            ), "The returned grasp candidates are not minimum distance"
+                distance,
+                y_grid_spacing,
+                f"Grasp candidate {i} is not at the minimum distance: repeating "
+                f"the line search from it gives a signed distance of {distance:.4f} "
+                f"m, more than one grid spacing ({y_grid_spacing:.4f} m).",
+            )
             self.assertTrue(
-                check_collision(pcd, X_WP)
-            ), "The returned grasp candidates have collisions"
+                check_collision(pcd, X_WP),
+                f"Grasp candidate {i} is in collision with the point cloud.",
+            )
             self.assertTrue(
-                check_nonempty(pcd, X_WP)
-            ), "The returned grasp candidates are not empty"
+                check_nonempty(pcd, X_WP),
+                f"Grasp candidate {i} has no points in the closing region.",
+            )
