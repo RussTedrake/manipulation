@@ -2,7 +2,7 @@
 name = "manipulation"
 # Use e.g. 2024.10.4.rc0 if I need to release a release candidate.
 # Use e.g. 2024.10.4.post1 if I need to rerelease on the same day.
-version = "2026.9.17.post1"
+version = "2026.10.17"
 description = "MIT 6.421 - Robotic Manipulation"
 authors = ["Russ Tedrake <russt@mit.edu>"]
 license = "BSD License"
@@ -74,7 +74,10 @@ pyzmq = [
 ]
 scene-synthesizer = { version=">=1.13.2", optional=true }
 requests = { version=">=2.33.0", optional=true }
-scipy = { version=">=1.10.0", optional=true }
+scipy = [
+  {python="<3.11", version=">=1.10.0", optional=true},
+  {python=">=3.11", version=">=1.16.0", optional=true}, # 1.15 wheels fail to load on macOS 27
+]
 setuptools = { version=">=83.0.0", optional=true }
 stable-baselines3 = { version=">=2.0.0", optional=true }
 timeout-decorator = { version=">=0.4.1", optional=true }
