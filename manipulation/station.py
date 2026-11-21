@@ -1117,6 +1117,8 @@ def NegatedPort(
     return negater.get_output_port()
 
 
+# TODO(russt): Use lcm_buses.Find() directly once
+# https://github.com/RobotLocomotion/drake/issues/25284 is fixed.
 def _FindLcmBus(
     lcm_buses: LcmBuses, builder: DiagramBuilder, description: str, bus_name: str
 ):
