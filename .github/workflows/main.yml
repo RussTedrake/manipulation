@@ -285,9 +285,9 @@ jobs:
           if-no-files-found: ignore
           retention-days: 14
 
-  sequoia:
-    name: macos sequoia 15
-    runs-on: macos-15
+  tahoe:
+    name: macos tahoe 26
+    runs-on: macos-26
     needs: [check-approval]
     if: >
       (github.event_name == 'pull_request' &&
