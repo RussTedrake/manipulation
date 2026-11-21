@@ -871,19 +871,41 @@ files = [
 
 [[package]]
 name = "drake"
-version = "1.50.0"
+version = "1.51.1"
 description = "Model-based design and verification for robotics"
 optional = false
 python-versions = ">=3.10"
 groups = ["main", "docs"]
+markers = "python_version < \"3.12\""
 files = [
-    {file = "drake-1.50.0-cp310-cp310-manylinux_2_34_x86_64.whl", hash = "sha256:7933e33a93336c5b1a5c4570b31aa75fcd81059c6481e4e8b4230d6b502347ce"},
-    {file = "drake-1.50.0-cp311-cp311-manylinux_2_34_x86_64.whl", hash = "sha256:cf1b3a0023e10ff2a466d0b8a363ce19ca3f2b4d56566df231cb54530769f1f6"},
-    {file = "drake-1.50.0-cp312-cp312-manylinux_2_34_x86_64.whl", hash = "sha256:913be925530b7167f51a3223b9c4f99a17b9cd02b5a04fc2bda095ea57eaf22c"},
-    {file = "drake-1.50.0-cp313-cp313-macosx_15_0_arm64.whl", hash = "sha256:88a8bb9f60833f082931ca467c545cd75074b28225958bda5e1e5db0a7d7d2dd"},
-    {file = "drake-1.50.0-cp313-cp313-manylinux_2_34_x86_64.whl", hash = "sha256:ab7c3a5a2f53708dee2102f988c694b8626f4e52f66a36b1f4c322a3b0ed096d"},
-    {file = "drake-1.50.0-cp314-cp314-macosx_15_0_arm64.whl", hash = "sha256:eebed80dc9c2ea147475d2b70ba62422da8fe87d1745b910ed7a4beb2d2f5ce8"},
-    {file = "drake-1.50.0-cp314-cp314-manylinux_2_34_x86_64.whl", hash = "sha256:3f6db3abb15801a1c0830d80c2efb9df55541dd76e167f159e29d5fa2a559a6b"},
+    {file = "drake-1.51.1-cp310-cp310-manylinux_2_34_x86_64.whl", hash = "sha256:26dad57cad2bebe619c9f0a29e1c6aa59f1e15b98c462e5343bd4ee03e187ff9"},
+    {file = "drake-1.51.1-cp311-cp311-manylinux_2_34_x86_64.whl", hash = "sha256:ce2a9df43194e447a85556f96593d7de79891eec16bf48b406c5ce5d1de93270"},
+    {file = "drake-1.51.1-cp312-cp312-manylinux_2_34_x86_64.whl", hash = "sha256:e088355e02199adf06b77ae5ea68ee3168fce441577bf2ae55e3e1d4bfe60b37"},
+    {file = "drake-1.51.1-cp313-cp313-macosx_15_0_arm64.whl", hash = "sha256:4d6a43e9c0f0c2665bedbbcf8bf4b23266208e694babc0e4de5bb90534b75242"},
+    {file = "drake-1.51.1-cp313-cp313-manylinux_2_34_x86_64.whl", hash = "sha256:ceb42ebba446f4025622c2d7ef52ebf3a69845fdd2a341ae8d04d2ee3899b132"},
+    {file = "drake-1.51.1-cp314-cp314-macosx_15_0_arm64.whl", hash = "sha256:9844ff99992a391c2b5c5e81a91fc5105fcfa3e7c57be9aab78a1e4fe0e1f80c"},
+    {file = "drake-1.51.1-cp314-cp314-manylinux_2_34_x86_64.whl", hash = "sha256:195e871c91a6b75ebb37d4decd92b67997f968d80c62fb23e9f14487ac1ba908"},
+]
+
+[package.dependencies]
+matplotlib = "*"
+Mosek = {version = "11.1.2", markers = "python_version < \"3.15\" and platform_machine != \"aarch64\""}
+numpy = "*"
+pydot = "*"
+PyYAML = "*"
+
+[[package]]
+name = "drake"
+version = "1.58.0"
+description = "Model-based design and verification for robotics"
+optional = false
+python-versions = ">=3.12"
+groups = ["main", "docs"]
+markers = "python_version >= \"3.12\""
+files = [
+    {file = "drake-1.58.0-cp312-abi3-macosx_26_0_arm64.whl", hash = "sha256:f4b8f5b1334364bfa700910d0ce48c88c3dc63f9f6bb98af98778295bed82dd8"},
+    {file = "drake-1.58.0-cp312-abi3-manylinux_2_34_aarch64.whl", hash = "sha256:6d248364d1cd4958f85aadfbced235a36c9cd508bde32dcf402d62cb1b62d6ff"},
+    {file = "drake-1.58.0-cp312-abi3-manylinux_2_34_x86_64.whl", hash = "sha256:f095174852480020fc0ef05999f33ab98558b7a27c02b1fe4018b6b17126b24c"},
 ]
 
 [package.dependencies]
