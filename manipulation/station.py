@@ -36,6 +36,7 @@ from pydrake.all import (
     Joint,
     LcmBuses,
     LcmImageArrayToImages,
+    LcmInterfaceSystem,
     LcmPublisherSystem,
     LcmSubscriberSystem,
     LeafSystem,
@@ -1116,6 +1117,24 @@ def NegatedPort(
     return negater.get_output_port()
 
 
+def _FindLcmBus(
+    lcm_buses: LcmBuses, builder: DiagramBuilder, description: str, bus_name: str
+):
+    """Returns the LCM interface for `bus_name`, like `lcm_buses.Find()`.
+
+    In Drake 1.58 (nanobind), the object that `LcmBuses.Find()` returns to
+    Python crashes when it is used: it is typed as an LcmInterfaceSystem, but
+    the pointer is the DrakeLcmInterface base. Look up the LcmInterfaceSystem
+    that ApplyLcmBusConfig added to the builder instead, and fall back to
+    `Find()` for buses without one (e.g. memq://null).
+    """
+    name = f"LcmInterfaceSystem(bus_name={bus_name})"
+    for system in builder.GetSystems():
+        if system.get_name() == name and isinstance(system, LcmInterfaceSystem):
+            return system
+    return lcm_buses.Find(description, bus_name)
+
+
 # TODO(russt): Use the c++ version pending https://github.com/RobotLocomotion/drake/issues/20055
 def _ApplyDriverConfigInterface(
     driver_config,  # See Scenario.model_drivers for typing
@@ -1124,7 +1143,12 @@ def _ApplyDriverConfigInterface(
     builder: DiagramBuilder,
 ) -> None:
     if isinstance(driver_config, IiwaDriver):
-        lcm = lcm_buses.Find("Driver for " + model_instance_name, driver_config.lcm_bus)
+        lcm = _FindLcmBus(
+            lcm_buses,
+            builder,
+            "Driver for " + model_instance_name,
+            driver_config.lcm_bus,
+        )
 
         # Publish IIWA command.
         # Note on publish period: IIWA driver won't respond faster than 1000Hz in
@@ -1227,7 +1251,12 @@ def _ApplyDriverConfigInterface(
             iiwa_status_receiver.get_input_port(),
         )
     if isinstance(driver_config, SchunkWsgDriver):
-        lcm = lcm_buses.Find("Driver for " + model_instance_name, driver_config.lcm_bus)
+        lcm = _FindLcmBus(
+            lcm_buses,
+            builder,
+            "Driver for " + model_instance_name,
+            driver_config.lcm_bus,
+        )
 
         # Publish WSG command.
         wsg_command_sender = builder.AddSystem(SchunkWsgCommandSender())
@@ -1384,7 +1413,9 @@ def _ApplyCameraLcmIdInterface(
     lcm_buses: LcmBuses,
     builder: DiagramBuilder,
 ) -> None:
-    lcm = lcm_buses.Find("Driver for " + camera_config.name, camera_config.lcm_bus)
+    lcm = _FindLcmBus(
+        lcm_buses, builder, "Driver for " + camera_config.name, camera_config.lcm_bus
+    )
 
     print(camera_config.name, camera_id)
     camera_data_receiver = builder.AddSystem(LcmImageArrayToImages())
@@ -1456,6 +1487,10 @@ def _MakeHardwareStationInterface(
         config = VisualizationConfig()
         config.publish_contacts = False
         config.publish_inertia = False
+        # This plant is only visualized, never added to the builder, so the
+        # Meshcat mouse spring (Drake >= 1.58) has no plant ports to connect.
+        if hasattr(config, "mouse_interaction_stiffness"):
+            config.mouse_interaction_stiffness = None
         ApplyVisualizationConfig(
             config,
             builder=builder,
