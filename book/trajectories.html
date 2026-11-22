@@ -1148,17 +1148,17 @@ ik.AddPositionConstraint(
 
       <example><h1>IRIS in Configuration Space</h1>
       
-        <p>Let's run the <code>IrisInConfigurationSpace</code> (aka IRIS-NP) algorithm
+        <p>Let's run the <code>IrisNp</code> (IRIS-NP) algorithm
         on the example of iiwa reaching into a shelf that we played with before. We will
         use the full 7 degrees of freedom of the arm, and the original collision
         geometry. I'd like for this example to demonstrate two things: (1) the mechanics
-        of using <code>IrisInConfigurationSpace</code> and (2) the fact that these IRIS
+        of using <code>IrisNp</code> and (2) the fact that these IRIS
         regions can cover a lot of volume, even when they are up against complicated
         configuration-space geometries.</p>
 
         <center><img style="width:60%" src="data/shelf_ik.png"></center>
 
-        <p><code>IrisInConfigurationSpace</code> can be configured using a single seed
+        <p><code>IrisNp</code> can be configured using a single seed
         point; iterations of the algorithm will start with a small region around that
         point and "inflate" it to maximize a local approximation of configuration space
         volume. We can find a seed configuration, $q,$ that is reaching inside the top
@@ -1171,6 +1171,14 @@ ik.AddPositionConstraint(
         but with an additional constraint using the first region as an obstacle (asking
         that they do not overlap). This will force the second region to use the volume
         inside the shelf to maximize volume.</p>
+
+        <p>The notebook also shows a second approach, which uses the newer
+        <code>IrisNp2</code> (IRIS-NP2) <elib>Werner24</elib>. Rather than using an
+        obstacle, we solve IK for several targets inside the shelf, and start IRIS from
+        the smallest ellipsoid that contains all of those configurations. Running just
+        one iteration from that starting ellipsoid keeps the region inside the shelf.
+        (<code>IrisNp2</code> does not support configuration-space obstacles, which is
+        why the first approach still uses <code>IrisNp</code>.)</p>
 
         <script>document.write(notebook_link('trajectories', notebook="iris_in_configuration_space"))</script>
 
