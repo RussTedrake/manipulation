@@ -1,4 +1,5 @@
 import os
+import re
 from datetime import date
 from urllib.request import urlretrieve
 from warnings import warn
@@ -154,6 +155,43 @@ def DrakeVersionGreaterThan(minimum_date: date):
         "1.22.0": date(year=2023, month=10, day=16),
         "1.23.0": date(year=2023, month=11, day=17),
         "1.24.0": date(year=2023, month=12, day=18),
+        "1.25.0": date(year=2024, month=1, day=16),
+        "1.26.0": date(year=2024, month=2, day=15),
+        "1.27.0": date(year=2024, month=3, day=19),
+        "1.28.0": date(year=2024, month=4, day=12),
+        "1.29.0": date(year=2024, month=5, day=15),
+        "1.30.0": date(year=2024, month=6, day=14),
+        "1.31.0": date(year=2024, month=7, day=18),
+        "1.32.0": date(year=2024, month=8, day=15),
+        "1.33.0": date(year=2024, month=9, day=13),
+        "1.34.0": date(year=2024, month=10, day=16),
+        "1.35.0": date(year=2024, month=11, day=15),
+        "1.36.0": date(year=2024, month=12, day=13),
+        "1.37.0": date(year=2025, month=1, day=15),
+        "1.38.0": date(year=2025, month=2, day=18),
+        "1.39.0": date(year=2025, month=3, day=14),
+        "1.40.0": date(year=2025, month=4, day=12),
+        "1.41.0": date(year=2025, month=5, day=16),
+        "1.42.0": date(year=2025, month=6, day=12),
+        "1.43.0": date(year=2025, month=7, day=17),
+        "1.44.0": date(year=2025, month=8, day=15),
+        "1.45.0": date(year=2025, month=9, day=16),
+        "1.46.0": date(year=2025, month=10, day=17),
+        "1.47.0": date(year=2025, month=11, day=17),
+        "1.48.0": date(year=2025, month=12, day=15),
+        "1.49.0": date(year=2026, month=1, day=15),
+        "1.50.0": date(year=2026, month=2, day=17),
+        "1.51.0": date(year=2026, month=3, day=11),
+        "1.51.1": date(year=2026, month=3, day=11),
+        "1.52.0": date(year=2026, month=4, day=15),
+        "1.52.1": date(year=2026, month=4, day=17),
+        "1.53.0": date(year=2026, month=5, day=15),
+        "1.54.0": date(year=2026, month=6, day=12),
+        "1.55.0": date(year=2026, month=7, day=15),
+        "1.56.0": date(year=2026, month=8, day=14),
+        "1.57.0": date(year=2026, month=9, day=10),
+        "1.58.0": date(year=2026, month=10, day=15),
+        "1.59.0": date(year=2026, month=11, day=17),
     }
     drake_version = GetDrakeVersion()
     # A source install won't have package metadata; assume it's new enough.
@@ -173,15 +211,35 @@ def DrakeVersionGreaterThan(minimum_date: date):
             return
     elif drake_version in version_dates:
         drake_date = version_dates[drake_version]
+    elif _IsNewerRelease(drake_version, max(version_dates, key=_ReleaseKey)):
+        # A release newer than this table is at least as new as its last entry.
+        drake_date = max(version_dates.values())
+        if drake_date < minimum_date:
+            warn(
+                f"Cannot tell whether drake {drake_version} is from at least "
+                f"{minimum_date}; please add it to DrakeVersionGreaterThan."
+            )
+            return
     else:
         warn(f"Unrecognized drake version {drake_version}")
         return
     if drake_date < minimum_date:
         raise (
             RuntimeError(
-                f"You need to update your Drake version. Python is using the Drake installation in {GetDrakePath()}. This installation was from a nightly build on {drake_date}, but this method requires Drake from at least {minimum_date}."
+                f"You need to update your Drake version. Python is using the Drake installation in {GetDrakePath()}. This installation is from {drake_date}, but this method requires Drake from at least {minimum_date}."
             )
         )
+
+
+def _ReleaseKey(version: str) -> tuple[int, ...]:
+    return tuple(int(part) for part in version.split("."))
+
+
+def _IsNewerRelease(version: str, than: str) -> bool:
+    """Returns True if `version` is a release like "1.60.0" newer than `than`."""
+    if not re.fullmatch(r"\d+\.\d+\.\d+", version):
+        return False
+    return _ReleaseKey(version) > _ReleaseKey(than)
 
 
 def RenderDiagram(
