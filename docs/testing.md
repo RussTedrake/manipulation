@@ -5,7 +5,9 @@ normal user cache (or `XDG_CACHE_HOME`, when set).
 
 Each CI test job runs `python -m setup.prefetch_remotes` before pytest,
 using the same Python installation, user, and `XDG_CACHE_HOME=/tmp` as the tests.
-The pip job prefetches using the installed manipulation wheel, matching its tests.
+The prefetch retries failed downloads (see `book/htmlbook/drake_remotes.py`).
+The pip job builds a wheel from the commit under test, installs it, and
+prefetches using that installation, matching its tests.
 During pytest, `DRAKE_ALLOW_NETWORK=lcm:meshcat` disables PackageMap downloads
 while allowing Meshcat and LCM. Notebook subprocesses inherit these settings.
 An uncached remote package therefore fails instead of silently downloading.
@@ -21,12 +23,29 @@ DRAKE_ALLOW_NETWORK=lcm:meshcat .venv/bin/python -m pytest -ra
 
 If a test reports that PackageMap networking is disabled and no matching cache
 entry exists, check that prefetch and pytest use the same user and cache directory.
-If a test adds a new remote package, add it to `setup/prefetch_remotes.py`, which
-also works with the pip job's published wheel. This list covers packages used
-by tests; it deliberately excludes models such as Gymnasium Robotics that
-notebooks only download in interactive mode.
+If a test adds a new remote package, add it to `setup/prefetch_remotes.py`.
+This list covers packages used by tests; it deliberately excludes models such
+as Gymnasium Robotics that notebooks only download in interactive mode.
 
 See Drake's [network policy documentation](https://drake.mit.edu/doxygen_cxx/group__allow__network.html).
+
+# Notebook coverage
+
+`book/test_notebook_coverage.py` fails when a tracked notebook is not
+registered with `ipynb_test()` in a `test_*.py` file in its directory. Notebooks
+that cannot run in CI go in its `UNTESTED` mapping with a reason. Exercise
+notebooks are covered by tests in the solutions checkout; that check is skipped
+when `solutions/` is absent. The shared logic is in
+`book/htmlbook/notebook_coverage.py`.
+
+# Solutions in CI
+
+When the `SOLUTIONS_TOKEN` repository secret is set, each test job clones
+`RobotLocomotion/manipulation-solutions` at the revision in
+`solutions_sha.txt`, and pytest runs its tests too. Without the secret, the
+jobs skip the solutions tests. Fork pull requests do not receive secrets until
+a maintainer applies the `approved-for-ci` label, which runs the workflow
+through `pull_request_target`.
 
 # CI timings
 
